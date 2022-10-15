@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  pygateway:
+    build: pygateway
+    devices:
+      - "/dev/ttyACM0:/dev/ttyACM0"
+    tty: true
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    command: mosquitto -c /mosquittoconf/mosquitto.conf
+    ports:
+      - 1883:1883
+    volumes:
+      - ./mosquitto:/mosquittoconf
