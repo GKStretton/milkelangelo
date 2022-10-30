@@ -5,10 +5,26 @@ volumes:
 
 
 services:
+  camera-config:
+    build: camera-config
+    devices:
+      - $TOP_CAM:/dev/top-cam
+      - $FRONT_CAM:/dev/front-cam
+  rtsp:
+    build: rtsp
+    restart: unless-stopped
+    network_mode: host
+    ports:
+      - 8554:8554
+    volumes:
+      - ./rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
+    devices:
+      - $TOP_CAM:/dev/top-cam
+      - $FRONT_CAM:/dev/front-cam
   pygateway:
     build: pygateway
     devices:
-      - "/dev/ttyACM0:/dev/ttyACM0"
+      - /dev/ttyACM0
     tty: true
   mosquitto:
     image: eclipse-mosquitto:latest
