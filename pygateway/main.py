@@ -21,6 +21,12 @@ def handleInput(client: mqtt.Client, line: str):
     else:
         print(line)
 
+# subscribe to all topics, or whitelist?
+#   Write [topic];[payload]\n to serial
+
+# subscribe to /flash
+#   spawn avrdude script to flash the message payload to the board
+
 if __name__ == "__main__":
     client = mqtt.Client()
     client.on_connect = on_connect
