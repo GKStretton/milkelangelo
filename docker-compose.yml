@@ -26,6 +26,8 @@ services:
     devices:
       - /dev/ttyACM0
     tty: true
+    depends_on:
+      - mosquitto
   mosquitto:
     image: eclipse-mosquitto:latest
     command: mosquitto -c /mosquittoconf/mosquitto.conf
