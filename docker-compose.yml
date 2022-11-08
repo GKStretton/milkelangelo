@@ -18,6 +18,8 @@ services:
       - 8554:8554
     volumes:
       - ./rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
+      - ./crop/getcrop.sh:/getcrop.sh
+      - ./crop/crop.yml:/crop.yml
     devices:
       - $TOP_CAM:/dev/top-cam
       - $FRONT_CAM:/dev/front-cam

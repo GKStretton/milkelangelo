@@ -176,6 +176,11 @@ hlsTrustedProxies: []
 # The settings under the path "all" are applied to all paths that do not match
 # another entry.
 paths:
+  top-cam-crop:
+    runOnDemand: gst-launch-1.0 -v rtspsrc protocols=tcp location="rtsp://localhost:8554/top-cam" latency=0 ! queue ! decodebin ! videocrop top=300 bottom=300 right=500 left=50 ! rtspclientsink location=rtsp://localhost:8554/top-cam-crop protocols=tcp
+    runOnDemandRestart: no
+    runOnDemandStartTimeout: 10s
+    runOnDemandCloseAfter: 10s
   all:
     # Source of the stream. This can be:
     # * publisher -> the stream is published by a RTSP or RTMP client
