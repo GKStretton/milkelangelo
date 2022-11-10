@@ -6,35 +6,34 @@ volumes:
 
 services:
   camera-config:
-    build: camera-config
+    build: services/camera-config
     devices:
       - $TOP_CAM:/dev/top-cam
       - $FRONT_CAM:/dev/front-cam
   config-manager:
-    build: config-manager
+    build: services/config-manager
     tty: true
     volumes:
-      - ./crop:/crop
+      - ./config:/config
     depends_on:
       - mosquitto
     environment:
-      CROP_YML_FILE: "/crop/crop.yml"
+      CROP_YML_FILE: "/config/crop.yml"
   rtsp:
-    build: rtsp
+    build: services/rtsp
     restart: unless-stopped
     network_mode: host
     ports:
       - 8554:8554
     volumes:
-      - ./rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
-      - ./rtsp/static_img:/static_img
-      - ./rtsp/scripts:/scripts
-      - ./crop:/crop
+      - ./services/rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
+      - ./services/rtsp/scripts:/scripts
+      - ./config:/config
     devices:
       - $TOP_CAM:/dev/top-cam
       - $FRONT_CAM:/dev/front-cam
   pygateway:
-    build: pygateway
+    build: services/pygateway
     devices:
       - /dev/ttyACM0
     tty: true
@@ -46,7 +45,7 @@ services:
     ports:
       - 1883:1883
     volumes:
-      - ./mosquitto:/mosquittoconf
+      - ./config/mosquitto:/mosquittoconf
   grafana:
     image: grafana/grafana-oss
     volumes:
