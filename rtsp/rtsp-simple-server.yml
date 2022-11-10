@@ -177,128 +177,27 @@ hlsTrustedProxies: []
 # another entry.
 paths:
   top-cam-crop:
-    runOnDemand: gst-launch-1.0 -v rtspsrc protocols=tcp location="rtsp://localhost:8554/top-cam" latency=0 ! queue ! decodebin ! videocrop top=300 bottom=300 right=500 left=50 ! rtspclientsink location=rtsp://localhost:8554/top-cam-crop protocols=tcp
+    # fallback: /fallback
+    runOnDemand: bash /scripts/stream-top-crop.sh
+    runOnDemandRestart: no
+    runOnDemandStartTimeout: 10s
+    # 1 or 0 so config gets reloaded after the api kick off feature
+    runOnDemandCloseAfter: 1s
+  top-cam:
+    # fallback: /fallback
+    runOnDemand: bash /scripts/stream-top.sh
     runOnDemandRestart: no
     runOnDemandStartTimeout: 10s
     runOnDemandCloseAfter: 10s
+  front-cam:
+    # fallback: /fallback
+    runOnDemand: bash /scripts/stream-front.sh
+    runOnDemandRestart: no
+    runOnDemandStartTimeout: 10s
+    runOnDemandCloseAfter: 10s
+  # fallback:
+  #   runOnDemand: gst-launch-1.0 filesrc location=/static_img/fallback.png ! decodebin ! videoconvert ! imagefreeze ! rtspclientsink location=rtsp://localhost:8554/$RTSP_PATH protocols=tcp
+  #   runOnDemandRestart: no
+  #   runOnDemandStartTimeout: 10s
+  #   runOnDemandCloseAfter: 10s
   all:
-    # Source of the stream. This can be:
-    # * publisher -> the stream is published by a RTSP or RTMP client
-    # * rtsp://existing-url -> the stream is pulled from another RTSP server / camera
-    # * rtsps://existing-url -> the stream is pulled from another RTSP server / camera with RTSPS
-    # * rtmp://existing-url -> the stream is pulled from another RTMP server / camera
-    # * rtmps://existing-url -> the stream is pulled from another RTMP server / camera with RTMPS
-    # * http://existing-url/stream.m3u8 -> the stream is pulled from another HLS server
-    # * https://existing-url/stream.m3u8 -> the stream is pulled from another HLS server with HTTPS
-    # * redirect -> the stream is provided by another path or server
-    # * rpiCamera -> the stream is provided by a Raspberry Pi Camera
-    source: publisher
-
-    # If the source is an RTSP or RTSPS URL, this is the protocol that will be used to
-    # pull the stream. available values are "automatic", "udp", "multicast", "tcp".
-    sourceProtocol: automatic
-
-    # Tf the source is an RTSP or RTSPS URL, this allows to support sources that
-    # don't provide server ports or use random server ports. This is a security issue
-    # and must be used only when interacting with sources that require it.
-    sourceAnyPortEnable: no
-
-    # If the source is a RTSPS, RTMPS or HTTPS URL, and the source certificate is self-signed
-    # or invalid, you can provide the fingerprint of the certificate in order to
-    # validate it anyway. It can be obtained by running:
-    # openssl s_client -connect source_ip:source_port </dev/null 2>/dev/null | sed -n '/BEGIN/,/END/p' > server.crt
-    # openssl x509 -in server.crt -noout -fingerprint -sha256 | cut -d "=" -f2 | tr -d ':'
-    sourceFingerprint:
-
-    # If the source is an RTSP or RTMP URL, it will be pulled only when at least
-    # one reader is connected, saving bandwidth.
-    sourceOnDemand:
-    # If sourceOnDemand is "yes", readers will be put on hold until the source is
-    # ready or until this amount of time has passed.
-    sourceOnDemandStartTimeout: 10s
-    # If sourceOnDemand is "yes", the source will be closed when there are no
-    # readers connected and this amount of time has passed.
-    sourceOnDemandCloseAfter: 10s
-
-    # If the source is "redirect", this is the RTSP URL which clients will be
-    # redirected to.
-    sourceRedirect:
-
-    # If the source is "publisher" and a client is publishing, do not allow another
-    # client to disconnect the former and publish in its place.
-    disablePublisherOverride: no
-
-    # If the source is "publisher" and no one is publishing, redirect readers to this
-    # path. It can be can be a relative path  (i.e. /otherstream) or an absolute RTSP URL.
-    fallback:
-
-    # Username required to publish.
-    # SHA256-hashed values can be inserted with the "sha256:" prefix.
-    publishUser:
-    # Password required to publish.
-    # SHA256-hashed values can be inserted with the "sha256:" prefix.
-    publishPass:
-    # IPs or networks (x.x.x.x/24) allowed to publish.
-    publishIPs: []
-
-    # Username required to read.
-    # SHA256-hashed values can be inserted with the "sha256:" prefix.
-    readUser:
-    # password required to read.
-    # SHA256-hashed values can be inserted with the "sha256:" prefix.
-    readPass:
-    # IPs or networks (x.x.x.x/24) allowed to read.
-    readIPs: []
-
-    # Command to run when this path is initialized.
-    # This can be used to publish a stream and keep it always opened.
-    # This is terminated with SIGINT when the program closes.
-    # The following environment variables are available:
-    # * RTSP_PATH: path name
-    # * RTSP_PORT: server port
-    # * G1, G2, ...: regular expression groups, if path name is
-    #   a regular expression.
-    runOnInit:
-    # Restart the command if it exits suddenly.
-    runOnInitRestart: no
-
-    # Command to run when this path is requested.
-    # This can be used to publish a stream on demand.
-    # This is terminated with SIGINT when the path is not requested anymore.
-    # The following environment variables are available:
-    # * RTSP_PATH: path name
-    # * RTSP_PORT: server port
-    # * G1, G2, ...: regular expression groups, if path name is
-    #   a regular expression.
-    runOnDemand: gst-launch-1.0 v4l2src device=/dev/$RTSP_PATH ! image/jpeg,width=1920,height=1080,framerate=30/1,format=MJPG ! rtspclientsink location=rtsp://localhost:8554/$RTSP_PATH protocols=tcp
-    # Restart the command if it exits suddenly.
-    runOnDemandRestart: no
-    # Readers will be put on hold until the runOnDemand command starts publishing
-    # or until this amount of time has passed.
-    runOnDemandStartTimeout: 10s
-    # The command will be closed when there are no
-    # readers connected and this amount of time has passed.
-    runOnDemandCloseAfter: 10s
-
-    # Command to run when the stream is ready to be read, whether it is
-    # published by a client or pulled from a server / camera.
-    # This is terminated with SIGINT when the stream is not ready anymore.
-    # The following environment variables are available:
-    # * RTSP_PATH: path name
-    # * RTSP_PORT: server port
-    # * G1, G2, ...: regular expression groups, if path name is
-    #   a regular expression.
-    runOnReady:
-    # Restart the command if it exits suddenly.
-    runOnReadyRestart: no
-
-    # Command to run when a clients starts reading.
-    # This is terminated with SIGINT when a client stops reading.
-    # The following environment variables are available:
-    # * RTSP_PATH: path name
-    # * RTSP_PORT: server port
-    # * G1, G2, ...: regular expression groups, if path name is
-    #   a regular expression.
-    runOnRead:
-    # Restart the command if it exits suddenly.
-    runOnReadRestart: no

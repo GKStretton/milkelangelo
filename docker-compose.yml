@@ -10,6 +10,15 @@ services:
     devices:
       - $TOP_CAM:/dev/top-cam
       - $FRONT_CAM:/dev/front-cam
+  config-manager:
+    build: config-manager
+    tty: true
+    volumes:
+      - ./crop:/crop
+    depends_on:
+      - mosquitto
+    environment:
+      CROP_YML_FILE: "/crop/crop.yml"
   rtsp:
     build: rtsp
     restart: unless-stopped
@@ -18,8 +27,9 @@ services:
       - 8554:8554
     volumes:
       - ./rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
-      - ./crop/getcrop.sh:/getcrop.sh
-      - ./crop/crop.yml:/crop.yml
+      - ./rtsp/static_img:/static_img
+      - ./rtsp/scripts:/scripts
+      - ./crop:/crop
     devices:
       - $TOP_CAM:/dev/top-cam
       - $FRONT_CAM:/dev/front-cam
