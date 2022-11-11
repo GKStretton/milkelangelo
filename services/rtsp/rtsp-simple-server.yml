@@ -182,7 +182,7 @@ paths:
     runOnDemandRestart: no
     runOnDemandStartTimeout: 10s
     # 1 or 0 so config gets reloaded after the api kick off feature
-    runOnDemandCloseAfter: 1s
+    runOnDemandCloseAfter: 10s
   top-cam:
     # fallback: /fallback
     runOnDemand: bash /scripts/stream-top.sh

@@ -1,3 +1,14 @@
+ 
+#!
+#!
+#!
+#!
+#! Make "setcrop" a single interface. use keys to switch between modes
+#! crop mode, ik positioning mode, etc.
+#!
+#!
+#!
+
 import cv2
 
 WINDOW = "window"
@@ -11,7 +22,8 @@ def mouse_callback(event, x, y, flags, param):
 		mouse_y = y
 
 # tcp is default
-vcap = cv2.VideoCapture("rtsp://DEPTH:8554/top-cam")#, cv2.CAP_GSTREAMER)
+# top-cam-crop not working with ffmpeg pipelines for some reason. And gstreamer isn't installed
+vcap = cv2.VideoCapture("rtsp://localhost:8554/top-cam")#, cv2.CAP_FFMPEG)
 
 # Set up window settings
 cv2.namedWindow(WINDOW)

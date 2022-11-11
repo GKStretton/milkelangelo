@@ -2,13 +2,41 @@
 # used by the cropper in rtsp.
 
 import cv2
+import numpy as np
 import yaml
 import os
 import sys
 import paho.mqtt.publish as mqttpub
 import paho.mqtt.subscribe as mqttsub
 
+def overlay_image_alpha(img, img_overlay, x, y, alpha_mask):
+    """Overlay `img_overlay` onto `img` at (x, y) and blend using `alpha_mask`.
+
+    `alpha_mask` must have same HxW as `img_overlay` and values in range [0, 1].
+    """
+    # Image ranges
+    y1, y2 = max(0, y), min(img.shape[0], y + img_overlay.shape[0])
+    x1, x2 = max(0, x), min(img.shape[1], x + img_overlay.shape[1])
+
+    # Overlay ranges
+    y1o, y2o = max(0, -y), min(img_overlay.shape[0], img.shape[0] - y)
+    x1o, x2o = max(0, -x), min(img_overlay.shape[1], img.shape[1] - x)
+
+    # Exit if nothing to do
+    if y1 >= y2 or x1 >= x2 or y1o >= y2o or x1o >= x2o:
+        return
+
+    # Blend overlay within the determined ranges
+    img_crop = img[y1:y2, x1:x2]
+    img_overlay_crop = img_overlay[y1o:y2o, x1o:x2o]
+    alpha = alpha_mask[y1o:y2o, x1o:x2o, np.newaxis]
+    alpha_inv = 1.0 - alpha
+
+    img_crop[:] = alpha * img_overlay_crop + alpha_inv * img_crop
+
 WINDOW = "window"
+
+TOP_MASK = "./resources/static_img/top-mask.png"
 GET_TOPIC = "crop-config/get"
 GET_RESP_TOPIC = "crop-config/get-resp"
 SET_TOPIC = "crop-config/set"
@@ -85,6 +113,18 @@ cv2.setMouseCallback(WINDOW, mouse_callback)
 width = 0
 height = 0
 
+ret, frame = vcap.read()
+if ret == False:
+	print("Frame empty")
+	exit()
+
+width = frame.shape[1]
+height = frame.shape[0]
+
+# load mask
+mask = cv2.imread(TOP_MASK)
+print(mask.shape)
+
 print("starting loop")
 while 1:
 	ret, frame = vcap.read()
@@ -94,10 +134,13 @@ while 1:
 
 	cv2.rectangle(frame,(x1,y1), (x2, y1 + x2 - x1), (0,0,255),2, cv2.LINE_AA)
 
-	width = frame.shape[1]
-	height = frame.shape[0]
+	resized_mask = cv2.resize(mask, (x2-x1, x2-x1))
+	res = frame.copy()
+	# https://stackoverflow.com/a/45118011
+	overlay_image_alpha(res, np.zeros((x2-x1,x2-x1,3)), x1, y1, 1 - resized_mask[:,:,0] / 255.0)
 
-	cv2.imshow(WINDOW, frame)
+
+	cv2.imshow(WINDOW, res)
 	if cv2.waitKey(1) == 27:
 		break
 
