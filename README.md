@@ -2,8 +2,10 @@
 
 Dark is the supporting system monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLight). Also see [Light](https://github.com/GKStretton/Light). This is in a very early alpha pre-release. Scope includes:
 
-- [ ] Serial-MQTT bridge supporting an event driven architecture
-- [ ] RTSP streaming for multiple consumers of webcam feeds
+- [x] Serial-MQTT bridge supporting an event driven architecture
+- [x] RTSP streaming for multiple consumers of webcam feeds
+- [x] Remote firmware update
+- [x] Remote camera crop configuration
 - [ ] Control interface for system
 - [ ] Automated video and photo capture
 - [ ] Automated post-processing of short- & long-form video, and photos.
