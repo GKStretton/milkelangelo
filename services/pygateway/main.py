@@ -1,9 +1,16 @@
+import signal
 import serial
 import time
 import paho.mqtt.client as mqtt
+import subprocess
 
 # global var for the serial connection
 serialConn = None
+
+FIRMWARE_LOCATION = "./light.hex"
+flashing = False
+
+exiting = False
 
 #####################
 ### MQTT HANDLERS ###
@@ -30,8 +37,26 @@ def mega_handler(client, userdata, msg: mqtt.MQTTMessage):
     serialConn.write('\n'.encode("utf-8"))
     
 # This flashes the arduino mega
+# spawns avrdude script to flash the message payload to the board
 def flash_mega(client, userdata, msg: mqtt.MQTTMessage):
-    print("flash mega not implement")
+    global flashing
+    with open(FIRMWARE_LOCATION, 'wb') as f:
+        f.write(msg.payload)
+
+    flashing = True
+    serialConn.close()
+    time.sleep(1)
+
+    res = subprocess.run(["/bin/sh", "/src/flash.sh", FIRMWARE_LOCATION])
+    print("Flash command done.")
+    time.sleep(2)
+    print("Opening serial again...")
+
+
+
+    serialConn.open()
+    flashing = False
+    print("Serial open") 
 
 
 #######################
@@ -59,13 +84,20 @@ def handleSerialLine(client: mqtt.Client, line: str):
         print("Misc output:", l)
         client.publish("mega/log/misc", l)
 
-# subscribe to all topics, or whitelist?
-#   Write [topic];[payload]\n to serial
 
-# subscribe to /flash
-#   spawn avrdude script to flash the message payload to the board
+def term_handler(signum, frame):
+    global exiting
+    print("term received, closing serial")
+    exiting = True
+    serialConn.close()
+    exit()
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGTERM, term_handler)
+    signal.signal(signal.SIGINT, term_handler)
+
+    # MQTT
+
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
@@ -77,22 +109,21 @@ if __name__ == "__main__":
     client.message_callback_add("mega/flash", flash_mega)
     client.message_callback_add("mega/#", mega_handler)
     client.on_message = on_message
-    # We don't want everything to prevent ard slowdown
     client.subscribe([
         ("mega/req/#", 1),
         ("mega/flash", 1),
     ])
 
+    client.loop_start()
+    print("Started broker network loop")
+
+    # SERIAL
 
     print("Attempting to open serial interface...")
-    with serial.Serial('/dev/ttyACM0', 1000000, timeout=1) as ser:
-        serialConn = ser
-        print("Opened Serial.")
+    serialConn = serial.Serial('/dev/ttyACM0', 1000000, timeout=1)
+    print("Opened Serial.")
 
-        client.loop_start()
-        print("Started broker network loop")
-
-        while True:
-            if ser.inWaiting() > 0:
-                handleSerialLine(client, ser.readline().decode("utf-8"))
-            time.sleep(0.01)
+    while not exiting:
+        if not flashing and serialConn.inWaiting() > 0:
+            handleSerialLine(client, serialConn.readline().decode("utf-8"))
+        time.sleep(0.01)

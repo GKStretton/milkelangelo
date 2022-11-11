@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+import signal
 import yaml
 import time
 import os
@@ -41,9 +42,17 @@ def get_config_listener(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 	# wait for client to reconnect
 	print("sent response")
 
+def term_handler(signum, frame):
+	exit()
+
 print("launch")
 if __name__ == "__main__":
 	print("Starting")
+
+	signal.signal(signal.SIGTERM, term_handler)
+	signal.signal(signal.SIGINT, term_handler)
+
+	# MQTT
 	client = mqtt.Client()
 	client.on_connect = on_connect
 	client.on_disconnect = on_disconnect
