@@ -1,171 +1,147 @@
 # The crop tool lets you configure the crop on the top webcam. Its output is
 # used by the cropper in rtsp.
 
+import pycommon.window as window
 import cv2
-import numpy as np
-import yaml
-import os
-import sys
+from argparse import ArgumentParser
 import paho.mqtt.publish as mqttpub
 import paho.mqtt.subscribe as mqttsub
+import pycommon.image as image
+import yaml
+import numpy as np
+import sys
+import os
 
-def overlay_image_alpha(img, img_overlay, x, y, alpha_mask):
-    """Overlay `img_overlay` onto `img` at (x, y) and blend using `alpha_mask`.
-
-    `alpha_mask` must have same HxW as `img_overlay` and values in range [0, 1].
-    """
-    # Image ranges
-    y1, y2 = max(0, y), min(img.shape[0], y + img_overlay.shape[0])
-    x1, x2 = max(0, x), min(img.shape[1], x + img_overlay.shape[1])
-
-    # Overlay ranges
-    y1o, y2o = max(0, -y), min(img_overlay.shape[0], img.shape[0] - y)
-    x1o, x2o = max(0, -x), min(img_overlay.shape[1], img.shape[1] - x)
-
-    # Exit if nothing to do
-    if y1 >= y2 or x1 >= x2 or y1o >= y2o or x1o >= x2o:
-        return
-
-    # Blend overlay within the determined ranges
-    img_crop = img[y1:y2, x1:x2]
-    img_overlay_crop = img_overlay[y1o:y2o, x1o:x2o]
-    alpha = alpha_mask[y1o:y2o, x1o:x2o, np.newaxis]
-    alpha_inv = 1.0 - alpha
-
-    img_crop[:] = alpha * img_overlay_crop + alpha_inv * img_crop
-
-WINDOW = "window"
-
-TOP_MASK = "./resources/static_img/top-mask.png"
+TOP_MASK = "../resources/static_img/top-mask.png"
 GET_TOPIC = "crop-config/get"
 GET_RESP_TOPIC = "crop-config/get-resp"
 SET_TOPIC = "crop-config/set"
 SET_RESP_TOPIC = "crop-config/set-resp"
 CLIENT_ID="crop-setter-ui"
 
-# left click
-x1 = 0
-y1 = 0
+HOST="DEPTH"
 
-# right click
-x2 = 0
-y2 = 0
+def write_yaml(yml):
+    local_file = ""#input("write to local yaml? enter path if so:")
+    if local_file != "":
+        with open(local_file, 'w') as f:
+            yaml.dump(result, f)
+    else:
+        conf = yaml.dump(result)
+        mqttpub.single(SET_TOPIC, payload=conf, hostname=HOST, port=1883, client_id=CLIENT_ID)
+        print("sent conf to", SET_TOPIC)
+        
+        print("waiting for response...")
+        resp = mqttsub.simple(SET_RESP_TOPIC, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=1)
+        print("got response", resp.payload.decode("utf-8"))
 
-def load_config(yml):
-	global x1, y1, x2, y2
-	x1 = yml['left_abs']
-	y1 = yml['top_abs']
-	x2 = yml['right_abs']
-	y2 = yml['bottom_abs']
+def load_yaml():
+    local_file = ""#input("read from local yaml? enter path if so:")
+    local = False
+    if local_file != "":
+        local = True
+        print("local mode")
 
-	print("loaded values from yaml:", yml)
-
-if len(sys.argv) > 1:
-	YML_FILE = sys.argv[1]
-	LOCAL = True
-	print("local mode")
-else:
-	LOCAL = False
-	print("remote mode")
-
-# LOAD EXISTING CONFIG
-if LOCAL:
-	print("loading from", YML_FILE, "...")
-	if os.path.isfile(YML_FILE):
-		with open(YML_FILE, 'r') as f:
-			yml = yaml.load(f)
-			load_config(yml)
-	else:
-		print("file not found, proceeding with 0 values")
-else:
-	mqttpub.single(GET_TOPIC, payload="get", hostname="localhost", port=1883, client_id=CLIENT_ID)
-	print("sent config request to", GET_TOPIC)
-	print("waiting for response on", GET_RESP_TOPIC, "...")
-	resp = mqttsub.simple(GET_RESP_TOPIC, hostname="localhost", port=1883, client_id=CLIENT_ID, keepalive=1)
-	if resp.payload == "404":
-		print("no config yet, using 0 values")
-	else:
-		print("got response", resp.payload)
-		yml = yaml.load(resp.payload, Loader=yaml.FullLoader)
-		load_config(yml)
+    # LOAD EXISTING CONFIG
+    if local:
+        print("loading from", local_file, "...")
+        if os.path.isfile(local_file):
+            with open(local_file, 'r') as f:
+                yml = yaml.load(f)
+                return yml
+        else:
+            print("file not found, proceeding with 0 values")
+    else:
+        mqttpub.single(GET_TOPIC, payload="get", hostname=HOST, port=1883, client_id=CLIENT_ID)
+        print("sent config request to", GET_TOPIC)
+        print("waiting for response on", GET_RESP_TOPIC, "...")
+        resp = mqttsub.simple(GET_RESP_TOPIC, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=1)
+        if resp.payload.decode("utf-8") == "404":
+            print("no config yet, using 0 values")
+        else:
+            print("got response", resp.payload)
+            yml = yaml.load(resp.payload, Loader=yaml.FullLoader)
+            return yml
 
 
-def mouse_callback(event, x, y, flags, param):
-	global x1, y1, x2, y2
-	if flags & cv2.EVENT_FLAG_LBUTTON and flags & cv2.EVENT_FLAG_SHIFTKEY:
-		x2 = x
-		y2 = y
-	elif flags & cv2.EVENT_FLAG_LBUTTON:
-		x1 = x
-		y1 = y
+class CropWindow(window.Window):
+    def __init__(self):
+        super().__init__()
+        self.stream = cv2.VideoCapture("rtsp://{}:8554/top-cam".format(HOST))#, cv2.CAP_GSTREAMER)
+        if not self.stream.isOpened():
+            print("Error loading webcam stream, aborting.")
+            self.exit()
 
-print("attempting rtsp conn...")
-# tcp is default
-vcap = cv2.VideoCapture("rtsp://localhost:8554/top-cam")#, cv2.CAP_GSTREAMER)
-if not vcap.isOpened():
-	print("Error loading webcam stream, aborting.")
-	exit()
+        # load mask
+        self.mask = cv2.imread(TOP_MASK)
 
-# Set up window settings
-cv2.namedWindow(WINDOW)
-cv2.setMouseCallback(WINDOW, mouse_callback)
+        current_yml = load_yaml()
+        if current_yml:
+            self.load_config(current_yml)
+        else:
+            self.x1 = 0
+            self.y1 = 0
+            self.x2 = 100
+            self.y2 = 100
+    
+    def load_config(self, current_yml):
+        self.x1 = current_yml['left_abs']
+        self.y1 = current_yml['top_abs']
+        self.x2 = current_yml['right_abs']
+        self.y2 = current_yml['bottom_abs']
 
-width = 0
-height = 0
+        print("loaded values from yaml:", current_yml)
+        
+    def mouse_handler(self, event, x, y, flags, param):
+        super().mouse_handler(event, x, y, flags, param)
+        if flags & cv2.EVENT_FLAG_LBUTTON and flags & cv2.EVENT_FLAG_SHIFTKEY:
+            self.x2 = x
+            self.y2 = y
+        elif flags & cv2.EVENT_FLAG_LBUTTON:
+            self.x1 = x
+            self.y1 = y
+    
+    def keyboard_handler(self, key):
+        super().keyboard_handler(key)
 
-ret, frame = vcap.read()
-if ret == False:
-	print("Frame empty")
-	exit()
+        if key != -1:
+            print(key)
+    
+    def update(self):
+        ret, frame = self.stream.read()
+        if ret == False:
+            print("Frame empty, quitting")
+            self.exit()
+        self.frame_width=frame.shape[1]
+        self.frame_height=frame.shape[0]
+        mag = abs(self.x2 - self.x1)
 
-width = frame.shape[1]
-height = frame.shape[0]
+        # draw crop location
+        cv2.rectangle(frame,(self.x1,self.y1), (self.x2, self.y1 + mag), (0,0,255),2, cv2.LINE_AA)
 
-# load mask
-mask = cv2.imread(TOP_MASK)
-print(mask.shape)
+        # mask with the vig
+        resized_mask = cv2.resize(self.mask, (mag, mag))
+        res = frame.copy()
+        image.overlay_image_alpha(res, np.zeros((mag, mag, 3)), self.x1, self.y1, 1 - resized_mask[:,:,0] / 255.0)
 
-print("starting loop")
-while 1:
-	ret, frame = vcap.read()
-	if ret == False:
-		print("Frame empty")
-		break
+        return res
+    
 
-	cv2.rectangle(frame,(x1,y1), (x2, y1 + x2 - x1), (0,0,255),2, cv2.LINE_AA)
+if __name__ == "__main__":
+    win = CropWindow()
+    win.loop()
 
-	resized_mask = cv2.resize(mask, (x2-x1, x2-x1))
-	res = frame.copy()
-	# https://stackoverflow.com/a/45118011
-	overlay_image_alpha(res, np.zeros((x2-x1,x2-x1,3)), x1, y1, 1 - resized_mask[:,:,0] / 255.0)
+    result = {
+        "left_abs": win.x1,
+        "right_abs": win.x2,
+        "top_abs": win.y1,
+        "bottom_abs": win.y2,
+        "left_rel": win.x1,
+        "right_rel": win.frame_width - win.x2,
+        "top_rel": win.y1,
+        "bottom_rel": win.frame_height - win.y2,
+    }
 
+    print(result)
 
-	cv2.imshow(WINDOW, res)
-	if cv2.waitKey(1) == 27:
-		break
-
-print(width, height)
-
-result = {
-	"left_abs": x1,
-	"right_abs": x2,
-	"top_abs": y1,
-	"bottom_abs": y2,
-	"left_rel": x1,
-	"right_rel": width - x2,
-	"top_rel": y1,
-	"bottom_rel": height - y2,
-}
-print(result)
-
-if LOCAL:
-	with open(YML_FILE, 'w') as f:
-		yaml.dump(result, f)
-else:
-	conf = yaml.dump(result)
-	mqttpub.single(SET_TOPIC, payload=conf, hostname="localhost", port=1883, client_id=CLIENT_ID)
-	print("sent conf to", SET_TOPIC)
-	
-	print("waiting for response...")
-	resp = mqttsub.simple(SET_RESP_TOPIC, hostname="localhost", port=1883, client_id=CLIENT_ID, keepalive=1)
-	print("got response", resp.payload.decode("utf-8"))
+    write_yaml(result)

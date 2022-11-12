@@ -1,42 +1,32 @@
- 
-#!
-#!
-#!
-#!
-#! Make "setcrop" a single interface. use keys to switch between modes
-#! crop mode, ik positioning mode, etc.
-#!
-#!
-#!
-
 import cv2
+from pycommon.window import Window
 
-WINDOW = "window"
-mouse_x = 0
-mouse_y = 0
+class Interface(Window):
+	def __init__(self):
+		super().__init__()
 
-def mouse_callback(event, x, y, flags, param):
-	global mouse_x, mouse_y
-	if flags & cv2.EVENT_FLAG_LBUTTON:
-		mouse_x = x
-		mouse_y = y
+		self.target_x = 0
+		self.target_y = 0
 
-# tcp is default
-# top-cam-crop not working with ffmpeg pipelines for some reason. And gstreamer isn't installed
-vcap = cv2.VideoCapture("rtsp://localhost:8554/top-cam")#, cv2.CAP_FFMPEG)
+		# tcp is default
+		# top-cam-crop not working with ffmpeg pipelines for some reason. And gstreamer isn't installed
+		self.stream = cv2.VideoCapture("rtsp://DEPTH:8554/top-cam")#, cv2.CAP_FFMPEG)
 
-# Set up window settings
-cv2.namedWindow(WINDOW)
-cv2.setMouseCallback(WINDOW, mouse_callback)
+	def mouse_handler(self, event, x, y, flags, param):
+		if flags & cv2.EVENT_FLAG_LBUTTON:
+			self.target_x = x
+			self.target_y = y
 
-while 1:
-	ret, frame = vcap.read()
-	if ret == False:
-		print("Frame empty")
-		break
+	def update(self):
+		ret, frame = self.stream.read()
+		if ret == False:
+			print("Frame empty, exiting")
+			self.exit()
 
-	cv2.circle(frame,(mouse_x,mouse_y),10,(0,0,255),2, cv2.LINE_AA)
+		cv2.circle(frame,(self.target_x,self.target_y),10,(0,0,255),2, cv2.LINE_AA)
 
-	cv2.imshow(WINDOW, frame)
-	if cv2.waitKey(1) == 27:
-		break
+		return frame
+
+if __name__ == "__main__":
+	win = Interface()
+	win.loop()
