@@ -12,6 +12,8 @@ GOTO_TOPIC = "mega/req/goto-xy"
 GOTO_RESP_TOPIC = "mega/resp/goto-xy"
 DISPENSE_TOPIC = "mega/req/dispense"
 DISPENSE_RESP_TOPIC = "mega/resp/dispense"
+SLEEP_TOPIC = "mega/req/sleep"
+WAKE_TOPIC = "mega/req/wake"
 
 # debug print
 def debug(msg):
@@ -44,3 +46,9 @@ def dispense(ul):
     debug("wrote dispense payload")#. Listening for response...")
     # resp = sub(DISPENSE_RESP_TOPIC)
     # debug("got dispense response payload '{}'".format(resp.payload))
+
+def sleep():
+    pub(SLEEP_TOPIC, "")
+
+def wake():
+    pub(WAKE_TOPIC, "")

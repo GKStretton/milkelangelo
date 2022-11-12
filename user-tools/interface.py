@@ -110,6 +110,12 @@ class Interface(Window):
 		if key == ord(' '):
 			print("dispense at", self.target_x_rel, self.target_y_rel)
 			mc.dispense(DISPENSE_uL)
+		if key == ord('s'):
+			print("sent sleep request")
+			mc.sleep()
+		if key == ord('w'):
+			print("sent wake request")
+			mc.wake()
 
 
 	def crop(self, frame):
