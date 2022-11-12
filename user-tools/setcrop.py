@@ -4,22 +4,16 @@
 import pycommon.window as window
 import cv2
 from argparse import ArgumentParser
-import paho.mqtt.publish as mqttpub
-import paho.mqtt.subscribe as mqttsub
 import pycommon.image as image
 import yaml
 import numpy as np
 import sys
 import os
+from pycommon.config_manager_client import read_remote_crop_config
+from pycommon.config_manager_client import write_remote_crop_config
 
 TOP_MASK = "../resources/static_img/top-mask.png"
-GET_TOPIC = "crop-config/get"
-GET_RESP_TOPIC = "crop-config/get-resp"
-SET_TOPIC = "crop-config/set"
-SET_RESP_TOPIC = "crop-config/set-resp"
-CLIENT_ID="crop-setter-ui"
-
-HOST="DEPTH"
+HOST = "DEPTH"
 
 def write_yaml(yml):
     local_file = ""#input("write to local yaml? enter path if so:")
@@ -27,13 +21,7 @@ def write_yaml(yml):
         with open(local_file, 'w') as f:
             yaml.dump(result, f)
     else:
-        conf = yaml.dump(result)
-        mqttpub.single(SET_TOPIC, payload=conf, hostname=HOST, port=1883, client_id=CLIENT_ID)
-        print("sent conf to", SET_TOPIC)
-        
-        print("waiting for response...")
-        resp = mqttsub.simple(SET_RESP_TOPIC, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=1)
-        print("got response", resp.payload.decode("utf-8"))
+        write_remote_crop_config(yml)
 
 def load_yaml():
     local_file = ""#input("read from local yaml? enter path if so:")
@@ -52,16 +40,7 @@ def load_yaml():
         else:
             print("file not found, proceeding with 0 values")
     else:
-        mqttpub.single(GET_TOPIC, payload="get", hostname=HOST, port=1883, client_id=CLIENT_ID)
-        print("sent config request to", GET_TOPIC)
-        print("waiting for response on", GET_RESP_TOPIC, "...")
-        resp = mqttsub.simple(GET_RESP_TOPIC, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=1)
-        if resp.payload.decode("utf-8") == "404":
-            print("no config yet, using 0 values")
-        else:
-            print("got response", resp.payload)
-            yml = yaml.load(resp.payload, Loader=yaml.FullLoader)
-            return yml
+        return read_remote_crop_config()
 
 
 class CropWindow(window.Window):
