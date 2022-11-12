@@ -5,11 +5,6 @@ volumes:
 
 
 services:
-  camera-config:
-    build: services/camera-config
-    devices:
-      - $TOP_CAM:/dev/top-cam
-      - $FRONT_CAM:/dev/front-cam
   config-manager:
     build: services/config-manager
     tty: true
