@@ -8,11 +8,18 @@ v4l2-ctl --device /dev/top-cam --set-ctrl \
 focus_auto=0,\
 exposure_auto=1
 
+
 v4l2-ctl --device /dev/top-cam --set-ctrl \
 gain=0,\
 focus_absolute=27,\
 zoom_absolute=120,\
 exposure_absolute=60
+
+
+# have to set focus twice because it doesn't engage if you set it to the
+# value as it already is. Seems to just stay at a silent 0 even though the value
+# changes
+v4l2-ctl --device /dev/top-cam --set-ctrl focus_absolute=28
 
 v4l2-ctl --device /dev/top-cam --list-ctrls-menus
 
@@ -26,12 +33,17 @@ focus_auto=0,\
 exposure_auto=1
 
 v4l2-ctl --device /dev/front-cam --set-ctrl \
-focus_absolute=40
+focus_absolute=39
 
 v4l2-ctl --device /dev/front-cam --set-ctrl \
 gain=0,\
 zoom_absolute=100,\
 exposure_absolute=200
+
+# have to set focus twice because it doesn't engage if you set it to the
+# value as it already is. Seems to just stay at a silent 0 even though the value
+# changes
+v4l2-ctl --device /dev/front-cam --set-ctrl focus_absolute=40
 
 v4l2-ctl --device /dev/front-cam --list-ctrls-menus
 
