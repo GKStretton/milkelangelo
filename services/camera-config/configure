@@ -9,6 +9,7 @@ focus_auto=0,\
 exposure_auto=1
 
 v4l2-ctl --device /dev/top-cam --set-ctrl \
+gain=0,\
 focus_absolute=27,\
 zoom_absolute=120,\
 exposure_absolute=60
