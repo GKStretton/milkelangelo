@@ -4,15 +4,18 @@ from pycommon.window import Window
 from pycommon.config_manager_client import read_remote_crop_config
 import pycommon.image as image
 import numpy as np
+import pycommon.mqtt_client as mc
 
 TOP_MASK = "../resources/static_img/top-mask.png"
+# how many microlitres to dispense at a time
+DISPENSE_uL = 10
 
 class Interface(Window):
 	def __init__(self):
 		super().__init__()
 
-		self.target_x = 0
-		self.target_y = 0
+		self.target_x_rel = 0
+		self.target_y_rel = 0
 
 		self.do_crop = True
 		self.do_mask = False
@@ -72,7 +75,7 @@ class Interface(Window):
 			x += self.crop_config['left_abs']
 			y += self.crop_config['top_abs']
 		
-		return x, y
+		return int(x), int(y)
 
 		
 	def mouse_handler(self, event, x, y, flags, param):
@@ -84,9 +87,13 @@ class Interface(Window):
 				xr /= m
 				yr /= m
 
-			xa, ya = self.rel_to_abs(xr, yr)
-			self.target_x = int(xa)
-			self.target_y = int(ya)
+			self.target_x_rel = xr
+			self.target_y_rel = yr
+
+			mc.goto_xy(self.target_x_rel, self.target_y_rel)
+			print("goto_xy", self.target_x_rel, self.target_y_rel)
+
+
 	
 	def keyboard_handler(self, key):
 		super().keyboard_handler(key)
@@ -100,6 +107,9 @@ class Interface(Window):
 				self.do_mask = not self.do_mask
 			else:
 				print("cannot mask because no mask loaded")
+		if key == ord(' '):
+			print("dispense at", self.target_x_rel, self.target_y_rel)
+			mc.dispense(DISPENSE_uL)
 
 
 	def crop(self, frame):
@@ -126,7 +136,8 @@ class Interface(Window):
 				image.overlay_image_alpha(frame, np.zeros((self.crop_mag, self.crop_mag, 3)), self.crop_config['left_abs'], self.crop_config['top_abs'], self.mask)
 		
 
-		cv2.circle(frame,(self.target_x,self.target_y),10,(0,0,255),2, cv2.LINE_AA)
+
+		cv2.circle(frame,self.rel_to_abs(self.target_x_rel,self.target_y_rel),10,(0,0,255),2, cv2.LINE_AA)
 
 		return frame
 
