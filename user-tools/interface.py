@@ -1,4 +1,5 @@
 import cv2
+import time
 import math
 from pycommon.window import Window
 from pycommon.config_manager_client import read_remote_crop_config
@@ -20,7 +21,9 @@ helps = {
 	"1-7": "Collect from test tube n",
 	" ": "Dispense {}".format(DISPENSE_uL),
 	"lmb": "Select IK target",
-	"u": "Uncalibrate the motors, freeing up movement if there's been a slip"
+	"u": "Uncalibrate the motors, freeing up movement if there's been a slip",
+	"d": "open drain",
+	"p": "close/plug drain",
 }
 
 def print_help_text():
@@ -144,6 +147,12 @@ class Interface(Window):
 		if key == ord('u'):
 			print("uncalibrating")
 			mc.uncalibrate()
+		if key == ord('d'):
+			print("open drain...")
+			mc.set_drain(True)
+		if key == ord('p'):
+			print("close drain...")
+			mc.set_drain(False)
 
 
 	def crop(self, frame):
@@ -164,10 +173,12 @@ class Interface(Window):
 			frame = self.crop(frame)
 
 		if self.do_mask:
+			start = time.time()
 			if self.do_crop:
 				image.overlay_image_alpha(frame, np.zeros((self.crop_mag, self.crop_mag, 3)), 0, 0, self.mask)
 			else:
 				image.overlay_image_alpha(frame, np.zeros((self.crop_mag, self.crop_mag, 3)), self.crop_config['left_abs'], self.crop_config['top_abs'], self.mask)
+			print(time.time() - start)
 		
 
 

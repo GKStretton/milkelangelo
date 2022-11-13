@@ -16,6 +16,8 @@ COLLECT_TOPIC = "mega/req/collect"
 SLEEP_TOPIC = "mega/req/sleep"
 WAKE_TOPIC = "mega/req/wake"
 UNCALIBRATE_TOPIC = "mega/req/uncalibrate"
+OPEN_DRAIN_TOPIC = "mega/req/open-drain"
+CLOSE_DRAIN_TOPIC = "mega/req/close-drain"
 
 # debug print
 def debug(msg):
@@ -63,3 +65,9 @@ def wake():
 
 def uncalibrate():
     pub(UNCALIBRATE_TOPIC, "")
+
+def set_drain(b: bool):
+    if b:
+        pub(OPEN_DRAIN_TOPIC, "")
+    else:
+        pub(CLOSE_DRAIN_TOPIC, "")
