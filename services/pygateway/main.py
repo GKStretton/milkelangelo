@@ -35,7 +35,7 @@ def mega_handler(client, userdata, msg: mqtt.MQTTMessage):
     serialConn.write(';'.encode("utf-8"))
     serialConn.write(msg.payload)
     serialConn.write('\n'.encode("utf-8"))
-    print("forwarded msg on {} to serial", msg.topic)
+    print("forwarded msg on {} to serial".format(msg.topic))
     
 # This flashes the arduino mega
 # spawns avrdude script to flash the message payload to the board
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     
 
     client.message_callback_add("mega/flash", flash_mega)
-    client.message_callback_add("mega/#", mega_handler)
+    client.message_callback_add("mega/req/#", mega_handler)
     client.on_message = on_message
     client.subscribe([
         ("mega/req/#", 1),
