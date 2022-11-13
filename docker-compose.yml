@@ -14,6 +14,7 @@ services:
       - mosquitto
     environment:
       CROP_YML_FILE: "/config/crop.yml"
+    restart: unless-stopped
   rtsp:
     build: services/rtsp
     restart: unless-stopped
@@ -34,6 +35,7 @@ services:
     tty: true
     depends_on:
       - mosquitto
+    restart: unless-stopped
   mosquitto:
     image: eclipse-mosquitto:latest
     command: mosquitto -c /mosquittoconf/mosquitto.conf
@@ -41,6 +43,7 @@ services:
       - 1883:1883
     volumes:
       - ./config/mosquitto:/mosquittoconf
+    restart: unless-stopped
   grafana:
     image: grafana/grafana-oss
     volumes:

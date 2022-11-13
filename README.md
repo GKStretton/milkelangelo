@@ -1,6 +1,6 @@
 # Dark 
 
-Dark is the supporting system monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLight). Also see [Light](https://github.com/GKStretton/Light). This is in a very early alpha pre-release. Scope includes:
+Dark is the supporting system monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLight). Also see [Light](https://github.com/GKStretton/Light). This is in a very early alpha. Scope includes:
 
 - [x] Serial-MQTT bridge supporting an event driven architecture
 - [x] RTSP streaming for multiple consumers of webcam feeds
