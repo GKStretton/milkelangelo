@@ -5,13 +5,14 @@ import paho.mqtt.publish as mqttpub
 import paho.mqtt.subscribe as mqttsub
 
 CLIENT_ID="py-interfaces"
-DEBUG = True
+DEBUG = False
 
 
 GOTO_TOPIC = "mega/req/goto-xy"
 GOTO_RESP_TOPIC = "mega/resp/goto-xy"
 DISPENSE_TOPIC = "mega/req/dispense"
 DISPENSE_RESP_TOPIC = "mega/resp/dispense"
+COLLECT_TOPIC = "mega/req/collect"
 SLEEP_TOPIC = "mega/req/sleep"
 WAKE_TOPIC = "mega/req/wake"
 
@@ -46,6 +47,12 @@ def dispense(ul):
     debug("wrote dispense payload")#. Listening for response...")
     # resp = sub(DISPENSE_RESP_TOPIC)
     # debug("got dispense response payload '{}'".format(resp.payload))
+
+def collect(pos):
+    debug("writing collect payload '{}'".format(pos))
+    pub(COLLECT_TOPIC, pos)
+
+    debug("wrote collect payload")
 
 def sleep():
     pub(SLEEP_TOPIC, "")

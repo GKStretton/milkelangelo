@@ -116,6 +116,10 @@ class Interface(Window):
 		if key == ord('w'):
 			print("sent wake request")
 			mc.wake()
+		if key >= ord('0') and key <= ord('7'):
+			num = key - ord('0')
+			print("selected position", num)
+			mc.collect(num)
 
 
 	def crop(self, frame):

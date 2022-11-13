@@ -38,7 +38,7 @@ def mega_handler(client, userdata, msg: mqtt.MQTTMessage):
     
 # This flashes the arduino mega
 # spawns avrdude script to flash the message payload to the board
-def flash_mega(client, userdata, msg: mqtt.MQTTMessage):
+def flash_mega(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
     global flashing
     with open(FIRMWARE_LOCATION, 'wb') as f:
         f.write(msg.payload)
@@ -48,15 +48,21 @@ def flash_mega(client, userdata, msg: mqtt.MQTTMessage):
     time.sleep(1)
 
     res = subprocess.run(["/bin/sh", "/src/flash.sh", FIRMWARE_LOCATION])
-    print("Flash command done.")
+    if res.returncode != 0:
+        print("Flash command failed.")
+        client.publish("mega/flashresp", "Flash failed")
+    else:
+        print("Flash command successful.")
+        client.publish("mega/flashresp", "Flash complete")
+    
+    print("waiting...")
     time.sleep(2)
-    print("Opening serial again...")
-
-
+    print("Opening serial port...")
 
     serialConn.open()
     flashing = False
     print("Serial open") 
+    client.publish("mega/flashresp", "Serial reopened")
 
 
 #######################

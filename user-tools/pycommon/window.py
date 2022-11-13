@@ -41,3 +41,4 @@ class Window:
     def loop(self):
         while not self.exiting:
             self.__draw()
+        print("Exiting...")
