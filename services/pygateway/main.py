@@ -27,7 +27,7 @@ def on_disconnect(client, userdata, rc):
 def on_message(client, userdata, msg: mqtt.MQTTMessage):
     print("Received mqtt topic" + msg.topic + "without handler. Doing nothing.")
 
-# handler for mega requests MEGA_REQUEST_PREFIX + #. only # gets passed to mega
+# handler for mega requests 
 def mega_handler(client, userdata, msg: mqtt.MQTTMessage):
     # send to serial
     # [topic];[payload]\n
@@ -35,6 +35,7 @@ def mega_handler(client, userdata, msg: mqtt.MQTTMessage):
     serialConn.write(';'.encode("utf-8"))
     serialConn.write(msg.payload)
     serialConn.write('\n'.encode("utf-8"))
+    print("forwarded msg on {} to serial", msg.topic)
     
 # This flashes the arduino mega
 # spawns avrdude script to flash the message payload to the board

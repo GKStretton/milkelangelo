@@ -10,6 +10,25 @@ TOP_MASK = "../resources/static_img/top-mask.png"
 # how many microlitres to dispense at a time
 DISPENSE_uL = 10
 
+helps = {
+	"h": "Print this help text",
+	"c": "Toggle crop",
+	"o": "Toggle vigenette overlay",
+	"s": "Go to sleep",
+	"w": "Wake up",
+	"0": "Go to position before tube 1",
+	"1-7": "Collect from test tube n",
+	" ": "Dispense {}".format(DISPENSE_uL),
+	"lmb": "Select IK target",
+	"u": "Uncalibrate the motors, freeing up movement if there's been a slip"
+}
+
+def print_help_text():
+	print("~~ HELP ~~")
+	for k in helps:
+		print("'{}':\t{}".format(k, helps[k]))
+	print()
+
 class Interface(Window):
 	def __init__(self):
 		super().__init__()
@@ -97,6 +116,8 @@ class Interface(Window):
 	
 	def keyboard_handler(self, key):
 		super().keyboard_handler(key)
+		if key == ord('h'):
+			print_help_text()
 		if key == ord('c'):
 			if self.crop_config != None:
 				self.do_crop = not self.do_crop
@@ -120,6 +141,9 @@ class Interface(Window):
 			num = key - ord('0')
 			print("selected position", num)
 			mc.collect(num)
+		if key == ord('u'):
+			print("uncalibrating")
+			mc.uncalibrate()
 
 
 	def crop(self, frame):

@@ -15,6 +15,7 @@ DISPENSE_RESP_TOPIC = "mega/resp/dispense"
 COLLECT_TOPIC = "mega/req/collect"
 SLEEP_TOPIC = "mega/req/sleep"
 WAKE_TOPIC = "mega/req/wake"
+UNCALIBRATE_TOPIC = "mega/req/uncalibrate"
 
 # debug print
 def debug(msg):
@@ -59,3 +60,6 @@ def sleep():
 
 def wake():
     pub(WAKE_TOPIC, "")
+
+def uncalibrate():
+    pub(UNCALIBRATE_TOPIC, "")
