@@ -18,7 +18,11 @@ exiting = False
 
 
 def on_connect(client, userdata, flags, rc):
-    print("MQTT connected")
+    client.subscribe([
+        ("mega/req/#", 1),
+        ("mega/flash", 1),
+    ])
+    print("MQTT connected, subscribed to topics")
 
 def on_disconnect(client, userdata, rc):
     print("MQTT disconnected")
@@ -57,7 +61,7 @@ def flash_mega(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
         client.publish("mega/flashresp", "Flash complete")
     
     print("waiting...")
-    time.sleep(2)
+    time.sleep(1)
     print("Opening serial port...")
 
     serialConn.open()
@@ -116,10 +120,6 @@ if __name__ == "__main__":
     client.message_callback_add("mega/flash", flash_mega)
     client.message_callback_add("mega/req/#", mega_handler)
     client.on_message = on_message
-    client.subscribe([
-        ("mega/req/#", 1),
-        ("mega/flash", 1),
-    ])
 
     client.loop_start()
     print("Started broker network loop")

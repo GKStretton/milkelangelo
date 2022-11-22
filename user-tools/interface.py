@@ -153,6 +153,9 @@ class Interface(Window):
 		if key == ord('p'):
 			print("close drain...")
 			mc.set_drain(False)
+		if key == ord('n'):
+			node = input("goto-node. Specify node number (see firmware for enum): ")
+			mc.goto_node(node)
 
 
 	def crop(self, frame):

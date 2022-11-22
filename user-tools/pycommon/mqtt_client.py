@@ -7,7 +7,7 @@ import paho.mqtt.subscribe as mqttsub
 CLIENT_ID="py-interfaces"
 DEBUG = False
 
-
+GOTO_NODE_TOPIC = "mega/req/goto-node"
 GOTO_TOPIC = "mega/req/goto-xy"
 GOTO_RESP_TOPIC = "mega/resp/goto-xy"
 DISPENSE_TOPIC = "mega/req/dispense"
@@ -71,3 +71,6 @@ def set_drain(b: bool):
         pub(OPEN_DRAIN_TOPIC, "")
     else:
         pub(CLOSE_DRAIN_TOPIC, "")
+    
+def goto_node(node):
+    pub(GOTO_NODE_TOPIC, node)
