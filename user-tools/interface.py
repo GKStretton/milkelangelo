@@ -39,7 +39,7 @@ class Interface(Window):
 		self.target_x_rel = 0
 		self.target_y_rel = 0
 
-		self.do_crop = True
+		self.do_crop = False
 		self.do_mask = False
 
 		# tcp is default
@@ -143,7 +143,7 @@ class Interface(Window):
 		if key >= ord('0') and key <= ord('7'):
 			num = key - ord('0')
 			print("selected position", num)
-			mc.collect(num)
+			mc.collect(num, 200)
 		if key == ord('u'):
 			print("uncalibrating")
 			mc.uncalibrate()
@@ -190,5 +190,6 @@ class Interface(Window):
 		return frame
 
 if __name__ == "__main__":
+	mc.connect()
 	win = Interface()
 	win.loop()

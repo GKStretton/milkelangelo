@@ -29,7 +29,8 @@ def set_config_listener(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 
 def get_config_listener(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 	print("received get config request")
-	time.sleep(0.1)
+	# Add delay because it was returning faster than the client could subscribe
+	time.sleep(1)
 	if os.path.isfile(YML_FILE):
 		with open(YML_FILE, 'r') as f:
 			conf = f.read()

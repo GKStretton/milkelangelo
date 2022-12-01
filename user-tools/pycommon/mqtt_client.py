@@ -1,11 +1,9 @@
 import paho.mqtt.client as mqtt
 from pycommon.const import HOST
 import yaml
-import paho.mqtt.publish as mqttpub
-import paho.mqtt.subscribe as mqttsub
 
 CLIENT_ID="py-interfaces"
-DEBUG = False
+DEBUG = True
 
 GOTO_NODE_TOPIC = "mega/req/goto-node"
 GOTO_TOPIC = "mega/req/goto-xy"
@@ -19,17 +17,39 @@ UNCALIBRATE_TOPIC = "mega/req/uncalibrate"
 OPEN_DRAIN_TOPIC = "mega/req/open-drain"
 CLOSE_DRAIN_TOPIC = "mega/req/close-drain"
 
+# mqtt client
+client = None
+
 # debug print
 def debug(msg):
     if DEBUG:
         print("[MQTT]", msg)
 
-def pub(topic, pl):
-    mqttpub.single(topic, payload=pl, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=2)
+def on_connect(client, userdata, flags, rc):
+    # client.subscribe([
+    #     ("topic", 1)
+    # ])
+    print("Connected to broker")
 
-def sub(topic):
-    return mqttsub.simple(topic, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=2)
+def on_disconnect(client, userdata, rc):
+    print("Disconnected from broker")
 
+def connect():
+    global client
+    client = mqtt.Client(reconnect_on_failure=True)
+    client.on_connect = on_connect
+    client.on_disconnect = on_disconnect
+    client.connect(HOST, 1883, 10)
+    client.loop_start()
+    print("Starter broker network loop")
+    
+
+def pub(topic, payload):
+    global client
+    if client is None:
+        print("client is None, call connect?")
+    else:
+        client.publish(topic, payload)
 
 def goto_xy(x, y):
     pl = "{:.3f},{:.3f}".format(x, y)
@@ -51,9 +71,10 @@ def dispense(ul):
     # resp = sub(DISPENSE_RESP_TOPIC)
     # debug("got dispense response payload '{}'".format(resp.payload))
 
-def collect(pos):
+def collect(pos, ul):
     debug("writing collect payload '{}'".format(pos))
-    pub(COLLECT_TOPIC, pos)
+    pl = "{},{:.1f}".format(pos, ul)
+    pub(COLLECT_TOPIC, pl)
 
     debug("wrote collect payload")
 
