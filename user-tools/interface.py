@@ -9,7 +9,7 @@ import pycommon.mqtt_client as mc
 
 TOP_MASK = "../resources/static_img/top-mask.png"
 # how many microlitres to dispense at a time
-DISPENSE_uL = 10
+DISPENSE_uL = 50.0
 
 helps = {
 	"h": "Print this help text",
@@ -143,7 +143,7 @@ class Interface(Window):
 		if key >= ord('0') and key <= ord('7'):
 			num = key - ord('0')
 			print("selected position", num)
-			mc.collect(num, 200)
+			mc.collect(num, 200.0)
 		if key == ord('u'):
 			print("uncalibrating")
 			mc.uncalibrate()

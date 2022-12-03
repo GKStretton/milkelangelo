@@ -64,8 +64,9 @@ def goto_xy(x, y):
     # debug("got goto_xy response payload '{}'".format(resp.payload))
 
 def dispense(ul):
-    debug("writing dispense payload '{}'".format(ul))
-    pub(DISPENSE_TOPIC, ul)
+    pl = "{:.1f}".format(ul)
+    debug("writing dispense payload '{}'".format(pl))
+    pub(DISPENSE_TOPIC, pl)
 
     debug("wrote dispense payload")#. Listening for response...")
     # resp = sub(DISPENSE_RESP_TOPIC)
