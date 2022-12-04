@@ -20,7 +20,7 @@ def set_config_listener(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 	# write it to the file at /crop/crop.yml
 	yml = yaml.load(msg.payload, Loader=yaml.FullLoader)
 	print(yml)
-	time.sleep(0.1)
+	time.sleep(1)
 	with open(YML_FILE, 'w') as f:
 		yaml.dump(yml, f)
 		print("config written to", YML_FILE)

@@ -12,7 +12,7 @@ import os
 from pycommon.config_manager_client import read_remote_crop_config
 from pycommon.config_manager_client import write_remote_crop_config
 
-TOP_MASK = "../resources/static_img/top-mask.png"
+TOP_MASK = "resources/static_img/top-mask.png"
 HOST = "DEPTH"
 
 def write_yaml(yml):
@@ -62,6 +62,8 @@ class CropWindow(window.Window):
             self.y1 = 0
             self.x2 = 100
             self.y2 = 100
+        
+        print("loaded (x1, y1); (x2, y2) as ({}, {}); ({}, {})".format(self.x1, self.y1, self.x2, self.y2))
     
     def load_config(self, current_yml):
         self.x1 = current_yml['left_abs']

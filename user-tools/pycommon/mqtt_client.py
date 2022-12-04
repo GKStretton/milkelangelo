@@ -12,10 +12,12 @@ DISPENSE_TOPIC = "mega/req/dispense"
 DISPENSE_RESP_TOPIC = "mega/resp/dispense"
 COLLECT_TOPIC = "mega/req/collect"
 SLEEP_TOPIC = "mega/req/sleep"
+SHUTDOWN_TOPIC = "mega/req/shutdown"
 WAKE_TOPIC = "mega/req/wake"
 UNCALIBRATE_TOPIC = "mega/req/uncalibrate"
 OPEN_DRAIN_TOPIC = "mega/req/open-drain"
 CLOSE_DRAIN_TOPIC = "mega/req/close-drain"
+TOGGLE_MANUAL = "mega/req/manual"
 
 # mqtt client
 client = None
@@ -82,6 +84,9 @@ def collect(pos, ul):
 def sleep():
     pub(SLEEP_TOPIC, "")
 
+def shutdown():
+    pub(SHUTDOWN_TOPIC, "")
+
 def wake():
     pub(WAKE_TOPIC, "")
 
@@ -96,3 +101,6 @@ def set_drain(b: bool):
     
 def goto_node(node):
     pub(GOTO_NODE_TOPIC, node)
+
+def toggle_manual():
+    pub(TOGGLE_MANUAL, "")

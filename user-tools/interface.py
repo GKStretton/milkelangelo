@@ -15,7 +15,8 @@ helps = {
 	"h": "Print this help text",
 	"c": "Toggle crop",
 	"o": "Toggle vigenette overlay",
-	"s": "Go to sleep",
+	"s": "Shutdown cleanly",
+	"k": "Kill / Sleep",
 	"w": "Wake up",
 	"0": "Go to position before tube 1",
 	"1-7": "Collect from test tube n",
@@ -24,6 +25,7 @@ helps = {
 	"u": "Uncalibrate the motors, freeing up movement if there's been a slip",
 	"d": "open drain",
 	"p": "close/plug drain",
+	"m": "toggle manual mode",
 }
 
 def print_help_text():
@@ -135,7 +137,10 @@ class Interface(Window):
 			print("dispense at", self.target_x_rel, self.target_y_rel)
 			mc.dispense(DISPENSE_uL)
 		if key == ord('s'):
-			print("sent sleep request")
+			print("sent shutdown request")
+			mc.shutdown()
+		if key == ord('k'):
+			print("sent kill / sleep request")
 			mc.sleep()
 		if key == ord('w'):
 			print("sent wake request")
@@ -156,6 +161,9 @@ class Interface(Window):
 		if key == ord('n'):
 			node = input("goto-node. Specify node number (see firmware for enum): ")
 			mc.goto_node(node)
+		if key == ord('m'):
+			print("toggling manual mode...")
+			mc.toggle_manual()
 
 
 	def crop(self, frame):
