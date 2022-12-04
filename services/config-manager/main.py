@@ -20,7 +20,7 @@ def set_config_listener(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 	# write it to the file at /crop/crop.yml
 	yml = yaml.load(msg.payload, Loader=yaml.FullLoader)
 	print(yml)
-	time.sleep(1)
+	time.sleep(2)
 	with open(YML_FILE, 'w') as f:
 		yaml.dump(yml, f)
 		print("config written to", YML_FILE)
@@ -30,7 +30,7 @@ def set_config_listener(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 def get_config_listener(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 	print("received get config request")
 	# Add delay because it was returning faster than the client could subscribe
-	time.sleep(1)
+	time.sleep(2)
 	if os.path.isfile(YML_FILE):
 		with open(YML_FILE, 'r') as f:
 			conf = f.read()
