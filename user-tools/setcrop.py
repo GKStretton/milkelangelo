@@ -46,10 +46,6 @@ def load_yaml():
 class CropWindow(window.Window):
     def __init__(self):
         super().__init__()
-        self.stream = cv2.VideoCapture("rtsp://{}:8554/top-cam".format(HOST))#, cv2.CAP_GSTREAMER)
-        if not self.stream.isOpened():
-            print("Error loading webcam stream, aborting.")
-            self.exit()
 
         # load mask
         self.mask = cv2.imread(TOP_MASK)
@@ -64,6 +60,15 @@ class CropWindow(window.Window):
             self.y2 = 100
         
         print("loaded (x1, y1); (x2, y2) as ({}, {}); ({}, {})".format(self.x1, self.y1, self.x2, self.y2))
+
+        print("Opening stream...")
+        self.stream = cv2.VideoCapture("rtsp://{}:8554/top-cam".format(HOST))#, cv2.CAP_GSTREAMER)
+        self.stream.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+
+        if not self.stream.isOpened():
+            print("Error loading webcam stream, aborting.")
+            self.exit()
+        print("Stream opened")
     
     def load_config(self, current_yml):
         self.x1 = current_yml['left_abs']
