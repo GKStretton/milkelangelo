@@ -11,6 +11,10 @@ TOP_MASK = "../resources/static_img/top-mask.png"
 # how many microlitres to dispense at a time
 DISPENSE_uL = 50.0
 
+STREAM=False
+DO_CROP=True
+DO_MASK=True
+
 helps = {
 	"h": "Print this help text",
 	"c": "Toggle crop",
@@ -41,12 +45,9 @@ class Interface(Window):
 		self.target_x_rel = 0
 		self.target_y_rel = 0
 
-		self.do_crop = False
-		self.do_mask = False
+		self.do_crop = DO_CROP
+		self.do_mask = DO_MASK
 
-		# tcp is default
-		# top-cam-crop not working with ffmpeg pipelines for some reason. And gstreamer isn't installed
-		self.stream = cv2.VideoCapture("rtsp://DEPTH:8554/top-cam")#, cv2.CAP_FFMPEG)
 
 		self.crop_config = read_remote_crop_config()
 		if self.crop_config is None:
@@ -55,6 +56,16 @@ class Interface(Window):
 		self.crop_mag = self.crop_config['right_abs'] - self.crop_config['left_abs']
 
 		self.load_mask()
+
+		if STREAM:
+			# tcp is default
+			# top-cam-crop not working with ffmpeg pipelines for some reason. And gstreamer isn't installed
+			self.stream = cv2.VideoCapture("rtsp://DEPTH:8554/top-cam")#, cv2.CAP_FFMPEG)
+			self.stream.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+			if not self.stream.isOpened():
+				print("Error loading webcam stream, aborting.")
+				self.exit()
+			print("Stream opened")
 
 	def load_mask(self):
 		mask = cv2.imread(TOP_MASK)
@@ -175,23 +186,23 @@ class Interface(Window):
 		return frame[top:bottom, left:right]
 
 	def update(self):
-		ret, frame = self.stream.read()
-		if ret == False:
-			print("Frame empty, exiting")
-			self.exit()
+		if STREAM:
+			ret, frame = self.stream.read()
+			if ret == False:
+				print("Frame empty, exiting")
+				self.exit()
+		else:
+			frame = np.ones((1080, 1920, 3)) * 255
 
 		if self.do_crop:
 			frame = self.crop(frame)
 
 		if self.do_mask:
-			start = time.time()
 			if self.do_crop:
 				image.overlay_image_alpha(frame, np.zeros((self.crop_mag, self.crop_mag, 3)), 0, 0, self.mask)
 			else:
 				image.overlay_image_alpha(frame, np.zeros((self.crop_mag, self.crop_mag, 3)), self.crop_config['left_abs'], self.crop_config['top_abs'], self.mask)
-			print(time.time() - start)
-		
-
+			
 
 		cv2.circle(frame,self.rel_to_abs(self.target_x_rel,self.target_y_rel),10,(0,0,255),2, cv2.LINE_AA)
 
