@@ -114,7 +114,7 @@ class Interface(Window):
 
 		
 	def mouse_handler(self, event, x, y, flags, param):
-		if flags & cv2.EVENT_FLAG_LBUTTON:
+		if event == cv2.EVENT_LBUTTONDOWN:
 			xr, yr = self.abs_to_rel(x, y)
 			# reduce to unit length
 			m = abs(math.hypot(xr, yr))
