@@ -116,7 +116,7 @@ if __name__ == "__main__":
 	client.on_connect = on_connect
 	client.on_disconnect = on_disconnect
 
-	client.connect("mosquitto", 1883, 10)
+	client.connect("localhost", 1883, 10)
 	print("Connected to broker")
 	
 

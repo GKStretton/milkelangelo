@@ -62,7 +62,7 @@ if __name__ == "__main__":
 	client.on_disconnect = on_disconnect
 	client.on_message = on_message
 
-	client.connect("mosquitto", 1883, 10)
+	client.connect("localhost", 1883, 10)
 	print("Connected to broker")
 	client.message_callback_add("crop-config/set", set_config_listener)
 	client.message_callback_add("crop-config/get", get_config_listener)
