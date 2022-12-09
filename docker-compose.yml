@@ -10,6 +10,7 @@ services:
     environment:
       CROP_YML_FILE: "/config/crop.yml"
     restart: unless-stopped
+    network_mode: host
   rtsp:
     build: services/rtsp
     restart: unless-stopped
@@ -29,3 +30,4 @@ services:
       - /dev/ttyACM0
     tty: true
     restart: unless-stopped
+    network_mode: host
