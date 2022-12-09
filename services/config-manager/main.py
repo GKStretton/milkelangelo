@@ -53,6 +53,9 @@ if __name__ == "__main__":
 	signal.signal(signal.SIGTERM, term_handler)
 	signal.signal(signal.SIGINT, term_handler)
 
+	print("Sleeping to ensure mqtt broker is running after computer restart")
+	time.sleep(2)
+
 	# MQTT
 	client = mqtt.Client()
 	client.on_connect = on_connect
