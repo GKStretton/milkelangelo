@@ -11,9 +11,9 @@ TOP_MASK = "../resources/static_img/top-mask.png"
 # how many microlitres to dispense at a time
 DISPENSE_uL = 50.0
 
-STREAM=False
-DO_CROP=True
-DO_MASK=True
+STREAM=True
+DO_CROP=False
+DO_MASK=False
 
 helps = {
 	"h": "Print this help text",
