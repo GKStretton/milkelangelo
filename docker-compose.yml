@@ -7,8 +7,6 @@ services:
     tty: true
     volumes:
       - ./config:/config
-    depends_on:
-      - mosquitto
     environment:
       CROP_YML_FILE: "/config/crop.yml"
     restart: unless-stopped
@@ -30,6 +28,4 @@ services:
     devices:
       - /dev/ttyACM0
     tty: true
-    depends_on:
-      - mosquitto
     restart: unless-stopped
