@@ -7,7 +7,7 @@ import pycommon.image as image
 import numpy as np
 import pycommon.mqtt_client as mc
 
-TOP_MASK = "../resources/static_img/top-mask.png"
+TOP_MASK = "resources/static_img/top-mask.png"
 # how many microlitres to dispense at a time
 DISPENSE_uL = 50.0
 

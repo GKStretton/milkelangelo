@@ -3,7 +3,7 @@ from pycommon.const import HOST
 import yaml
 
 CLIENT_ID="py-interfaces"
-DEBUG = True
+DEBUG = False
 
 GOTO_NODE_TOPIC = "mega/req/goto-node"
 GOTO_TOPIC = "mega/req/goto-xy"
