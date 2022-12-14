@@ -7,6 +7,11 @@ import os
 YML_FILE = os.getenv("CROP_YML_FILE")
 
 def on_connect(client, userdata, flags, rc):
+	client.subscribe([
+		("crop-config/set", 1),
+		("crop-config/get", 1),
+	])
+
 	print("MQTT connected")
 
 def on_disconnect(client, userdata, rc):
@@ -66,11 +71,6 @@ if __name__ == "__main__":
 	print("Connected to broker")
 	client.message_callback_add("crop-config/set", set_config_listener)
 	client.message_callback_add("crop-config/get", get_config_listener)
-
-	client.subscribe([
-		("crop-config/set", 1),
-		("crop-config/get", 1),
-	])
 
 	print("Starting broker network loop")
 	client.loop_forever()
