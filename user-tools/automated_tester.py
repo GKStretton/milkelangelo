@@ -4,44 +4,48 @@
 import pycommon.mqtt_client as mc
 import time
 import signal
+import datetime
 
+def p(msg, *args):
+	prefix = "{}:".format(datetime.datetime.now().time())
+	print(prefix, msg, *args)
 
 def simulate_piece():
-	print("Simulating piece...")
-	print("Sending Wake")
+	p("Simulating piece...")
+	p("Sending Wake")
 	mc.wake()
-	time.sleep(5)
+	time.sleep(30)
 
 	coords = [(-0.5, 0.5), (0.5, 0.5), (-0.5, -0.5), (0.5, -0.5)]
 	dispense_amount = 50
 
 	for vial in range(1, 7, 2):
-		print("collecting from vial", vial)
+		p("collecting from vial", vial)
 		mc.collect(vial, len(coords) * dispense_amount)
 
-		time.sleep(10)
+		time.sleep(15)
 
 		for i, coord in enumerate(coords):
-			print("going to coord {}: ({}, {})".format(i, *coord))
+			p("going to coord {}: ({}, {})".format(i, *coord))
 			mc.goto_xy(*coord)
-			time.sleep(3)
-			print("requested dispense")
-			mc.dispense(dispense_amount)
 			time.sleep(10)
+			p("requested dispense")
+			mc.dispense(dispense_amount)
+			time.sleep(5)
 		
-		print("sleeping before next vial")
+		p("sleeping before next vial")
 		time.sleep(10)
 	
-	print("finished vials. waiting before sleep")
+	p("finished vials. waiting before sleep")
 	time.sleep(10)
-	print("shutting down")
+	p("shutting down")
 	mc.shutdown()
-	print("waiting after shutdown...")
+	p("waiting after shutdown...")
 	time.sleep(20)
 
 
 def term_handler(signum, frame):
-	print("term received, sending shutdown...")
+	p("term received, sending shutdown...")
 	mc.shutdown()
 	time.sleep(3)
 	exit()
