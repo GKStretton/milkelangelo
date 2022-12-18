@@ -19,6 +19,9 @@ OPEN_DRAIN_TOPIC = "mega/req/open-drain"
 CLOSE_DRAIN_TOPIC = "mega/req/close-drain"
 TOGGLE_MANUAL = "mega/req/manual"
 
+BEGIN_SESSION = "mega/session/begin"
+END_SESSION = "mega/session/end"
+
 # mqtt client
 client = None
 

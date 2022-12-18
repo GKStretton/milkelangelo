@@ -30,6 +30,8 @@ helps = {
 	"d": "open drain",
 	"p": "close/plug drain",
 	"m": "toggle manual mode",
+	"b": "begin session",
+	"e": "end session",
 }
 
 def print_help_text():
@@ -175,6 +177,12 @@ class Interface(Window):
 		if key == ord('m'):
 			print("toggling manual mode...")
 			mc.toggle_manual()
+		if key == ord('b'):
+			print("Starting session")
+			mc.pub(mc.BEGIN_SESSION, "")
+		if key == ord('e'):
+			print("Ending session")
+			mc.pub(mc.END_SESSION, "")
 
 
 	def crop(self, frame):

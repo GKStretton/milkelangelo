@@ -1,0 +1,4 @@
+package livecapture
+
+func Start() {
+}
