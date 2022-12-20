@@ -1,5 +1,7 @@
 package session
 
+import "fmt"
+
 type EventType int
 
 const (
@@ -12,6 +14,23 @@ type sessionEvent struct {
 	Type      EventType
 }
 
-func (sm *sessionManager) GetEventsChan() <-chan *sessionEvent {
-	return sm.e
+func (sm *sessionManager) SubscribeToEvents() (<-chan *sessionEvent, error) {
+	ch := make(chan *sessionEvent)
+	sm.subs = append(sm.subs, ch)
+	return ch, nil
+}
+
+// eventDistributor handles event fan out
+func (sm *sessionManager) eventDistributor() {
+	fmt.Println("Running eventDistributor")
+	for {
+		e := <-sm.pub
+		for _, sub := range sm.subs {
+			// non-blocking send to subscriber
+			select {
+			case sub <- e:
+			default:
+			}
+		}
+	}
 }

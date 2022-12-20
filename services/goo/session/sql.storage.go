@@ -20,6 +20,6 @@ func (s *sqlStorage) deleteSession(id ID) error {
 	return fmt.Errorf("not implemented")
 }
 
-func (s *sqlStorage) matchSession(match *Session) ([]*Session, error) {
+func (s *sqlStorage) matchSession(matcher *SessionMatcher) ([]*Session, error) {
 	return nil, fmt.Errorf("not implemented")
 }

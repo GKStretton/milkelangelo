@@ -8,6 +8,6 @@ import (
 func main() {
 	mqtt.Start()
 
-	sm := session.NewSessionManager()
-	<-sm.GetEventsChan()
+	sm := session.NewSessionManager(true)
+	_ = sm
 }

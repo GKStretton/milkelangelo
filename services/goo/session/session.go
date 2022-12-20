@@ -9,6 +9,12 @@ import (
 type ID uint64
 
 type Session struct {
+	Id         ID
+	Complete   bool
+	Production bool
+}
+
+type SessionMatcher struct {
 	Id         *ID
 	Complete   *bool
 	Production *bool
@@ -16,14 +22,20 @@ type Session struct {
 
 type sessionManager struct {
 	s storage
-	e chan *sessionEvent
+	// pub is the channel that this package can publish to
+	pub chan *sessionEvent
+	// subs is all the channels listened to by subscribers
+	subs []chan *sessionEvent
 }
 
-func NewSessionManager() *sessionManager {
-	return &sessionManager{
-		s: newStorage(),
-		e: make(chan *sessionEvent),
+func NewSessionManager(useMemoryStorage bool) *sessionManager {
+	sm := &sessionManager{
+		s:    newStorage(useMemoryStorage),
+		pub:  make(chan *sessionEvent),
+		subs: []chan *sessionEvent{},
 	}
+	go sm.eventDistributor()
+	return sm
 }
 
 // BeginSession will attempt to begin a new session
@@ -38,15 +50,15 @@ func (sm *sessionManager) BeginSession() (*Session, error) {
 
 	// okay to start a session
 	session := &Session{
-		Complete:   util.Ptr(false),
-		Production: util.Ptr(false),
+		Complete:   false,
+		Production: false,
 	}
 	session, err = sm.s.createSession(session)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create session: %v", err)
 	}
-	sm.e <- &sessionEvent{
-		SessionID: *session.Id,
+	sm.pub <- &sessionEvent{
+		SessionID: session.Id,
 		Type:      SESSION_STARTED,
 	}
 	return session, nil
@@ -61,13 +73,13 @@ func (sm *sessionManager) EndSession() (*Session, error) {
 	if session == nil {
 		return nil, fmt.Errorf("no session in progress")
 	}
-	*session.Complete = true
+	session.Complete = true
 	session, err = sm.s.updateSession(session)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update session: %v", err)
 	}
-	sm.e <- &sessionEvent{
-		SessionID: *session.Id,
+	sm.pub <- &sessionEvent{
+		SessionID: session.Id,
 		Type:      SESSION_ENDED,
 	}
 	return session, nil
@@ -75,7 +87,7 @@ func (sm *sessionManager) EndSession() (*Session, error) {
 
 // GetCurrentSession returns nil, nil if there is no current session
 func (sm *sessionManager) GetCurrentSession() (*Session, error) {
-	incompleteSessions, err := sm.s.matchSession(&Session{
+	incompleteSessions, err := sm.s.matchSession(&SessionMatcher{
 		Complete: util.Ptr(false),
 	})
 	if err != nil {

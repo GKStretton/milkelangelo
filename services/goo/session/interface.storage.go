@@ -6,9 +6,15 @@ type storage interface {
 	updateSession(session *Session) (*Session, error)
 	deleteSession(id ID) error
 	// matchSession returns a slice of sessions where all non-nil fields match
-	matchSession(match *Session) ([]*Session, error)
+	matchSession(matcher *SessionMatcher) ([]*Session, error)
 }
 
-func newStorage() storage {
-	return &memoryStorage{}
+func newStorage(useMemoryStorage bool) storage {
+	if useMemoryStorage {
+		return &memoryStorage{
+			memoryStore: map[ID]*Session{},
+		}
+	} else {
+		return &sqlStorage{}
+	}
 }
