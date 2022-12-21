@@ -20,26 +20,29 @@ type SessionMatcher struct {
 	Production *bool
 }
 
-type sessionManager struct {
+type SessionManager struct {
 	s storage
 	// pub is the channel that this package can publish to
-	pub chan *sessionEvent
+	pub chan *SessionEvent
 	// subs is all the channels listened to by subscribers
-	subs []chan *sessionEvent
+	subs []chan *SessionEvent
 }
 
-func NewSessionManager(useMemoryStorage bool) *sessionManager {
-	sm := &sessionManager{
+func NewSessionManager(useMemoryStorage bool) *SessionManager {
+	sm := &SessionManager{
 		s:    newStorage(useMemoryStorage),
-		pub:  make(chan *sessionEvent),
-		subs: []chan *sessionEvent{},
+		pub:  make(chan *SessionEvent),
+		subs: []chan *SessionEvent{},
 	}
 	go sm.eventDistributor()
+
+	sm.subscribeToBrokerTopics()
+
 	return sm
 }
 
 // BeginSession will attempt to begin a new session
-func (sm *sessionManager) BeginSession() (*Session, error) {
+func (sm *SessionManager) BeginSession() (*Session, error) {
 	current, err := sm.GetCurrentSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed to check if session is in progress: %v", err)
@@ -57,15 +60,16 @@ func (sm *sessionManager) BeginSession() (*Session, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create session: %v", err)
 	}
-	sm.pub <- &sessionEvent{
+	sm.pub <- &SessionEvent{
 		SessionID: session.Id,
 		Type:      SESSION_STARTED,
 	}
+	fmt.Printf("Began session %d\n", session.Id)
 	return session, nil
 }
 
 // EndSession will end a session if one is in progress
-func (sm *sessionManager) EndSession() (*Session, error) {
+func (sm *SessionManager) EndSession() (*Session, error) {
 	session, err := sm.GetCurrentSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed getting current session: %v", err)
@@ -78,15 +82,16 @@ func (sm *sessionManager) EndSession() (*Session, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to update session: %v", err)
 	}
-	sm.pub <- &sessionEvent{
+	sm.pub <- &SessionEvent{
 		SessionID: session.Id,
 		Type:      SESSION_ENDED,
 	}
+	fmt.Printf("Ended session %d\n", session.Id)
 	return session, nil
 }
 
 // GetCurrentSession returns nil, nil if there is no current session
-func (sm *sessionManager) GetCurrentSession() (*Session, error) {
+func (sm *SessionManager) GetCurrentSession() (*Session, error) {
 	incompleteSessions, err := sm.s.matchSession(&SessionMatcher{
 		Complete: util.Ptr(false),
 	})

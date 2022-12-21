@@ -1,6 +1,11 @@
 package session
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/gkstretton/dark/services/goo/mqtt"
+	"github.com/gkstretton/dark/services/goo/topics"
+)
 
 type EventType int
 
@@ -9,22 +14,25 @@ const (
 	SESSION_ENDED
 )
 
-type sessionEvent struct {
+type SessionEvent struct {
 	SessionID ID
 	Type      EventType
 }
 
-func (sm *sessionManager) SubscribeToEvents() (<-chan *sessionEvent, error) {
-	ch := make(chan *sessionEvent)
+func (sm *SessionManager) SubscribeToEvents() <-chan *SessionEvent {
+	ch := make(chan *SessionEvent)
 	sm.subs = append(sm.subs, ch)
-	return ch, nil
+	return ch
 }
 
 // eventDistributor handles event fan out
-func (sm *sessionManager) eventDistributor() {
+func (sm *SessionManager) eventDistributor() {
 	fmt.Println("Running eventDistributor")
 	for {
 		e := <-sm.pub
+
+		// publish event to broker, and to internal channel
+		sm.publishToBroker(e)
 		for _, sub := range sm.subs {
 			// non-blocking send to subscriber
 			select {
@@ -33,4 +41,34 @@ func (sm *sessionManager) eventDistributor() {
 			}
 		}
 	}
+}
+
+func (sm *SessionManager) publishToBroker(e *SessionEvent) {
+	if e.Type == SESSION_STARTED {
+		err := mqtt.Publish(topics.BEGAN_SESSION, fmt.Sprintf("%d", e.SessionID))
+		if err != nil {
+			fmt.Printf("error publishing session event: %v\n", err)
+		}
+	} else if e.Type == SESSION_ENDED {
+		err := mqtt.Publish(topics.ENDED_SESSION, fmt.Sprintf("%d", e.SessionID))
+		if err != nil {
+			fmt.Printf("error publishing session event: %v\n", err)
+		}
+	}
+}
+
+func (sm *SessionManager) subscribeToBrokerTopics() {
+	mqtt.Subscribe(topics.BEGIN_SESSION, func(topic string, payload []byte) {
+		_, err := sm.BeginSession()
+		if err != nil {
+			fmt.Printf("cannot begin session: %v\n", err)
+		}
+	})
+
+	mqtt.Subscribe(topics.END_SESSION, func(topic string, payload []byte) {
+		_, err := sm.EndSession()
+		if err != nil {
+			fmt.Printf("cannot end session: %v\n", err)
+		}
+	})
 }

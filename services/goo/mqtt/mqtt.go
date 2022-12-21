@@ -1,10 +1,15 @@
 package mqtt
 
 import (
+	"flag"
 	"fmt"
 	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
+)
+
+var (
+	host = flag.String("host", "DEPTH", "the hostname of the mqtt broker")
 )
 
 const QOS = 1
@@ -19,9 +24,10 @@ var subs = subscriptions{}
 func Start() {
 	_ = paho.CRITICAL
 	client = paho.NewClient(paho.NewClientOptions().
-		AddBroker("DEPTH:1883").
+		AddBroker(fmt.Sprintf("%s:1883", *host)).
 		SetOnConnectHandler(on_connect).
-		SetAutoReconnect(true),
+		SetAutoReconnect(true).
+		SetConnectionLostHandler(on_disconnect),
 	)
 	token := client.Connect()
 	if !token.WaitTimeout(time.Second * time.Duration(5)) {
@@ -30,6 +36,16 @@ func Start() {
 	if token.Error() != nil {
 		panic(token.Error())
 	}
+
+	client.AddRoute("#", on_message)
+}
+
+func on_message(client paho.Client, msg paho.Message) {
+	// fmt.Printf("Received mqtt message on '%s': %v\n", msg.Topic(), string(msg.Payload()))
+}
+
+func on_disconnect(client paho.Client, err error) {
+	fmt.Printf("Disconnected from broker: %v\n", err)
 }
 
 func on_connect(client paho.Client) {
@@ -44,6 +60,9 @@ func on_connect(client paho.Client) {
 }
 
 func Publish(topic string, payload interface{}) error {
+	if client == nil {
+		return fmt.Errorf("mqtt client not initialised")
+	}
 	token := client.Publish(topic, QOS, false, payload)
 	if !token.WaitTimeout(time.Second) {
 		return fmt.Errorf("publish to %s timed out", topic)
@@ -55,6 +74,9 @@ func Publish(topic string, payload interface{}) error {
 }
 
 func Subscribe(topic string, cb Callback) {
+	if client == nil {
+		fmt.Println("mqtt client not initialised")
+	}
 	subs[topic] = append(subs[topic], cb)
 	if client != nil && client.IsConnectionOpen() {
 		client.Subscribe(topic, QOS, func(c paho.Client, m paho.Message) {

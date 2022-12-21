@@ -3,55 +3,51 @@ package session
 import (
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSubscribeToEvents(t *testing.T) {
-	//todo: subscribe twice.
-	//todo: begin session
-	//todo: end session
-}
-
-func TestEndSession(t *testing.T) {
-}
-
-func TestBeginSession(t *testing.T) {
-	//todo: cut down
-
 	sm := NewSessionManager(true)
 
-	// This tests the event listener feature
-
+	// subscribe twice.
 	wg := sync.WaitGroup{}
 
 	wg.Add(1)
-	var chSessionID1 ID
+	var chSessionIDStarted ID
+	var chSessionIDEnded ID
 	go func() {
 		defer wg.Done()
-		ch, err := sm.SubscribeToEvents()
-		assert.NoError(t, err)
+		ch := sm.SubscribeToEvents()
 
 		e := <-ch
 		assert.Equal(t, SESSION_STARTED, e.Type)
-		chSessionID1 = e.SessionID
+		chSessionIDStarted = e.SessionID
+
+		e = <-ch
+		assert.Equal(t, SESSION_ENDED, e.Type)
+		chSessionIDEnded = e.SessionID
 	}()
 
-	wg.Add(1)
-	var chSessionID2 ID
-	go func() {
-		defer wg.Done()
-		ch, err := sm.SubscribeToEvents()
-		assert.NoError(t, err)
+	// Begin session
+	startedSession, err := sm.BeginSession()
+	assert.NoError(t, err)
+	assert.Equal(t, false, startedSession.Complete)
 
-		e := <-ch
-		assert.Equal(t, SESSION_STARTED, e.Type)
-		chSessionID2 = e.SessionID
-	}()
+	// End session
+	endedSession, err := sm.EndSession()
+	assert.NoError(t, err)
+	assert.Equal(t, true, endedSession.Complete)
 
-	// ensure they are subscribed
-	time.Sleep(time.Millisecond * time.Duration(10))
+	wg.Wait()
+	assert.Equal(t, startedSession.Id, endedSession.Id)
+	assert.Equal(t, startedSession.Id, chSessionIDStarted)
+	assert.Equal(t, endedSession.Id, chSessionIDEnded)
+}
+
+// TestSessionBasics tests BeginSession, EndSession, and GetCurrentSession
+func TestSessionBasics(t *testing.T) {
+	sm := NewSessionManager(true)
 
 	// This tests BeginSession with reference to GetCurrentSession
 
@@ -64,12 +60,16 @@ func TestBeginSession(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, false, startedSession.Complete)
 
-	// No session in progress
-	retrievedSession, err := sm.GetCurrentSession()
-	assert.Equal(t, startedSession, retrievedSession)
+	session, err = sm.GetCurrentSession()
+	assert.Equal(t, startedSession, session)
 	assert.NoError(t, err)
 
-	wg.Wait()
-	assert.Equal(t, retrievedSession.Id, chSessionID1)
-	assert.Equal(t, retrievedSession.Id, chSessionID2)
+	endedSession, err := sm.EndSession()
+	assert.NoError(t, err)
+	assert.Equal(t, true, endedSession.Complete)
+
+	// No session in progress
+	session, err = sm.GetCurrentSession()
+	assert.Nil(t, session)
+	assert.NoError(t, err)
 }

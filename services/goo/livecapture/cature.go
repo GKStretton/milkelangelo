@@ -1,4 +1,0 @@
-package livecapture
-
-func Start() {
-}
