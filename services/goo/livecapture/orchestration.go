@@ -2,6 +2,7 @@ package livecapture
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/gkstretton/dark/services/goo/session"
 )
@@ -12,16 +13,16 @@ var (
 )
 
 type recorder struct {
-	sm          *session.SessionManager
-	isRecording bool
-	stop        chan bool
+	sm            *session.SessionManager
+	isRecording   bool
+	stopRecording chan bool
 }
 
 func Run(sm *session.SessionManager) {
 	rec = &recorder{
-		sm:          sm,
-		isRecording: false,
-		stop:        make(chan bool),
+		sm:            sm,
+		isRecording:   false,
+		stopRecording: make(chan bool),
 	}
 	go rec.run()
 }
@@ -38,17 +39,21 @@ func (r *recorder) run() {
 }
 
 func (r *recorder) evaluateAction() {
-	session, _ := r.sm.GetCurrentSession()
-
-	// If no active session and we're recording
-	if session == nil && r.isRecording {
-		// Stop recording
-		r.stop <- true
+	latestSession, err := r.sm.GetLatestSession()
+	if err != nil || latestSession == nil {
+		fmt.Printf("failed to GetLatestSession in livecapture: %v", err)
+		return
 	}
 
-	// If there is an active session and we're not recording
-	if session != nil && !r.isRecording {
+	// If we're recording but shouldn't be
+	if r.isRecording && (latestSession.Complete || latestSession.Paused) {
+		// Stop recording
+		r.stopRecording <- true
+	}
+
+	// If we're not recording but should be
+	if !r.isRecording && (!latestSession.Complete && !latestSession.Paused) {
 		// Start recording
-		go r.record()
+		go r.record(latestSession.Id)
 	}
 }

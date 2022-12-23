@@ -20,3 +20,27 @@ Dark is the supporting system monorepo for [A Study of Light](https://www.youtub
 
 Fill out the .env file in root of repo with your configuration
 
+
+## Storage
+
+Currently all data is stored to disk.
+
+Each session has the following format (output content in bold):
+
+- metadata/
+	- **session.yml**
+	- events.yml
+- dslr/
+	- raw/
+	- post/
+	- **selected/**
+- video/
+	- raw/
+		- front/
+		- top/
+		- stills/
+	- post/
+		- **shortform/**
+		- **longform/**
+		- stills/
+- **thumbnails/**

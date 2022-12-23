@@ -7,6 +7,8 @@ type storage interface {
 	deleteSession(id ID) error
 	// matchSession returns a slice of sessions where all non-nil fields match
 	matchSession(matcher *SessionMatcher) ([]*Session, error)
+	// getLatest returns the latest to be added (highest id)
+	getLatest() (*Session, error)
 }
 
 func newStorage(useMemoryStorage bool) storage {

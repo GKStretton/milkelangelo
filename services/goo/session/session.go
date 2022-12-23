@@ -2,20 +2,20 @@ package session
 
 import (
 	"fmt"
-
-	"github.com/gkstretton/dark/services/goo/util"
 )
 
 type ID uint64
 
 type Session struct {
 	Id         ID
+	Paused     bool
 	Complete   bool
 	Production bool
 }
 
 type SessionMatcher struct {
 	Id         *ID
+	Paused     *bool
 	Complete   *bool
 	Production *bool
 }
@@ -43,11 +43,11 @@ func NewSessionManager(useMemoryStorage bool) *SessionManager {
 
 // BeginSession will attempt to begin a new session
 func (sm *SessionManager) BeginSession() (*Session, error) {
-	current, err := sm.GetCurrentSession()
+	latest, err := sm.GetLatestSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed to check if session is in progress: %v", err)
 	}
-	if current != nil {
+	if latest != nil && !latest.Complete {
 		return nil, fmt.Errorf("session already in progress")
 	}
 
@@ -68,43 +68,91 @@ func (sm *SessionManager) BeginSession() (*Session, error) {
 	return session, nil
 }
 
+// ResumeSession will resume a paused in-progress session
+func (sm *SessionManager) ResumeSession() (*Session, error) {
+	latest, err := sm.GetLatestSession()
+	if err != nil {
+		return nil, fmt.Errorf("failed to check if session is in progress: %v", err)
+	}
+	if latest == nil || latest.Complete {
+		return nil, fmt.Errorf("no session in progress, cannot resume")
+	}
+
+	if !latest.Paused {
+		return latest, fmt.Errorf("session not paused")
+	}
+	latest.Paused = false
+	latest, err = sm.s.updateSession(latest)
+	if err != nil {
+		return latest, fmt.Errorf("failed to resume: %v", err)
+	}
+
+	sm.pub <- &SessionEvent{
+		SessionID: latest.Id,
+		Type:      SESSION_RESUMED,
+	}
+	fmt.Printf("Resumed session %d\n", latest.Id)
+
+	return latest, nil
+}
+
+// PauseSession will pause a current session
+func (sm *SessionManager) PauseSession() (*Session, error) {
+	latest, err := sm.GetLatestSession()
+	if err != nil {
+		return nil, fmt.Errorf("failed to check if session is in progress: %v", err)
+	}
+	if latest == nil || latest.Complete {
+		return nil, fmt.Errorf("no session in progress, cannot pause")
+	}
+
+	if latest.Paused {
+		return latest, fmt.Errorf("session already paused")
+	}
+	latest.Paused = true
+	latest, err = sm.s.updateSession(latest)
+	if err != nil {
+		return latest, fmt.Errorf("failed to pause: %v", err)
+	}
+
+	sm.pub <- &SessionEvent{
+		SessionID: latest.Id,
+		Type:      SESSION_PAUSED,
+	}
+	fmt.Printf("Paused session %d\n", latest.Id)
+
+	return latest, nil
+}
+
 // EndSession will end a session if one is in progress
 func (sm *SessionManager) EndSession() (*Session, error) {
-	session, err := sm.GetCurrentSession()
+	latest, err := sm.GetLatestSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed getting current session: %v", err)
 	}
-	if session == nil {
+	if latest == nil || latest.Complete {
 		return nil, fmt.Errorf("no session in progress")
 	}
-	session.Complete = true
-	session, err = sm.s.updateSession(session)
+
+	latest.Complete = true
+	latest.Paused = false
+	latest, err = sm.s.updateSession(latest)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update session: %v", err)
 	}
 	sm.pub <- &SessionEvent{
-		SessionID: session.Id,
+		SessionID: latest.Id,
 		Type:      SESSION_ENDED,
 	}
-	fmt.Printf("Ended session %d\n", session.Id)
-	return session, nil
+	fmt.Printf("Ended session %d\n", latest.Id)
+	return latest, nil
 }
 
-// GetCurrentSession returns nil, nil if there is no current session
-func (sm *SessionManager) GetCurrentSession() (*Session, error) {
-	incompleteSessions, err := sm.s.matchSession(&SessionMatcher{
-		Complete: util.Ptr(false),
-	})
+// GetLatestSession returns nil, nil if there are no sessions yet
+func (sm *SessionManager) GetLatestSession() (*Session, error) {
+	latest, err := sm.s.getLatest()
 	if err != nil {
 		return nil, err
 	}
-	if len(incompleteSessions) > 1 {
-		return nil, fmt.Errorf("%d sessions in progress, expected <= 1", len(incompleteSessions))
-	}
-
-	if len(incompleteSessions) == 1 {
-		return incompleteSessions[0], nil
-	}
-
-	return nil, nil
+	return latest, nil
 }

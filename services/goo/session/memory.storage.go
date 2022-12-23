@@ -64,6 +64,15 @@ func (s *memoryStorage) matchSession(matcher *SessionMatcher) ([]*Session, error
 	return matches, nil
 }
 
+func (s *memoryStorage) getLatest() (*Session, error) {
+	// if there's none
+	if len(s.memoryStore) == 0 {
+		return nil, nil
+	}
+	id := s.getMaxID()
+	return s.readSession(id)
+}
+
 func (s *memoryStorage) getMaxID() ID {
 	var max ID
 	for id := range s.memoryStore {

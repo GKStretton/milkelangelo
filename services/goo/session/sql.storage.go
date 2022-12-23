@@ -23,3 +23,7 @@ func (s *sqlStorage) deleteSession(id ID) error {
 func (s *sqlStorage) matchSession(matcher *SessionMatcher) ([]*Session, error) {
 	return nil, fmt.Errorf("not implemented")
 }
+
+func (s *sqlStorage) getLatest() (*Session, error) {
+	return nil, fmt.Errorf("not implemented")
+}

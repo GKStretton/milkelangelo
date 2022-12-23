@@ -12,6 +12,8 @@ type EventType int
 const (
 	SESSION_STARTED EventType = iota
 	SESSION_ENDED
+	SESSION_PAUSED
+	SESSION_RESUMED
 )
 
 type SessionEvent struct {

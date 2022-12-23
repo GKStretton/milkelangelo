@@ -3,9 +3,11 @@ package livecapture
 import (
 	"fmt"
 	"time"
+
+	"github.com/gkstretton/dark/services/goo/session"
 )
 
-func (r *recorder) record() {
+func (r *recorder) record(id session.ID) {
 	defer stopVideoRecording()
 	defer func() { r.isRecording = false }()
 
@@ -18,7 +20,7 @@ func (r *recorder) record() {
 		case <-next:
 			next = time.After(time.Second * time.Duration(*captureInterval))
 			captureImage()
-		case <-r.stop:
+		case <-r.stopRecording:
 			return
 		}
 	}
