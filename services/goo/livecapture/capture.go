@@ -4,15 +4,29 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/session"
 )
 
 func (r *recorder) record(id session.ID) {
-	defer stopVideoRecording()
+	r.isRecording = true
 	defer func() { r.isRecording = false }()
 
-	r.isRecording = true
-	startVideoRecording()
+	// webcam recordings
+
+	topRecording, err := startWebcamRecording(*config.TopCamRtspPath, uint64(id))
+	if err != nil {
+		fmt.Printf("failed to start top webcam recording: %v\n", err)
+	}
+	// frontRecording, err := startWebcamRecording(*config.FrontCamRtspPath, uint64(id))
+	// if err != nil {
+	// 	fmt.Printf("failed to start front webcam recording: %v\n", err)
+	// }
+
+	defer topRecording.Stop()
+	// defer frontRecording.Stop()
+
+	// Regular image capture
 
 	next := time.After(0)
 	for {
@@ -28,12 +42,4 @@ func (r *recorder) record(id session.ID) {
 
 func captureImage() {
 	fmt.Println("capture image (not implemented)")
-}
-
-func startVideoRecording() {
-	fmt.Println("start recording (not implemented)")
-}
-
-func stopVideoRecording() {
-	fmt.Println("stop recording (not implemented)")
 }

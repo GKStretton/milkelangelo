@@ -41,7 +41,7 @@ func (r *recorder) run() {
 func (r *recorder) evaluateAction() {
 	latestSession, err := r.sm.GetLatestSession()
 	if err != nil || latestSession == nil {
-		fmt.Printf("failed to GetLatestSession in livecapture: %v", err)
+		fmt.Printf("failed to GetLatestSession in livecapture: %v\n", err)
 		return
 	}
 
