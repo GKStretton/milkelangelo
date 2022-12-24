@@ -17,6 +17,6 @@ func newStorage(useMemoryStorage bool) storage {
 			memoryStore: map[ID]*Session{},
 		}
 	} else {
-		return &sqlStorage{}
+		return &yamlStorage{}
 	}
 }

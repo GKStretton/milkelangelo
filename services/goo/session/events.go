@@ -3,8 +3,8 @@ package session
 import (
 	"fmt"
 
+	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/mqtt"
-	"github.com/gkstretton/dark/services/goo/topics"
 )
 
 type EventType int
@@ -47,12 +47,12 @@ func (sm *SessionManager) eventDistributor() {
 
 func (sm *SessionManager) publishToBroker(e *SessionEvent) {
 	if e.Type == SESSION_STARTED {
-		err := mqtt.Publish(topics.BEGAN_SESSION, fmt.Sprintf("%d", e.SessionID))
+		err := mqtt.Publish(config.TOPIC_SESSION_BEGAN, fmt.Sprintf("%d", e.SessionID))
 		if err != nil {
 			fmt.Printf("error publishing session event: %v\n", err)
 		}
 	} else if e.Type == SESSION_ENDED {
-		err := mqtt.Publish(topics.ENDED_SESSION, fmt.Sprintf("%d", e.SessionID))
+		err := mqtt.Publish(config.TOPIC_SESSION_ENDED, fmt.Sprintf("%d", e.SessionID))
 		if err != nil {
 			fmt.Printf("error publishing session event: %v\n", err)
 		}
@@ -60,14 +60,14 @@ func (sm *SessionManager) publishToBroker(e *SessionEvent) {
 }
 
 func (sm *SessionManager) subscribeToBrokerTopics() {
-	mqtt.Subscribe(topics.BEGIN_SESSION, func(topic string, payload []byte) {
+	mqtt.Subscribe(config.TOPIC_SESSION_BEGIN, func(topic string, payload []byte) {
 		_, err := sm.BeginSession()
 		if err != nil {
 			fmt.Printf("cannot begin session: %v\n", err)
 		}
 	})
 
-	mqtt.Subscribe(topics.END_SESSION, func(topic string, payload []byte) {
+	mqtt.Subscribe(config.TOPIC_SESSION_END, func(topic string, payload []byte) {
 		_, err := sm.EndSession()
 		if err != nil {
 			fmt.Printf("cannot end session: %v\n", err)
