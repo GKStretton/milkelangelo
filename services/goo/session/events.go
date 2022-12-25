@@ -46,16 +46,24 @@ func (sm *SessionManager) eventDistributor() {
 }
 
 func (sm *SessionManager) publishToBroker(e *SessionEvent) {
-	if e.Type == SESSION_STARTED {
-		err := mqtt.Publish(config.TOPIC_SESSION_BEGAN, fmt.Sprintf("%d", e.SessionID))
-		if err != nil {
-			fmt.Printf("error publishing session event: %v\n", err)
-		}
-	} else if e.Type == SESSION_ENDED {
-		err := mqtt.Publish(config.TOPIC_SESSION_ENDED, fmt.Sprintf("%d", e.SessionID))
-		if err != nil {
-			fmt.Printf("error publishing session event: %v\n", err)
-		}
+	var topic string
+	switch e.Type {
+	case SESSION_STARTED:
+		topic = config.TOPIC_SESSION_BEGAN
+	case SESSION_ENDED:
+		topic = config.TOPIC_SESSION_ENDED
+	case SESSION_PAUSED:
+		topic = config.TOPIC_SESSION_PAUSED
+	case SESSION_RESUMED:
+		topic = config.TOPIC_SESSION_RESUMED
+	default:
+		fmt.Printf("unknown event type in publishToBroker: %v\n", e)
+		return
+	}
+
+	err := mqtt.Publish(topic, fmt.Sprintf("%d", e.SessionID))
+	if err != nil {
+		fmt.Printf("error publishing session event: %v\n", err)
 	}
 }
 
@@ -71,6 +79,20 @@ func (sm *SessionManager) subscribeToBrokerTopics() {
 		_, err := sm.EndSession()
 		if err != nil {
 			fmt.Printf("cannot end session: %v\n", err)
+		}
+	})
+
+	mqtt.Subscribe(config.TOPIC_SESSION_PAUSE, func(topic string, payload []byte) {
+		_, err := sm.PauseSession()
+		if err != nil {
+			fmt.Printf("cannot pause session: %v\n", err)
+		}
+	})
+
+	mqtt.Subscribe(config.TOPIC_SESSION_RESUME, func(topic string, payload []byte) {
+		_, err := sm.ResumeSession()
+		if err != nil {
+			fmt.Printf("cannot resume session: %v\n", err)
 		}
 	})
 }

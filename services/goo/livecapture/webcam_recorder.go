@@ -7,6 +7,7 @@ import (
 	"os/exec"
 
 	"github.com/gkstretton/dark/services/goo/config"
+	"github.com/gkstretton/dark/services/goo/filesystem"
 )
 
 type webcamRecorder struct {
@@ -18,23 +19,17 @@ type webcamRecorder struct {
 
 func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, error) {
 	url := fmt.Sprintf("%s:8554/%s", *config.RtspHost, rtspPath)
-	outDir := fmt.Sprintf("%s/%d/%s/%s/",
-		*config.SessionBasePath,
-		uint64(sessionId),
-		*config.RawFootagePath,
-		rtspPath,
-	)
 
-	//todo: incremental file name for resumes
-	fileName := "1.mp4"
+	dir := filesystem.GetRawVideoDir(sessionId, rtspPath)
+	filePath := filesystem.GetIncrementalFileName(dir, "mp4")
 
-	fmt.Printf("Calling capture-rtsp.sh with '%s' and '%s'\n", url, outDir+fileName)
+	fmt.Printf("Calling capture-rtsp.sh with '%s' and '%s'\n", url, filePath)
 
 	wr := &webcamRecorder{
 		sessionId: sessionId,
 		name:      rtspPath,
 	}
-	wr.cmd = exec.Command("./scripts/capture-rtsp.sh", url, outDir+fileName)
+	wr.cmd = exec.Command("./scripts/capture-rtsp.sh", url, filePath)
 
 	wr.cmd.Stdout = os.Stdout
 	wr.cmd.Stderr = os.Stderr
@@ -72,6 +67,6 @@ func (wr *webcamRecorder) Stop() {
 }
 
 func (wr *webcamRecorder) log(s string, args ...interface{}) {
-	msg := fmt.Sprintf("[Webcam Recorder] (%d - %s): "+s+"\n", wr.sessionId, wr.name, args)
-	fmt.Println(msg)
+	prefix := fmt.Sprintf("[Webcam Recorder] (%d - %s): ", wr.sessionId, wr.name)
+	fmt.Printf(prefix+s, args...)
 }

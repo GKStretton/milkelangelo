@@ -5,6 +5,7 @@ import (
 	"flag"
 	"os"
 
+	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/livecapture"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
@@ -12,6 +13,8 @@ import (
 
 func main() {
 	flag.Parse()
+
+	filesystem.AssertSessionBasePath()
 
 	mqtt.Start()
 
