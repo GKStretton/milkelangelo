@@ -19,8 +19,10 @@ OPEN_DRAIN_TOPIC = "mega/req/open-drain"
 CLOSE_DRAIN_TOPIC = "mega/req/close-drain"
 TOGGLE_MANUAL = "mega/req/manual"
 
-BEGIN_SESSION = "mega/session/begin"
-END_SESSION = "mega/session/end"
+BEGIN_SESSION = "asol/session/begin"
+END_SESSION = "asol/session/end"
+PAUSE_SESSION = "asol/session/pause"
+RESUME_SESSION = "asol/session/resume"
 
 # mqtt client
 client = None

@@ -32,6 +32,8 @@ helps = {
 	"m": "toggle manual mode",
 	"b": "begin session",
 	"e": "end session",
+	"z": "pause session",
+	",": "resume session",
 }
 
 def print_help_text():
@@ -183,6 +185,12 @@ class Interface(Window):
 		if key == ord('e'):
 			print("Ending session")
 			mc.pub(mc.END_SESSION, "")
+		if key == ord('z'):
+			print("Pausing session")
+			mc.pub(mc.PAUSE_SESSION, "")
+		if key == ord(','):
+			print("Resuming session")
+			mc.pub(mc.RESUME_SESSION, "")
 
 
 	def crop(self, frame):
