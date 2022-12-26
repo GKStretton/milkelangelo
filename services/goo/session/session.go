@@ -65,7 +65,7 @@ func (sm *SessionManager) BeginSession() (*Session, error) {
 	}
 
 	// Create session folder for content etc.
-	err = filesystem.InitSession(uint64(session.Id))
+	err = filesystem.InitSessionContent(uint64(session.Id))
 	if err != nil {
 		sm.s.deleteSession(session.Id)
 		return nil, fmt.Errorf("failed to InitSession in filesystem: %v", err)

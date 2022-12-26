@@ -14,7 +14,7 @@ import (
 func main() {
 	flag.Parse()
 
-	filesystem.AssertSessionBasePath()
+	filesystem.AssertBasePaths()
 
 	mqtt.Start()
 

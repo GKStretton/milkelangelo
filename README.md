@@ -23,13 +23,21 @@ Fill out the .env file in root of repo with your configuration
 
 ## Storage
 
-Currently all data is stored to disk.
+Currently all data is stored to disk at the `-basePath`.
 
-Each session has the following format (output content in bold):
+`basePath`:
+- session_content/
+	- 1/
+	- 2/
+- session_metadata/
+	- 1.yml
+	- 2.yml
+- session_events/
+	- 1.yml
+	- 2.yml
 
-- metadata/
-	- **session.yml**
-	- events.yml
+Each `session_content` folder has the following format (output content in bold):
+
 - dslr/
 	- raw/
 	- post/

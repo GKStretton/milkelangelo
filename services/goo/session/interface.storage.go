@@ -1,5 +1,7 @@
 package session
 
+import "sync"
+
 type storage interface {
 	createSession(session *Session) (*Session, error)
 	readSession(id ID) (*Session, error)
@@ -17,6 +19,8 @@ func newStorage(useMemoryStorage bool) storage {
 			memoryStore: map[ID]*Session{},
 		}
 	} else {
-		return &yamlStorage{}
+		return &yamlStorage{
+			lock: &sync.Mutex{},
+		}
 	}
 }
