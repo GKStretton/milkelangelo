@@ -17,6 +17,10 @@ type yamlStorage struct {
 }
 
 func (s *yamlStorage) createSession(session *Session) (*Session, error) {
+	// first id
+	session.Id = 1
+
+	// overwrite if others present
 	latest, _ := s.getLatest()
 	if latest != nil {
 		session.Id = latest.Id + 1
@@ -72,7 +76,6 @@ func (s *yamlStorage) updateSession(session *Session) (*Session, error) {
 
 	// encode
 	e := yaml.NewEncoder(f)
-	session.Production = true
 	err = e.Encode(session)
 	if err != nil {
 		return nil, fmt.Errorf("error encoding yml: %v", err)
