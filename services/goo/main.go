@@ -18,7 +18,7 @@ func main() {
 
 	mqtt.Start()
 
-	sm := session.NewSessionManager(true)
+	sm := session.NewSessionManager(false)
 
 	livecapture.Run(sm)
 

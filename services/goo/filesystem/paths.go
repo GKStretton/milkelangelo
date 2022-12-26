@@ -10,15 +10,15 @@ import (
 )
 
 var (
-	SessionBasePath = flag.String("sessionBasePath", "/mnt/md0/light-stores/sessions", "base path for sessions")
-	RawVideoPath    = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
-	MetadataPath    = flag.String("metadataPath", "metadata", "session subdir for metadata")
+	sessionBasePath = flag.String("sessionBasePath", "/mnt/md0/light-stores/sessions", "base path for sessions")
+	rawVideoPath    = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
+	metadataPath    = flag.String("metadataPath", "metadata", "session subdir for metadata")
 )
 
 func AssertSessionBasePath() {
-	exists := exists(*SessionBasePath)
+	exists := exists(*sessionBasePath)
 	if !exists {
-		panic("session base path '" + *SessionBasePath + "' does not exist")
+		panic("session base path '" + *sessionBasePath + "' does not exist")
 	}
 }
 
@@ -35,7 +35,7 @@ func exists(filepath string) bool {
 }
 
 func GetMetadataDir(id uint64) string {
-	p := filepath.Join(*SessionBasePath, strconv.Itoa(int(id)), *MetadataPath)
+	p := filepath.Join(*sessionBasePath, strconv.Itoa(int(id)), *metadataPath)
 	err := os.MkdirAll(p, 0744)
 	if err != nil {
 		panic(fmt.Errorf("failed to create base path: %v", err))
@@ -48,9 +48,9 @@ func GetMetadataDir(id uint64) string {
 //	e.g. 5, top-cam
 func GetRawVideoDir(sessionId uint64, rtspPath string) string {
 	p := filepath.Join(
-		*SessionBasePath,
+		*sessionBasePath,
 		strconv.Itoa(int(sessionId)),
-		*RawVideoPath,
+		*rawVideoPath,
 		rtspPath,
 	)
 	err := os.MkdirAll(p, 0744)
@@ -76,4 +76,37 @@ func GetIncrementalFileName(outDir string, ext string) string {
 			panic("bug in GetIncrementalFileName: filename should not likely exceed 10000")
 		}
 	}
+}
+
+// InitSession creates a session folder on disk that content uses
+// It also sets the 'latest' symlink to point to this session folder
+func InitSession(sessionId uint64) error {
+	sessionPath := filepath.Join(*sessionBasePath, strconv.Itoa(int(sessionId)))
+	err := os.Mkdir(sessionPath, 0744)
+	if err != nil {
+		return fmt.Errorf("failed to mkdir: %v", err)
+	}
+
+	latestPath := filepath.Join(*sessionBasePath, "latest")
+	if err = removeSymlink(latestPath); err != nil {
+		return fmt.Errorf("failed to unlink latest: %v", err)
+	}
+	if err = os.Symlink(sessionPath, latestPath); err != nil {
+		return fmt.Errorf("failed to symlink latest: %v", err)
+	}
+
+	return nil
+}
+
+func removeSymlink(symlinkPath string) error {
+	if _, err := os.Lstat(symlinkPath); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
+		return fmt.Errorf("failed to stat symlink: %v", err)
+	}
+	if err := os.Remove(symlinkPath); err != nil {
+		return fmt.Errorf("failed to remove symlink: %v", err)
+	}
+	return nil
 }

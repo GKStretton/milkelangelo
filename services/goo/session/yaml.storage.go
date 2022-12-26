@@ -1,6 +1,11 @@
 package session
 
-import "fmt"
+import (
+	"fmt"
+	"path/filepath"
+
+	"github.com/gkstretton/dark/services/goo/filesystem"
+)
 
 type yamlStorage struct{}
 
@@ -9,6 +14,7 @@ func (s *yamlStorage) createSession(session *Session) (*Session, error) {
 }
 
 func (s *yamlStorage) readSession(id ID) (*Session, error) {
+
 	return nil, fmt.Errorf("not implemented")
 }
 
@@ -26,4 +32,8 @@ func (s *yamlStorage) matchSession(matcher *SessionMatcher) ([]*Session, error) 
 
 func (s *yamlStorage) getLatest() (*Session, error) {
 	return nil, fmt.Errorf("not implemented")
+}
+
+func (s *yamlStorage) getSessionYamlPath(id ID) string {
+	return filepath.Join(filesystem.GetMetadataDir(uint64(id)), "session.yml")
 }

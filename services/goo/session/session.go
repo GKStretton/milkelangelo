@@ -2,6 +2,8 @@ package session
 
 import (
 	"fmt"
+
+	"github.com/gkstretton/dark/services/goo/filesystem"
 )
 
 type ID uint64
@@ -56,10 +58,20 @@ func (sm *SessionManager) BeginSession() (*Session, error) {
 		Complete:   false,
 		Production: false,
 	}
+	// Save created session somewhere, db or filesystem
 	session, err = sm.s.createSession(session)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create session: %v", err)
 	}
+
+	// Create session folder for content etc.
+	err = filesystem.InitSession(uint64(session.Id))
+	if err != nil {
+		sm.s.deleteSession(session.Id)
+		return nil, fmt.Errorf("failed to InitSession in filesystem: %v", err)
+	}
+
+	// Notify listeners
 	sm.pub <- &SessionEvent{
 		SessionID: session.Id,
 		Type:      SESSION_STARTED,
