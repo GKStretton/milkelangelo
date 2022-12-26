@@ -14,6 +14,7 @@ var (
 	contentPath  = flag.String("sessionPath", "session_content", "path for session content")
 	metadataPath = flag.String("metadataPath", "session_metadata", "path for session metadata")
 	rawVideoPath = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
+	rawDslrPath  = flag.String("rawDslrPath", "dslr/raw", "path within session, of raw dslr captures")
 )
 
 func AssertBasePaths() {
@@ -39,7 +40,7 @@ func GetMetadataDir() string {
 	p := filepath.Join(*basePath, *metadataPath)
 	err := os.MkdirAll(p, 0744)
 	if err != nil {
-		panic(fmt.Errorf("failed to create base path: %v", err))
+		panic(fmt.Errorf("failed to create metadata path: %v", err))
 	}
 	return p
 }
@@ -57,7 +58,21 @@ func GetRawVideoDir(sessionId uint64, rtspPath string) string {
 	)
 	err := os.MkdirAll(p, 0744)
 	if err != nil {
-		panic(fmt.Errorf("failed to create base path: %v", err))
+		panic(fmt.Errorf("failed to create raw video path: %v", err))
+	}
+	return p
+}
+
+func GetRawDslrDir(sessionId uint64) string {
+	p := filepath.Join(
+		*basePath,
+		*contentPath,
+		strconv.Itoa(int(sessionId)),
+		*rawDslrPath,
+	)
+	err := os.MkdirAll(p, 0744)
+	if err != nil {
+		panic(fmt.Errorf("failed to create raw dslr path: %v", err))
 	}
 	return p
 }
@@ -75,7 +90,7 @@ func GetIncrementalFileName(outDir string, ext string) string {
 		}
 		i++
 		if i > 10000 {
-			panic("bug in GetIncrementalFileName: filename should not likely exceed 10000")
+			panic("bug in GetIncrementalFileName: filename should likely not exceed 10000")
 		}
 	}
 }

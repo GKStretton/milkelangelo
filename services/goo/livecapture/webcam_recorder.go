@@ -3,7 +3,6 @@ package livecapture
 import (
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 
 	"github.com/gkstretton/dark/services/goo/config"
@@ -31,8 +30,8 @@ func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, e
 	}
 	wr.cmd = exec.Command("./scripts/capture-rtsp.sh", url, filePath)
 
-	wr.cmd.Stdout = os.Stdout
-	wr.cmd.Stderr = os.Stderr
+	// wr.cmd.Stdout = os.Stdout
+	// wr.cmd.Stderr = os.Stderr
 
 	var err error
 	wr.stdin, err = wr.cmd.StdinPipe()
@@ -67,6 +66,6 @@ func (wr *webcamRecorder) Stop() {
 }
 
 func (wr *webcamRecorder) log(s string, args ...interface{}) {
-	prefix := fmt.Sprintf("[Webcam Recorder] (%d - %s): ", wr.sessionId, wr.name)
-	fmt.Printf(prefix+s, args...)
+	prefix := fmt.Sprintf("%s ", wr.name)
+	fmt.Printf(prefix+s+"\n", args...)
 }

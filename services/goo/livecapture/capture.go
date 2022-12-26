@@ -9,6 +9,9 @@ import (
 )
 
 func (r *recorder) record(id session.ID) {
+	setDslrState(true)
+	defer setDslrState(false)
+
 	r.isRecording = true
 	defer func() { r.isRecording = false }()
 
@@ -18,13 +21,13 @@ func (r *recorder) record(id session.ID) {
 	if err != nil {
 		fmt.Printf("failed to start top webcam recording: %v\n", err)
 	}
-	// frontRecording, err := startWebcamRecording(*config.FrontCamRtspPath, uint64(id))
-	// if err != nil {
-	// 	fmt.Printf("failed to start front webcam recording: %v\n", err)
-	// }
+	frontRecording, err := startWebcamRecording(*config.FrontCamRtspPath, uint64(id))
+	if err != nil {
+		fmt.Printf("failed to start front webcam recording: %v\n", err)
+	}
 
 	defer topRecording.Stop()
-	// defer frontRecording.Stop()
+	defer frontRecording.Stop()
 
 	// Regular image capture
 
@@ -33,13 +36,9 @@ func (r *recorder) record(id session.ID) {
 		select {
 		case <-next:
 			next = time.After(time.Second * time.Duration(*captureInterval))
-			captureImage()
+			captureImage(uint64(id))
 		case <-r.stopRecording:
 			return
 		}
 	}
-}
-
-func captureImage() {
-	fmt.Println("capture image (not implemented)")
 }
