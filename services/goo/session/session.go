@@ -28,13 +28,16 @@ type SessionManager struct {
 	pub chan *SessionEvent
 	// subs is all the channels listened to by subscribers
 	subs []chan *SessionEvent
+	// True if sessions are stored in ram
+	inMemory bool
 }
 
 func NewSessionManager(useMemoryStorage bool) *SessionManager {
 	sm := &SessionManager{
-		s:    newStorage(useMemoryStorage),
-		pub:  make(chan *SessionEvent),
-		subs: []chan *SessionEvent{},
+		s:        newStorage(useMemoryStorage),
+		pub:      make(chan *SessionEvent),
+		subs:     []chan *SessionEvent{},
+		inMemory: useMemoryStorage,
 	}
 	go sm.eventDistributor()
 
@@ -64,11 +67,13 @@ func (sm *SessionManager) BeginSession() (*Session, error) {
 		return nil, fmt.Errorf("failed to create session: %v", err)
 	}
 
-	// Create session folder for content etc.
-	err = filesystem.InitSessionContent(uint64(session.Id))
-	if err != nil {
-		sm.s.deleteSession(session.Id)
-		return nil, fmt.Errorf("failed to InitSession in filesystem: %v", err)
+	if !sm.inMemory {
+		// Create session folder for content etc.
+		err = filesystem.InitSessionContent(uint64(session.Id))
+		if err != nil {
+			sm.s.deleteSession(session.Id)
+			return nil, fmt.Errorf("failed to InitSession in filesystem: %v", err)
+		}
 	}
 
 	// Notify listeners
