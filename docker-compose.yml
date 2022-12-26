@@ -31,3 +31,11 @@ services:
     tty: true
     restart: unless-stopped
     network_mode: host
+  goo:
+    build: services/goo
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    volumes:
+      - ${LIGHT_STORES_DIR}:/light-stores
+      - /dev:/dev

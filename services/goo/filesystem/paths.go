@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	basePath     = flag.String("basePath", "/mnt/md0/light-stores/", "base path for storage data")
+	basePath     = flag.String("basePath", "/light-stores/", "base path for storage data")
 	contentPath  = flag.String("sessionPath", "session_content", "path for session content")
 	metadataPath = flag.String("metadataPath", "session_metadata", "path for session metadata")
 	rawVideoPath = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
@@ -38,7 +38,7 @@ func exists(filepath string) bool {
 
 func GetMetadataDir() string {
 	p := filepath.Join(*basePath, *metadataPath)
-	err := os.MkdirAll(p, 0744)
+	err := os.MkdirAll(p, 0777)
 	if err != nil {
 		panic(fmt.Errorf("failed to create metadata path: %v", err))
 	}
@@ -56,7 +56,7 @@ func GetRawVideoDir(sessionId uint64, rtspPath string) string {
 		*rawVideoPath,
 		rtspPath,
 	)
-	err := os.MkdirAll(p, 0744)
+	err := os.MkdirAll(p, 0777)
 	if err != nil {
 		panic(fmt.Errorf("failed to create raw video path: %v", err))
 	}
@@ -70,7 +70,7 @@ func GetRawDslrDir(sessionId uint64) string {
 		strconv.Itoa(int(sessionId)),
 		*rawDslrPath,
 	)
-	err := os.MkdirAll(p, 0744)
+	err := os.MkdirAll(p, 0777)
 	if err != nil {
 		panic(fmt.Errorf("failed to create raw dslr path: %v", err))
 	}

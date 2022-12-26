@@ -68,7 +68,7 @@ func (s *yamlStorage) updateSession(session *Session) (*Session, error) {
 	defer s.lock.Unlock()
 
 	// open file
-	f, err := os.OpenFile(s.getSessionYamlPath(session.Id), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(s.getSessionYamlPath(session.Id), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open session yml: %v", err)
 	}

@@ -1,9 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"flag"
-	"os"
+	"time"
 
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/livecapture"
@@ -23,6 +22,7 @@ func main() {
 	livecapture.Run(sm)
 
 	// Block to prevent early quit
-	input := bufio.NewScanner(os.Stdin)
-	input.Scan()
+	for {
+		time.Sleep(time.Millisecond * time.Duration(100))
+	}
 }

@@ -11,7 +11,7 @@ import (
 // It also sets the 'latest' symlink to point to this session folder
 func InitSessionContent(sessionId uint64) error {
 	p := filepath.Join(*basePath, *contentPath, strconv.Itoa(int(sessionId)))
-	if err := os.MkdirAll(p, 0744); err != nil {
+	if err := os.MkdirAll(p, 0777); err != nil {
 		return fmt.Errorf("failed to mkdir: %v", err)
 	}
 
