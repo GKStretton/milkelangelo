@@ -30,6 +30,9 @@ func Run(sm *session.SessionManager) {
 func (r *recorder) run() {
 	r.evaluateAction()
 
+	// special handler for the crop config preview capture
+	registerDslrPreviewHandler()
+
 	// Listen for ongoing begin/end session events
 	ch := r.sm.SubscribeToEvents()
 	for {

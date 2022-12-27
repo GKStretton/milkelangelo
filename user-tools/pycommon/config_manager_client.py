@@ -7,6 +7,10 @@ TOPIC_SET = KV_ROOT_TOPIC+"set/"
 TOPIC_SET_RESP = KV_ROOT_TOPIC+"set-resp/"
 TOPIC_GET = KV_ROOT_TOPIC+"get/"
 TOPIC_GET_RESP = KV_ROOT_TOPIC+"get-resp/"
+
+TOPIC_TRIGGER_DSLR = "asol/dslr-crop-capture"
+TOPIC_TRIGGER_DSLR_RESP = "asol/dslr-crop-capture-resp"
+
 CLIENT_ID="pythoninterfaces"
 HOST="DEPTH"
 
@@ -33,3 +37,15 @@ def read_remote_crop_config(name):
         print(resp.payload.decode("utf-8"))
         cfg = yaml.load(resp.payload, Loader=yaml.FullLoader)
         return cfg
+
+# returns True if successful, otherwise False
+def trigger_dslr_capture():
+    print("triggering dslr capture...")
+    mqttpub.single(TOPIC_TRIGGER_DSLR, payload="", hostname=HOST, port=1883, client_id=CLIENT_ID)
+    resp = mqttsub.simple(TOPIC_TRIGGER_DSLR_RESP, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=1)
+    msg = resp.payload.decode("utf-8")
+    if msg == "ack":
+        return True
+    
+    print("noack:", msg)
+    return False

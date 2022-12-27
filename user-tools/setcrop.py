@@ -5,11 +5,14 @@ import pycommon.window as window
 import cv2
 import pycommon.image as image
 import numpy as np
-from pycommon.config_manager_client import read_remote_crop_config
-from pycommon.config_manager_client import write_remote_crop_config
+from pycommon.config_manager_client import *
 
 TOP_MASK = "resources/static_img/top-mask.png"
 HOST = "DEPTH"
+
+# location to load dslr image from if doing that crop
+# note, this uses the mount-md0 script to mount remote filesystem
+DSLR_CAPTURE_LOCATION = "/home/greg/md0-depth/light-stores/dslr-preview.jpg"
 
 TOP_CAM_CHOICE = "1"
 FRONT_CAM_CHOICE = "2"
@@ -57,8 +60,14 @@ class CropWindow(window.Window):
             self.load_dslr_image()
     
     def load_dslr_image(self):
-        # todo: get dslr capture
-        self.dslr_capture = np.zeros((1000, 1000, 3))
+        # request dslr capture to be taken
+        succ = trigger_dslr_capture()
+        if succ:
+            # load the capture from DEPTH
+            self.dslr_capture = cv2.imread(DSLR_CAPTURE_LOCATION)
+        else:
+            print("failed to do dslr capture, using zeros")
+            self.dslr_capture = np.zeros((1000, 1000, 3))
     
     def open_stream(self):
         print("Opening stream...")

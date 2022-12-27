@@ -24,6 +24,10 @@ func AssertBasePaths() {
 	}
 }
 
+func GetBasePath() string {
+	return *basePath
+}
+
 func Exists(filepath string) bool {
 	_, err := os.Stat(filepath)
 	if err == nil {

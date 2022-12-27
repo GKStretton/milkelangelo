@@ -20,15 +20,22 @@ func setDslrState(b bool) {
 	}
 }
 
-func captureImage(sessionId uint64) {
+func captureSessionImage(sessionId uint64) {
 	p := filesystem.GetIncrementalFileName(filesystem.GetRawDslrDir(sessionId), "jpg")
+	err := captureImage(p)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
 
+func captureImage(p string) error {
 	cmd := exec.Command("./scripts/capture-dslr.sh", p)
 	// cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	err := cmd.Run()
 	if err != nil {
-		fmt.Printf("failed to run capture-dslr: %v\n", err)
+		return fmt.Errorf("failed to run capture-dslr: %v", err)
 	}
+	return nil
 }

@@ -35,7 +35,7 @@ func reqCallback(topic string, payload []byte) {
 func sendToSubs(key string) {
 	value, err := getKeyValue(key)
 	if err != nil {
-		fmt.Printf("error getting value for key %s: %v\n", key, err)
+		// fmt.Printf("error getting value for key %s: %v\n", key, err)
 		value = []byte{}
 	}
 	err = mqtt.Publish(TOPIC_GET_RESP+key, value)

@@ -36,7 +36,7 @@ func (r *recorder) record(id session.ID) {
 		select {
 		case <-next:
 			next = time.After(time.Second * time.Duration(*captureInterval))
-			captureImage(uint64(id))
+			captureSessionImage(uint64(id))
 		case <-r.stopRecording:
 			return
 		}
