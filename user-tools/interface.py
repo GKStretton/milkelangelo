@@ -53,7 +53,7 @@ class Interface(Window):
 		self.do_mask = DO_MASK
 
 
-		self.crop_config = read_remote_crop_config()
+		self.crop_config = read_remote_crop_config("top-cam")
 		if self.crop_config is None:
 			print("no crop config, quitting")
 			self.exit()
