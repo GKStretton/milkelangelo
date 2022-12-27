@@ -18,13 +18,13 @@ var (
 )
 
 func AssertBasePaths() {
-	e := exists(*basePath)
+	e := Exists(*basePath)
 	if !e {
 		panic("base path '" + *basePath + "' does not exist")
 	}
 }
 
-func exists(filepath string) bool {
+func Exists(filepath string) bool {
 	_, err := os.Stat(filepath)
 	if err == nil {
 		return true
@@ -85,7 +85,7 @@ func GetIncrementalFileName(outDir string, ext string) string {
 	i := 1
 	for {
 		p := filepath.Join(outDir, strconv.Itoa(i)+"."+ext)
-		if !exists(p) {
+		if !Exists(p) {
 			return p
 		}
 		i++
@@ -93,4 +93,8 @@ func GetIncrementalFileName(outDir string, ext string) string {
 			panic("bug in GetIncrementalFileName: filename should likely not exceed 10000")
 		}
 	}
+}
+
+func GetKeyValueStorePath() string {
+	return filepath.Join(*basePath, "kv")
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/filesystem"
+	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/livecapture"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
@@ -16,6 +17,8 @@ func main() {
 	filesystem.AssertBasePaths()
 
 	mqtt.Start()
+
+	keyvalue.Start()
 
 	sm := session.NewSessionManager(false)
 
