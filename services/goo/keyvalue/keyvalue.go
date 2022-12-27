@@ -2,10 +2,8 @@ package keyvalue
 
 import (
 	"fmt"
-	"os"
 	"sync"
 
-	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 )
 
@@ -20,13 +18,6 @@ var (
 )
 
 func Start() {
-	if !filesystem.Exists(filesystem.GetKeyValueStorePath()) {
-		err := os.Mkdir(filesystem.GetKeyValueStorePath(), 0777)
-		if err != nil {
-			fmt.Printf("failed to make kv dir: %v\n", err)
-			return
-		}
-	}
 	// set
 	mqtt.Subscribe(TOPIC_SET+"#", setCallback)
 	// req

@@ -12,6 +12,13 @@ func setKeyValue(key string, value []byte) error {
 	lock.Lock()
 	defer lock.Unlock()
 
+	if !filesystem.Exists(filesystem.GetKeyValueStorePath()) {
+		err := os.Mkdir(filesystem.GetKeyValueStorePath(), 0777)
+		if err != nil {
+			return fmt.Errorf("failed to make kv dir: %v", err)
+		}
+	}
+
 	// open file
 	p := filepath.Join(filesystem.GetKeyValueStorePath(), key)
 	err := os.WriteFile(p, value, 0666)
