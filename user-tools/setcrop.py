@@ -3,54 +3,44 @@
 
 import pycommon.window as window
 import cv2
-from argparse import ArgumentParser
 import pycommon.image as image
-import yaml
 import numpy as np
-import sys
-import os
 from pycommon.config_manager_client import read_remote_crop_config
 from pycommon.config_manager_client import write_remote_crop_config
 
 TOP_MASK = "resources/static_img/top-mask.png"
 HOST = "DEPTH"
 
-def write_yaml(yml):
-    local_file = ""#input("write to local yaml? enter path if so:")
-    if local_file != "":
-        with open(local_file, 'w') as f:
-            yaml.dump(result, f)
-    else:
-        write_remote_crop_config("top-cam", yml)
+TOP_CAM_CHOICE = "1"
+FRONT_CAM_CHOICE = "2"
+DSLR_CHOICE = "3"
 
-def load_yaml():
-    local_file = ""#input("read from local yaml? enter path if so:")
-    local = False
-    if local_file != "":
-        local = True
-        print("local mode")
+def name_from_choice(choice):
+    if choice == TOP_CAM_CHOICE:
+        return "crop_top-cam"
+    if choice == FRONT_CAM_CHOICE:
+        return "crop_front-cam"
+    if choice == DSLR_CHOICE:
+        return "crop_dslr"
 
-    # LOAD EXISTING CONFIG
-    if local:
-        print("loading from", local_file, "...")
-        if os.path.isfile(local_file):
-            with open(local_file, 'r') as f:
-                yml = yaml.load(f)
-                return yml
-        else:
-            print("file not found, proceeding with 0 values")
-    else:
-        return read_remote_crop_config("top-cam")
+def write_yaml(choice, yml):
+    name = name_from_choice(choice)
+    write_remote_crop_config(name, yml)
+
+def load_yaml(choice):
+    name = name_from_choice(choice)
+    return read_remote_crop_config(name)
 
 
 class CropWindow(window.Window):
-    def __init__(self):
+    def __init__(self, choice):
         super().__init__()
 
+        self.choice = choice
         # load mask
         self.mask = cv2.imread(TOP_MASK)
 
-        current_yml = load_yaml()
+        current_yml = load_yaml(choice)
         if current_yml:
             self.load_config(current_yml)
         else:
@@ -61,8 +51,19 @@ class CropWindow(window.Window):
         
         print("loaded (x1, y1); (x2, y2) as ({}, {}); ({}, {})".format(self.x1, self.y1, self.x2, self.y2))
 
+        if choice == TOP_CAM_CHOICE or choice == FRONT_CAM_CHOICE:
+            self.open_stream()
+        else:
+            self.load_dslr_image()
+    
+    def load_dslr_image(self):
+        # todo: get dslr capture
+        self.dslr_capture = np.zeros((1000, 1000, 3))
+    
+    def open_stream(self):
         print("Opening stream...")
-        self.stream = cv2.VideoCapture("rtsp://{}:8554/top-cam".format(HOST))#, cv2.CAP_GSTREAMER)
+        endpoint = "top-cam" if self.choice == TOP_CAM_CHOICE else "front-cam"
+        self.stream = cv2.VideoCapture("rtsp://{}:8554/{}".format(HOST, endpoint))#, cv2.CAP_GSTREAMER)
         self.stream.set(cv2.CAP_PROP_BUFFERSIZE, 2)
 
         if not self.stream.isOpened():
@@ -89,15 +90,16 @@ class CropWindow(window.Window):
     
     def keyboard_handler(self, key):
         super().keyboard_handler(key)
-
-        if key != -1:
-            print(key)
     
     def update(self):
-        ret, frame = self.stream.read()
-        if ret == False:
-            print("Frame empty, quitting")
-            self.exit()
+        if self.choice == TOP_CAM_CHOICE or self.choice == FRONT_CAM_CHOICE:
+            ret, frame = self.stream.read()
+            if ret == False:
+                print("Frame empty, quitting")
+                self.exit()
+        else:
+            frame = self.dslr_capture.copy()
+
         self.frame_width=frame.shape[1]
         self.frame_height=frame.shape[0]
         mag = abs(self.x2 - self.x1)
@@ -111,10 +113,17 @@ class CropWindow(window.Window):
         image.overlay_image_alpha(res, np.zeros((mag, mag, 3)), self.x1, self.y1, 1 - resized_mask[:,:,0] / 255.0)
 
         return res
-    
 
 if __name__ == "__main__":
-    win = CropWindow()
+    print(TOP_CAM_CHOICE, "- top-cam")
+    print(FRONT_CAM_CHOICE, "- front-cam")
+    print(DSLR_CHOICE, "- dslr")
+    choice = input("Enter choice 1-3: ")
+    if choice != TOP_CAM_CHOICE and choice != FRONT_CAM_CHOICE and choice != DSLR_CHOICE:
+        print("invalid choice:", choice)
+        exit()
+
+    win = CropWindow(choice)
     win.loop()
 
     result = {
@@ -130,4 +139,4 @@ if __name__ == "__main__":
 
     print(result)
 
-    write_yaml(result)
+    write_yaml(choice, result)
