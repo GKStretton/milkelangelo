@@ -25,7 +25,10 @@ func captureSessionImage(sessionId uint64) {
 	err := captureImage(p)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
+
+	saveCropConfig(CC_DSLR, p)
 }
 
 func captureImage(p string) error {

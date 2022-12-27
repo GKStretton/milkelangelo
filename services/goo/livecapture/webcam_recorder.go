@@ -46,6 +46,12 @@ func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, e
 
 	wr.log("capture started")
 
+	if rtspPath == *config.TopCamRtspPath {
+		saveCropConfig(CC_TOP_CAM, filePath)
+	} else if rtspPath == *config.FrontCamRtspPath {
+		saveCropConfig(CC_FRONT_CAM, filePath)
+	}
+
 	return wr, nil
 }
 
