@@ -24,9 +24,10 @@ services:
     network_mode: host
   goo:
     build: services/goo
+    command: -basePath ${LIGHT_STORES_DIR}
     restart: unless-stopped
     network_mode: host
     privileged: true
     volumes:
-      - ${LIGHT_STORES_DIR}:/light-stores
+      - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev

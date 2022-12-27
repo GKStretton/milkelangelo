@@ -53,13 +53,14 @@ class Interface(Window):
 		self.do_mask = DO_MASK
 
 
-		self.crop_config = read_remote_crop_config("top-cam")
+		self.crop_config = read_remote_crop_config("crop_top-cam")
 		if self.crop_config is None:
-			print("no crop config, quitting")
-			self.exit()
-		self.crop_mag = self.crop_config['right_abs'] - self.crop_config['left_abs']
-
-		self.load_mask()
+			print("no crop config, disabling crop and mask")
+			self.do_crop = False
+			self.do_mask = False
+		else:
+			self.crop_mag = self.crop_config['right_abs'] - self.crop_config['left_abs']
+			self.load_mask()
 
 		if STREAM:
 			# tcp is default
@@ -220,7 +221,8 @@ class Interface(Window):
 				image.overlay_image_alpha(frame, np.zeros((self.crop_mag, self.crop_mag, 3)), self.crop_config['left_abs'], self.crop_config['top_abs'], self.mask)
 			
 
-		cv2.circle(frame,self.rel_to_abs(self.target_x_rel,self.target_y_rel),10,(0,0,255),2, cv2.LINE_AA)
+		if self.crop_config is not None:
+			cv2.circle(frame,self.rel_to_abs(self.target_x_rel,self.target_y_rel),10,(0,0,255),2, cv2.LINE_AA)
 
 		return frame
 

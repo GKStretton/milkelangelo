@@ -92,10 +92,18 @@ class CropWindow(window.Window):
         super().mouse_handler(event, x, y, flags, param)
         if flags & cv2.EVENT_FLAG_LBUTTON and flags & cv2.EVENT_FLAG_SHIFTKEY:
             self.x2 = x
-            self.y2 = y
+            if self.choice != FRONT_CAM_CHOICE:
+                mag = abs(self.x2 - self.x1)
+                self.y2 = self.y1 + mag
+            else:
+                self.y2 = y
         elif flags & cv2.EVENT_FLAG_LBUTTON:
             self.x1 = x
             self.y1 = y
+
+            if self.choice != FRONT_CAM_CHOICE:
+                mag = abs(self.x2 - self.x1)
+                self.y2 = self.y1 + mag
     
     def keyboard_handler(self, key):
         super().keyboard_handler(key)
@@ -114,12 +122,13 @@ class CropWindow(window.Window):
         mag = abs(self.x2 - self.x1)
 
         # draw crop location
-        cv2.rectangle(frame,(self.x1,self.y1), (self.x2, self.y1 + mag), (0,0,255),2, cv2.LINE_AA)
+        cv2.rectangle(frame,(self.x1,self.y1), (self.x2, self.y2), (0,0,255),2, cv2.LINE_AA)
 
-        # mask with the vig
-        resized_mask = cv2.resize(self.mask, (mag, mag))
         res = frame.copy()
-        image.overlay_image_alpha(res, np.zeros((mag, mag, 3)), self.x1, self.y1, 1 - resized_mask[:,:,0] / 255.0)
+        # mask with the vig
+        if self.choice != FRONT_CAM_CHOICE:
+            resized_mask = cv2.resize(self.mask, (mag, mag))
+            image.overlay_image_alpha(res, np.zeros((mag, mag, 3)), self.x1, self.y1, 1 - resized_mask[:,:,0] / 255.0)
 
         return res
 
