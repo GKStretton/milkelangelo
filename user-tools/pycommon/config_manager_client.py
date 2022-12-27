@@ -16,14 +16,14 @@ def write_remote_crop_config(name, cfg):
     print("sent conf to", TOPIC_SET+name)
     
     print("waiting for response...")
-    resp = mqttsub.simple(TOPIC_SET_RESP, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=1)
+    resp = mqttsub.simple(TOPIC_SET_RESP+name, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=1)
     print("got response")
     print(resp.payload.decode("utf-8"))
 
 def read_remote_crop_config(name):
-    print("sending config request to", TOPIC_GET)
+    print("sending config request to", TOPIC_GET+name)
     print("and waiting for response on", TOPIC_GET_RESP+name, "...")
-    mqttpub.single(TOPIC_GET, payload=name, hostname=HOST, port=1883, client_id=CLIENT_ID)
+    mqttpub.single(TOPIC_GET+name, payload="", hostname=HOST, port=1883, client_id=CLIENT_ID)
     resp = mqttsub.simple(TOPIC_GET_RESP+name, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=1)
     if resp.payload.decode("utf-8") == "404":
         print("no config yet, using 0 values")

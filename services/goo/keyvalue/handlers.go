@@ -18,14 +18,14 @@ func setCallback(topic string, payload []byte) {
 	} else {
 		go func() {
 			time.Sleep(respDelay)
-			mqtt.Publish(TOPIC_SET_RESP, []byte(key))
+			mqtt.Publish(TOPIC_SET_RESP+key, []byte("ack"))
 			sendToSubs(key)
 		}()
 	}
 }
 
 func reqCallback(topic string, payload []byte) {
-	key := string(payload)
+	key := getLastTopicValue(topic)
 	go func() {
 		time.Sleep(respDelay)
 		sendToSubs(key)
