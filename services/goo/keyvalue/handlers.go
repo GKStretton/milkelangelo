@@ -2,9 +2,12 @@ package keyvalue
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gkstretton/dark/services/goo/mqtt"
 )
+
+var respDelay = time.Millisecond * time.Duration(200)
 
 func setCallback(topic string, payload []byte) {
 	key := getLastTopicValue(topic)
@@ -13,14 +16,20 @@ func setCallback(topic string, payload []byte) {
 	if err != nil {
 		fmt.Printf("failed to set key %s to %v: %v\n", key, payload, err)
 	} else {
-		mqtt.Publish(TOPIC_ROOT+"set-ack", []byte(key))
-		sendToSubs(key)
+		go func() {
+			time.Sleep(respDelay)
+			mqtt.Publish(TOPIC_SET_RESP, []byte(key))
+			sendToSubs(key)
+		}()
 	}
 }
 
 func reqCallback(topic string, payload []byte) {
 	key := string(payload)
-	sendToSubs(key)
+	go func() {
+		time.Sleep(respDelay)
+		sendToSubs(key)
+	}()
 }
 
 func sendToSubs(key string) {
@@ -29,7 +38,7 @@ func sendToSubs(key string) {
 		fmt.Printf("error getting value for key %s: %v\n", key, err)
 		value = []byte{}
 	}
-	err = mqtt.Publish(TOPIC_ROOT+"get-resp/"+key, value)
+	err = mqtt.Publish(TOPIC_GET_RESP+key, value)
 	if err != nil {
 		fmt.Printf("error publishing value for key %s: %v\n", key, err)
 	}

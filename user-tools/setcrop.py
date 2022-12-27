@@ -21,7 +21,7 @@ def write_yaml(yml):
         with open(local_file, 'w') as f:
             yaml.dump(result, f)
     else:
-        write_remote_crop_config(yml)
+        write_remote_crop_config("top-cam", yml)
 
 def load_yaml():
     local_file = ""#input("read from local yaml? enter path if so:")
@@ -40,7 +40,7 @@ def load_yaml():
         else:
             print("file not found, proceeding with 0 values")
     else:
-        return read_remote_crop_config()
+        return read_remote_crop_config("top-cam")
 
 
 class CropWindow(window.Window):

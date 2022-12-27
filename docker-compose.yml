@@ -2,15 +2,6 @@ version: "3.7"
 
 
 services:
-  config-manager:
-    build: services/config-manager
-    tty: true
-    volumes:
-      - ./config:/config
-    environment:
-      CROP_YML_FILE: "/config/crop.yml"
-    restart: unless-stopped
-    network_mode: host
   rtsp:
     build: services/rtsp
     restart: unless-stopped

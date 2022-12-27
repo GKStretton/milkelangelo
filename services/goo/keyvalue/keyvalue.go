@@ -11,8 +11,8 @@ import (
 
 const TOPIC_ROOT = "asol/kv/"
 const TOPIC_SET = TOPIC_ROOT + "set/"
-const TOPIC_SET_ACK = TOPIC_ROOT + "set-ack/"
-const TOPIC_GET_REQ = TOPIC_ROOT + "get-req/"
+const TOPIC_SET_RESP = TOPIC_ROOT + "set-resp/"
+const TOPIC_GET = TOPIC_ROOT + "get/"
 const TOPIC_GET_RESP = TOPIC_ROOT + "get-resp/"
 
 var (
@@ -30,7 +30,7 @@ func Start() {
 	// set
 	mqtt.Subscribe(TOPIC_SET+"#", setCallback)
 	// req
-	mqtt.Subscribe(TOPIC_GET_REQ+"#", reqCallback)
+	mqtt.Subscribe(TOPIC_GET+"#", reqCallback)
 }
 
 func Get(key string) []byte {
