@@ -10,7 +10,7 @@ import (
 
 func Run() {
 	mqtt.Subscribe("mega/state-report", func(topic string, payload []byte) {
-		fmt.Println("Received machine state report")
+		fmt.Printf("Received machine state report: '%v ( %s )'\n", payload, string(payload))
 
 		pr := &machinepb.PingResponse{}
 		err := proto.Unmarshal(payload, pr)

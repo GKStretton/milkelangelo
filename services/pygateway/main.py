@@ -74,18 +74,31 @@ def flash_mega(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 ### SERIAL HANDLERS ###
 #######################
 
+def handleProtobufOutput(client: mqtt.Client, topic, data):
+	#todo: unmarshal, add timestamp
+	#todo: marshal to json, publish as json
+	# I haven't done this yet because I'm getting pip issues, not sure how to
+	# fix yet. Will just add timestamps downstream for now.
+
+	client.publish(topic, data)
 
 # process a line received over serial from arduino.
 # >[topic];[payload]\n will be published as (topic, payload)
 # anything else will be published as (mega/log/misc)
 def handleSerialLine(client: mqtt.Client, line: str):
-	if line[0] == '>':
+	if line[0] == '>' or line[0] == '$':
 		data = line[1:].strip("\r\n\t ").split(';')
 		if len(data) == 2:
-			client.publish(data[0], data[1])
-			# print(data[0], ":", data[1])
+			if line[0] == '>':
+				# plaintext
+				client.publish(data[0], data[1])
+			elif line[0] == '$':
+				# protobuf
+				handleProtobufOutput(client, data[0], data[1])
 		else:
-			print("malformed data, expected 2 parameters after splitting on string:", line)
+			msg = "malformed data, expected 2 parameters after splitting on string: {}".format(line)
+			print(msg)
+			client.publish("mega/log/misc", msg)
 	elif line == "" or line == "\r\n" or line == "\n":
 		# Empty lines, just skip
 		return
