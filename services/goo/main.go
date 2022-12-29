@@ -4,6 +4,7 @@ import (
 	"flag"
 	"time"
 
+	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/livecapture"
@@ -19,6 +20,8 @@ func main() {
 	mqtt.Start()
 
 	keyvalue.Start()
+
+	events.Run()
 
 	sm := session.NewSessionManager(false)
 
