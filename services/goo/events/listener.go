@@ -10,14 +10,15 @@ import (
 
 func Run() {
 	mqtt.Subscribe("mega/state-report", func(topic string, payload []byte) {
-		fmt.Printf("Received machine state report: '%v ( %s )'\n", payload, string(payload))
+		fmt.Printf("Received machine state report: '%v', ' %s '\n", payload, string(payload))
 
-		pr := &machinepb.PingResponse{}
-		err := proto.Unmarshal(payload, pr)
+		sr := &machinepb.StateReport{}
+		err := proto.Unmarshal(payload, sr)
 		if err != nil {
 			fmt.Printf("error unmarshalling state report: %v\n", err)
+			return
 		}
 
-		fmt.Printf("\tNumber: %d\n", pr.Number)
+		fmt.Printf("%+v\n", sr)
 	})
 }

@@ -148,5 +148,5 @@ if __name__ == "__main__":
 
 	while not exiting:
 		if not flashing and serialConn.inWaiting() > 0:
-			handleSerialLine(client, serialConn.readline().decode("utf-8"))
+			handleSerialLine(client, serialConn.readline().decode("ascii"))
 		time.sleep(0.01)
