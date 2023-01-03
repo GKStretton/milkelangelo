@@ -113,7 +113,7 @@ if __name__ == "__main__":
 	print("Opened Serial.")
 
 
-	START_SYMBOL = '^'
+	START_SYMBOL = '>'
 	TOPIC_END = ';'
 	PLAINTEXT_IDENTIFIER = '#'
 	PROTOBUF_IDENTIFIER = '$'
