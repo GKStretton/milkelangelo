@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
 	# SERIAL
 	print("Attempting to open serial interface...")
-	serialConn = serial.Serial('/dev/ttyACM0', 1000000, timeout=1)
+	serialConn = serial.Serial('/dev/ttyACM0', 1000000, timeout=10)
 	print("Opened Serial.")
 
 
