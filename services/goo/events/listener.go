@@ -21,4 +21,6 @@ func Run() {
 
 		fmt.Printf("%+v\n", sr)
 	})
+
+	//todo: add a way to fake the state reports, and continue building
 }

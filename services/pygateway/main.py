@@ -49,8 +49,10 @@ def flash_mega(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 		f.write(msg.payload)
 
 	flashing = True
+	# time for message to finish sending
+	time.sleep(0.6)
 	serialConn.close()
-	time.sleep(1)
+	time.sleep(0.2)
 
 	res = subprocess.run(["/bin/sh", "/src/flash.sh", FIRMWARE_LOCATION])
 	if res.returncode != 0:
@@ -73,41 +75,6 @@ def flash_mega(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 #######################
 ### SERIAL HANDLERS ###
 #######################
-
-def handleProtobufOutput(client: mqtt.Client, topic, data):
-	#todo: unmarshal, add timestamp
-	#todo: marshal to json, publish as json
-	# I haven't done this yet because I'm getting pip issues, not sure how to
-	# fix yet. Will just add timestamps downstream for now.
-
-	client.publish(topic, data)
-
-# process a line received over serial from arduino.
-# >[topic];[payload]\n will be published as (topic, payload)
-# anything else will be published as (mega/log/misc)
-def handleSerialLine(client: mqtt.Client, line: str):
-	if line[0] == '>' or line[0] == '$':
-		data = line[1:].strip("\r\n\t ").split(';')
-		if len(data) == 2:
-			if line[0] == '>':
-				# plaintext
-				client.publish(data[0], data[1])
-			elif line[0] == '$':
-				# protobuf
-				handleProtobufOutput(client, data[0], data[1])
-		else:
-			msg = "malformed data, expected 2 parameters after splitting on string: {}".format(line)
-			print(msg)
-			client.publish("mega/log/misc", msg)
-	elif line == "" or line == "\r\n" or line == "\n":
-		# Empty lines, just skip
-		return
-	else:
-		# Print anything that isn't an mqtt pub > and publish it to special topic
-		l = line.strip("\r\n\t")
-		print("Misc output:", l)
-		client.publish("mega/log/misc", l)
-
 
 def term_handler(signum, frame):
 	global exiting
@@ -141,12 +108,50 @@ if __name__ == "__main__":
 	print("Started broker network loop")
 
 	# SERIAL
-
 	print("Attempting to open serial interface...")
 	serialConn = serial.Serial('/dev/ttyACM0', 1000000, timeout=1)
 	print("Opened Serial.")
 
+
+	START_SYMBOL = '^'
+	TOPIC_END = ';'
+	PLAINTEXT_IDENTIFIER = '#'
+	PROTOBUF_IDENTIFIER = '$'
+	PAYLOAD_END = '\n'
+
 	while not exiting:
-		if not flashing and serialConn.inWaiting() > 0:
-			handleSerialLine(client, serialConn.readline().decode("ascii"))
-		time.sleep(0.01)
+		# reset state here
+
+		while not flashing:
+			# Read until start
+			unused = serialConn.read_until(START_SYMBOL)
+			print("received start symbol with '{}'".format(unused))
+			# now it's the topic
+			topic = serialConn.read_until(TOPIC_END)
+			print("received topic end for '{}'".format(topic))
+			payloadType = serialConn.read()
+			print("received payload type '{}'".format(payloadType))
+
+			if payloadType == PLAINTEXT_IDENTIFIER:
+				payload = serialConn.read_until(PAYLOAD_END)
+				print("received plaintext payload '{}'".format(payload))
+			elif payloadType == PROTOBUF_IDENTIFIER:
+				# todo: support longer lengths than 255
+				payloadSizeRaw = serialConn.read(1)
+				payloadSize = int(payloadSizeRaw[0])
+				print("received protobuf payload size", payloadSize)
+				payload = serialConn.read(payloadSize)
+				print("received protobuf payload")
+				end = serialConn.read()
+				if end != PAYLOAD_END:
+					print("error, payload_end not found after protobuf")
+					continue
+			else:
+				print("error, payloadType", payloadType, "is invalid")
+				continue
+			
+			print("topic:", topic, "; payload:", payload)
+			client.publish(topic, payload)
+				
+			
+		time.sleep(0.1)
