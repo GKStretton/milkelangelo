@@ -22,6 +22,8 @@ services:
     tty: true
     restart: unless-stopped
     network_mode: host
+    environment:
+      BROKER_HOST: ${BROKER_HOST:-localhost}
   goo:
     build: services/goo
     command: -basePath ${LIGHT_STORES_DIR}

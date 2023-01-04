@@ -1,4 +1,5 @@
 import signal
+import os
 import serial
 import time
 import paho.mqtt.client as mqtt
@@ -49,8 +50,6 @@ def flash_mega(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 		f.write(msg.payload)
 
 	flashing = True
-	# time for message to finish sending
-	time.sleep(0.6)
 	serialConn.close()
 	time.sleep(0.2)
 
@@ -96,7 +95,10 @@ if __name__ == "__main__":
 	client.on_connect = on_connect
 	client.on_disconnect = on_disconnect
 
-	client.connect("localhost", 1883, 10)
+	# client.connect("localhost", 1883, 10)
+	host = os.environ["BROKER_HOST"]
+	print("connecting to", host)
+	client.connect(host, 1883, 10)
 	print("Connected to broker")
 	
 
@@ -112,46 +114,52 @@ if __name__ == "__main__":
 	serialConn = serial.Serial('/dev/ttyACM0', 1000000, timeout=10)
 	print("Opened Serial.")
 
-
-	START_SYMBOL = '>'
-	TOPIC_END = ';'
-	PLAINTEXT_IDENTIFIER = '#'
-	PROTOBUF_IDENTIFIER = '$'
-	PAYLOAD_END = '\n'
+	START_SYMBOL = b'>'
+	TOPIC_END = b';'
+	PLAINTEXT_IDENTIFIER = b'#'
+	PROTOBUF_IDENTIFIER = b'$'
+	PAYLOAD_END = b'\n'
+	MISC_TOPIC = "mega/l/misc"
 
 	while not exiting:
 		# reset state here
 
 		while not flashing:
-			# Read until start
-			unused = serialConn.read_until(START_SYMBOL)
-			print("received start symbol with '{}'".format(unused))
-			# now it's the topic
-			topic = serialConn.read_until(TOPIC_END)
-			print("received topic end for '{}'".format(topic))
-			payloadType = serialConn.read()
-			print("received payload type '{}'".format(payloadType))
+			try:
+				# Read until start, handle undefined output
+				miscOutput = serialConn.read_until(START_SYMBOL)[:-1]
+				if len(miscOutput) > 0:
+					client.publish(MISC_TOPIC, miscOutput)
 
-			if payloadType == PLAINTEXT_IDENTIFIER:
-				payload = serialConn.read_until(PAYLOAD_END)
-				print("received plaintext payload '{}'".format(payload))
-			elif payloadType == PROTOBUF_IDENTIFIER:
-				# todo: support longer lengths than 255
-				payloadSizeRaw = serialConn.read(1)
-				payloadSize = int(payloadSizeRaw[0])
-				print("received protobuf payload size", payloadSize)
-				payload = serialConn.read(payloadSize)
-				print("received protobuf payload")
-				end = serialConn.read()
-				if end != PAYLOAD_END:
-					print("error, payload_end not found after protobuf")
+				print("received start symbol")
+				# now it's the topic
+				topic = serialConn.read_until(TOPIC_END)[:-1]
+				print("received topic end for '{}'".format(topic))
+				payloadType = serialConn.read()
+				print("received payload type '{}'".format(payloadType))
+
+				if payloadType == PLAINTEXT_IDENTIFIER:
+					payload = serialConn.read_until(PAYLOAD_END)[:-1]
+					print("received plaintext payload '{}'".format(payload))
+				elif payloadType == PROTOBUF_IDENTIFIER:
+					# todo: support longer lengths than 255
+					payloadSizeRaw = serialConn.read(1)
+					payloadSize = int(payloadSizeRaw[0])
+					print("received protobuf payload size", payloadSize)
+					payload = serialConn.read(payloadSize)
+					print("received protobuf payload:,", payload)
+					end = serialConn.read()
+					if end != PAYLOAD_END:
+						print("error, payload_end not found after protobuf")
+						continue
+				else:
+					print("error, payloadType", payloadType, "is invalid")
 					continue
-			else:
-				print("error, payloadType", payloadType, "is invalid")
-				continue
-			
-			print("topic:", topic, "; payload:", payload)
-			client.publish(topic, payload)
+				
+				print("topic:", topic, "; payload:", payload)
+				client.publish(topic.decode("utf-8"), payload)
+			except TypeError as err:
+				print("TypeError:", err)
 				
 			
 		time.sleep(0.1)
