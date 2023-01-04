@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/gkstretton/dark/services/goo/filesystem"
 )
@@ -29,7 +30,9 @@ type SessionManager struct {
 	// subs is all the channels listened to by subscribers
 	subs []chan *SessionEvent
 	// True if sessions are stored in ram
-	inMemory bool
+	inMemory           bool
+	latestSessionCache *Session
+	lock               *sync.Mutex
 }
 
 func NewSessionManager(useMemoryStorage bool) *SessionManager {
@@ -38,6 +41,7 @@ func NewSessionManager(useMemoryStorage bool) *SessionManager {
 		pub:      make(chan *SessionEvent),
 		subs:     []chan *SessionEvent{},
 		inMemory: useMemoryStorage,
+		lock:     &sync.Mutex{},
 	}
 	go sm.eventDistributor()
 
@@ -66,6 +70,7 @@ func (sm *SessionManager) BeginSession() (*Session, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create session: %v", err)
 	}
+	sm.clearLatestCache()
 
 	if !sm.inMemory {
 		// Create session folder for content etc.
@@ -103,6 +108,7 @@ func (sm *SessionManager) ResumeSession() (*Session, error) {
 	if err != nil {
 		return latest, fmt.Errorf("failed to resume: %v", err)
 	}
+	sm.clearLatestCache()
 
 	sm.pub <- &SessionEvent{
 		SessionID: latest.Id,
@@ -131,6 +137,7 @@ func (sm *SessionManager) PauseSession() (*Session, error) {
 	if err != nil {
 		return latest, fmt.Errorf("failed to pause: %v", err)
 	}
+	sm.clearLatestCache()
 
 	sm.pub <- &SessionEvent{
 		SessionID: latest.Id,
@@ -157,6 +164,8 @@ func (sm *SessionManager) EndSession() (*Session, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to update session: %v", err)
 	}
+	sm.clearLatestCache()
+
 	sm.pub <- &SessionEvent{
 		SessionID: latest.Id,
 		Type:      SESSION_ENDED,
@@ -167,9 +176,21 @@ func (sm *SessionManager) EndSession() (*Session, error) {
 
 // GetLatestSession returns nil, nil if there are no sessions yet
 func (sm *SessionManager) GetLatestSession() (*Session, error) {
+	if sm.latestSessionCache != nil {
+		return sm.latestSessionCache, nil
+	}
+
 	latest, err := sm.s.getLatest()
 	if err != nil {
 		return nil, err
 	}
+	sm.latestSessionCache = latest
 	return latest, nil
+}
+
+func (sm *SessionManager) clearLatestCache() {
+	sm.lock.Lock()
+	defer sm.lock.Unlock()
+
+	sm.latestSessionCache = nil
 }

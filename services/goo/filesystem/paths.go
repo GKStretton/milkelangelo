@@ -10,11 +10,12 @@ import (
 )
 
 var (
-	basePath     = flag.String("basePath", "/light-stores/", "base path for storage data")
-	contentPath  = flag.String("sessionPath", "session_content", "path for session content")
-	metadataPath = flag.String("metadataPath", "session_metadata", "path for session metadata")
-	rawVideoPath = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
-	rawDslrPath  = flag.String("rawDslrPath", "dslr/raw", "path within session, of raw dslr captures")
+	basePath            = flag.String("basePath", "/light-stores/", "base path for storage data")
+	contentPath         = flag.String("sessionPath", "session_content", "path for session content")
+	metadataPath        = flag.String("metadataPath", "session_metadata", "path for session metadata")
+	rawVideoPath        = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
+	rawDslrPath         = flag.String("rawDslrPath", "dslr/raw", "path within session, of raw dslr captures")
+	stateReportFileName = flag.String("stateReportFileName", "state-reports.yml", "filename for list of state reports")
 )
 
 func AssertBasePaths() {
@@ -47,6 +48,19 @@ func GetMetadataDir() string {
 		panic(fmt.Errorf("failed to create metadata path: %v", err))
 	}
 	return p
+}
+
+func GetStateReportPath(sessionId uint64) string {
+	p := filepath.Join(
+		*basePath,
+		*contentPath,
+		strconv.Itoa(int(sessionId)),
+	)
+	err := os.MkdirAll(p, 0777)
+	if err != nil {
+		panic(fmt.Errorf("failed to create state report path: %v", err))
+	}
+	return filepath.Join(p, *stateReportFileName)
 }
 
 // GetRawVideoDir mkdirAlls the path if it doesn't exist.

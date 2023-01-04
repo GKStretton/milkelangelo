@@ -1,6 +1,8 @@
 package session
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // memoryStorage is an in-memory, non-persistent store for testing
 type memoryStorage struct {

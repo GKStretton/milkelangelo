@@ -18,13 +18,11 @@ func main() {
 	filesystem.AssertBasePaths()
 
 	mqtt.Start()
-
 	keyvalue.Start()
-
-	events.Run()
 
 	sm := session.NewSessionManager(false)
 
+	events.Run(sm)
 	livecapture.Run(sm)
 
 	// Block to prevent early quit

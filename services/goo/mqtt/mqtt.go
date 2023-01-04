@@ -51,9 +51,16 @@ func on_disconnect(client paho.Client, err error) {
 func on_connect(client paho.Client) {
 	for topic, cbs := range subs {
 		for _, cb := range cbs {
-			client.Subscribe(topic, QOS, func(c paho.Client, m paho.Message) {
+			fmt.Printf("subscribing to %s\n", topic)
+			t := client.Subscribe(topic, QOS, func(c paho.Client, m paho.Message) {
 				cb(m.Topic(), m.Payload())
 			})
+			if !t.WaitTimeout(time.Second) {
+				fmt.Printf("subscribe to %s timed out\n", topic)
+			}
+			if t.Error() != nil {
+				fmt.Printf("error subscribing to %s: %v", topic, t.Error())
+			}
 		}
 	}
 	fmt.Println("Connected to broker")
