@@ -13,6 +13,12 @@ flashing = False
 
 exiting = False
 
+debug = False
+
+def debugf(msg, *args):
+	if debug:
+		print(msg, *args)
+
 #####################
 ### MQTT HANDLERS ###
 #####################
@@ -83,6 +89,8 @@ def term_handler(signum, frame):
 	exit()
 
 if __name__ == "__main__":
+	debug = True if os.environ["DEBUG_PYGATEWAY"].lower() == "true" else False
+
 	signal.signal(signal.SIGTERM, term_handler)
 	signal.signal(signal.SIGINT, term_handler)
 
@@ -131,23 +139,23 @@ if __name__ == "__main__":
 				if len(miscOutput) > 0:
 					client.publish(MISC_TOPIC, miscOutput)
 
-				print("received start symbol")
+				debugf("received start symbol")
 				# now it's the topic
 				topic = serialConn.read_until(TOPIC_END)[:-1]
-				print("received topic end for '{}'".format(topic))
+				debugf("received topic end for '{}'".format(topic))
 				payloadType = serialConn.read()
-				print("received payload type '{}'".format(payloadType))
+				debugf("received payload type '{}'".format(payloadType))
 
 				if payloadType == PLAINTEXT_IDENTIFIER:
 					payload = serialConn.read_until(PAYLOAD_END)[:-1]
-					print("received plaintext payload '{}'".format(payload))
+					debugf("received plaintext payload '{}'".format(payload))
 				elif payloadType == PROTOBUF_IDENTIFIER:
 					# todo: support longer lengths than 255
 					payloadSizeRaw = serialConn.read(1)
 					payloadSize = int(payloadSizeRaw[0])
-					print("received protobuf payload size", payloadSize)
+					debugf("received protobuf payload size", payloadSize)
 					payload = serialConn.read(payloadSize)
-					print("received protobuf payload:,", payload)
+					debugf("received protobuf payload:,", payload)
 					end = serialConn.read()
 					if end != PAYLOAD_END:
 						print("error, payload_end not found after protobuf")

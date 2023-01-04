@@ -24,6 +24,7 @@ services:
     network_mode: host
     environment:
       BROKER_HOST: ${BROKER_HOST:-localhost}
+      DEBUG_PYGATEWAY: ${DEBUG_PYGATEWAY:-false}
   goo:
     build: services/goo
     command: -basePath ${LIGHT_STORES_DIR}
