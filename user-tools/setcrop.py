@@ -12,7 +12,7 @@ HOST = "DEPTH"
 
 # location to load dslr image from if doing that crop
 # note, this uses the mount-md0 script to mount remote filesystem
-DSLR_CAPTURE_LOCATION = "/home/greg/md0-depth/light-stores/dslr-preview.jpg"
+DSLR_CAPTURE_LOCATION = "/mnt/md0/light-stores/dslr-preview.jpg"
 
 TOP_CAM_CHOICE = "1"
 FRONT_CAM_CHOICE = "2"

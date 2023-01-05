@@ -43,6 +43,7 @@ def simulate_piece():
 	p("shutting down")
 	mc.shutdown()
 	time.sleep(2)
+	p("Ending session")
 	mc.end_session()
 	p("waiting after shutdown...")
 	time.sleep(20)
