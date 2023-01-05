@@ -12,6 +12,8 @@ def p(msg, *args):
 
 def simulate_piece():
 	p("Simulating piece...")
+	p("Starting session")
+	mc.begin_session()
 	p("Sending Wake")
 	mc.wake()
 	time.sleep(30)
@@ -40,6 +42,8 @@ def simulate_piece():
 	time.sleep(10)
 	p("shutting down")
 	mc.shutdown()
+	time.sleep(2)
+	mc.end_session()
 	p("waiting after shutdown...")
 	time.sleep(20)
 

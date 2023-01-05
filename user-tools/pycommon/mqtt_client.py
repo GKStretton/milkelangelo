@@ -109,3 +109,9 @@ def goto_node(node):
 
 def toggle_manual():
     pub(TOGGLE_MANUAL, "")
+
+def begin_session():
+    pub(BEGIN_SESSION, "")
+
+def end_session():
+    pub(END_SESSION, "")

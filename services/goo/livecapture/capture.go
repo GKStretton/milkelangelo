@@ -9,8 +9,9 @@ import (
 )
 
 func (r *recorder) record(id session.ID) {
-	setDslrState(true)
-	defer setDslrState(false)
+	// after testing, it seems that this isn't needed:
+	// setDslrState(true)
+	// defer setDslrState(false)
 
 	r.isRecording = true
 	defer func() { r.isRecording = false }()

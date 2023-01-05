@@ -8,6 +8,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/filesystem"
 )
 
+// After testing it seems like this isn't necessary
 func setDslrState(b bool) {
 	state := "off"
 	if b {
