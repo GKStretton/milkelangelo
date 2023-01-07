@@ -7,7 +7,6 @@ import pycommon.image as image
 import numpy as np
 from pycommon.config_manager_client import *
 
-TOP_MASK = "resources/static_img/top-mask.png"
 HOST = "DEPTH"
 
 # location to load dslr image from if doing that crop
@@ -40,8 +39,6 @@ class CropWindow(window.Window):
         super().__init__()
 
         self.choice = choice
-        # load mask
-        self.mask = cv2.imread(TOP_MASK)
 
         current_yml = load_yaml(choice)
         if current_yml:
@@ -62,12 +59,10 @@ class CropWindow(window.Window):
     def load_dslr_image(self):
         # request dslr capture to be taken
         succ = trigger_dslr_capture()
-        if succ:
-            # load the capture from DEPTH
-            self.dslr_capture = cv2.imread(DSLR_CAPTURE_LOCATION)
-        else:
-            print("failed to do dslr capture, using zeros")
-            self.dslr_capture = np.zeros((1000, 1000, 3))
+        if not succ:
+            print("failed to do dslr capture, reading anyway")
+        self.dslr_capture = cv2.imread(DSLR_CAPTURE_LOCATION)
+        # self.dslr_capture = np.zeros((1000, 1000, 3))
     
     def open_stream(self):
         print("Opening stream...")
@@ -127,8 +122,7 @@ class CropWindow(window.Window):
         res = frame.copy()
         # mask with the vig
         if self.choice != FRONT_CAM_CHOICE:
-            resized_mask = cv2.resize(self.mask, (mag, mag))
-            image.overlay_image_alpha(res, np.zeros((mag, mag, 3)), self.x1, self.y1, 1 - resized_mask[:,:,0] / 255.0)
+            image.add_overlay(res, self.x1, self.y1, mag)
 
         return res
 

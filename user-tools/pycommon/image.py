@@ -1,4 +1,21 @@
 import numpy as np
+import cv2 as cv
+
+TOP_MASK = "resources/static_img/top-mask.png"
+mask = None
+
+# add_overlay adds the mask overlay with dims magXmag to an image at x,y
+# is mag is unspecified, it will default to the width of the input image
+def add_overlay(img: np.ndarray, x=0, y=0, mag=0):
+    global mask
+    if mask is None:
+        mask = cv.imread(TOP_MASK)
+
+    if mag == 0:
+        mag = img.shape[0]
+
+    resized_mask = cv.resize(mask, (mag, mag))
+    overlay_image_alpha(img, np.zeros((mag, mag, 3)), x, y, 1 - resized_mask[:,:,0] / 255.0)
 
 # https://stackoverflow.com/a/45118011
 def overlay_image_alpha(img, img_overlay, x, y, alpha_mask):

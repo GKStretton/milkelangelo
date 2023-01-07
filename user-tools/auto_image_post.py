@@ -7,23 +7,47 @@
 # standard.
 
 from skimage import io, exposure
+import skimage.color as color
 import matplotlib.pyplot as plt
 import cv2 as cv
+import pycommon.image as image
 import numpy as np
 import time
 import argparse
 import yaml
 
-def process_image(raw, crop_config=None):
-	# post = exposure.equalize_hist(raw)
-	# post = exposure.equalize_adapthist(raw, clip_limit=0.01)
 
-	post = raw
-	print(crop_config)
+def process_image(raw, crop_config=None):
+	cropped = raw.copy()
 	# crop
+	if crop_config is not None:
+		x1 = crop_config['left_abs']
+		x2 = crop_config['right_abs']
+		y1 = crop_config['top_abs']
+		y2 = crop_config['bottom_abs']
+		cropped = cropped[y1:y2,x1:x2,:]
+
+		image.add_overlay(cropped)
+
+	cropped = cv.rotate(cropped, cv.ROTATE_180)
+	post = cropped.copy()
+
+	# post = exposure.adjust_gamma(post, 0.5)
 	# equalise
+	# post = exposure.equalize_hist(post)
+	# post = exposure.equalize_adapthist(post, clip_limit=0.01)
+
+
+	saturation_factor=1.3
+
+	hsv = color.rgb2hsv(post)
+	hsv[:,:,1] = hsv[:,:,1] * saturation_factor
+	post = color.hsv2rgb(hsv)
+	
+
 	# any other post
-	return post
+
+	return cropped, post
 
 def handle_directory(in_path, out_path):
 	# for each image in directory:
@@ -34,19 +58,26 @@ def handle_image(in_file, out_dir):
 	raw = load_image(in_file)
 	crop_config = load_crop_config(args.input)
 
-	post = process_image(raw, crop_config=crop_config)
+	cropped, post = process_image(raw, crop_config=crop_config)
 
-	preview_image(raw, post)
+	preview_image(raw, cropped, post)
 	save_image(out_dir, post)
 
 	return
 
-def preview_image(raw, post):
-	# print(raw.shape)
-	# print(post.shape)
+def preview_image(raw, cropped, post):
 	# print(raw[0,0,0])
 	# print(post[0,0,0])
-	res = cv.vconcat([raw, post])
+	after = cv.hconcat([cropped, post])
+	print(raw.shape)
+	print(after.shape)
+	if raw.shape[1] > after.shape[1]:
+		after = np.pad(after, ((0,0),(0,raw.shape[1]-after.shape[1]), (0,0)))
+	else:
+		raw = np.pad(raw, ((0,0),(0,after.shape[1]-raw.shape[1]), (0,0)))
+	print(raw.shape)
+	print(after.shape)
+	res = cv.vconcat([raw, after])
 	cv.namedWindow("win", cv.WINDOW_NORMAL)
 	cv.imshow("win", res)
 
