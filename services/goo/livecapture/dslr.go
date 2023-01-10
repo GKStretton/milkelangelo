@@ -29,17 +29,41 @@ func captureSessionImage(sessionId uint64) {
 		return
 	}
 
-	saveCropConfig(CC_DSLR, p)
+	err = saveCropConfig(CC_DSLR, p)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err = processImage(p, filesystem.GetPostDslrDir(sessionId))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 func captureImage(p string) error {
-	cmd := exec.Command("./scripts/capture-dslr.sh", p)
+	captureCmd := exec.Command("./scripts/capture-dslr.sh", p)
 	// cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	captureCmd.Stderr = os.Stderr
 
-	err := cmd.Run()
+	err := captureCmd.Run()
 	if err != nil {
 		return fmt.Errorf("failed to run capture-dslr: %v", err)
+	}
+
+	return nil
+}
+
+func processImage(imgPath, outDir string) error {
+	postCmd := exec.Command("python", "../../user-tools/auto_image_post.py",
+		"-i", imgPath, "-o", outDir,
+	)
+	postCmd.Stderr = os.Stdout
+	// postCmd.Stdout = os.Stdout
+	err := postCmd.Start()
+	if err != nil {
+		return fmt.Errorf("failed to start imagePost cmd: %v", err)
 	}
 	return nil
 }

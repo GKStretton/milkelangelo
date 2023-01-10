@@ -37,12 +37,13 @@ def process_image(raw, crop_config=None):
 	# post = exposure.equalize_hist(post)
 	# post = exposure.equalize_adapthist(post, clip_limit=0.01)
 
+	#! Best go to the source, should the shutter time/aperture size be greater?
 
-	saturation_factor=1.3
+	# saturation_factor=1.3
 
-	hsv = color.rgb2hsv(post)
-	hsv[:,:,1] = hsv[:,:,1] * saturation_factor
-	post = color.hsv2rgb(hsv)
+	# hsv = color.rgb2hsv(post)
+	# hsv[:,:,1] = hsv[:,:,1] * saturation_factor
+	# post = color.hsv2rgb(hsv)
 	
 
 	# any other post
@@ -60,8 +61,10 @@ def handle_image(in_file, out_dir):
 
 	cropped, post = process_image(raw, crop_config=crop_config)
 
-	preview_image(raw, cropped, post)
-	save_image(out_dir, post)
+	if out_dir is None:
+		preview_image(raw, cropped, post)
+	else:
+		save_image(out_dir, post)
 
 	return
 
@@ -90,7 +93,7 @@ def load_image(path):
 	return img / 255.0
 
 def save_image(path, image):
-	return None
+	print("saving...", cv.imwrite(path, image*255))
 
 def load_crop_config(path):
 	config = None

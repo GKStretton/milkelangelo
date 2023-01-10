@@ -15,6 +15,7 @@ var (
 	metadataPath        = flag.String("metadataPath", "session_metadata", "path for session metadata")
 	rawVideoPath        = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
 	rawDslrPath         = flag.String("rawDslrPath", "dslr/raw", "path within session, of raw dslr captures")
+	postDslrPath        = flag.String("postDslrPath", "dslr/post", "path within session, of post dslr captures")
 	stateReportFileName = flag.String("stateReportFileName", "state-reports.yml", "filename for list of state reports")
 )
 
@@ -91,6 +92,20 @@ func GetRawDslrDir(sessionId uint64) string {
 	err := os.MkdirAll(p, 0777)
 	if err != nil {
 		panic(fmt.Errorf("failed to create raw dslr path: %v", err))
+	}
+	return p
+}
+
+func GetPostDslrDir(sessionId uint64) string {
+	p := filepath.Join(
+		*basePath,
+		*contentPath,
+		strconv.Itoa(int(sessionId)),
+		*postDslrPath,
+	)
+	err := os.MkdirAll(p, 0777)
+	if err != nil {
+		panic(fmt.Errorf("failed to create post dslr path: %v", err))
 	}
 	return p
 }

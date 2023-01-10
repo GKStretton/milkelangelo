@@ -14,15 +14,16 @@ const (
 	CC_DSLR      = "crop_dslr"
 )
 
-func saveCropConfig(ccKey string, contentPath string) {
+func saveCropConfig(ccKey string, contentPath string) error {
 	// e.g. 1.mp4.yml
 	ymlPath := contentPath + ".yml"
 	config := keyvalue.Get(ccKey)
 	if config == nil {
-		fmt.Printf("cannot saveCropConfig of %s for '%s' because key not found\n", ccKey, contentPath)
+		return fmt.Errorf("cannot saveCropConfig of %s for '%s' because key not found", ccKey, contentPath)
 	}
 	err := os.WriteFile(ymlPath, config, 0666)
 	if err != nil {
-		fmt.Printf("failed to write cropConfig of %s to '%s': %v\n", ccKey, ymlPath, err)
+		return fmt.Errorf("failed to write cropConfig of %s to '%s': %v", ccKey, ymlPath, err)
 	}
+	return nil
 }
