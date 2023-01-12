@@ -5,7 +5,7 @@ class Window:
     def __init__(self, name="window"):
         self.name = name
         self.exiting = False
-        cv2.namedWindow(self.name)
+        cv2.namedWindow(self.name, cv2.WINDOW_NORMAL)
         cv2.setMouseCallback(self.name, self.mouse_handler)
 
         self.placeholder_image = cv2.imread("resources/static_img/fallback.png")
