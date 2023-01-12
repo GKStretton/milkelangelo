@@ -32,6 +32,7 @@ def process_image(raw, crop_config=None):
 
 	cropped = cv.rotate(cropped, cv.ROTATE_180)
 	post = cropped.copy()
+	print(post.shape)
 
 	# post = exposure.adjust_gamma(post, 0.5)
 	# equalise
@@ -74,13 +75,12 @@ def preview_image(raw, cropped, post):
 	# print(post[0,0,0])
 	after = cv.hconcat([cropped, post])
 	print(raw.shape)
+	print(post.shape)
 	print(after.shape)
 	if raw.shape[1] > after.shape[1]:
 		after = np.pad(after, ((0,0),(0,raw.shape[1]-after.shape[1]), (0,0)))
 	else:
 		raw = np.pad(raw, ((0,0),(0,after.shape[1]-raw.shape[1]), (0,0)))
-	print(raw.shape)
-	print(after.shape)
 	res = cv.vconcat([raw, after])
 	cv.namedWindow("win", cv.WINDOW_NORMAL)
 	cv.imshow("win", res)
@@ -90,7 +90,7 @@ def preview_image(raw, cropped, post):
 	cv.destroyAllWindows()
 
 def load_image(path):
-	img = cv.imread(path)
+	img = cv.imread(path, cv.IMREAD_UNCHANGED)
 	return img / 255.0
 
 def save_image(in_file, out_dir, image):
