@@ -99,7 +99,7 @@ def load_crop_config(path):
 	config = None
 	try:
 		with open(path + ".yml", 'r') as f:
-			config = yaml.load(f)
+			config = yaml.load(f, Loader=yaml.FullLoader)
 	except FileNotFoundError as err:
 		pass
 
