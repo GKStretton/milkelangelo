@@ -8,7 +8,7 @@ class Window:
         cv2.namedWindow(self.name, cv2.WINDOW_NORMAL)
         cv2.setMouseCallback(self.name, self.mouse_handler)
 
-        self.placeholder_image = cv2.imread("resources/static_img/fallback.png")
+        self.placeholder_image = cv2.imread("resources/static_img/fallback.png", cv2.IMREAD_UNCHANGED)
 
         print("Window created")
 

@@ -73,7 +73,7 @@ class Interface(Window):
 			print("Stream opened")
 
 	def load_mask(self):
-		mask = cv2.imread(TOP_MASK)
+		mask = cv2.imread(TOP_MASK, cv2.IMREAD_UNCHANGED)
 		if len(mask) < 1:
 			print("mask not loaded, quitting")
 			self.exit()

@@ -6,6 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/gkstretton/dark/services/goo/filesystem"
+	"github.com/gkstretton/dark/services/goo/util"
 )
 
 // After testing it seems like this isn't necessary
@@ -43,13 +44,21 @@ func captureSessionImage(sessionId uint64) {
 }
 
 func captureImage(p string) error {
-	captureCmd := exec.Command("./scripts/capture-dslr.sh", p)
-	// cmd.Stdout = os.Stdout
-	captureCmd.Stderr = os.Stderr
+	if !util.EnvPresent("MOCK_DSLR") {
+		captureCmd := exec.Command("./scripts/capture-dslr.sh", p)
+		// cmd.Stdout = os.Stdout
+		captureCmd.Stderr = os.Stderr
 
-	err := captureCmd.Run()
-	if err != nil {
-		return fmt.Errorf("failed to run capture-dslr: %v", err)
+		err := captureCmd.Run()
+		if err != nil {
+			return fmt.Errorf("failed to run capture-dslr: %v", err)
+		}
+	} else {
+		copyCmd := exec.Command("cp", "./resources/static_img/dslr_fallback.jpg", p)
+		err := copyCmd.Run()
+		if err != nil {
+			return fmt.Errorf("error copying fallback dslr image: %v", err)
+		}
 	}
 
 	return nil

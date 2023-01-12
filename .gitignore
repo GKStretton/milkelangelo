@@ -5,5 +5,3 @@ config/crop.yml
 update-depth
 mount-md0
 unmount-md0
-*.jpg
-*.png
