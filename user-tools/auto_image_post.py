@@ -15,6 +15,7 @@ import numpy as np
 import time
 import argparse
 import yaml
+import os
 
 
 def process_image(raw, crop_config=None):
@@ -64,7 +65,7 @@ def handle_image(in_file, out_dir):
 	if out_dir is None:
 		preview_image(raw, cropped, post)
 	else:
-		save_image(out_dir, post)
+		save_image(in_file, out_dir, post)
 
 	return
 
@@ -92,8 +93,10 @@ def load_image(path):
 	img = cv.imread(path)
 	return img / 255.0
 
-def save_image(path, image):
-	print("saving...", cv.imwrite(path, image*255))
+def save_image(in_file, out_dir, image):
+	name = os.path.basename(in_file)
+	write_path = os.path.join(out_dir, name)
+	print("saving...", cv.imwrite(write_path, image*255))
 
 def load_crop_config(path):
 	config = None
