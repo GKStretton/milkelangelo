@@ -56,7 +56,7 @@ func captureImage(p string) error {
 }
 
 func processImage(imgPath, outDir string) error {
-	postCmd := exec.Command("python", "../../user-tools/auto_image_post.py",
+	postCmd := exec.Command("python3", "../../user-tools/auto_image_post.py",
 		"-i", imgPath, "-o", outDir,
 	)
 	postCmd.Stderr = os.Stdout
