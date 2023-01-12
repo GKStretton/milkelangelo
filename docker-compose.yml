@@ -34,4 +34,5 @@ services:
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev
-      - ./user-tools:/user-tools
+      - ./user-tools:/src/user-tools
+      - ./resources:/src/resources
