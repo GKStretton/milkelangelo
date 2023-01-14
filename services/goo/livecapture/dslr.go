@@ -36,6 +36,12 @@ func captureSessionImage(sessionId uint64) {
 		return
 	}
 
+	err = filesystem.WriteCreationTime(p)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	err = processImage(p, filesystem.GetPostDslrDir(sessionId))
 	if err != nil {
 		fmt.Println(err)

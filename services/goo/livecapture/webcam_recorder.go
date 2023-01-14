@@ -14,6 +14,7 @@ type webcamRecorder struct {
 	name      string
 	cmd       *exec.Cmd
 	stdin     io.WriteCloser
+	filePath  string
 }
 
 func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, error) {
@@ -27,6 +28,7 @@ func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, e
 	wr := &webcamRecorder{
 		sessionId: sessionId,
 		name:      rtspPath,
+		filePath:  filePath,
 	}
 	wr.cmd = exec.Command("./scripts/capture-rtsp.sh", url, filePath)
 
@@ -46,11 +48,11 @@ func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, e
 
 	wr.log("capture started")
 
-	if rtspPath == *config.TopCamRtspPath {
-		saveCropConfig(CC_TOP_CAM, filePath)
-	} else if rtspPath == *config.FrontCamRtspPath {
-		saveCropConfig(CC_FRONT_CAM, filePath)
+	ccKey := CC_TOP_CAM
+	if rtspPath == *config.FrontCamRtspPath {
+		ccKey = CC_FRONT_CAM
 	}
+	saveCropConfig(ccKey, filePath)
 
 	return wr, nil
 }
@@ -69,6 +71,12 @@ func (wr *webcamRecorder) Stop() {
 		return
 	}
 	wr.log("gracefully stopped recording")
+
+	err = filesystem.WriteCreationTime(wr.filePath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 func (wr *webcamRecorder) log(s string, args ...interface{}) {
