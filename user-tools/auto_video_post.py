@@ -13,15 +13,16 @@ from datetime import datetime
 TOP_CAM = "top-cam"
 FRONT_CAM = "front-cam"
 
+
 class CropConfig:
 	def __init__(self, path):
 		self.is_loaded = False
 		yml = self._load_crop_config(path)
+		self.raw_yml = yml
 		if yml is None:
 			return
 		
 		self.is_loaded = True
-		self.raw_yml = yml
 		self.x1 = yml['left_abs']
 		self.x2 = yml['right_abs']
 		self.y1 = yml['top_abs']
@@ -37,18 +38,26 @@ class CropConfig:
 
 		return config
 
+
 class FootagePiece:
 	def __init__(self, path):
+		print("\tLoading FootagePiece:", path)
+
 		# create VideoClip 
 		self.video = VideoFileClip.VideoFileClip(path)
 		# load crop configs 
 		self.crop_config = CropConfig(path + ".yml")
-		# calculate absolute start timestamp 
-		result = subprocess.run(["./user-tools/get-creation-timestamp.sh", path], stdout=subprocess.PIPE)
-		result.check_returncode()
-		raw_ts = result.stdout.decode("utf-8")
-		self.creation_timestamp = float(raw_ts)
-		print("clip creation date:",datetime.utcfromtimestamp(self.creation_timestamp).strftime('%Y-%m-%d %H:%M:%S'))
+
+		# calculate absolute start timestamp
+		with open(path + ".creationtime", 'r') as f:
+			unixtime = f.readline()
+
+			# timestamp unix in seconds with decimal
+			self.creation_timestamp = float(unixtime)
+		
+		print("\t\tcc:\t\t", self.crop_config.raw_yml)
+		print("\t\tstart:\t\t", self.get_creation_timestamp_string())
+		print("\t\tduration:\t {}s".format(self.video.duration))
 
 	def get_clip(self) -> VideoClip.VideoClip:
 		return self.video
@@ -61,16 +70,25 @@ class FootagePiece:
 	def get_creation_timestamp(self) -> float:
 		return self.creation_timestamp
 
+	def get_creation_timestamp_string(self) -> str:
+		return datetime.utcfromtimestamp(self.creation_timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+
 # FootageWrapper abstracts out any separate video recordings from paused sessions
 # and lets us get subclips by absolute timestamps rather than file-relative.
 # it will return crop information with the subclips.
 class FootageWrapper:
-	def __init__(self, *paths):
+	def __init__(self, footagePath):
+		print("Loading footage from directory:", footagePath)
 		self.clips = []
-		for p in paths:
-			self.clips.append(FootagePiece(p))
+		# get every .mp4 in the directory
+			# create a FootagePiece for each
+		for file in os.listdir(footagePath):
+			if file.endswith(".mp4"):
+				path = os.path.join(footagePath, file)
+				self.clips.append(FootagePiece(path))
 
-	def get_subclip(camera: str, start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, CropConfig]:
+	def get_subclip(start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, CropConfig]:
 		pass
 	
 if __name__ == "__main__":
@@ -79,18 +97,19 @@ if __name__ == "__main__":
 	parser.add_argument("-i", "--inspect", action="store_true", help="If true, detailed information will be shown on the video")
 	args = parser.parse_args()
 
-	print(args.session_dir)
+	print("Launching auto_video_post for {}".format(args.session_dir))
 
+	# state reports
+	state_reports = None
 	state_reports_path = os.path.join(args.session_dir, "state-reports.yml")
 	with open(state_reports_path, 'r') as f:
 		state_reports = yaml.load(f, yaml.FullLoader)
-	
-	print(len(state_reports))
-	print(state_reports[0])
+	print("Loaded {} state report entries".format(len(state_reports)))
 
-	filepath = os.path.join(args.session_dir, "video/raw/top-cam/1.mp4")
-	clip = FootagePiece(filepath)
+	# top-cam
+	print("Loading top-cam footage")
+	top_footage = FootageWrapper(os.path.join(args.session_dir, "video/raw/top-cam"))
 
-	print(clip.creation_timestamp)
-	print(clip.get_clip().duration)
-	print(clip.crop_config.raw_yml)
+	# front-cam
+	print("Loading front-cam footage")
+	front_footage = FootageWrapper(os.path.join(args.session_dir, "video/raw/front-cam"))
