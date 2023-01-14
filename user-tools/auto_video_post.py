@@ -81,35 +81,44 @@ class FootageWrapper:
 	def __init__(self, footagePath):
 		print("Loading footage from directory:", footagePath)
 		self.clips = []
-		# get every .mp4 in the directory
-			# create a FootagePiece for each
 		for file in os.listdir(footagePath):
+			# get every .mp4 in the directory
 			if file.endswith(".mp4"):
+				# create a FootagePiece for each
 				path = os.path.join(footagePath, file)
 				self.clips.append(FootagePiece(path))
 
 	def get_subclip(start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, CropConfig]:
+		#? how to handle transfer between clips?
 		pass
+
+def get_session_metadata(args):
+	pass
 	
+def get_session_content_path(args):
+	pass
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-d", "--session-dir", action="store", help="session content directory")
+	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata")
+	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5")
 	parser.add_argument("-i", "--inspect", action="store_true", help="If true, detailed information will be shown on the video")
 	args = parser.parse_args()
 
 	print("Launching auto_video_post for {}".format(args.session_dir))
 
+	content_path = get_session_content_path(args)
+
 	# state reports
 	state_reports = None
-	state_reports_path = os.path.join(args.session_dir, "state-reports.yml")
-	with open(state_reports_path, 'r') as f:
+	with open(os.path.join(content_path, "state-reports.yml"), 'r') as f:
 		state_reports = yaml.load(f, yaml.FullLoader)
 	print("Loaded {} state report entries".format(len(state_reports)))
 
 	# top-cam
 	print("Loading top-cam footage")
-	top_footage = FootageWrapper(os.path.join(args.session_dir, "video/raw/top-cam"))
+	top_footage = FootageWrapper(os.path.join(content_path, "video/raw/top-cam"))
 
 	# front-cam
 	print("Loading front-cam footage")
-	front_footage = FootageWrapper(os.path.join(args.session_dir, "video/raw/front-cam"))
+	front_footage = FootageWrapper(os.path.join(content_path, "video/raw/front-cam"))
