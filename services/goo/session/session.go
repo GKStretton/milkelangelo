@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/filesystem"
+	"github.com/gkstretton/dark/services/goo/mqtt"
 )
 
 type ID uint64
@@ -86,7 +88,9 @@ func (sm *SessionManager) BeginSession() (*Session, error) {
 		SessionID: session.Id,
 		Type:      SESSION_STARTED,
 	}
+	requestStateReport()
 	fmt.Printf("Began session %d\n", session.Id)
+
 	return session, nil
 }
 
@@ -114,6 +118,7 @@ func (sm *SessionManager) ResumeSession() (*Session, error) {
 		SessionID: latest.Id,
 		Type:      SESSION_RESUMED,
 	}
+	requestStateReport()
 	fmt.Printf("Resumed session %d\n", latest.Id)
 
 	return latest, nil
@@ -193,4 +198,11 @@ func (sm *SessionManager) clearLatestCache() {
 	defer sm.lock.Unlock()
 
 	sm.latestSessionCache = nil
+}
+
+func requestStateReport() {
+	err := mqtt.Publish(config.TOPIC_STATE_REPORT_REQUEST, "")
+	if err != nil {
+		fmt.Printf("failed to request state report from firmware: %v\n", err)
+	}
 }
