@@ -92,11 +92,29 @@ class FootageWrapper:
 		#? how to handle transfer between clips?
 		pass
 
-def get_session_metadata(args):
-	pass
+def get_session_metadata(args: argparse.Namespace):
+	filename = "{}_session.yml".format(args.session_number)
+	path = os.path.join(args.base_dir, "session_metadata", filename)
+	yml = None
+	with open(path, 'r') as f:
+		yml = yaml.load(f, Loader=yaml.FullLoader)
+	print("Loaded session metadata:", yml)
+	return yml
 	
-def get_session_content_path(args):
-	pass
+def get_session_content_path(args: argparse.Namespace):
+	return os.path.join(args.base_dir, "session_content", args.session_number)
+
+def get_state_reports(args: argparse.Namespace):
+	content_path = get_session_content_path(args)
+	state_reports = None
+	with open(os.path.join(content_path, "state-reports.yml"), 'r') as f:
+		state_reports = yaml.load(f, yaml.FullLoader)
+	print("Loaded {} state report entries".format(len(state_reports)))
+	return state_reports
+
+def get_cam_footage_wrapper(args: argparse.Namespace, cam: str):
+	content_path = get_session_content_path(args)
+	return FootageWrapper(os.path.join(content_path, "video/raw/" + cam))
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
@@ -104,21 +122,17 @@ if __name__ == "__main__":
 	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5")
 	parser.add_argument("-i", "--inspect", action="store_true", help="If true, detailed information will be shown on the video")
 	args = parser.parse_args()
+	print("Launching auto_video_post for session {} in '{}'\n".format(args.session_number, args.base_dir))
 
-	print("Launching auto_video_post for {}".format(args.session_dir))
+	## Gather resources
+	print("~~~ GATHERING RESOURCES ~~~")
 
-	content_path = get_session_content_path(args)
+	session_metadata = get_session_metadata(args)
+	state_reports = get_state_reports(args)
 
-	# state reports
-	state_reports = None
-	with open(os.path.join(content_path, "state-reports.yml"), 'r') as f:
-		state_reports = yaml.load(f, yaml.FullLoader)
-	print("Loaded {} state report entries".format(len(state_reports)))
+	# load camera footage
+	top_footage = get_cam_footage_wrapper(args, TOP_CAM)
+	front_footage = get_cam_footage_wrapper(args, FRONT_CAM)
 
-	# top-cam
-	print("Loading top-cam footage")
-	top_footage = FootageWrapper(os.path.join(content_path, "video/raw/top-cam"))
-
-	# front-cam
-	print("Loading front-cam footage")
-	front_footage = FootageWrapper(os.path.join(content_path, "video/raw/front-cam"))
+	print()
+	print("~~~ . ~~~")
