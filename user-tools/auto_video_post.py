@@ -116,6 +116,26 @@ def get_cam_footage_wrapper(args: argparse.Namespace, cam: str):
 	content_path = get_session_content_path(args)
 	return FootageWrapper(os.path.join(content_path, "video/raw/" + cam))
 
+
+class ContentGenerator:
+	def __init__(self, args: argparse.Namespace):
+		## Gather resources
+		print("~~~ GATHERING RESOURCES ~~~")
+
+		self.session_metadata = get_session_metadata(args)
+		self.state_reports = get_state_reports(args)
+
+		# load camera footage
+		self.top_footage = get_cam_footage_wrapper(args, TOP_CAM)
+		self.front_footage = get_cam_footage_wrapper(args, FRONT_CAM)
+
+		print()
+
+	def generate_content(self, content_type: str):
+		pass
+
+
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata")
@@ -124,15 +144,8 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	print("Launching auto_video_post for session {} in '{}'\n".format(args.session_number, args.base_dir))
 
-	## Gather resources
-	print("~~~ GATHERING RESOURCES ~~~")
+	cg = ContentGenerator(args)
 
-	session_metadata = get_session_metadata(args)
-	state_reports = get_state_reports(args)
-
-	# load camera footage
-	top_footage = get_cam_footage_wrapper(args, TOP_CAM)
-	front_footage = get_cam_footage_wrapper(args, FRONT_CAM)
-
-	print()
-	print("~~~ . ~~~")
+	# cg.generate_content(LONGFORM_1)
+	# cg.generate_content(SHORTFORM_FULL)
+	# cg.generate_content(SHORTFORM_HIGHLIGHTS)
