@@ -6,6 +6,7 @@ import moviepy.video.VideoClip as VideoClip
 import moviepy.video.io.VideoFileClip as VideoFileClip
 import yaml
 import pycommon.machine_pb2 as pb
+from google.protobuf.json_format import Parse, ParseDict
 import typing
 import subprocess
 from datetime import datetime
@@ -39,6 +40,9 @@ class CropConfig:
 		return config
 
 
+# FootagePiece handles loading and storage of a video clip, its crop config, and
+# timestamps. It supports getting subclips by absolute timestamp, wrapping
+# moviepy's file-relative timestamps.
 class FootagePiece:
 	def __init__(self, path):
 		print("\tLoading FootagePiece:", path)
@@ -53,11 +57,11 @@ class FootagePiece:
 			unixtime = f.readline()
 
 			# timestamp unix in seconds with decimal
-			self.creation_timestamp = float(unixtime)
+			self.start_timestamp = float(unixtime)
 		
 		print("\t\tcc:\t\t", self.crop_config.raw_yml)
-		print("\t\tstart:\t\t", self.get_creation_timestamp_string())
-		print("\t\tduration:\t {}s".format(self.video.duration))
+		print("\t\tstart:\t\t {} ({})".format(self.get_start_timestamp(), self.get_start_timestamp_string()))
+		print("\t\tduration:\t {}".format(self.video.duration))
 
 	def get_clip(self) -> VideoClip.VideoClip:
 		return self.video
@@ -67,20 +71,38 @@ class FootagePiece:
 			return self.crop_config
 		return None
 	
-	def get_creation_timestamp(self) -> float:
-		return self.creation_timestamp
+	def get_start_timestamp(self) -> float:
+		return self.start_timestamp
 
-	def get_creation_timestamp_string(self) -> str:
-		return datetime.utcfromtimestamp(self.creation_timestamp).strftime('%Y-%m-%d %H:%M:%S')
+	def get_start_timestamp_string(self) -> str:
+		return datetime.utcfromtimestamp(self.start_timestamp).strftime('%Y-%m-%d %H:%M:%S')
+	
+	def get_end_timestamp(self) -> float:
+		return self.start_timestamp + self.video.duration
+	
+	def contains_timestamp(self, t: float):
+		return t >= self.get_start_timestamp() and t <= self.get_end_timestamp()
+	
+	# this returns a subclip within decimal absolute unix timestamps. Handles the
+	# case where end_t is outside the footage by setting end to footage end
+	def get_subclip_from_timestamps(self, start_t: float, end_t: float) -> VideoClip.VideoClip:
+		if not self.contains_timestamp(start_t):
+			return None
+		
+		start_relative = start_t - self.start_timestamp
+		end_relative = end_t - self.get_end_timestamp()
+		if end_relative > self.video.duration:
+			end_relative = self.video.duration
+
+		return self.video.subclip(start_relative, end_relative)
 
 
 # FootageWrapper abstracts out any separate video recordings from paused sessions
-# and lets us get subclips by absolute timestamps rather than file-relative.
 # it will return crop information with the subclips.
 class FootageWrapper:
 	def __init__(self, footagePath):
 		print("Loading footage from directory:", footagePath)
-		self.clips = []
+		self.clips: typing.List[FootagePiece] = []
 		for file in os.listdir(footagePath):
 			# get every .mp4 in the directory
 			if file.endswith(".mp4"):
@@ -88,9 +110,24 @@ class FootageWrapper:
 				path = os.path.join(footagePath, file)
 				self.clips.append(FootagePiece(path))
 
-	def get_subclip(start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, CropConfig]:
-		#? how to handle transfer between clips?
-		pass
+	def get_subclip(self, start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, CropConfig]:
+		# if start_t is in clip x, we ignore everything after clip x. So each
+		# state report interval can only be in one clip. This is okay because
+		# on start / resume, a state report will be triggered.
+		for _, v in enumerate(self.clips):
+			if v.contains_timestamp(start_t):
+				# this clip contains footage of the state report
+				return v.get_subclip_from_timestamps(start_t, end_t), v.get_crop_config()
+		
+		# no clip with footage
+		return None, None
+	
+	def test(self):
+		start = self.clips[0].start_timestamp + 8
+		end = start + 3.5
+		c, _ = self.get_subclip(start, end)
+		c.preview()
+
 
 def get_session_metadata(args: argparse.Namespace):
 	filename = "{}_session.yml".format(args.session_number)
@@ -132,7 +169,13 @@ class ContentGenerator:
 		print()
 
 	def generate_content(self, content_type: str):
-		pass
+		print("Iterating state reports...")
+		for i, sr in enumerate(self.state_reports):
+			report = ParseDict(sr, pb.StateReport())
+			print("{}\t - {}".format(i, report.status))
+
+	def test(self):
+		self.top_footage.test()
 
 
 
@@ -146,6 +189,9 @@ if __name__ == "__main__":
 
 	cg = ContentGenerator(args)
 
+	# cg.test()
+
+	cg.generate_content("")
 	# cg.generate_content(LONGFORM_1)
 	# cg.generate_content(SHORTFORM_FULL)
 	# cg.generate_content(SHORTFORM_HIGHLIGHTS)
