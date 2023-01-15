@@ -9,8 +9,8 @@ import (
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
+	"github.com/gkstretton/dark/services/goo/util/protoyaml"
 	"google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v3"
 )
 
 func Run(sm *session.SessionManager) {
@@ -37,8 +37,12 @@ func Run(sm *session.SessionManager) {
 }
 
 func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
-	list := []*machinepb.StateReport{sr}
-	output, err := yaml.Marshal(list)
+	list := &machinepb.StateReportList{
+		StateReports: []*machinepb.StateReport{
+			sr,
+		},
+	}
+	output, err := protoyaml.Marshal(list)
 	if err != nil {
 		fmt.Printf("error marshalling state report to yaml: %v\n", err)
 	}
