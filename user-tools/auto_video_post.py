@@ -174,6 +174,10 @@ class ContentGenerator:
 			report = ParseDict(sr, pb.StateReport())
 			print("{}\t - {}".format(i, report.status))
 
+			# todo: another test session, with all testable features
+			# todo: verify it here
+			# todo: generate a video clip that is normal, except with overlay of state report information
+
 	def test(self):
 		self.top_footage.test()
 
