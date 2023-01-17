@@ -64,6 +64,7 @@ def simulate_piece(record=False):
 	if record:
 		p("Ending session")
 		mc.end_session()
+		time.sleep(5)
 
 
 def term_handler(signum, frame):
