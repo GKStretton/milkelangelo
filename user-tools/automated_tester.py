@@ -5,15 +5,17 @@ import pycommon.mqtt_client as mc
 import time
 import signal
 import datetime
+import argparse
 
 def p(msg, *args):
 	prefix = "{}:".format(datetime.datetime.now().time())
 	print(prefix, msg, *args)
 
-def simulate_piece():
+def simulate_piece(record=False):
 	p("Simulating piece...")
-	p("Starting session")
-	mc.begin_session()
+	if record:
+		p("Starting session")
+		mc.begin_session()
 	p("Sending Wake")
 	mc.wake()
 	time.sleep(30)
@@ -22,6 +24,10 @@ def simulate_piece():
 	dispense_amount = 50
 
 	for vial in range(1, 7, 2):
+		if record:
+			p("resuming session")
+			mc.resume_session()
+
 		p("collecting from vial", vial)
 		mc.collect(vial, len(coords) * dispense_amount)
 
@@ -36,6 +42,10 @@ def simulate_piece():
 			time.sleep(5)
 		
 		p("sleeping before next vial")
+		time.sleep(5)
+		if record:
+			p("pausing session")
+			mc.pause_session()
 		time.sleep(10)
 	
 	p("finished vials. waiting before sleep")
@@ -43,8 +53,9 @@ def simulate_piece():
 	p("shutting down")
 	mc.shutdown()
 	time.sleep(2)
-	p("Ending session")
-	mc.end_session()
+	if record:
+		p("Ending session")
+		mc.end_session()
 	p("waiting after shutdown...")
 	time.sleep(20)
 
@@ -59,8 +70,11 @@ if __name__ == "__main__":
 	signal.signal(signal.SIGTERM, term_handler)
 	signal.signal(signal.SIGINT, term_handler)
 
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-r", "--record", action="store_true", help="if true, session request will be emitted to trigger recording")
+	args = parser.parse_args()
+
 	mc.connect()
 	time.sleep(1)
 
-	while True:
-		simulate_piece()
+	simulate_piece(record=args.record)

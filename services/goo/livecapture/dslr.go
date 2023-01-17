@@ -59,12 +59,14 @@ func captureImage(p string) error {
 		if err != nil {
 			return fmt.Errorf("failed to run capture-dslr: %v", err)
 		}
+		fmt.Println("captured dslr image")
 	} else {
 		copyCmd := exec.Command("cp", "./resources/static_img/dslr_fallback.jpg", p)
 		err := copyCmd.Run()
 		if err != nil {
 			return fmt.Errorf("error copying fallback dslr image: %v", err)
 		}
+		fmt.Println("copied mock dslr image")
 	}
 
 	return nil
