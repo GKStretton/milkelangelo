@@ -14,6 +14,8 @@ flashing = False
 exiting = False
 
 debug = False
+# If true, just print, don't handle serial
+justPrint = False
 
 def debugf(msg, *args):
 	if debug:
@@ -28,6 +30,7 @@ def on_connect(client, userdata, flags, rc):
 	client.subscribe([
 		("mega/req/#", 1),
 		("mega/flash", 1),
+		("pygateway/justprint", 1),
 	])
 	print("MQTT connected, subscribed to topics")
 
@@ -37,6 +40,10 @@ def on_disconnect(client, userdata, rc):
 # default handler for things we aren't handling explicitly
 def on_message(client, userdata, msg: mqtt.MQTTMessage):
 	print("Received mqtt topic" + msg.topic + "without handler. Doing nothing.")
+
+def just_print_handler(client, userdata, msg: mqtt.MQTTMessage):
+	global justPrint
+	justPrint = not justPrint
 
 # handler for mega requests 
 def mega_handler(client, userdata, msg: mqtt.MQTTMessage):
@@ -112,6 +119,7 @@ if __name__ == "__main__":
 
 	client.message_callback_add("mega/flash", flash_mega)
 	client.message_callback_add("mega/req/#", mega_handler)
+	client.message_callback_add("pygateway/justprint", just_print_handler)
 	client.on_message = on_message
 
 	client.loop_start()
@@ -133,7 +141,7 @@ if __name__ == "__main__":
 		# reset state here
 
 		while not flashing:
-			if os.getenv("PYGATEWAY_PRINT_SERIAL"):
+			if justPrint:
 				b = serialConn.read_all()
 				print(b.hex())
 			else:
