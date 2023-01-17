@@ -133,41 +133,45 @@ if __name__ == "__main__":
 		# reset state here
 
 		while not flashing:
-			try:
-				# Read until start, handle undefined output
-				miscOutput = serialConn.read_until(START_SYMBOL)[:-1]
-				if len(miscOutput) > 0:
-					client.publish(MISC_TOPIC, miscOutput)
+			if os.environ["PYGATEWAY_PRINT_SERIAL"]:
+				b = serialConn.read_all()
+				print(b.hex())
+			else:
+				try:
+					# Read until start, handle undefined output
+					miscOutput = serialConn.read_until(START_SYMBOL)[:-1]
+					if len(miscOutput) > 0:
+						client.publish(MISC_TOPIC, miscOutput)
 
-				debugf("received start symbol")
-				# now it's the topic
-				topic = serialConn.read_until(TOPIC_END)[:-1]
-				debugf("received topic end for '{}'".format(topic))
-				payloadType = serialConn.read()
-				debugf("received payload type '{}'".format(payloadType))
+					debugf("received start symbol, discarding the following:", miscOutput)
+					# now it's the topic
+					topic = serialConn.read_until(TOPIC_END)[:-1]
+					debugf("received topic end for '{}'".format(topic))
+					payloadType = serialConn.read()
+					debugf("received payload type '{}'".format(payloadType))
 
-				if payloadType == PLAINTEXT_IDENTIFIER:
-					payload = serialConn.read_until(PAYLOAD_END)[:-1]
-					debugf("received plaintext payload '{}'".format(payload))
-				elif payloadType == PROTOBUF_IDENTIFIER:
-					# todo: support longer lengths than 255
-					payloadSizeRaw = serialConn.read(1)
-					payloadSize = int(payloadSizeRaw[0])
-					debugf("received protobuf payload size", payloadSize)
-					payload = serialConn.read(payloadSize)
-					debugf("received protobuf payload:,", payload)
-					end = serialConn.read()
-					if end != PAYLOAD_END:
-						print("error, payload_end not found after protobuf")
+					if payloadType == PLAINTEXT_IDENTIFIER:
+						payload = serialConn.read_until(PAYLOAD_END)[:-1]
+						debugf("received plaintext payload '{}'".format(payload))
+					elif payloadType == PROTOBUF_IDENTIFIER:
+						# todo: support longer lengths than 255
+						payloadSizeRaw = serialConn.read(1)
+						payloadSize = int(payloadSizeRaw[0])
+						debugf("received protobuf payload size", payloadSize)
+						payload = serialConn.read(payloadSize)
+						debugf("received protobuf payload:,", payload)
+						end = serialConn.read()
+						if end != PAYLOAD_END:
+							print("error, payload_end not found after protobuf")
+							continue
+					else:
+						print("error, payloadType", payloadType, "is invalid")
 						continue
-				else:
-					print("error, payloadType", payloadType, "is invalid")
-					continue
-				
-				print("topic:", topic, "; payload:", payload)
-				client.publish(topic.decode("utf-8"), payload)
-			except TypeError as err:
-				print("TypeError:", err)
+					
+					print("topic:", topic, "; payload:", payload)
+					client.publish(topic.decode("utf-8"), payload)
+				except TypeError as err:
+					print("TypeError:", err)
 				
 			
 		time.sleep(0.1)
