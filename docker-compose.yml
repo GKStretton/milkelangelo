@@ -25,6 +25,10 @@ services:
     environment:
       BROKER_HOST: ${BROKER_HOST:-localhost}
       DEBUG_PYGATEWAY: ${DEBUG_PYGATEWAY:-false}
+    logging:
+      driver: loki
+      options:
+        loki-url: ${LOKI_URL}
   goo:
     build: services/goo
     command: -basePath ${LIGHT_STORES_DIR}
@@ -38,3 +42,7 @@ services:
       - /dev:/dev
       - ./user-tools:/src/user-tools
       - ./resources:/src/resources
+    logging:
+      driver: loki
+      options:
+        loki-url: ${LOKI_URL}
