@@ -115,3 +115,9 @@ def begin_session():
 
 def end_session():
     pub(END_SESSION, "")
+
+def pause_session():
+    pub(PAUSE_SESSION, "")
+
+def resume_session():
+    pub(RESUME_SESSION, "")

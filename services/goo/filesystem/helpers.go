@@ -41,7 +41,7 @@ func WriteCreationTime(filePath string) error {
 	// discard \n
 	ts.Truncate(ts.Len() - 1)
 
-	fmt.Printf("got creation timestamp %s\n", ts.Bytes())
+	// fmt.Printf("got creation timestamp %s\n", ts.Bytes())
 	if err := os.WriteFile(filePath+".creationtime", ts.Bytes(), 0666); err != nil {
 		return fmt.Errorf("error writing creation time for %s: %v", filePath, err)
 	}

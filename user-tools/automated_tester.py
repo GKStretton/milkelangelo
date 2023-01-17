@@ -48,16 +48,22 @@ def simulate_piece(record=False):
 			mc.pause_session()
 		time.sleep(10)
 	
+	
 	p("finished vials. waiting before sleep")
 	time.sleep(10)
+
+	if record:
+		p("resuming session")
+		mc.resume_session()
+
 	p("shutting down")
 	mc.shutdown()
 	time.sleep(2)
+	p("waiting after shutdown...")
+	time.sleep(20)
 	if record:
 		p("Ending session")
 		mc.end_session()
-	p("waiting after shutdown...")
-	time.sleep(20)
 
 
 def term_handler(signum, frame):

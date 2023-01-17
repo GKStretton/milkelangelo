@@ -66,7 +66,6 @@ func captureImage(p string) error {
 		if err != nil {
 			return fmt.Errorf("failed to run capture-dslr: %v", err)
 		}
-		fmt.Println("captured dslr image")
 	}
 
 	return nil

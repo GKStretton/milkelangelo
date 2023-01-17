@@ -99,6 +99,12 @@ class CropWindow(window.Window):
             if self.choice != FRONT_CAM_CHOICE:
                 mag = abs(self.x2 - self.x1)
                 self.y2 = self.y1 + mag
+        
+        # constrain to image
+        self.x1 = max(0, self.x1)
+        self.y1 = max(0, self.y1)
+        self.x2 = min(self.frame_width, self.x2)
+        self.y2 = min(self.frame_height, self.y2)
     
     def keyboard_handler(self, key):
         super().keyboard_handler(key)

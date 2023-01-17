@@ -24,7 +24,7 @@ func Run(sm *session.SessionManager) {
 			return
 		}
 		sr.TimestampUnixMicros = uint64(t)
-		fmt.Printf("%+v\n", sr)
+		// fmt.Printf("%+v\n", sr)
 
 		// Abort unless session is active
 		session, _ := sm.GetLatestSession()
