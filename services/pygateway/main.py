@@ -133,7 +133,7 @@ if __name__ == "__main__":
 		# reset state here
 
 		while not flashing:
-			if os.environ["PYGATEWAY_PRINT_SERIAL"]:
+			if os.getenv("PYGATEWAY_PRINT_SERIAL"):
 				b = serialConn.read_all()
 				print(b.hex())
 			else:
