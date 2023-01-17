@@ -144,7 +144,7 @@ if __name__ == "__main__":
 			if justPrint:
 				if serialConn.in_waiting > 0:
 					b = serialConn.read_all()
-					print(b)
+					print(b.hex(':'))
 			else:
 				try:
 					# Read until start, handle undefined output
