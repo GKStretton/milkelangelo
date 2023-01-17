@@ -3,6 +3,7 @@ package events
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
@@ -47,6 +48,8 @@ func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
 		fmt.Printf("error marshalling state report to yaml: %v\n", err)
 	}
 
+	result := strings.Replace(string(output), "StateReports:\n", "", 1)
+
 	p := filesystem.GetStateReportPath(uint64(s.Id))
 
 	f, err := os.OpenFile(p, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -54,5 +57,5 @@ func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
 		fmt.Printf("error opening file for state report storage: %v\n", err)
 	}
 	defer f.Close()
-	f.Write(output)
+	f.Write([]byte(result))
 }

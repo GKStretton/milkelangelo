@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
@@ -55,9 +56,14 @@ func testFunc() {
 		},
 	}
 	out, err := protojson.Marshal(sr)
-	fmt.Println(err)
+	if err != nil {
+		fmt.Println(err)
+	}
 	fmt.Println(string(out))
 	out, err = protoyaml.Marshal(sr)
-	fmt.Println(err)
-	fmt.Println(string(out))
+	if err != nil {
+		fmt.Println(err)
+	}
+	res := strings.Replace(string(out), "StateReports:\n", "", 1)
+	fmt.Println(res)
 }

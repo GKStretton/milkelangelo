@@ -85,3 +85,5 @@ if __name__ == "__main__":
 	time.sleep(1)
 
 	simulate_piece(record=args.record)
+
+	print("Exiting.")
