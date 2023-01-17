@@ -50,7 +50,14 @@ func captureSessionImage(sessionId uint64) {
 }
 
 func captureImage(p string) error {
-	if !util.EnvPresent("MOCK_DSLR") {
+	if util.EnvBool("MOCK_DSLR") {
+		copyCmd := exec.Command("cp", "./resources/static_img/dslr_fallback.jpg", p)
+		err := copyCmd.Run()
+		if err != nil {
+			return fmt.Errorf("error copying fallback dslr image: %v", err)
+		}
+		fmt.Println("copied mock dslr image")
+	} else {
 		captureCmd := exec.Command("./scripts/capture-dslr.sh", p)
 		// cmd.Stdout = os.Stdout
 		captureCmd.Stderr = os.Stderr
@@ -60,13 +67,6 @@ func captureImage(p string) error {
 			return fmt.Errorf("failed to run capture-dslr: %v", err)
 		}
 		fmt.Println("captured dslr image")
-	} else {
-		copyCmd := exec.Command("cp", "./resources/static_img/dslr_fallback.jpg", p)
-		err := copyCmd.Run()
-		if err != nil {
-			return fmt.Errorf("error copying fallback dslr image: %v", err)
-		}
-		fmt.Println("copied mock dslr image")
 	}
 
 	return nil

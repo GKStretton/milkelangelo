@@ -7,7 +7,7 @@ func Ptr[T any](v T) *T {
 	return &v
 }
 
-// EnvPresent returns true if the env var is set to something, otherwise false
-func EnvPresent(name string) bool {
-	return os.Getenv(name) != ""
+// EnvBool returns true if the env var is set to true, otherwise false
+func EnvBool(name string) bool {
+	return os.Getenv(name) == "true"
 }
