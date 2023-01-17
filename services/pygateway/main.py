@@ -142,8 +142,9 @@ if __name__ == "__main__":
 
 		while not flashing:
 			if justPrint:
-				b = serialConn.read_all()
-				print(b.hex())
+				if serialConn.in_waiting > 0:
+					b = serialConn.read_all()
+					print(b)
 			else:
 				try:
 					# Read until start, handle undefined output
