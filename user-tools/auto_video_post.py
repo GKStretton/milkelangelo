@@ -58,7 +58,7 @@ class ContentGenerator:
 			status_name = pb.Status.Name(report.status)
 			ts = float(report.timestamp_unix_micros) / 1.0e6
 
-			print("{}\t{}     ({})\t{}".format(i, util.ts_format(ts), ts, status_name))
+			print("{}\t{}     ({:.2f})\t{}".format(i, util.ts_format(ts), ts, status_name))
 
 			# clip interval
 			start_ts = ts
@@ -69,21 +69,28 @@ class ContentGenerator:
 				next_report = ParseDict(self.state_reports[i+1], pb.StateReport())
 				end_ts = float(next_report.timestamp_unix_micros) / 1.0e6
 			
-			print("\tInterval range: {} -> {}\t({})".format(start_ts, end_ts, end_ts-start_ts))
+			print("\tInterval range: {:.2f} -> {:.2f}\t({:.2f})".format(start_ts, end_ts, end_ts-start_ts))
 
-			#todo: handle first state report not being in 1.mp4. Currently it will choose 2.mp4 rather
-			#todo: than best of 1.
 
-			#todo: check if pausing is reflected in the below?
-
-			#! state reports only for 1.mp4???
-
+			# TOP-CAM
+			print("\tGetting top-cam clip...")
 			top_clip, top_crop = self.top_footage.get_subclip(start_t=start_ts, end_t=end_ts)
-			print("\tTop Duration:\t{}".format(top_clip.duration))
+			if top_clip is None:
+				print("\tNo footage of top-cam, skipping")
+				continue
+			print("\ttop-cam footage duration:\t{:.2f}".format(top_clip.duration))
 
+
+			# FRONT-CAM
+			print("\tGetting front-cam clip...")
 			front_clip, front_crop = self.top_footage.get_subclip(start_t=start_ts, end_t=end_ts)
-			print("\tFront Duration:\t{}".format(front_clip.duration))
+			if front_clip is None:
+				print("\tNo footage of front-cam, skipping")
+				continue
+			print("\tfront-cam footage duration:\t{:.2f}".format(front_clip.duration))
 
+			#? why is front_clip subclip orders of magnitude faster than top_clip? But
+			#? when just doing front it takes long too...
 			# todo: generate a video clip that is normal, except with overlay of state report information
 
 
