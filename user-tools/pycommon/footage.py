@@ -103,6 +103,7 @@ class FootageWrapper:
 				# create a FootagePiece for each
 				path = os.path.join(footagePath, file)
 				self.clips.append(FootagePiece(path))
+		print()
 
 	def get_subclip(self, start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, CropConfig]:
 		# if start_t is in clip x, we ignore everything after clip x. So each

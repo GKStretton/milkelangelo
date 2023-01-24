@@ -11,6 +11,8 @@ import pycommon.machine_pb2 as pb
 from google.protobuf.json_format import ParseDict
 from pycommon.footage import FootageWrapper
 import pycommon.util as util
+from termcolor import colored
+
 
 TOP_CAM = "top-cam"
 FRONT_CAM = "front-cam"
@@ -21,7 +23,7 @@ def get_session_metadata(args: argparse.Namespace):
 	yml = None
 	with open(path, 'r') as f:
 		yml = yaml.load(f, Loader=yaml.FullLoader)
-	print("Loaded session metadata:", yml)
+	print("Loaded session metadata: {}\n".format(yml))
 	return yml
 	
 def get_session_content_path(args: argparse.Namespace):
@@ -32,19 +34,19 @@ def get_state_reports(args: argparse.Namespace):
 	state_reports = None
 	with open(os.path.join(content_path, "state-reports.yml"), 'r') as f:
 		state_reports = yaml.load(f, yaml.FullLoader)
-	print("Loaded {} state report entries".format(len(state_reports)))
+	print("Loaded {} state report entries\n".format(len(state_reports)))
 	return state_reports
 
 # Scenes for defining composition of top and front cams
-SCENE_UNDEFINED = 0
-SCENE_FRONT_ONLY = 1
-SCENE_FRONT_PRIMARY = 2
-SCENE_TOP_PRIMARY = 3
-SCENE_TOP_ONLY = 4
+SCENE_UNDEFINED = "UNDEFINED"
+SCENE_FRONT_ONLY = "FRONT_ONLY"
+SCENE_FRONT_PRIMARY = "FRONT_PRIMARY"
+SCENE_TOP_PRIMARY = "TOP_PRIMARY"
+SCENE_TOP_ONLY = "TOP_ONLY"
 
-FORMAT_UNDEFINED = 0
-FORMAT_LANDSCAPE = 1
-FORMAT_PORTRAIT = 2
+FORMAT_UNDEFINED = "UNDEFINED"
+FORMAT_LANDSCAPE = "LANDSCAPE"
+FORMAT_PORTRAIT = "PORTRAIT"
 
 class ContentGenerator:
 	def __init__(self, args: argparse.Namespace):
@@ -68,6 +70,9 @@ class ContentGenerator:
 		print("Iterating state reports...")
 		subclips: typing.List[VideoClip.VideoClip] = []
 
+		# state for the content generation, used with get_section_properties
+		video_state = {}
+
 		section_start_ts = 0
 		section_properties = {
 			"scene": SCENE_UNDEFINED,
@@ -77,50 +82,99 @@ class ContentGenerator:
 		# content already generated up to this point, so skip any state reports without info past this point
 		already_generated_up_to = 0
 
+		sections = 0
+
 		for i in range(len(self.state_reports)):
+			# get status report object
 			report = ParseDict(self.state_reports[i], pb.StateReport())
 
+			# get status name and ts
 			status_name = pb.Status.Name(report.status)
-			ts = float(report.timestamp_unix_micros) / 1.0e6
+			report_ts = float(report.timestamp_unix_micros) / 1.0e6
 
-			print("{}\t{}     ({:.2f})\t{}".format(i, util.ts_format(ts), ts, status_name))
-
-
-			#! outline:
-			# get new_section_properties under this state report
-			# if new_section_properties is different to section_properties, begin a new section
-				# generate_section on the previous properties, from section_start_ts to latest ts.
-				# set section_start_ts to latest ts
-				# set section_properties to new ones
-			# if dispense, immediately generate the section and mark "already_generated_up_to"
-
-			# ! end outline
-
-			# # clip interval
-			# start_ts = ts
-			# end_ts = ts + 3600*24*365 # 1 year in future, guaranteed to be at end of clip...
-
-			# # If there is an upcoming state report, set that as end_ts instead
-			# if i + 1 < len(self.state_reports):
-			# 	next_report = ParseDict(self.state_reports[i+1], pb.StateReport())
-			# 	end_ts = float(next_report.timestamp_unix_micros) / 1.0e6
-			
-			# print("\tInterval range: {:.2f} -> {:.2f}\t({:.2f})".format(start_ts, end_ts, end_ts-start_ts))
+			# i    timestamp_str     ts       STATUS_X
+			print("{}\t{}     ({})\t{}".format(colored(str(i), attrs=['bold', 'underline']), util.ts_format(report_ts), colored("{:.2f}".format(report_ts), 'red'), status_name))
 
 
-		final_clip = concatenate_videoclips(subclips)
+			#todo: add flag for dry-run
+			#todo: support force_duration
+			new_section_properties, force_duration = self.get_section_properties(video_state, report)
+			if new_section_properties != section_properties: # if content properties have changed
+				print("\t*Property change*")
+				if i == 0 or section_properties['skip']:
+					print("\t{} content until {}".format(colored("Skipping", attrs=['bold']), colored("{:.2f}".format(report_ts), 'red')))
+					print()
+				else:
+					print("\t{} content up to this SR: {} -> {}\t({:.2f})".format(colored("Generating", attrs=['bold']), colored("{:.2f}".format(section_start_ts), 'green'), colored("{:.2f}".format(report_ts), 'red'), report_ts-section_start_ts))
+					print()
+					sections += 1
+					# todo: support None as end_ts
+					# todo: support multi-footage subclips
+					# todo: add properties
+					# clip = self.generate_section(section_start_ts, report_ts)
+					# if clip is not None:
+						# subclips.append(clip)
 
-		self.write_video(content_type, final_clip)
+				# update state
+				section_start_ts = report_ts
+				section_properties = new_section_properties
+				print("\tUpdated section_start_ts to {} and properties to {}".format(colored("{:.2f}".format(section_start_ts), 'green'), section_properties))
+			else:
+				# print("\tSkipping state report because video properties have not changed")
+				pass
+
+			# todo: if dispense, immediately generate the section and mark "already_generated_up_to"
+
+		
+
+		if section_properties['skip']:
+			print("{}\tSkipping final section from {} to {}".format(colored("end", attrs=['bold', 'underline']), colored("{:.2f}".format(section_start_ts), 'green'), colored("end_of_footage", 'red')))
+		else:
+			print("{}\tGenerating final section from {} to {}".format(colored("end", attrs=['bold', 'underline']), colored("{:.2f}".format(section_start_ts), 'green'), colored("end_of_footage", 'red')))
+			sections += 1
+
+			# todo: support None as end_ts
+			# todo: support multi-footage subclips
+			# todo: add properties
+			# clip = self.generate_section(section_start_ts, None)
+			# if clip is not None:
+				# subclips.append(clip)
+			print()
+		
+		print("-"*40)
+		print("State reports: {}\nSections: {}".format(len(self.state_reports), sections))
+		print("-"*40)
+		print()
+
+		# print("Concatenating...")
+		# final_clip = concatenate_videoclips(subclips)
+
+		# self.write_video(content_type, final_clip)
 	
 	# returns properties for this section. if the second parameter is not 0, 
 	# this is a "forced_duration". a forced duration requires these properties be
 	# maintained for this time, even if the state reports change.
-	def get_section_properties(self, state_report) -> typing.Tuple[properties, float]:
-		pass
+	def get_section_properties(self, video_state, state_report) -> typing.Tuple[dict, float]:
+		props = {
+			'scene': SCENE_FRONT_PRIMARY,
+			'speed': 1.0,
+			'skip': False,
+		}
+
+		if state_report.status == pb.WAITING_FOR_DISPENSE:
+			props['skip'] = True
+		elif state_report.status == pb.NAVIGATING_IK or state_report.status == pb.DISPENSING:
+			props['scene'] = SCENE_TOP_PRIMARY
+			props['speed'] = 1.0
+		else:
+			props['scene'] = SCENE_FRONT_PRIMARY
+			props['speed'] = 5.0
+		
+		return props
 	
 
 	# generates a section of the content, one subclip.
-	def generate_section(self, start_ts: float, end_ts: float, scene: int, speed: float = 1.0, format: int = FORMAT_LANDSCAPE) -> VideoClip:
+	def generate_section(self, start_ts: float, end_ts: float, scene: str, speed: float = 1.0, format: str = FORMAT_LANDSCAPE) -> VideoClip:
 		# TOP-CAM
 		print("\tGetting top-cam clip...")
 		top_clip, top_crop = self.top_footage.get_subclip(start_t=start_ts, end_t=end_ts)
