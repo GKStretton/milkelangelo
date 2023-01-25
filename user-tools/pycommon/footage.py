@@ -1,4 +1,5 @@
 import moviepy.video.VideoClip as VideoClip
+from moviepy.editor import concatenate_videoclips
 import moviepy.video.io.VideoFileClip as VideoFileClip
 import time
 import typing
@@ -61,6 +62,9 @@ class FootagePiece:
 	# this returns a subclip within decimal absolute unix timestamps. 
 	# Return any footage from this video in the stated range.
 	def get_subclip_from_timestamps(self, start_t: float, end_t: float) -> VideoClip.VideoClip:
+		if end_t is None:
+			end_t = self.get_end_timestamp()
+
 		if not self.intersects_timestamp_range(start_t, end_t):
 			return None
 		
@@ -109,16 +113,19 @@ class FootageWrapper:
 		# if start_t is in clip x, we ignore everything after clip x. So each
 		# state report interval can only be in one clip. This is okay because
 		# on start / resume, a state report will be triggered.
+		full_clip = None
+		crop_config = None
 		for _, v in enumerate(self.clips):
 			clip = v.get_subclip_from_timestamps(start_t, end_t)
 			if clip is not None:
 				# this clip contains footage of the state report
-				return clip, v.get_crop_config()
-			else:
-				continue
+				if full_clip is None:
+					full_clip = clip
+				else:
+					full_clip = concatenate_videoclips([full_clip, clip])
+				crop_config = v.get_crop_config()
 		
-		# no clip with footage
-		return None, None
+		return full_clip, crop_config
 	
 	def test(self):
 		start = self.clips[0].start_timestamp + 8

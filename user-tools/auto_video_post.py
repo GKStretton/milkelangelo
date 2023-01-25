@@ -97,8 +97,8 @@ class ContentGenerator:
 
 
 			#todo: add flag for dry-run
-			#todo: support force_duration
-			new_section_properties, force_duration = self.get_section_properties(video_state, report)
+			#todo: support min_duration
+			new_section_properties, min_duration = self.get_section_properties(video_state, report)
 			if new_section_properties != section_properties: # if content properties have changed
 				print("\t*Property change*")
 				if i == 0 or section_properties['skip']:
@@ -108,8 +108,6 @@ class ContentGenerator:
 					print("\t{} content up to this SR: {} -> {}\t({:.2f})".format(colored("Generating", attrs=['bold']), colored("{:.2f}".format(section_start_ts), 'green'), colored("{:.2f}".format(report_ts), 'red'), report_ts-section_start_ts))
 					print()
 					sections += 1
-					# todo: support None as end_ts
-					# todo: support multi-footage subclips
 					# todo: add properties
 					# clip = self.generate_section(section_start_ts, report_ts)
 					# if clip is not None:
@@ -133,8 +131,6 @@ class ContentGenerator:
 			print("{}\tGenerating final section from {} to {}".format(colored("end", attrs=['bold', 'underline']), colored("{:.2f}".format(section_start_ts), 'green'), colored("end_of_footage", 'red')))
 			sections += 1
 
-			# todo: support None as end_ts
-			# todo: support multi-footage subclips
 			# todo: add properties
 			# clip = self.generate_section(section_start_ts, None)
 			# if clip is not None:
