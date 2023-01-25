@@ -73,14 +73,13 @@ class ContentGenerator:
 		# state for the content generation, used with get_section_properties
 		video_state = {}
 
+		# content already generated up to this point, so skip any state reports without info past this point
 		section_start_ts = 0
 		section_properties = {
-			"scene": SCENE_UNDEFINED,
-			"speed": 1.0,
+			'scene': SCENE_UNDEFINED,
+			'speed': 1.0,
+			'skip': False,
 		}
-
-		# content already generated up to this point, so skip any state reports without info past this point
-		already_generated_up_to = 0
 
 		sections = 0
 
@@ -95,35 +94,46 @@ class ContentGenerator:
 			# i    timestamp_str     ts       STATUS_X
 			print("{}\t{}     ({})\t{}".format(colored(str(i), attrs=['bold', 'underline']), util.ts_format(report_ts), colored("{:.2f}".format(report_ts), 'red'), status_name))
 
-
-			#todo: add flag for dry-run
-			#todo: support min_duration
-			new_section_properties, min_duration = self.get_section_properties(video_state, report)
+			new_section_properties = self.get_section_properties(video_state, report)
 			if new_section_properties != section_properties: # if content properties have changed
 				print("\t*Property change*")
 				if i == 0 or section_properties['skip']:
 					print("\t{} content until {}".format(colored("Skipping", attrs=['bold']), colored("{:.2f}".format(report_ts), 'red')))
 					print()
+				elif section_start_ts >= report_ts:
+					# Skip this report if we have already generated up to it. This may occur after a force_duration.
+					print("\t{} content for section because section_start_ts {:.2f} is already greater than this report timestamp".format(colored("Skipping", attrs=['bold']), section_start_ts))
 				else:
 					print("\t{} content up to this SR: {} -> {}\t({:.2f})".format(colored("Generating", attrs=['bold']), colored("{:.2f}".format(section_start_ts), 'green'), colored("{:.2f}".format(report_ts), 'red'), report_ts-section_start_ts))
 					print()
 					sections += 1
 					# todo: add properties
-					# clip = self.generate_section(section_start_ts, report_ts)
-					# if clip is not None:
-						# subclips.append(clip)
+					if not args.dry_run:
+						clip = self.generate_section(section_start_ts, report_ts)
+						if clip is not None:
+							subclips.append(clip)
 
 				# update state
-				section_start_ts = report_ts
+				section_start_ts = max(section_start_ts, report_ts)
 				section_properties = new_section_properties
 				print("\tUpdated section_start_ts to {} and properties to {}".format(colored("{:.2f}".format(section_start_ts), 'green'), section_properties))
 			else:
 				# print("\tSkipping state report because video properties have not changed")
 				pass
 
-			# todo: if dispense, immediately generate the section and mark "already_generated_up_to"
+			# force duration of this section if min_duration is set
+			min_duration = new_section_properties['min_duration']
+			if min_duration > 0:
+				if not args.dry_run:
+					# todo: add properties
+					clip = self.generate_section(section_start_ts, section_start_ts + min_duration)
+					if clip is not None:
+						subclips.append(clip)
 
-		
+				section_start_ts += min_duration
+
+
+		# Final section handling
 
 		if section_properties['skip']:
 			print("{}\tSkipping final section from {} to {}".format(colored("end", attrs=['bold', 'underline']), colored("{:.2f}".format(section_start_ts), 'green'), colored("end_of_footage", 'red')))
@@ -132,20 +142,26 @@ class ContentGenerator:
 			sections += 1
 
 			# todo: add properties
-			# clip = self.generate_section(section_start_ts, None)
-			# if clip is not None:
-				# subclips.append(clip)
-			print()
+			if not args.dry_run:
+				clip = self.generate_section(section_start_ts, None)
+				if clip is not None:
+					subclips.append(clip)
+				print()
+		
+		# Summary
 		
 		print("-"*40)
 		print("State reports: {}\nSections: {}".format(len(self.state_reports), sections))
 		print("-"*40)
 		print()
 
-		# print("Concatenating...")
-		# final_clip = concatenate_videoclips(subclips)
+		# Writing
 
-		# self.write_video(content_type, final_clip)
+		if not args.dry_run:
+			print("Concatenating...")
+			final_clip = concatenate_videoclips(subclips)
+
+			self.write_video(content_type, final_clip)
 	
 	# returns properties for this section. if the second parameter is not 0, 
 	# this is a "forced_duration". a forced duration requires these properties be
@@ -155,13 +171,17 @@ class ContentGenerator:
 			'scene': SCENE_FRONT_PRIMARY,
 			'speed': 1.0,
 			'skip': False,
+			'min_duration': 0
 		}
 
 		if state_report.status == pb.WAITING_FOR_DISPENSE:
 			props['skip'] = True
-		elif state_report.status == pb.NAVIGATING_IK or state_report.status == pb.DISPENSING:
+		elif state_report.status == pb.NAVIGATING_IK:
 			props['scene'] = SCENE_TOP_PRIMARY
-			props['speed'] = 1.0
+			props['speed'] = 2.5
+		elif state_report.status == pb.DISPENSING:
+			props['scene'] = SCENE_TOP_PRIMARY
+			props['min_duration'] = 3
 		else:
 			props['scene'] = SCENE_FRONT_PRIMARY
 			props['speed'] = 5.0
@@ -244,6 +264,7 @@ if __name__ == "__main__":
 	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata")
 	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5")
 	parser.add_argument("-i", "--inspect", action="store_true", help="If true, detailed information will be shown on the video")
+	parser.add_argument("-x", "--dry-run", action="store_true", help="If true, this will be a dry run and no content will be generated")
 	args = parser.parse_args()
 	print("Launching auto_video_post for session {} in '{}'\n".format(args.session_number, args.base_dir))
 
