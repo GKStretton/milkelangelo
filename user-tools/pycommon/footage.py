@@ -52,21 +52,20 @@ class FootagePiece:
 	# absolute time range. i.e. does this video contain any content from this
 	# time range?
 	def intersects_timestamp_range(self, start_t: float, end_t: float):
-		if start_t >= self.get_start_timestamp() and start_t <= self.get_end_timestamp():
-			return True
-		if end_t >= self.get_start_timestamp() and end_t <= self.get_end_timestamp():
-			return True
-
+		if start_t < self.get_end_timestamp():
+			if end_t is None or end_t > self.get_start_timestamp():
+				return True
 		return False
 	
 	# this returns a subclip within decimal absolute unix timestamps. 
 	# Return any footage from this video in the stated range.
 	def get_subclip_from_timestamps(self, start_t: float, end_t: float) -> VideoClip.VideoClip:
+		if not self.intersects_timestamp_range(start_t, end_t):
+			return None
+
 		if end_t is None:
 			end_t = self.get_end_timestamp()
 
-		if not self.intersects_timestamp_range(start_t, end_t):
-			return None
 		
 		print("\t\tGathering subclip for range ({:.2f}, {:.2f}) in {}".format(start_t, end_t, self.file_name))
 		
