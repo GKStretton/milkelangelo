@@ -13,7 +13,8 @@ from pycommon.footage import FootageWrapper
 import pycommon.util as util
 from termcolor import colored
 from google.protobuf.json_format import MessageToJson
-
+import moviepy.video.fx.all as vfx
+import pycommon.image as image
 
 
 TOP_CAM = "top-cam"
@@ -42,8 +43,7 @@ def get_state_reports(args: argparse.Namespace):
 # Scenes for defining composition of top and front cams
 SCENE_UNDEFINED = "UNDEFINED"
 SCENE_FRONT_ONLY = "FRONT_ONLY"
-SCENE_FRONT_PRIMARY = "FRONT_PRIMARY"
-SCENE_TOP_PRIMARY = "TOP_PRIMARY"
+SCENE_DUAL = "DUAL"
 SCENE_TOP_ONLY = "TOP_ONLY"
 
 FORMAT_UNDEFINED = "UNDEFINED"
@@ -83,8 +83,6 @@ class ContentGenerator:
 		section_start_ts = 0
 		section_properties = {
 			'scene': SCENE_UNDEFINED,
-			'speed': 1.0,
-			'skip': False,
 		}
 		previous_state_report = None
 
@@ -187,11 +185,13 @@ class ContentGenerator:
 	# maintained for this time, even if the state reports change.
 	def get_section_properties(self, video_state, state_report, content_type: str) -> typing.Tuple[dict, float]:
 		props = {
-			'scene': SCENE_FRONT_PRIMARY,
+			'scene': SCENE_DUAL,
 			'speed': 1.0,
 			'skip': False,
 			'min_duration': 0,
-			'format': FORMAT_UNDEFINED
+			'format': FORMAT_UNDEFINED,
+			'crop': True,
+			'overlay': True,
 		}
 
 		if content_type == TYPE_LONGFORM:
@@ -200,15 +200,16 @@ class ContentGenerator:
 			props['format'] = FORMAT_PORTRAIT
 
 		if state_report.status == pb.WAITING_FOR_DISPENSE:
-			props['skip'] = True
+			props['scene'] = SCENE_DUAL
+			# props['skip'] = True
 		elif state_report.status == pb.NAVIGATING_IK:
-			props['scene'] = SCENE_TOP_PRIMARY
+			props['scene'] = SCENE_DUAL
 			props['speed'] = 2.5
 		elif state_report.status == pb.DISPENSING:
-			props['scene'] = SCENE_TOP_PRIMARY
+			props['scene'] = SCENE_DUAL
 			props['min_duration'] = 3
 		else:
-			props['scene'] = SCENE_FRONT_PRIMARY
+			props['scene'] = SCENE_DUAL
 			props['speed'] = 5.0
 		
 		return props
@@ -234,7 +235,18 @@ class ContentGenerator:
 		print("\tfront-cam footage duration:\t{:.2f}".format(front_clip.duration))
 
 		# CROP
-		# todo: crop
+		if properties['crop']:
+			if top_crop is not None:
+				top_clip = vfx.crop(top_clip, x1=top_crop.x1, y1=top_crop.y1, x2=top_crop.x2, y2=top_crop.y2)
+			if front_crop is not None:
+				front_clip = vfx.crop(front_clip, x1=front_crop.x1, y1=front_crop.y1, x2=front_crop.x2, y2=front_crop.y2)
+			
+			def add_top_overlay(img):
+				i = img.copy()
+				image.add_overlay(i)
+				return i
+			if properties['overlay']:
+				top_clip = top_clip.fl_image(add_top_overlay)
 
 		speed = properties['speed']
 		scene = properties['scene']
@@ -251,17 +263,15 @@ class ContentGenerator:
 		clip = None
 
 		if format == FORMAT_LANDSCAPE:
-			if scene == SCENE_FRONT_PRIMARY:
-				top_clip = top_clip.resize(0.5).set_position((50, 50))
+			if scene == SCENE_DUAL:
+				front_clip = front_clip.resize(0.7).set_position((10, 'center'))
+				top_clip = top_clip.resize(1.2).set_position((1100, 'center'))
 				clip = CompositeVideoClip([front_clip, top_clip], size=landscape_dim)
-			elif scene == SCENE_TOP_PRIMARY:
-				front_clip = front_clip.resize(0.5).set_position((50, 50))
-				clip = CompositeVideoClip([top_clip, front_clip], size=landscape_dim)
 			else:
 				print("scene {} not supported".format(scene))
 				return None
 		elif format == FORMAT_PORTRAIT:
-			if scene == SCENE_FRONT_PRIMARY or scene == SCENE_TOP_PRIMARY:
+			if scene == SCENE_DUAL:
 				top_clip = top_clip.resize(0.5).set_position((100, 100))
 				front_clip = front_clip.resize(0.5).set_position((100, 1000))
 				clip = CompositeVideoClip([front_clip, top_clip], size=portrait_dim)
