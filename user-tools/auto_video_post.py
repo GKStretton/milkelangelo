@@ -199,6 +199,7 @@ class ContentGenerator:
 		else:
 			props['format'] = FORMAT_PORTRAIT
 
+
 		if state_report.status == pb.WAITING_FOR_DISPENSE:
 			props['scene'] = SCENE_DUAL
 			# props['skip'] = True
@@ -210,7 +211,7 @@ class ContentGenerator:
 			props['min_duration'] = 3
 		else:
 			props['scene'] = SCENE_DUAL
-			props['speed'] = 5.0
+			props['speed'] = 10.0
 		
 		return props
 	
@@ -271,9 +272,9 @@ class ContentGenerator:
 				print("scene {} not supported".format(scene))
 				return None
 		elif format == FORMAT_PORTRAIT:
-			if scene == SCENE_DUAL:
-				top_clip = top_clip.resize(0.5).set_position((100, 100))
-				front_clip = front_clip.resize(0.5).set_position((100, 1000))
+			if scene != SCENE_UNDEFINED:
+				front_clip = front_clip.resize(0.7).set_position(('center', 1000))
+				top_clip = top_clip.resize(1.2).set_position(('center', 100))
 				clip = CompositeVideoClip([front_clip, top_clip], size=portrait_dim)
 			else:
 				print("scene {} not supported".format(scene))
@@ -347,7 +348,8 @@ if __name__ == "__main__":
 
 	# cg.test()
 
-	cg.generate_content(args, TYPE_LONGFORM)
+	# cg.generate_content(args, TYPE_LONGFORM)
+	cg.generate_content(args, TYPE_SHORTFORM)
 	# cg.generate_content(LONGFORM_1)
 	# cg.generate_content(SHORTFORM_FULL)
 	# cg.generate_content(SHORTFORM_HIGHLIGHTS)
