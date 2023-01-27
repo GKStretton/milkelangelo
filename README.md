@@ -6,8 +6,9 @@ Dark is the supporting system monorepo for [A Study of Light](https://www.youtub
 - [x] RTSP streaming for multiple consumers of webcam feeds
 - [x] Remote firmware update
 - [x] Remote camera crop configuration
-- [ ] Control interface for system
-- [ ] Automated video and photo capture
+- [x] Control interface for system
+- [x] Session management system
+- [x] Automated video, photo, and state report capture
 - [ ] Automated post-processing of short- & long-form video, and photos.
 - [ ] Automated social media posting
 - [ ] OBS integration for live streaming
