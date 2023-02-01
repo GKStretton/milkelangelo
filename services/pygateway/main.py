@@ -33,9 +33,16 @@ def on_connect(client, userdata, flags, rc):
 		("pygateway/justprint", 1),
 	])
 	print("MQTT connected, subscribed to topics")
+	# note: making serial open/close with mqtt because there's a strange
+	# bug where on mqtt reconnect, the serial just reads garbage bytes.
+	# maybe some strange threading thing?
+	serialConn.open()
+	print("opened serial")
 
 def on_disconnect(client, userdata, rc):
 	print("MQTT disconnected")
+	serialConn.close()
+	print("closed serial")
 
 # default handler for things we aren't handling explicitly
 def on_message(client, userdata, msg: mqtt.MQTTMessage):
@@ -101,10 +108,16 @@ if __name__ == "__main__":
 	signal.signal(signal.SIGTERM, term_handler)
 	signal.signal(signal.SIGINT, term_handler)
 
-	print("Sleeping to ensure mqtt broker is running after computer restart")
-	time.sleep(2)
+	# SERIAL
+	print("Configuring serial...")
+	serialConn = serial.Serial()
+	serialConn.port = '/dev/ttyACM0'
+	serialConn.baudrate = 1000000
+	serialConn.timeout = 10
 
 	# MQTT
+	print("Sleeping to ensure mqtt broker is running after computer restart")
+	time.sleep(2)
 
 	client = mqtt.Client()
 	client.on_connect = on_connect
@@ -125,10 +138,6 @@ if __name__ == "__main__":
 	client.loop_start()
 	print("Started broker network loop")
 
-	# SERIAL
-	print("Attempting to open serial interface...")
-	serialConn = serial.Serial('/dev/ttyACM0', 1000000, timeout=10)
-	print("Opened Serial.")
 
 	START_SYMBOL = b'>'
 	TOPIC_END = b';'
@@ -140,7 +149,7 @@ if __name__ == "__main__":
 	while not exiting:
 		# reset state here
 
-		while not flashing:
+		while serialConn.is_open:
 			if justPrint:
 				if serialConn.in_waiting > 0:
 					b = serialConn.read_all()
