@@ -19,14 +19,15 @@ v4l2-ctl --device $path --set-ctrl \
 focus_absolute=19
 
 v4l2-ctl --device $path --set-ctrl \
-gain=0,\
+gain=1,\
 zoom_absolute=100,\
 exposure_absolute=200
 
 
 # wait so focus set happens while camera is up (streamcam bug?)
 sleep 1.5
-v4l2-ctl --device $path --set-ctrl focus_absolute=20
+v4l2-ctl --device $path --set-ctrl focus_absolute=20,\
+gain=0
 
 v4l2-ctl --device $path --list-ctrls-menus
 
