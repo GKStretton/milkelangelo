@@ -4,9 +4,6 @@ path=/dev/front-cam
 
 echo "Starting $path configuration..."
 
-# wait so focus set happens while camera is up (streamcam bug?)
-sleep 1.0
-
 echo "~~ FRONT CAM ~~"
 v4l2-ctl --device $path -v width=1920,height=1080,pixelformat=MJPG --set-parm 60
 v4l2-ctl --device $path --get-fmt-video --get-parm
@@ -19,7 +16,7 @@ exposure_auto=1
 # value as it already is. Seems to just stay at a silent 0 even though the value
 # changes
 v4l2-ctl --device $path --set-ctrl \
-focus_absolute=39
+focus_absolute=19
 
 v4l2-ctl --device $path --set-ctrl \
 gain=0,\
@@ -28,8 +25,8 @@ exposure_absolute=200
 
 
 # wait so focus set happens while camera is up (streamcam bug?)
-sleep 0.5
-v4l2-ctl --device $path --set-ctrl focus_absolute=40
+sleep 1.5
+v4l2-ctl --device $path --set-ctrl focus_absolute=20
 
 v4l2-ctl --device $path --list-ctrls-menus
 
