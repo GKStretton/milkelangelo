@@ -9,7 +9,8 @@ import pycommon.mqtt_client as mc
 
 TOP_MASK = "resources/static_img/top-mask.png"
 # how many microlitres to dispense at a time
-DISPENSE_uL = 50.0
+DISPENSE_uL = 7.5
+collection_volume = 30.0
 
 STREAM=True
 DO_CROP=False
@@ -164,7 +165,7 @@ class Interface(Window):
 		if key >= ord('0') and key <= ord('7'):
 			num = key - ord('0')
 			print("selected position", num)
-			mc.collect(num, 200.0)
+			mc.collect(num, collection_volume)
 		if key == ord('u'):
 			print("uncalibrating")
 			mc.uncalibrate()
