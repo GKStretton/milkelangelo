@@ -11,29 +11,35 @@ TOP_MASK = "resources/static_img/top-mask.png"
 # how many microlitres to dispense at a time
 DISPENSE_uL = 7.5
 collection_volume = 30.0
+# how many ml of milk / water to dispense
+FLUID_ML = 150.0
 
 STREAM=True
 DO_CROP=False
 DO_MASK=False
 
 helps = {
-	"h": "Print this help text",
+	" ": "Dispense {}".format(DISPENSE_uL),
+	"b": "begin session",
 	"c": "Toggle crop",
-	"o": "Toggle vigenette overlay",
-	"s": "Shutdown cleanly",
+	"d": "open drain",
+	"e": "end session",
+	"h": "Print this help text",
 	"k": "Kill / Sleep",
+	"m": "toggle manual mode",
+	"n": "Go to navigation node",
+	"o": "Toggle vigenette overlay",
+	"p": "close/plug drain",
+	"s": "Shutdown cleanly",
+	"v": "DRAIN fluid request",
+	"u": "Uncalibrate the motors, freeing up movement if there's been a slip",
+	"x": "WATER fluid request",
+	"y": "MILK fluid request",
 	"w": "Wake up",
+	"z": "pause session",
 	"0": "Go to position before tube 1",
 	"1-7": "Collect from test tube n",
-	" ": "Dispense {}".format(DISPENSE_uL),
 	"lmb": "Select IK target",
-	"u": "Uncalibrate the motors, freeing up movement if there's been a slip",
-	"d": "open drain",
-	"p": "close/plug drain",
-	"m": "toggle manual mode",
-	"b": "begin session",
-	"e": "end session",
-	"z": "pause session",
 	",": "resume session",
 }
 
@@ -193,6 +199,15 @@ class Interface(Window):
 		if key == ord(','):
 			print("Resuming session")
 			mc.pub(mc.RESUME_SESSION, "")
+		if key == ord('v'):
+			print("sending fluid req: drain")
+			mc.fluid_req(mc.FLUID_DRAIN, FLUID_ML)
+		if key == ord('x'):
+			print("sending fluid req: water")
+			mc.fluid_req(mc.FLUID_WATER, FLUID_ML)
+		if key == ord('y'):
+			print("sending fluid req: milk")
+			mc.fluid_req(mc.FLUID_MILK, FLUID_ML)
 
 
 	def crop(self, frame):

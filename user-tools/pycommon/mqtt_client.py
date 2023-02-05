@@ -24,6 +24,11 @@ END_SESSION = "asol/session/end"
 PAUSE_SESSION = "asol/session/pause"
 RESUME_SESSION = "asol/session/resume"
 
+FLUID_REQ_TOPIC = "mega/req/fluid"
+FLUID_DRAIN = 1
+FLUID_WATER = 2
+FLUID_MILK = 3
+
 # mqtt client
 client = None
 
@@ -81,7 +86,7 @@ def dispense(ul):
 
 def collect(pos, ul):
     debug("writing collect payload '{}'".format(pos))
-    pl = "{},{:.1f}".format(pos, ul)
+    pl = f"{pos},{ul:.1f}"
     pub(COLLECT_TOPIC, pl)
 
     debug("wrote collect payload")
@@ -121,3 +126,7 @@ def pause_session():
 
 def resume_session():
     pub(RESUME_SESSION, "")
+
+def fluid_req(req_type, ml):
+    msg = f"{req_type},{ml:.2f}"
+    pub(FLUID_REQ_TOPIC, msg)
