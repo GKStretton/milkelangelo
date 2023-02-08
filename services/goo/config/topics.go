@@ -13,3 +13,6 @@ const TOPIC_SESSION_RESUME = "asol/session/resume"
 const TOPIC_SESSION_RESUMED = "asol/session/resumed"
 
 const TOPIC_STATE_REPORT_REQUEST = "mega/req/state-report"
+
+const TOPIC_STREAM_START = "asol/stream/begin"
+const TOPIC_STREAM_END = "asol/stream/end"

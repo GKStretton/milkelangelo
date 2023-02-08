@@ -16,13 +16,16 @@ const (
 	SESSION_RESUMED
 )
 
+const EVENT_CHAN_BUFFER = 10
+
 type SessionEvent struct {
 	SessionID ID
 	Type      EventType
 }
 
 func (sm *SessionManager) SubscribeToEvents() <-chan *SessionEvent {
-	ch := make(chan *SessionEvent)
+	ch := make(chan *SessionEvent, EVENT_CHAN_BUFFER)
+
 	sm.subs = append(sm.subs, ch)
 	return ch
 }

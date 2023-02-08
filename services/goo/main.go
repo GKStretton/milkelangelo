@@ -2,19 +2,15 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"strings"
 	"time"
 
-	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/livecapture"
 	"github.com/gkstretton/dark/services/goo/mqtt"
+	"github.com/gkstretton/dark/services/goo/obs"
 	"github.com/gkstretton/dark/services/goo/session"
-	"github.com/gkstretton/dark/services/goo/util/protoyaml"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 var (
@@ -38,6 +34,7 @@ func main() {
 
 	events.Run(sm)
 	livecapture.Run(sm)
+	obs.Run(sm)
 
 	// Block to prevent early quit
 	for {
@@ -46,24 +43,5 @@ func main() {
 }
 
 func testFunc() {
-	sr := &machinepb.StateReportList{
-		StateReports: []*machinepb.StateReport{
-			{
-				TimestampUnixMicros: 100,
-				Mode:                machinepb.Mode_AUTONOMOUS,
-				Status:              machinepb.Status_CLEANING_BOWL,
-			},
-		},
-	}
-	out, err := protojson.Marshal(sr)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(string(out))
-	out, err = protoyaml.Marshal(sr)
-	if err != nil {
-		fmt.Println(err)
-	}
-	res := strings.Replace(string(out), "StateReports:\n", "", 1)
-	fmt.Println(res)
+	obs.Run(session.NewSessionManager(true))
 }
