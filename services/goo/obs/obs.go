@@ -2,53 +2,55 @@ package obs
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/andreykaipov/goobs"
-	"github.com/andreykaipov/goobs/api/requests/streaming"
-	"github.com/andreykaipov/goobs/api/typedefs"
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
+	"github.com/gorilla/websocket"
 )
 
 var c *goobs.Client
 
+const retryWaitS = 5
+
 func Run(sm *session.SessionManager) {
 	fmt.Println("Running OBS controller")
 
-	var err error
-	c, err = goobs.New("localhost:4444")
-	if err != nil {
-		fmt.Printf("failed to create obs ws client: %v\n", err)
-		return
-	}
-	resp, err := c.General.GetVersion()
-	if err != nil {
-		fmt.Printf("failed to get version: %v\n", err)
-		return
-	}
-	fmt.Printf("OBS version: %s\n", resp.ObsStudioVersion)
-	fmt.Printf("OBSws version: %s\n", resp.ObsWebsocketVersion)
+	go connectionListener()
+	go sessionListener(sm)
 
 	mqtt.Subscribe(config.TOPIC_STREAM_START, startStream)
 	mqtt.Subscribe(config.TOPIC_STREAM_END, endStream)
 }
 
-func startStream(topic string, payload []byte) {
-	_, err := c.Streaming.StartStreaming(&streaming.StartStreamingParams{
-		Stream: &streaming.Stream{
-			Metadata: map[string]interface{}{},
-			Settings: &typedefs.StreamSettings{},
-		},
-	})
-	if err != nil {
-		fmt.Printf("failed to start streaming: %v\n", err)
+func connectionListener() {
+	var err error
+	c, err = goobs.New("localhost:4444")
+	for err != nil {
+		fmt.Printf("failed to create obs ws client, retrying in %d seconds: %v\n", retryWaitS, err)
+		time.Sleep(time.Second * time.Duration(retryWaitS))
+		c, err = goobs.New("localhost:4444")
 	}
-}
 
-func endStream(topic string, payload []byte) {
-	_, err := c.Streaming.StopStreaming()
+	c.Conn.SetCloseHandler(func(code int, text string) error {
+		fmt.Printf("obs connection closed - %d: %s\n", code, text)
+
+		message := websocket.FormatCloseMessage(code, "")
+		c.Conn.WriteControl(websocket.CloseMessage, message, time.Now().Add(time.Second))
+		go connectionListener()
+		return nil
+	})
+
+	resp, err := c.General.GetVersion()
 	if err != nil {
-		fmt.Printf("failed to stop streaming: %v\n", err)
+		fmt.Printf("failed to get obs version on connect: %v\n", err)
+		return
 	}
+	fmt.Printf("Connected to OBS\n"+
+		"\tOBSversion: %s\n"+
+		"\tOBSws version: %s\n",
+		resp.ObsStudioVersion, resp.ObsWebsocketVersion,
+	)
 }

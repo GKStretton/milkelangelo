@@ -14,6 +14,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+var subs = []chan *machinepb.StateReport{}
+
 func Run(sm *session.SessionManager) {
 	mqtt.Subscribe("mega/state-report", func(topic string, payload []byte) {
 		t := time.Now().UnixMicro()
@@ -34,7 +36,23 @@ func Run(sm *session.SessionManager) {
 		}
 
 		saveSessionStateReport(session, sr)
+		publishStateReport(sr)
 	})
+}
+
+func Subscribe() chan *machinepb.StateReport {
+	c := make(chan *machinepb.StateReport, 10)
+	subs = append(subs, c)
+	return c
+}
+
+func publishStateReport(sr *machinepb.StateReport) {
+	for _, c := range subs {
+		select {
+		case c <- sr:
+		default:
+		}
+	}
 }
 
 func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {

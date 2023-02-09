@@ -21,8 +21,7 @@ func main() {
 	flag.Parse()
 
 	if *test {
-		testFunc()
-		return
+		Test()
 	}
 
 	filesystem.AssertBasePaths()
@@ -42,6 +41,6 @@ func main() {
 	}
 }
 
-func testFunc() {
-	obs.Run(session.NewSessionManager(true))
+func Test() {
+
 }
