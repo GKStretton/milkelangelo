@@ -19,14 +19,14 @@ const retryWaitS = 5
 func Run(sm *session.SessionManager) {
 	fmt.Println("Running OBS controller")
 
-	go connectionListener()
 	go sessionListener(sm)
+	go connectionListener(sm)
 
 	mqtt.Subscribe(config.TOPIC_STREAM_START, startStream)
 	mqtt.Subscribe(config.TOPIC_STREAM_END, endStream)
 }
 
-func connectionListener() {
+func connectionListener(sm *session.SessionManager) {
 	var err error
 	c, err = goobs.New(os.Getenv("OBS_LANDSCAPE_URL"))
 	for err != nil {
@@ -40,7 +40,7 @@ func connectionListener() {
 
 		message := websocket.FormatCloseMessage(code, "")
 		c.Conn.WriteControl(websocket.CloseMessage, message, time.Now().Add(time.Second))
-		go connectionListener()
+		go connectionListener(sm)
 		return nil
 	})
 
@@ -54,4 +54,5 @@ func connectionListener() {
 		"\tOBSws version: %s\n",
 		resp.ObsStudioVersion, resp.ObsWebsocketVersion,
 	)
+	handleSessionEvent(sm)
 }

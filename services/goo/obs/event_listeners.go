@@ -11,6 +11,7 @@ import (
 func sessionListener(sm *session.SessionManager) {
 	sessionChan := sm.SubscribeToEvents()
 	stateReportChan := events.Subscribe()
+	handleSessionEvent(sm)
 	for {
 		select {
 		case <-sessionChan:
@@ -24,6 +25,7 @@ func sessionListener(sm *session.SessionManager) {
 func handleStateReport(sr *machinepb.StateReport) {
 	var scene string
 
+	// todo: proper obs scene logic
 	if sr.Status == machinepb.Status_IDLE_MOVING ||
 		sr.Status == machinepb.Status_IDLE_STATIONARY {
 		scene = SCENE_IDLE
