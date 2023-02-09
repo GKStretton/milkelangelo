@@ -37,6 +37,7 @@ services:
     privileged: true
     environment:
       MOCK_DSLR: ${MOCK_DSLR:-false}
+      OBS_LANDSCAPE_URL: ${OBS_LANDSCAPE_URL}
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev

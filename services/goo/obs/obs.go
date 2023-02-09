@@ -2,6 +2,7 @@ package obs
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/andreykaipov/goobs"
@@ -27,11 +28,11 @@ func Run(sm *session.SessionManager) {
 
 func connectionListener() {
 	var err error
-	c, err = goobs.New("localhost:4444")
+	c, err = goobs.New(os.Getenv("OBS_LANDSCAPE_URL"))
 	for err != nil {
 		fmt.Printf("failed to create obs ws client, retrying in %d seconds: %v\n", retryWaitS, err)
 		time.Sleep(time.Second * time.Duration(retryWaitS))
-		c, err = goobs.New("localhost:4444")
+		c, err = goobs.New(os.Getenv("OBS_LANDSCAPE_URL"))
 	}
 
 	c.Conn.SetCloseHandler(func(code int, text string) error {
