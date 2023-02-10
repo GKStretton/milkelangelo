@@ -9,10 +9,10 @@ import pycommon.mqtt_client as mc
 
 TOP_MASK = "resources/static_img/top-mask.png"
 # how many microlitres to dispense at a time
-DISPENSE_uL = 7.5
+DISPENSE_uL = 10
 collection_volume = 30.0
 # how many ml of milk / water to dispense
-FLUID_ML = 150.0
+FLUID_ML = 200.0
 
 STREAM=True
 DO_CROP=False
