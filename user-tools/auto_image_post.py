@@ -30,7 +30,6 @@ def process_image(raw, crop_config=None):
 
 		image.add_overlay(cropped)
 
-	cropped = cv.rotate(cropped, cv.ROTATE_180)
 	post = cropped.copy()
 	print(post.shape)
 
@@ -91,6 +90,7 @@ def preview_image(raw, cropped, post):
 
 def load_image(path):
 	img = cv.imread(path, cv.IMREAD_UNCHANGED)
+	img = cv.rotate(img, cv.ROTATE_180)
 	return img / 255.0
 
 def save_image(in_file, out_dir, image):

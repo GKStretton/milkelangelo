@@ -62,6 +62,7 @@ class CropWindow(window.Window):
         if not succ:
             print("failed to do dslr capture, reading anyway")
         self.dslr_capture = cv2.imread(DSLR_CAPTURE_LOCATION, cv2.IMREAD_UNCHANGED)
+        self.dslr_capture = cv2.rotate(self.dslr_capture, cv2.ROTATE_180)
         # self.dslr_capture = np.zeros((1000, 1000, 3))
     
     def open_stream(self):
