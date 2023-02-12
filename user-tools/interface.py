@@ -17,6 +17,7 @@ FLUID_ML = 200.0
 STREAM=True
 DO_CROP=False
 DO_MASK=False
+SHOW_GRID=True
 
 helps = {
 	" ": "Dispense {}".format(DISPENSE_uL),
@@ -41,6 +42,7 @@ helps = {
 	"1-7": "Collect from test tube n",
 	"lmb": "Select IK target",
 	",": "resume session",
+	";": "toggle grid",
 }
 
 def print_help_text():
@@ -208,6 +210,9 @@ class Interface(Window):
 		if key == ord('y'):
 			print("sending fluid req: milk")
 			mc.fluid_req(mc.FLUID_MILK, FLUID_ML)
+		if key == ord(';'):
+			print("toggling grid")
+			SHOW_GRID = not SHOW_GRID
 
 
 	def crop(self, frame):
@@ -217,6 +222,19 @@ class Interface(Window):
 		right = self.crop_config['right_abs']
 
 		return frame[top:bottom, left:right]
+	
+	def draw_grid(self, frame):
+		for y in np.linspace(-1, 1, 21):
+			thickness = 1
+			if y == 0:
+				thickness = 2
+			cv2.line(frame, self.rel_to_abs(-1, y), self.rel_to_abs(1, y), (0, 255, 0), thickness)
+		
+		for x in np.linspace(-1, 1, 21):
+			thickness = 1
+			if x == 0:
+				thickness = 2
+			cv2.line(frame, self.rel_to_abs(x, -1), self.rel_to_abs(x, 1), (0, 255, 0), thickness)
 
 	def update(self):
 		if STREAM:
@@ -236,9 +254,12 @@ class Interface(Window):
 			else:
 				image.overlay_image_alpha(frame, np.zeros((self.crop_mag, self.crop_mag, 3)), self.crop_config['left_abs'], self.crop_config['top_abs'], self.mask)
 			
+		if SHOW_GRID:
+			self.draw_grid(frame)
 
 		if self.crop_config is not None:
-			cv2.circle(frame,self.rel_to_abs(self.target_x_rel,self.target_y_rel),10,(0,0,255),2, cv2.LINE_AA)
+			cv2.circle(frame,self.rel_to_abs(self.target_x_rel,self.target_y_rel),3,(0,0,255),2, cv2.LINE_AA)
+		
 
 		return frame
 
