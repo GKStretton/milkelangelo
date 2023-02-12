@@ -60,6 +60,7 @@ class Interface(Window):
 
 		self.do_crop = DO_CROP
 		self.do_mask = DO_MASK
+		self.show_grid = SHOW_GRID
 
 
 		self.crop_config = read_remote_crop_config("crop_top-cam")
@@ -212,7 +213,7 @@ class Interface(Window):
 			mc.fluid_req(mc.FLUID_MILK, FLUID_ML)
 		if key == ord(';'):
 			print("toggling grid")
-			SHOW_GRID = not SHOW_GRID
+			self.show_grid = not self.show_grid
 
 
 	def crop(self, frame):
@@ -228,7 +229,7 @@ class Interface(Window):
 			thickness = 1
 			if y == 0:
 				thickness = 2
-			cv2.line(frame, self.rel_to_abs(-1, y), self.rel_to_abs(1, y), (0, 255, 0), thickness)
+			cv2.line(frame, self.rel_to_abs(-1, y), self.rel_to_abs(1, y), (0, 255, 0), thickness, cv2.LINE_AA)
 		
 		for x in np.linspace(-1, 1, 21):
 			thickness = 1
@@ -254,7 +255,7 @@ class Interface(Window):
 			else:
 				image.overlay_image_alpha(frame, np.zeros((self.crop_mag, self.crop_mag, 3)), self.crop_config['left_abs'], self.crop_config['top_abs'], self.mask)
 			
-		if SHOW_GRID:
+		if self.show_grid:
 			self.draw_grid(frame)
 
 		if self.crop_config is not None:
