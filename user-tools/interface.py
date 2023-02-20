@@ -225,13 +225,13 @@ class Interface(Window):
 		return frame[top:bottom, left:right]
 	
 	def draw_grid(self, frame):
-		for y in np.linspace(-1, 1, 21):
+		for y in np.linspace(-1, 1, 11):
 			thickness = 1
 			if y == 0:
 				thickness = 2
 			cv2.line(frame, self.rel_to_abs(-1, y), self.rel_to_abs(1, y), (0, 255, 0), thickness, cv2.LINE_AA)
 		
-		for x in np.linspace(-1, 1, 21):
+		for x in np.linspace(-1, 1, 11):
 			thickness = 1
 			if x == 0:
 				thickness = 2
