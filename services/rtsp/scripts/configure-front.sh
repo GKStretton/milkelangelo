@@ -38,7 +38,7 @@ exposure_absolute=300
 sleep 1.5
 v4l2-ctl --device $path --set-ctrl focus_absolute=20,\
 
-# Fix for red camera effect
+# Fix for red camera effect?
 v4l2-ctl --device $path --set-ctrl gain=255
 v4l2-ctl --device $path --set-ctrl gain=0
 

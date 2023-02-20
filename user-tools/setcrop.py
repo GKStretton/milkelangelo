@@ -39,6 +39,7 @@ class CropWindow(window.Window):
         super().__init__()
 
         self.choice = choice
+        self.show_overlay = True
 
         current_yml = load_yaml(choice)
         if current_yml:
@@ -55,6 +56,7 @@ class CropWindow(window.Window):
             self.open_stream()
         else:
             self.load_dslr_image()
+        
     
     def load_dslr_image(self):
         # request dslr capture to be taken
@@ -109,6 +111,9 @@ class CropWindow(window.Window):
     
     def keyboard_handler(self, key):
         super().keyboard_handler(key)
+        if key == ord('o'):
+            self.show_overlay = not self.show_overlay
+
     
     def update(self):
         if self.choice == TOP_CAM_CHOICE or self.choice == FRONT_CAM_CHOICE:
@@ -128,7 +133,7 @@ class CropWindow(window.Window):
 
         res = frame.copy()
         # mask with the vig
-        if self.choice != FRONT_CAM_CHOICE:
+        if self.choice != FRONT_CAM_CHOICE and self.show_overlay:
             image.add_overlay(res, self.x1, self.y1, mag)
 
         return res
