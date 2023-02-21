@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	SCENE_FALLBACK = "fallback"
+	SCENE_ERROR    = "error"
+	SCENE_COMPLETE = "complete"
 	SCENE_PAUSED   = "paused"
 	SCENE_LIVE     = "live"
-	SCENE_IDLE     = "idle"
 )
 
 func setScene(sceneName string) error {

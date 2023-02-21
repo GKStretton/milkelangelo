@@ -55,4 +55,5 @@ func connectionListener(sm *session.SessionManager) {
 		resp.ObsStudioVersion, resp.ObsWebsocketVersion,
 	)
 	handleSessionEvent(sm)
+	setCropConfig()
 }

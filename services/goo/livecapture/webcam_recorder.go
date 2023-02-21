@@ -48,9 +48,9 @@ func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, e
 
 	wr.log("capture started")
 
-	ccKey := CC_TOP_CAM
+	ccKey := config.CC_TOP_CAM
 	if rtspPath == *config.FrontCamRtspPath {
-		ccKey = CC_FRONT_CAM
+		ccKey = config.CC_FRONT_CAM
 	}
 	saveCropConfig(ccKey, filePath)
 

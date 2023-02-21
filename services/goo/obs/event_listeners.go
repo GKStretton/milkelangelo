@@ -23,20 +23,20 @@ func sessionListener(sm *session.SessionManager) {
 }
 
 func handleStateReport(sr *machinepb.StateReport) {
-	var scene string
+	// var scene string
 
 	// todo: proper obs scene logic
-	if sr.Status == machinepb.Status_IDLE_MOVING ||
-		sr.Status == machinepb.Status_IDLE_STATIONARY {
-		scene = SCENE_IDLE
-	} else {
-		scene = SCENE_LIVE
-	}
+	// if sr.Status == machinepb.Status_IDLE_MOVING ||
+	// 	sr.Status == machinepb.Status_IDLE_STATIONARY {
+	// 	scene = SCENE_IDLE
+	// } else {
+	// 	scene = SCENE_LIVE
+	// }
 
-	err := setScene(scene)
-	if err != nil {
-		fmt.Printf("error setting scene in session listener: %v\n", err)
-	}
+	// err := setScene(scene)
+	// if err != nil {
+	// 	fmt.Printf("error setting scene in session listener: %v\n", err)
+	// }
 }
 
 func handleSessionEvent(e *session.SessionManager) {
@@ -45,15 +45,15 @@ func handleSessionEvent(e *session.SessionManager) {
 	s, err := e.GetLatestSession()
 	if err != nil {
 		fmt.Printf("failed to get latest session in handleSessionEvent: %v\n", err)
-		scene = SCENE_FALLBACK
+		scene = SCENE_ERROR
 	} else if s == nil {
-		scene = SCENE_FALLBACK
+		scene = SCENE_COMPLETE
 	} else if s.Complete {
-		scene = SCENE_FALLBACK
+		scene = SCENE_COMPLETE
 	} else if s.Paused {
 		scene = SCENE_PAUSED
 	} else {
-		scene = SCENE_IDLE
+		scene = SCENE_LIVE
 	}
 
 	err = setScene(scene)

@@ -7,12 +7,6 @@ import (
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 )
 
-const (
-	// Crop config keys
-	CC_TOP_CAM   = "crop_top-cam"
-	CC_FRONT_CAM = "crop_front-cam"
-	CC_DSLR      = "crop_dslr"
-)
 
 func saveCropConfig(ccKey string, contentPath string) error {
 	// e.g. 1.mp4.yml

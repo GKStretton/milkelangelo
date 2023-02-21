@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/util"
 )
@@ -30,7 +31,7 @@ func captureSessionImage(sessionId uint64) {
 		return
 	}
 
-	err = saveCropConfig(CC_DSLR, p)
+	err = saveCropConfig(config.CC_DSLR, p)
 	if err != nil {
 		fmt.Println(err)
 		return
