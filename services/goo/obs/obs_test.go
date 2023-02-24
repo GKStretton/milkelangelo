@@ -3,7 +3,6 @@ package obs
 import (
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/andreykaipov/goobs"
 	"github.com/andreykaipov/goobs/api/requests/inputs"
@@ -25,10 +24,15 @@ func initTestClient(t *testing.T) {
 
 func TestSetScene(t *testing.T) {
 	initTestClient(t)
-	time.Sleep(time.Second * 5)
 
-	err := setScene("error")
+	err := setScene("complete")
 	assert.NoError(t, err)
+}
+
+func TestStartStream(t *testing.T) {
+	initTestClient(t)
+
+	startStream("", []byte{})
 }
 
 func TestSetCropConfig(t *testing.T) {

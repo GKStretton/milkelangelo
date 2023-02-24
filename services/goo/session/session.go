@@ -54,6 +54,8 @@ func NewSessionManager(useMemoryStorage bool) *SessionManager {
 
 // BeginSession will attempt to begin a new session
 func (sm *SessionManager) BeginSession() (*Session, error) {
+	sm.lock.Lock()
+	defer sm.lock.Unlock()
 	latest, err := sm.GetLatestSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed to check if session is in progress: %v", err)
@@ -96,6 +98,8 @@ func (sm *SessionManager) BeginSession() (*Session, error) {
 
 // ResumeSession will resume a paused in-progress session
 func (sm *SessionManager) ResumeSession() (*Session, error) {
+	sm.lock.Lock()
+	defer sm.lock.Unlock()
 	latest, err := sm.GetLatestSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed to check if session is in progress: %v", err)
@@ -126,6 +130,8 @@ func (sm *SessionManager) ResumeSession() (*Session, error) {
 
 // PauseSession will pause a current session
 func (sm *SessionManager) PauseSession() (*Session, error) {
+	sm.lock.Lock()
+	defer sm.lock.Unlock()
 	latest, err := sm.GetLatestSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed to check if session is in progress: %v", err)
@@ -155,6 +161,8 @@ func (sm *SessionManager) PauseSession() (*Session, error) {
 
 // EndSession will end a session if one is in progress
 func (sm *SessionManager) EndSession() (*Session, error) {
+	sm.lock.Lock()
+	defer sm.lock.Unlock()
 	latest, err := sm.GetLatestSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed getting current session: %v", err)
@@ -181,6 +189,8 @@ func (sm *SessionManager) EndSession() (*Session, error) {
 
 // GetLatestSession returns nil, nil if there are no sessions yet
 func (sm *SessionManager) GetLatestSession() (*Session, error) {
+	sm.lock.Lock()
+	defer sm.lock.Unlock()
 	if sm.latestSessionCache != nil {
 		return sm.latestSessionCache, nil
 	}
