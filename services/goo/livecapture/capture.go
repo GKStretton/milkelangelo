@@ -22,6 +22,7 @@ func (r *recorder) record(id session.ID) {
 	var topRecording, frontRecording *webcamRecorder
 	var err error
 	wg := sync.WaitGroup{}
+	wg.Add(2)
 	go func() {
 		defer wg.Done()
 		topRecording, err = startWebcamRecording(*config.TopCamRtspPath, uint64(id))
