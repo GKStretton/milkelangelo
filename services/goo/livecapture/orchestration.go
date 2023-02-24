@@ -32,7 +32,7 @@ func Run(sm *session.SessionManager) {
 
 func (r *recorder) isRecording() bool {
 	r.mutex.RLock()
-	defer r.mutex.Unlock()
+	defer r.mutex.RUnlock()
 	return r.recording
 }
 
