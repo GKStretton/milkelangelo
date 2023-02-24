@@ -2,10 +2,13 @@ package session
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 )
+
+var eventLock sync.Mutex
 
 type EventType int
 
@@ -26,6 +29,9 @@ type SessionEvent struct {
 func (sm *SessionManager) SubscribeToEvents() <-chan *SessionEvent {
 	ch := make(chan *SessionEvent, EVENT_CHAN_BUFFER)
 
+	eventLock.Lock()
+	defer eventLock.Unlock()
+
 	sm.subs = append(sm.subs, ch)
 	return ch
 }
@@ -38,6 +44,7 @@ func (sm *SessionManager) eventDistributor() {
 
 		// publish event to broker, and to internal channel
 		sm.publishToBroker(e)
+		eventLock.Lock()
 		for _, sub := range sm.subs {
 			// non-blocking send to subscriber
 			select {
@@ -45,6 +52,7 @@ func (sm *SessionManager) eventDistributor() {
 			default:
 			}
 		}
+		eventLock.Unlock()
 	}
 }
 

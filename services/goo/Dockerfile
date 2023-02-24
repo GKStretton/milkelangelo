@@ -16,6 +16,6 @@ RUN go mod download
 
 COPY . .
 
-RUN go build
+RUN go build -race
 
 ENTRYPOINT ["./goo"]
