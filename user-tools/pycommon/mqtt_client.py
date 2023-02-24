@@ -24,6 +24,9 @@ END_SESSION = "asol/session/end"
 PAUSE_SESSION = "asol/session/pause"
 RESUME_SESSION = "asol/session/resume"
 
+START_STREAM = "asol/stream/begin"
+END_STREAM = "asol/stream/end"
+
 FLUID_REQ_TOPIC = "mega/req/fluid"
 FLUID_DRAIN = 1
 FLUID_WATER = 2
@@ -130,3 +133,9 @@ def resume_session():
 def fluid_req(req_type, ml):
     msg = f"{req_type},{ml:.2f}"
     pub(FLUID_REQ_TOPIC, msg)
+
+def start_stream():
+    pub(START_STREAM, "")
+
+def end_stream():
+    pub(END_STREAM, "")

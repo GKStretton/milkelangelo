@@ -16,11 +16,14 @@ var c *goobs.Client
 
 const retryWaitS = 5
 
-func Run(sm *session.SessionManager) {
+var sm *session.SessionManager
+
+func Run(s *session.SessionManager) {
+	sm = s
 	fmt.Println("Running OBS controller")
 
-	go sessionListener(sm)
-	go connectionListener(sm)
+	go sessionListener(s)
+	go connectionListener(s)
 
 	mqtt.Subscribe(config.TOPIC_STREAM_START, startStream)
 	mqtt.Subscribe(config.TOPIC_STREAM_END, endStream)

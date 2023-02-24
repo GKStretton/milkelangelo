@@ -21,10 +21,12 @@ SHOW_GRID=True
 
 helps = {
 	" ": "Dispense {}".format(DISPENSE_uL),
+	"a": "start stream",
 	"b": "begin session",
 	"c": "Toggle crop",
 	"d": "open drain",
 	"e": "end session",
+	"f": "stop stream",
 	"h": "Print this help text",
 	"k": "Kill / Sleep",
 	"m": "toggle manual mode",
@@ -214,6 +216,12 @@ class Interface(Window):
 		if key == ord(';'):
 			print("toggling grid")
 			self.show_grid = not self.show_grid
+		if key == ord('a'):
+			print("starting stream")
+			mc.start_stream()
+		if key == ord('f'):
+			print("ending stream")
+			mc.end_stream()
 
 
 	def crop(self, frame):

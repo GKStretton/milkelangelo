@@ -11,6 +11,9 @@ func startStream(topic string, payload []byte) {
 		fmt.Println("obs client is nil")
 		return
 	}
+	handleSessionEvent(sm)
+	setCropConfig()
+
 	_, err := c.Streaming.StartStreaming(&streaming.StartStreamingParams{})
 	if err != nil {
 		fmt.Printf("failed to start streaming: %v\n", err)
