@@ -20,7 +20,7 @@ var client paho.Client
 type Callback func(topic string, payload []byte)
 type subscriptions map[string][]Callback
 
-var lock sync.Mutex
+var lock = &sync.Mutex{}
 
 var subs = subscriptions{}
 

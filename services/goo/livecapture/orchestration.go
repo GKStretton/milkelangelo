@@ -17,7 +17,7 @@ type recorder struct {
 	sm            *session.SessionManager
 	recording     bool
 	stopRecording chan bool
-	mutex         sync.RWMutex
+	mutex         *sync.RWMutex
 }
 
 func Run(sm *session.SessionManager) {
@@ -25,6 +25,7 @@ func Run(sm *session.SessionManager) {
 		sm:            sm,
 		recording:     false,
 		stopRecording: make(chan bool),
+		mutex:         &sync.RWMutex{},
 	}
 	go rec.run()
 }
