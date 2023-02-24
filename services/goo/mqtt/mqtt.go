@@ -3,6 +3,7 @@ package mqtt
 import (
 	"flag"
 	"fmt"
+	"sync"
 	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
@@ -18,6 +19,8 @@ var client paho.Client
 
 type Callback func(topic string, payload []byte)
 type subscriptions map[string][]Callback
+
+var lock sync.Mutex
 
 var subs = subscriptions{}
 
@@ -49,6 +52,8 @@ func on_disconnect(client paho.Client, err error) {
 }
 
 func on_connect(client paho.Client) {
+	lock.Lock()
+	defer lock.Unlock()
 	for topic, cbs := range subs {
 		for _, cb := range cbs {
 			fmt.Printf("subscribing to %s\n", topic)
@@ -81,6 +86,8 @@ func Publish(topic string, payload interface{}) error {
 }
 
 func Subscribe(topic string, cb Callback) {
+	lock.Lock()
+	defer lock.Unlock()
 	if client == nil {
 		fmt.Println("mqtt client not initialised")
 	}
@@ -93,5 +100,7 @@ func Subscribe(topic string, cb Callback) {
 }
 
 func Unsubscribe(topic string) {
+	lock.Lock()
+	defer lock.Unlock()
 	delete(subs, topic)
 }
