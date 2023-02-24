@@ -3,6 +3,7 @@ package livecapture
 import (
 	"flag"
 	"fmt"
+	"sync"
 
 	"github.com/gkstretton/dark/services/goo/session"
 )
@@ -14,17 +15,30 @@ var (
 
 type recorder struct {
 	sm            *session.SessionManager
-	isRecording   bool
+	recording     bool
 	stopRecording chan bool
+	mutex         sync.RWMutex
 }
 
 func Run(sm *session.SessionManager) {
 	rec = &recorder{
 		sm:            sm,
-		isRecording:   false,
+		recording:     false,
 		stopRecording: make(chan bool),
 	}
 	go rec.run()
+}
+
+func (r *recorder) isRecording() bool {
+	r.mutex.RLock()
+	defer r.mutex.Unlock()
+	return r.recording
+}
+
+func (r *recorder) setIsRecording(b bool) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	r.recording = b
 }
 
 func (r *recorder) run() {
@@ -53,13 +67,13 @@ func (r *recorder) evaluateAction() {
 	}
 
 	// If we're recording but shouldn't be
-	if r.isRecording && (latestSession.Complete || latestSession.Paused) {
+	if r.isRecording() && (latestSession.Complete || latestSession.Paused) {
 		// Stop recording
 		r.stopRecording <- true
 	}
 
 	// If we're not recording but should be
-	if !r.isRecording && (!latestSession.Complete && !latestSession.Paused) {
+	if !r.isRecording() && (!latestSession.Complete && !latestSession.Paused) {
 		// Start recording
 		go r.record(latestSession.Id)
 	}

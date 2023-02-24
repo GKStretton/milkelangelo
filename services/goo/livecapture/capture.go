@@ -14,8 +14,8 @@ func (r *recorder) record(id session.ID) {
 	// setDslrState(true)
 	// defer setDslrState(false)
 
-	r.isRecording = true
-	defer func() { r.isRecording = false }()
+	r.setIsRecording(true)
+	defer r.setIsRecording(false)
 
 	// webcam recordings
 
