@@ -17,7 +17,7 @@ func setScene(sceneName string) error {
 	if c == nil {
 		return fmt.Errorf("cannot set obs scene because client is nil")
 	}
-	_, err := c.Scenes.SetCurrentScene(&scenes.SetCurrentSceneParams{
+	_, err := c.Scenes.SetCurrentProgramScene(&scenes.SetCurrentProgramSceneParams{
 		SceneName: sceneName,
 	})
 	if err != nil {

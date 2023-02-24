@@ -9,7 +9,6 @@ import (
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
-	"github.com/gorilla/websocket"
 )
 
 var c *goobs.Client
@@ -38,15 +37,6 @@ func connectionListener(sm *session.SessionManager) {
 		c, err = goobs.New(os.Getenv("OBS_LANDSCAPE_URL"))
 	}
 
-	c.Conn.SetCloseHandler(func(code int, text string) error {
-		fmt.Printf("obs connection closed - %d: %s\n", code, text)
-
-		message := websocket.FormatCloseMessage(code, "")
-		c.Conn.WriteControl(websocket.CloseMessage, message, time.Now().Add(time.Second))
-		go connectionListener(sm)
-		return nil
-	})
-
 	resp, err := c.General.GetVersion()
 	if err != nil {
 		fmt.Printf("failed to get obs version on connect: %v\n", err)
@@ -55,7 +45,7 @@ func connectionListener(sm *session.SessionManager) {
 	fmt.Printf("Connected to OBS\n"+
 		"\tOBSversion: %s\n"+
 		"\tOBSws version: %s\n",
-		resp.ObsStudioVersion, resp.ObsWebsocketVersion,
+		resp.ObsVersion, resp.ObsWebSocketVersion,
 	)
 	handleSessionEvent(sm)
 	setCropConfig()

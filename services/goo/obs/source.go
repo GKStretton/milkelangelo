@@ -3,26 +3,27 @@ package obs
 import (
 	"fmt"
 
-	"github.com/andreykaipov/goobs/api/requests/sources"
+	"github.com/andreykaipov/goobs/api/requests/filters"
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"gopkg.in/yaml.v3"
 )
 
-func setSessionNumber(number int) {
-	if c == nil {
-		fmt.Println("cannot set obs session number because client is nil")
-		return
-	}
-	_, err := c.Sources.SetTextFreetype2Properties(&sources.SetTextFreetype2PropertiesParams{
-		Source: "Session Number",
-		Text:   fmt.Sprintf("%d", number),
-	})
-	if err != nil {
-		fmt.Printf("error setting obs session number: %v\n", err)
-		return
-	}
-}
+// // I can't find a call for v5 websockets in this client api
+// func setSessionNumber(number int) {
+// 	if c == nil {
+// 		fmt.Println("cannot set obs session number because client is nil")
+// 		return
+// 	}
+// 	_, err := c.Sources.SetTextFreetype2Properties(&sources.SetTextFreetype2PropertiesParams{
+// 		Source: "Session Number",
+// 		Text:   fmt.Sprintf("%d", number),
+// 	})
+// 	if err != nil {
+// 		fmt.Printf("error setting obs session number: %v\n", err)
+// 		return
+// 	}
+// }
 
 func setCropConfig() {
 	if c == nil {
@@ -57,7 +58,7 @@ func setSourceCrop(sourceName, cropConfigKey string) error {
 	}
 	fmt.Printf("setting %s in obs to settings %+v\n", sourceName, settings)
 
-	resp, err := c.Sources.SetSourceFilterSettings(&sources.SetSourceFilterSettingsParams{
+	resp, err := c.Filters.SetSourceFilterSettings(&filters.SetSourceFilterSettingsParams{
 		SourceName:     sourceName,
 		FilterName:     "Crop",
 		FilterSettings: settings,
