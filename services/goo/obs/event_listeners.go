@@ -11,7 +11,6 @@ import (
 func sessionListener(sm *session.SessionManager) {
 	sessionChan := sm.SubscribeToEvents()
 	stateReportChan := events.Subscribe()
-	handleSessionEvent(sm)
 	for {
 		select {
 		case <-sessionChan:
