@@ -118,8 +118,11 @@ def goto_node(node):
 def toggle_manual():
     pub(TOGGLE_MANUAL, "")
 
-def begin_session():
-    pub(BEGIN_SESSION, "")
+def begin_session(production: bool = False):
+    pl = ""
+    if production:
+        pl = "PRODUCTION"
+    pub(BEGIN_SESSION, pl)
 
 def end_session():
     pub(END_SESSION, "")

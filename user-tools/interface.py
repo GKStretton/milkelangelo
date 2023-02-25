@@ -22,11 +22,12 @@ SHOW_GRID=True
 helps = {
 	" ": "Dispense {}".format(DISPENSE_uL),
 	"a": "start stream",
-	"b": "begin session",
+	"b": "begin non-production session",
 	"c": "Toggle crop",
 	"d": "open drain",
 	"e": "end session",
 	"f": "stop stream",
+	"g": "begin production session",
 	"h": "Print this help text",
 	"k": "Kill / Sleep",
 	"m": "toggle manual mode",
@@ -193,8 +194,11 @@ class Interface(Window):
 			print("toggling manual mode...")
 			mc.toggle_manual()
 		if key == ord('b'):
-			print("Starting session")
-			mc.pub(mc.BEGIN_SESSION, "")
+			print("Starting non-production session")
+			mc.begin_session(production=False)
+		if key == ord('g'):
+			print("Starting production session")
+			mc.begin_session(production=True)
 		if key == ord('e'):
 			print("Ending session")
 			mc.pub(mc.END_SESSION, "")

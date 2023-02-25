@@ -45,7 +45,7 @@ func TestSubscribeToEvents(t *testing.T) {
 	time.Sleep(sl)
 
 	// Begin session
-	startedSession, _ := sm.BeginSession()
+	startedSession, _ := sm.BeginSession(false)
 	time.Sleep(sl)
 
 	sm.PauseSession()
@@ -72,7 +72,7 @@ func TestSessionBasics(t *testing.T) {
 
 	// Begin
 
-	startedSession, err := sm.BeginSession()
+	startedSession, err := sm.BeginSession(false)
 	assert.NoError(t, err)
 	assert.Equal(t, false, startedSession.Complete)
 

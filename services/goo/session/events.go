@@ -80,7 +80,11 @@ func (sm *SessionManager) publishToBroker(e *SessionEvent) {
 
 func (sm *SessionManager) subscribeToBrokerTopics() {
 	mqtt.Subscribe(config.TOPIC_SESSION_BEGIN, func(topic string, payload []byte) {
-		_, err := sm.BeginSession()
+		var production bool
+		if string(payload) == "PRODUCTION" {
+			production = true
+		}
+		_, err := sm.BeginSession(production)
 		if err != nil {
 			fmt.Printf("cannot begin session: %v\n", err)
 		}

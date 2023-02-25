@@ -53,7 +53,7 @@ func NewSessionManager(useMemoryStorage bool) *SessionManager {
 }
 
 // BeginSession will attempt to begin a new session
-func (sm *SessionManager) BeginSession() (*Session, error) {
+func (sm *SessionManager) BeginSession(production bool) (*Session, error) {
 	latest, err := sm.GetLatestSession()
 	if err != nil {
 		return nil, fmt.Errorf("failed to check if session is in progress: %v", err)
@@ -65,7 +65,7 @@ func (sm *SessionManager) BeginSession() (*Session, error) {
 	// okay to start a session
 	session := &Session{
 		Complete:   false,
-		Production: false,
+		Production: production,
 	}
 	// Save created session somewhere, db or filesystem
 	session, err = sm.s.createSession(session)
