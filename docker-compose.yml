@@ -34,7 +34,6 @@ services:
     command: -basePath ${LIGHT_STORES_DIR}
     restart: unless-stopped
     network_mode: host
-    privileged: true
     environment:
       MOCK_DSLR: ${MOCK_DSLR:-false}
       OBS_LANDSCAPE_URL: ${OBS_LANDSCAPE_URL}
