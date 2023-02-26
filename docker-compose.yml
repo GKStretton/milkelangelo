@@ -42,6 +42,7 @@ services:
       - /dev:/dev
       - ./user-tools:/src/user-tools
       - ./resources:/src/resources
+    user: "1000:1000"
     # logging:
     #   driver: loki
     #   options:
