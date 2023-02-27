@@ -118,7 +118,7 @@ rtmpServerCert: server.crt
 # HLS parameters
 
 # Disable support for the HLS protocol.
-hlsDisable: yes
+hlsDisable: no
 # Address of the HLS listener.
 hlsAddress: :8888
 # By default, HLS is generated only when requested by a user.
@@ -165,6 +165,7 @@ hlsServerCert: server.crt
 # If the server receives a request from one of these entries, IP in logs
 # will be taken from the X-Forwarded-For header.
 hlsTrustedProxies: []
+
 
 ###############################################
 # Path parameters

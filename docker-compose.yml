@@ -8,6 +8,7 @@ services:
     network_mode: host
     ports:
       - 8554:8554
+      - 8888:8888
     volumes:
       - ./services/rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
       - ./services/rtsp/scripts:/scripts
