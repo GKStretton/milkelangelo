@@ -7,17 +7,19 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/util/protoyaml"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
 
 var subs = []chan *machinepb.StateReport{}
 
 func Run(sm *session.SessionManager) {
-	mqtt.Subscribe("mega/state-report", func(topic string, payload []byte) {
+	mqtt.Subscribe(config.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
 		t := time.Now().UnixMicro()
 
 		sr := &machinepb.StateReport{}
@@ -46,12 +48,32 @@ func Subscribe() chan *machinepb.StateReport {
 	return c
 }
 
+// publish to internal channels and to broker
 func publishStateReport(sr *machinepb.StateReport) {
+	// internal
 	for _, c := range subs {
 		select {
 		case c <- sr:
 		default:
 		}
+	}
+
+	// broker
+	m := protojson.MarshalOptions{
+		Multiline:       true,
+		UseProtoNames:   true,
+		Indent:          "\t",
+		EmitUnpopulated: true,
+	}
+	b, err := m.Marshal(sr)
+	if err != nil {
+		fmt.Printf("error marshalling state report: %v\n", err)
+		return
+	}
+	err = mqtt.Publish(config.TOPIC_STATE_REPORT_JSON, string(b))
+	if err != nil {
+		fmt.Printf("error publishing json state report: %v\n", err)
+		return
 	}
 }
 
