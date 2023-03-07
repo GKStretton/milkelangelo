@@ -107,6 +107,11 @@ class FootageWrapper:
 				path = os.path.join(footagePath, file)
 				self.clips.append(FootagePiece(path))
 		print()
+	
+	def get_start_timestamp(self):
+		if len(self.clips) == 0:
+			return None
+		return self.clips[0].get_start_timestamp()
 
 	def get_subclip(self, start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, CropConfig]:
 		# if start_t is in clip x, we ignore everything after clip x. So each

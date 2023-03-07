@@ -20,18 +20,18 @@ def get_section_properties(video_state, state_report, content_type: str) -> dict
 	else:
 		props['format'] = FORMAT_PORTRAIT
 
-
-	if state_report.status == pb.WAITING_FOR_DISPENSE:
-		props['scene'] = SCENE_DUAL
-		# props['skip'] = True
-	elif state_report.status == pb.NAVIGATING_IK:
-		props['scene'] = SCENE_DUAL
-		props['speed'] = 2.5
-	elif state_report.status == pb.DISPENSING:
-		props['scene'] = SCENE_DUAL
-		props['min_duration'] = 3
-	else:
-		props['scene'] = SCENE_DUAL
-		props['speed'] = 10.0
+	#! Do state-based editing once requirements are clearer
+	# if state_report.status == pb.WAITING_FOR_DISPENSE:
+	# 	props['scene'] = SCENE_DUAL
+	# 	# props['skip'] = True
+	# elif state_report.status == pb.NAVIGATING_IK:
+	# 	props['scene'] = SCENE_DUAL
+	# 	props['speed'] = 2.5
+	# elif state_report.status == pb.DISPENSING:
+	# 	props['scene'] = SCENE_DUAL
+	# 	props['min_duration'] = 3
+	# else:
+	# 	props['scene'] = SCENE_DUAL
+	# 	props['speed'] = 10.0
 	
 	return props
