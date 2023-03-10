@@ -1,15 +1,21 @@
+from dataclasses import dataclass
+from enum import Enum
+
 TOP_CAM = "top-cam"
 FRONT_CAM = "front-cam"
 
 # Scenes for defining composition of top and front cams
-SCENE_UNDEFINED = "UNDEFINED"
-SCENE_FRONT_ONLY = "FRONT_ONLY"
-SCENE_DUAL = "DUAL"
-SCENE_TOP_ONLY = "TOP_ONLY"
+class Scene(Enum):
+	SCENE_UNDEFINED = 1
+	SCENE_FRONT_ONLY = 2
+	SCENE_DUAL = 3
+	SCENE_TOP_ONLY = 4
 
-FORMAT_UNDEFINED = "UNDEFINED"
-FORMAT_LANDSCAPE = "LANDSCAPE"
-FORMAT_PORTRAIT = "PORTRAIT"
+class Format(Enum):
+	FORMAT_UNDEFINED = 1
+	FORMAT_LANDSCAPE = 2
+	FORMAT_PORTRAIT = 3
 
-TYPE_LONGFORM = "LONGFORM"
-TYPE_SHORTFORM = "SHORTFORM"
+class ContentType(Enum):
+	TYPE_LONGFORM = 1
+	TYPE_SHORTFORM = 2
