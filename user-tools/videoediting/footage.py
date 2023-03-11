@@ -59,7 +59,8 @@ class FootagePiece:
 	
 	# this returns a subclip within decimal absolute unix timestamps. 
 	# Return any footage from this video in the stated range.
-	def get_subclip_from_timestamps(self, start_t: float, end_t: float) -> VideoClip.VideoClip:
+	# (footage, absolute_start, absolute_end)
+	def get_subclip_from_timestamps(self, start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, float, float]:
 		if not self.intersects_timestamp_range(start_t, end_t):
 			return None
 
@@ -91,7 +92,7 @@ class FootagePiece:
 		before = time.time()
 		subclip = self.video.subclip(start_relative, end_relative)
 		print("\t\tvideo.subclip took {}s".format(time.time() - before))
-		return subclip
+		return subclip, absolute_start_t, absolute_end_t
 
 
 # FootageWrapper abstracts out any separate video recordings from paused sessions
@@ -113,23 +114,59 @@ class FootageWrapper:
 			return None
 		return self.clips[0].get_start_timestamp()
 
+	# get subclip by absolute timestamp range, including padding
 	def get_subclip(self, start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, CropConfig]:
-		# if start_t is in clip x, we ignore everything after clip x. So each
-		# state report interval can only be in one clip. This is okay because
-		# on start / resume, a state report will be triggered.
-		full_clip = None
+		if len(self.clips) == 0:
+			print("get_subclip found self.clips to be empty")
+			exit(1)
+
+		# clips with absolute timestamp ranges
+		# [(clip, start_a, end_a)]
+		subclips = []
 		crop_config = None
 		for _, v in enumerate(self.clips):
-			clip = v.get_subclip_from_timestamps(start_t, end_t)
+			clip, start_a, end_a = v.get_subclip_from_timestamps(start_t, end_t)
 			if clip is not None:
 				# this clip contains footage of the state report
-				if full_clip is None:
-					full_clip = clip
-				else:
-					full_clip = concatenate_videoclips([full_clip, clip])
+				subclips.append((clip, start_a, end_a))
 				crop_config = v.get_crop_config()
+				print(f"\tFound footage from {start_a} to {end_a} ({end_a-start_a})")
 		
-		return full_clip, crop_config
+		# padding template
+		s = self.clips[0].get_clip().size
+		dur = end_t-start_t if end_t is not None else 2
+		padding = VideoClip.ColorClip(s, color=(0, 0, 0), duration=dur)
+		
+		# generate black video with correct duration if there's no footage
+		if len(subclips) == 0:
+			return padding, crop_config
+		
+		# if there is footage...
+		subclips_with_padding = []
+
+		# add any pre-video padding
+		initial_pad_duration = subclips[0][1] - start_t
+		if initial_pad_duration > 0:
+			print(f"\tAdding {initial_pad_duration:.2f} of initial padding")
+			subclips_with_padding.append(padding.set_duration(initial_pad_duration))
+		
+		# iterate subclips
+		for i in range(len(subclips)):
+			# add this clip
+			subclips_with_padding.append(subclips[i][0])
+			# if there's another one next, 
+			if i < len(subclips) - 1:
+				# add padding until the start of next one
+				padding_duration = subclips[i+1][1] - subclips[i][2]
+				subclips_with_padding.append(padding.set_duration(padding_duration))
+		
+		# add end padding
+		if end_t is not None:
+			end_padding_duration = max(0, end_t - subclips[-1][2])
+			if end_padding_duration > 0:
+				subclips_with_padding.append(padding.set_duration(end_padding_duration))
+
+		return concatenate_videoclips(subclips_with_padding), crop_config
 	
 	def test(self):
 		start = self.clips[0].start_timestamp + 8

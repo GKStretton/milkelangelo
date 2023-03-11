@@ -16,6 +16,7 @@ import pycommon.machine_pb2 as pb
 import videoediting.section_properties as properties
 from videoediting.section_properties import SectionProperties
 import pycommon.util as util
+from videoediting.compositor import compositeContentFromFootageSubclips
 
 from enum import Enum
 from abc import ABC, abstractmethod
@@ -48,15 +49,16 @@ class ContentDescriptor:
 			exit(1)
 		
 		# only add prop if it's different to last
-		FILTER_UNCHANGED = True
+		FILTER_UNCHANGED = False
 		if FILTER_UNCHANGED and len(self.properties) > 0 and self.properties[-1][1] == properties:
 			return
 
 		self.properties.append((timestamp, properties))
 	
-	def generate_overlay_clip(self) -> VideoClip.VideoClip:
+	# without any skips or speed changes, no props pass
+	def _generate_raw_overlay_clip(self) -> VideoClip.VideoClip:
 		if len(self.properties) == 0 or len(self.state_reports) == 0:
-			print("generate_overlay_clip found no properties / state_reports")
+			print("_generate_raw_overlay_clip found no properties / state_reports")
 			exit(1)
 		
 		if self.properties[0][0] != self.state_reports[0][0]:
@@ -80,52 +82,75 @@ class ContentDescriptor:
 				next_timestamp, _ = self.state_reports[i+1]
 				duration = next_timestamp - timestamp
 			
-			text_str = "STATE REPORT:\n"+util.ts_format(timestamp) + "\n" + MessageToJson(sr)
+			text_str = "STATE REPORT:\n"+util.ts_format(timestamp) + "\n" + MessageToJson(sr, including_default_value_fields=True, preserving_proto_field_name=True)
 			txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=20, color='white', align='West')
 			txt = txt.set_duration(duration)
-			
+
 			sr_clips.append(txt)
 		
 		sr_full_clip = concatenate_videoclips(sr_clips)
+		return sr_full_clip
 
+	# returns (Overlay, Content)
+	def generate_content_clip(self, top_footage: FootageWrapper, front_footage: FootageWrapper) -> typing.Tuple[VideoClip.VideoClip, VideoClip.VideoClip]:
+		if len(self.properties) == 0:
+			print("generate_content_clip found no properties / state_reports")
+			exit(1)
 
-		# todo: maybe consolidate this with the generate_content_clip functionality, 
-		# todo: so that there is only one place where the speed is controlled.
-		print(f"gen processed overlay for {len(self.properties)} props")
-		# reprocess, adding props overlay and applying speed / skips
-		clips = []
+		raw_overlay = self._generate_raw_overlay_clip()
+		start_timestamp = self.properties[0][0]
+
+		print(f"gen content for {len(self.properties)} props")
+		overlay_clips = []
+		content_clips = []
 		for i in range(len(self.properties)):
 			print(i)
 			props = self.properties[i][1]
 			if props.skip:
 				continue
 
-			ts1 = self.properties[i][0] - start_timestamp
+			ts1_abs = self.properties[i][0]
+			ts1_rel = ts1_abs - start_timestamp
 			# default to end
-			ts2 = sr_full_clip.duration
+			ts2_abs, ts2_rel = None, None
+			# if there's another prop after this
 			if i < len(self.properties) - 1:
-				ts2 = self.properties[i+1][0] - start_timestamp
-			clip: VideoClip = sr_full_clip.subclip(ts1, ts2)
-
-			# apply speed
-			if props.speed != 1.0:
-				clip = clip.speedx(props.speed)
-
-			# add prop overlay and apply speed
+				ts2_abs = self.properties[i+1][0]
+				ts2_rel = ts2_abs - start_timestamp
+			
+			# build overlay subclip
+			overlay_raw_subclip = raw_overlay.subclip(ts1_rel, ts2_rel)
 			text_str = "PROPS:\n"+util.ts_format(self.properties[i][0]) + "\n" + props.__str__()
+			# commenting out this line in /etc/ImageMagick-6/policy.xml was required:
+			# <policy domain="path" rights="none" pattern="@*" />
+			# https://github.com/Zulko/moviepy/issues/401#issuecomment-278679961
 			txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=20, color='white', align='West')
-			txt = txt.set_duration(clip.duration)
+			txt = txt.set_duration(overlay_raw_subclip.duration)
+			overlay_subclip = clips_array([[overlay_raw_subclip], [txt]])
 
-			clips.append(clips_array([[clip], [txt]]))
+			# build footage subclips
+			print(f"Getting top_footage between {ts1_abs} and {ts2_abs}")
+			top_subclip, top_crop = top_footage.get_subclip(ts1_abs, ts2_abs)
+			print(f"Getting front_footage between {ts1_abs} and {ts2_abs}")
+			front_subclip, front_crop = front_footage.get_subclip(ts1_abs, ts2_abs)
 
-		return concatenate_videoclips(clips)
-		
+			# apply speed to all
+			if props.speed != 1.0:
+				overlay_subclip = overlay_subclip.speedx(props.speed)
+				top_subclip = top_subclip.speedx(props.speed)
+				front_subclip = front_subclip.speedx(props.speed)
+
+			# clips should all be same length unless it's the last property.
+			if i != len(self.properties) - 1 and (overlay_subclip.duration != top_subclip.duration or overlay_subclip.duration != front_subclip.duration):
+				# these should be same length if the footage has been padded correctly''
+				print("processed subclips are not same duration: {} {} {}, exiting".format(overlay_subclip.duration, top_subclip.duration, front_subclip.duration))
+				exit(1)
+			
+			content_clips.append(compositeContentFromFootageSubclips(top_subclip, top_crop, front_subclip, front_crop, props))
+			overlay_clips.append(overlay_subclip)
 
 
-	def generate_content_clip(self, top_footage: FootageWrapper, front_footage: FootageWrapper) -> VideoClip.VideoClip:
-		# todo: make footage wrapper support pre- and-post padding rather than clipping.
-		# todo: also make footage wrapper support initialisation with a videoclip and an absolute timestamp
-		pass
+		return concatenate_videoclips(overlay_clips), concatenate_videoclips(content_clips)
 
 
 def save(args, overlay, content, content_type):
@@ -179,11 +204,12 @@ if __name__ == "__main__":
 		descriptor.set_state_report(report_ts, report)
 		descriptor.set_properties(report_ts, props)
 	
-	# overlay track
-	overlay_clip = descriptor.generate_overlay_clip()
 	# content track
-	content_clip = descriptor.generate_content_clip(top_footage, front_footage)
+	overlay_clip, content_clip = descriptor.generate_content_clip(top_footage, front_footage)
 
-	overlay_clip.preview()
+	combined_clip = CompositeVideoClip([content_clip, overlay_clip], size=content_clip.size)
+
+	combined_clip.preview()
+
 	# launch preview application, or save
 	# save(args, overlay_clip, content_clip, content_type)

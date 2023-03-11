@@ -1,5 +1,5 @@
 #!/bin/bash
-# bad script that just copies compiled proto from parent dir
+# script that just copies compiled proto from parent dir
 
 set -e
 

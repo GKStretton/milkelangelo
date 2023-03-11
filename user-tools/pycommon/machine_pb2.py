@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rmachine.proto\x12\x07machine\"\x1e\n\x0cPingResponse\x12\x0e\n\x06number\x18\x01 \x01(\r\"J\n\x0cPipetteState\x12\r\n\x05spent\x18\x01 \x01(\x08\x12\x11\n\tvial_held\x18\x02 \x01(\r\x12\x18\n\x10volume_target_ul\x18\x03 \x01(\x02\"f\n\x11\x43ollectionRequest\x12\x11\n\tcompleted\x18\x01 \x01(\x08\x12\x16\n\x0erequest_number\x18\x02 \x01(\x04\x12\x13\n\x0bvial_number\x18\x03 \x01(\x04\x12\x11\n\tvolume_ul\x18\x04 \x01(\x02\"p\n\x0fMovementDetails\x12\x15\n\rtarget_x_unit\x18\x01 \x01(\x02\x12\x15\n\rtarget_y_unit\x18\x02 \x01(\x02\x12\x17\n\x0ftarget_ring_deg\x18\n \x01(\x02\x12\x16\n\x0etarget_yaw_deg\x18\x0b \x01(\x02\"\x8a\x02\n\x0bStateReport\x12\x1d\n\x15timestamp_unix_micros\x18\x02 \x01(\x04\x12\x1b\n\x04mode\x18\x04 \x01(\x0e\x32\r.machine.Mode\x12\x1f\n\x06status\x18\x05 \x01(\x0e\x32\x0f.machine.Status\x12,\n\rpipette_state\x18\n \x01(\x0b\x32\x15.machine.PipetteState\x12\x36\n\x12\x63ollection_request\x18\x0b \x01(\x0b\x32\x1a.machine.CollectionRequest\x12\x32\n\x10movement_details\x18\x0c \x01(\x0b\x32\x18.machine.MovementDetailsJ\x04\x08\x01\x10\x02\"=\n\x0fStateReportList\x12*\n\x0cStateReports\x18\x01 \x03(\x0b\x32\x14.machine.StateReport*6\n\x04Mode\x12\x12\n\x0eUNDEFINED_MODE\x10\x00\x12\n\n\x06MANUAL\x10\x01\x12\x0e\n\nAUTONOMOUS\x10\x02*\xa8\x02\n\x06Status\x12\x14\n\x10UNDEFINED_STATUS\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x11\n\rE_STOP_ACTIVE\x10\x05\x12\x0c\n\x08SLEEPING\x10\x06\x12\x11\n\rSHUTTING_DOWN\x10\t\x12\r\n\tWAKING_UP\x10\n\x12\x0f\n\x0b\x43\x41LIBRATING\x10\x14\x12\x13\n\x0fIDLE_STATIONARY\x10\x1e\x12\x0f\n\x0bIDLE_MOVING\x10\x1f\x12\x10\n\x0c\x46ILLING_BOWL\x10(\x12\x11\n\rDRAINING_BOWL\x10)\x12\x11\n\rCLEANING_BOWL\x10*\x12\x0e\n\nDISPENSING\x10\x32\x12\x18\n\x14WAITING_FOR_DISPENSE\x10\x37\x12\x0e\n\nCOLLECTING\x10<\x12\x11\n\rNAVIGATING_IK\x10\x46\x42\x30Z.github.com/gkstretton/asol-protos/go/machinepbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rmachine.proto\x12\x07machine\"\x1e\n\x0cPingResponse\x12\x0e\n\x06number\x18\x01 \x01(\r\"J\n\x0cPipetteState\x12\r\n\x05spent\x18\x01 \x01(\x08\x12\x11\n\tvial_held\x18\x02 \x01(\r\x12\x18\n\x10volume_target_ul\x18\x03 \x01(\x02\"f\n\x11\x43ollectionRequest\x12\x11\n\tcompleted\x18\x01 \x01(\x08\x12\x16\n\x0erequest_number\x18\x02 \x01(\x04\x12\x13\n\x0bvial_number\x18\x03 \x01(\x04\x12\x11\n\tvolume_ul\x18\x04 \x01(\x02\"p\n\x0fMovementDetails\x12\x15\n\rtarget_x_unit\x18\x01 \x01(\x02\x12\x15\n\rtarget_y_unit\x18\x02 \x01(\x02\x12\x17\n\x0ftarget_ring_deg\x18\n \x01(\x02\x12\x16\n\x0etarget_yaw_deg\x18\x0b \x01(\x02\"Z\n\x0c\x46luidRequest\x12%\n\tfluidType\x18\x01 \x01(\x0e\x32\x12.machine.FluidType\x12\x11\n\tvolume_ml\x18\x02 \x01(\x02\x12\x10\n\x08\x63omplete\x18\x03 \x01(\x08\"+\n\x0c\x46luidDetails\x12\x1b\n\x13\x62owl_fluid_level_ml\x18\x01 \x01(\x02\"\x92\x03\n\x0bStateReport\x12\x1d\n\x15timestamp_unix_micros\x18\x02 \x01(\x04\x12\x1b\n\x04mode\x18\x04 \x01(\x0e\x32\r.machine.Mode\x12\x1f\n\x06status\x18\x05 \x01(\x0e\x32\x0f.machine.Status\x12,\n\rpipette_state\x18\n \x01(\x0b\x32\x15.machine.PipetteState\x12\x36\n\x12\x63ollection_request\x18\x0b \x01(\x0b\x32\x1a.machine.CollectionRequest\x12\x32\n\x10movement_details\x18\x0c \x01(\x0b\x32\x18.machine.MovementDetails\x12,\n\rfluid_request\x18\r \x01(\x0b\x32\x15.machine.FluidRequest\x12,\n\rfluid_details\x18\x0e \x01(\x0b\x32\x15.machine.FluidDetails\x12\x0e\n\x06paused\x18\x32 \x01(\x08\x12\x1a\n\x12timestamp_readable\x18\x33 \x01(\tJ\x04\x08\x01\x10\x02\"=\n\x0fStateReportList\x12*\n\x0cStateReports\x18\x01 \x03(\x0b\x32\x14.machine.StateReport*6\n\x04Mode\x12\x12\n\x0eUNDEFINED_MODE\x10\x00\x12\n\n\x06MANUAL\x10\x01\x12\x0e\n\nAUTONOMOUS\x10\x02*\xa8\x02\n\x06Status\x12\x14\n\x10UNDEFINED_STATUS\x10\x00\x12\t\n\x05\x45RROR\x10\x01\x12\x11\n\rE_STOP_ACTIVE\x10\x05\x12\x0c\n\x08SLEEPING\x10\x06\x12\x11\n\rSHUTTING_DOWN\x10\t\x12\r\n\tWAKING_UP\x10\n\x12\x0f\n\x0b\x43\x41LIBRATING\x10\x14\x12\x13\n\x0fIDLE_STATIONARY\x10\x1e\x12\x0f\n\x0bIDLE_MOVING\x10\x1f\x12\x10\n\x0c\x46ILLING_BOWL\x10(\x12\x11\n\rDRAINING_BOWL\x10)\x12\x11\n\rCLEANING_BOWL\x10*\x12\x0e\n\nDISPENSING\x10\x32\x12\x18\n\x14WAITING_FOR_DISPENSE\x10\x37\x12\x0e\n\nCOLLECTING\x10<\x12\x11\n\rNAVIGATING_IK\x10\x46*@\n\tFluidType\x12\x13\n\x0f\x46LUID_UNDEFINED\x10\x00\x12\t\n\x05\x44RAIN\x10\x01\x12\t\n\x05WATER\x10\x02\x12\x08\n\x04MILK\x10\x03\x42\x30Z.github.com/gkstretton/asol-protos/go/machinepbb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'machine_pb2', globals())
@@ -21,10 +21,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'Z.github.com/gkstretton/asol-protos/go/machinepb'
-  _MODE._serialized_start=684
-  _MODE._serialized_end=738
-  _STATUS._serialized_start=741
-  _STATUS._serialized_end=1037
+  _MODE._serialized_start=957
+  _MODE._serialized_end=1011
+  _STATUS._serialized_start=1014
+  _STATUS._serialized_end=1310
+  _FLUIDTYPE._serialized_start=1312
+  _FLUIDTYPE._serialized_end=1376
   _PINGRESPONSE._serialized_start=26
   _PINGRESPONSE._serialized_end=56
   _PIPETTESTATE._serialized_start=58
@@ -33,8 +35,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _COLLECTIONREQUEST._serialized_end=236
   _MOVEMENTDETAILS._serialized_start=238
   _MOVEMENTDETAILS._serialized_end=350
-  _STATEREPORT._serialized_start=353
-  _STATEREPORT._serialized_end=619
-  _STATEREPORTLIST._serialized_start=621
-  _STATEREPORTLIST._serialized_end=682
+  _FLUIDREQUEST._serialized_start=352
+  _FLUIDREQUEST._serialized_end=442
+  _FLUIDDETAILS._serialized_start=444
+  _FLUIDDETAILS._serialized_end=487
+  _STATEREPORT._serialized_start=490
+  _STATEREPORT._serialized_end=892
+  _STATEREPORTLIST._serialized_start=894
+  _STATEREPORTLIST._serialized_end=955
 # @@protoc_insertion_point(module_scope)
