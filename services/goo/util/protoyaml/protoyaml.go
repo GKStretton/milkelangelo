@@ -32,6 +32,7 @@ var strict = protojson.UnmarshalOptions{DiscardUnknown: false}
 
 // Marshal writes the given proto.Message in YAML format.
 func Marshal(m proto.Message) ([]byte, error) {
+	// ? why is this commented?
 	// opts := protojson.MarshalOptions{
 	// EmitUnpopulated: true,
 	// }

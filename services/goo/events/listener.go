@@ -37,6 +37,9 @@ func Run(sm *session.SessionManager) {
 			return
 		}
 		sr.Paused = session.Paused
+		sr.TimestampReadable = time.
+			UnixMicro(int64(sr.TimestampUnixMicros)).
+			Format("2006-03-02 15:04:05.000000")
 
 		saveSessionStateReport(session, sr)
 		publishStateReport(sr)
