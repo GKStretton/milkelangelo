@@ -29,20 +29,20 @@ func Run(sm *session.SessionManager) {
 			return
 		}
 		sr.TimestampUnixMicros = uint64(t)
-		// fmt.Printf("%+v\n", sr)
+		sr.TimestampReadable = time.UnixMicro(t).
+			Format("2006-03-02 15:04:05.000000")
 
 		// Abort unless session is active or paused
 		session, _ := sm.GetLatestSession()
-		if session == nil || session.Complete {
-			return
+		if session != nil {
+			sr.Paused = session.Paused
 		}
-		sr.Paused = session.Paused
-		sr.TimestampReadable = time.
-			UnixMicro(int64(sr.TimestampUnixMicros)).
-			Format("2006-03-02 15:04:05.000000")
 
-		saveSessionStateReport(session, sr)
 		publishStateReport(sr)
+
+		if session != nil && !session.Complete {
+			saveSessionStateReport(session, sr)
+		}
 	})
 }
 
