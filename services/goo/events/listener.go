@@ -31,11 +31,12 @@ func Run(sm *session.SessionManager) {
 		sr.TimestampUnixMicros = uint64(t)
 		// fmt.Printf("%+v\n", sr)
 
-		// Abort unless session is active
+		// Abort unless session is active or paused
 		session, _ := sm.GetLatestSession()
-		if session == nil || session.Complete || session.Paused {
+		if session == nil || session.Complete {
 			return
 		}
+		sr.Paused = session.Paused
 
 		saveSessionStateReport(session, sr)
 		publishStateReport(sr)

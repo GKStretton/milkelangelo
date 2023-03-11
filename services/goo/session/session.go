@@ -148,6 +148,7 @@ func (sm *SessionManager) PauseSession() (*Session, error) {
 		SessionID: latest.Id,
 		Type:      SESSION_PAUSED,
 	}
+	requestStateReport()
 	fmt.Printf("Paused session %d\n", latest.Id)
 
 	return latest, nil
