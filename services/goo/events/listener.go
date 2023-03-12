@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
@@ -17,6 +18,7 @@ import (
 )
 
 var subs = []chan *machinepb.StateReport{}
+var lock sync.Mutex
 
 func Run(sm *session.SessionManager) {
 	mqtt.Subscribe(config.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
@@ -47,6 +49,8 @@ func Run(sm *session.SessionManager) {
 }
 
 func Subscribe() chan *machinepb.StateReport {
+	lock.Lock()
+	defer lock.Unlock()
 	c := make(chan *machinepb.StateReport, 10)
 	subs = append(subs, c)
 	return c
@@ -54,6 +58,7 @@ func Subscribe() chan *machinepb.StateReport {
 
 // publish to internal channels and to broker
 func publishStateReport(sr *machinepb.StateReport) {
+	lock.Lock()
 	// internal
 	for _, c := range subs {
 		select {
@@ -61,6 +66,7 @@ func publishStateReport(sr *machinepb.StateReport) {
 		default:
 		}
 	}
+	lock.Unlock()
 
 	// broker
 	m := protojson.MarshalOptions{
