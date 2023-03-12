@@ -18,7 +18,7 @@ func TestWriteCreationTime(t *testing.T) {
 	err := os.WriteFile(filePath, []byte("testfile"), 0666)
 	assert.NoError(t, err)
 
-	err = WriteCreationTime(filePath)
+	err = WriteCreationTimeUsingMetadata(filePath)
 	assert.NoError(t, err)
 
 	b, err := os.ReadFile(filePath + ".creationtime")
@@ -49,4 +49,8 @@ func TestWriteCreationTime(t *testing.T) {
 	assert.NoError(t, err)
 	err = os.Remove(filePath + ".creationtime")
 	assert.NoError(t, err)
+}
+
+func TestWriteCreationTimeUsingNow(t *testing.T) {
+	WriteCreationTimeUsingNow("/home/greg/now")
 }

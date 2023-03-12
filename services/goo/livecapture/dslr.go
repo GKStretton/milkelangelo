@@ -31,13 +31,13 @@ func captureSessionImage(sessionId uint64) {
 		return
 	}
 
-	err = saveCropConfig(config.CC_DSLR, p)
+	err = filesystem.WriteCreationTimeUsingNow(p)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	err = filesystem.WriteCreationTime(p)
+	err = saveCropConfig(config.CC_DSLR, p)
 	if err != nil {
 		fmt.Println(err)
 		return

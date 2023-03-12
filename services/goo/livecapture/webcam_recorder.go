@@ -46,6 +46,11 @@ func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, e
 		return nil, err
 	}
 
+	err = filesystem.WriteCreationTimeUsingNow(filePath)
+	if err != nil {
+		fmt.Printf("failed to write creation timestamp for %s: %v\n", rtspPath, err)
+	}
+
 	wr.log("capture started")
 
 	ccKey := config.CC_TOP_CAM
@@ -72,11 +77,13 @@ func (wr *webcamRecorder) Stop() {
 	}
 	wr.log("gracefully stopped recording")
 
-	err = filesystem.WriteCreationTime(wr.filePath)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	// changing to use system time on creation as this seems inaccurate
+	// in testing
+	// err = filesystem.WriteCreationTimeUsingMetadata(wr.filePath)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 }
 
 func (wr *webcamRecorder) log(s string, args ...interface{}) {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 )
 
 func CreateSymlink(original, new string) error {
@@ -31,7 +32,7 @@ func removeSymlink(symlinkPath string) error {
 	return nil
 }
 
-func WriteCreationTime(filePath string) error {
+func WriteCreationTimeUsingMetadata(filePath string) error {
 	cmd := exec.Command("./scripts/get-creation-timestamp.sh", filePath)
 	var ts bytes.Buffer
 	cmd.Stdout = &ts
@@ -43,6 +44,16 @@ func WriteCreationTime(filePath string) error {
 
 	// fmt.Printf("got creation timestamp %s\n", ts.Bytes())
 	if err := os.WriteFile(filePath+".creationtime", ts.Bytes(), 0666); err != nil {
+		return fmt.Errorf("error writing creation time for %s: %v", filePath, err)
+	}
+	return nil
+}
+
+func WriteCreationTimeUsingNow(filePath string) error {
+	now := time.Now()
+	ts := fmt.Sprintf("%d.%d", now.Unix(), now.Nanosecond())
+
+	if err := os.WriteFile(filePath+".creationtime", []byte(ts), 0666); err != nil {
 		return fmt.Errorf("error writing creation time for %s: %v", filePath, err)
 	}
 	return nil
