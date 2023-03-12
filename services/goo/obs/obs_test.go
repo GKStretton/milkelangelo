@@ -1,11 +1,14 @@
 package obs
 
 import (
+	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/andreykaipov/goobs"
 	"github.com/andreykaipov/goobs/api/requests/inputs"
+	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,6 +24,25 @@ func initTestClient(t *testing.T) {
 
 // 	setSessionNumber(3)
 // }
+
+func TestEventListener(t *testing.T) {
+	initTestClient(t)
+	go c.Listen(func(i interface{}) {
+		err, ok := i.(error)
+		if ok {
+			innerErr := errors.Unwrap(err)
+			wsErr, ok := innerErr.(*websocket.CloseError)
+			if ok {
+				t.Logf("websocket closed: %v", wsErr)
+			} else {
+				t.Logf("misc error: %v", innerErr)
+			}
+		}
+
+	})
+	time.Sleep(time.Second * 10)
+	t.Log("test")
+}
 
 func TestSetScene(t *testing.T) {
 	initTestClient(t)
