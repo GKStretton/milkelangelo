@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"time"
 
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/filesystem"
@@ -63,6 +64,9 @@ func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, e
 }
 
 func (wr *webcamRecorder) Stop() {
+	// ensure footage stops after "paused" state report is saved
+	time.Sleep(time.Millisecond * time.Duration(500))
+
 	_, err := wr.stdin.Write([]byte("q"))
 	if err != nil {
 		wr.log("failed to terminate video recording by stdin: %v", err)

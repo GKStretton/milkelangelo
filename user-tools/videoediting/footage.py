@@ -62,7 +62,7 @@ class FootagePiece:
 	# (footage, absolute_start, absolute_end)
 	def get_subclip_from_timestamps(self, start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, float, float]:
 		if not self.intersects_timestamp_range(start_t, end_t):
-			return None
+			return None, None, None
 
 		if end_t is None:
 			end_t = self.get_end_timestamp()
