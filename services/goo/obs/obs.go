@@ -46,7 +46,7 @@ func connectionListener(sm *session.SessionManager) {
 		resp, err := c.General.GetVersion()
 		if err != nil {
 			fmt.Printf("failed to get obs version on connect: %v\n", err)
-			return
+			continue
 		}
 		fmt.Printf("Connected to OBS\n"+
 			"\tOBSversion: %s\n"+
