@@ -31,7 +31,7 @@ func Run(s *session.SessionManager) {
 }
 
 func connectionListener(sm *session.SessionManager) {
-	var reconnect chan bool
+	reconnect := make(chan bool)
 	for {
 		fmt.Printf("Attempting connection to OBS...\n")
 		c = nil
