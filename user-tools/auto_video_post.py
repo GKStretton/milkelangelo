@@ -49,7 +49,7 @@ class ContentDescriptor:
 			exit(1)
 		
 		# only add prop if it's different to last
-		FILTER_UNCHANGED = False
+		FILTER_UNCHANGED = True
 		if FILTER_UNCHANGED and len(self.properties) > 0 and self.properties[-1][1] == properties:
 			return
 
@@ -107,6 +107,7 @@ class ContentDescriptor:
 			print(i)
 			props = self.properties[i][1]
 			if props.skip:
+				print("skipping")
 				continue
 
 			ts1_abs = self.properties[i][0]
@@ -141,7 +142,7 @@ class ContentDescriptor:
 				front_subclip = front_subclip.speedx(props.speed)
 
 			# clips should all be same length unless it's the last property.
-			if i != len(self.properties) - 1 and (overlay_subclip.duration != top_subclip.duration or overlay_subclip.duration != front_subclip.duration):
+			if i != len(self.properties) - 1 and not util.floats_are_equal(0.00001, [overlay_subclip.duration, top_subclip.duration, front_subclip.duration]):
 				# these should be same length if the footage has been padded correctly''
 				print("processed subclips are not same duration: {} {} {}, exiting".format(overlay_subclip.duration, top_subclip.duration, front_subclip.duration))
 				exit(1)
@@ -183,7 +184,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	print(f"Launching auto_video_post for session {args.session_number} in '{args.base_dir}'\n")
 
-	content_type = ContentType.TYPE_LONGFORM
+	content_type = ContentType.LONGFORM
 
 	session_metadata = loaders.get_session_metadata(args)
 	state_reports = loaders.get_state_reports(args)

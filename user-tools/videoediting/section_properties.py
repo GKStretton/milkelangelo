@@ -3,10 +3,10 @@ import pycommon.machine_pb2 as pb
 
 @dataclass
 class SectionProperties:
-	scene: Scene = Scene.SCENE_UNDEFINED
+	scene: Scene = Scene.UNDEFINED
 	speed: float = 1.0
 	skip: bool = False
-	fmt: Format = Format.FORMAT_UNDEFINED
+	fmt: Format = Format.UNDEFINED
 	crop: bool = True
 	vig_overlay: bool = True
 
@@ -25,18 +25,28 @@ class SectionProperties:
 # maintained for this time, even if the state reports change.
 def get_section_properties(video_state, state_report, content_type: ContentType) -> SectionProperties:
 	props = SectionProperties(
-		scene = Scene.SCENE_DUAL,
+		scene = Scene.DUAL,
 		speed = 1.0,
 		skip = False,
-		fmt = Format.FORMAT_UNDEFINED,
+		fmt = Format.UNDEFINED,
 		crop = True,
 		vig_overlay = True,
 	)
 
-	if content_type == ContentType.TYPE_LONGFORM:
-		props.fmt = Format.FORMAT_LANDSCAPE
+	if state_report.paused or state_report.status == pb.Status.SLEEPING:
+		props.skip = True
+		return props
+	
+	if state_report.status == pb.Status.IDLE_MOVING:
+		props.speed = 3.0
+	
+	if state_report.status == pb.Status.IDLE_STATIONARY:
+		props.speed = 10.0
+
+	if content_type == ContentType.LONGFORM:
+		props.fmt = Format.LANDSCAPE
 	else:
-		props.fmt = Format.FORMAT_PORTRAIT
+		props.fmt = Format.PORTRAIT
 
 	#! Do state-based editing once requirements are clearer
 	# if state_report.status == pb.WAITING_FOR_DISPENSE:

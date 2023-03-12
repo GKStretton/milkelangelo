@@ -33,16 +33,16 @@ def compositeContentFromFootageSubclips(
 	portrait_dim = (1080, 1920)
 
 	clip: VideoClip = None
-	if props.fmt == Format.FORMAT_LANDSCAPE:
-		if props.scene == Scene.SCENE_DUAL:
+	if props.fmt == Format.LANDSCAPE:
+		if props.scene == Scene.DUAL:
 			front_subclip = front_subclip.resize(0.65).set_position((10, 'center'))
 			top_subclip = top_subclip.resize(1.2).set_position((850, 'center'))
 			clip = CompositeVideoClip([front_subclip, top_subclip], size=landscape_dim)
 		else:
 			print("scene {} not supported".format(props.scene))
 			exit(1)
-	elif props.fmt == Format.FORMAT_PORTRAIT:
-		if props.scene != Scene.SCENE_UNDEFINED:
+	elif props.fmt == Format.PORTRAIT:
+		if props.scene != Scene.UNDEFINED:
 			front_subclip = front_subclip.resize(0.7).set_position(('center', 1150))
 			top_subclip = top_subclip.resize(1.2).set_position(('center', 10))
 			clip = CompositeVideoClip([front_subclip, top_subclip], size=portrait_dim)
