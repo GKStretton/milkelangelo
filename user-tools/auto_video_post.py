@@ -82,7 +82,7 @@ class ContentDescriptor:
 				next_timestamp, _ = self.state_reports[i+1]
 				duration = next_timestamp - timestamp
 			
-			text_str = "STATE REPORT:\n"+util.ts_format(timestamp) + "\n" + MessageToJson(sr, including_default_value_fields=True, preserving_proto_field_name=True)
+			text_str = "STATE REPORT:\n"+util.ts_format(timestamp) + "\n" + MessageToJson(sr, including_default_value_fields=True, preserving_proto_field_name=True, sort_keys=True)
 			txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=20, color='white', align='West')
 			txt = txt.set_duration(duration)
 
@@ -129,9 +129,9 @@ class ContentDescriptor:
 			overlay_subclip = clips_array([[overlay_raw_subclip], [txt]])
 
 			# build footage subclips
-			print(f"Getting top_footage between {ts1_abs} and {ts2_abs}")
+			print(f"Getting top_footage between {ts1_abs} and {ts2_abs} ({util.ts_fmt(ts1_rel)} to {util.ts_fmt(ts2_rel)})")
 			top_subclip, top_crop = top_footage.get_subclip(ts1_abs, ts2_abs)
-			print(f"Getting front_footage between {ts1_abs} and {ts2_abs}")
+			print(f"Getting front_footage between {ts1_abs} and {ts2_abs} ({util.ts_fmt(ts1_rel)} to {util.ts_fmt(ts2_rel)})")
 			front_subclip, front_crop = front_footage.get_subclip(ts1_abs, ts2_abs)
 
 			# apply speed to all
@@ -159,12 +159,12 @@ def save(args, overlay, content, content_type):
 		os.mkdir(output_dir)
 
 	i = 0
-	output_file = os.path.join(output_dir, "{}.{}.mp4".format(content_type, i))
+	output_file = os.path.join(output_dir, "{}.{}.mp4".format(content_type.name, i))
 	while os.path.exists(output_file):
 		i+=1
-		output_file = os.path.join(output_dir, "{}.{}.mp4".format(content_type, i))
+		output_file = os.path.join(output_dir, "{}.{}.mp4".format(content_type.name, i))
 	
-	overlay_file = os.path.join(output_dir, "{}-overlay.{}.mp4".format(content_type, i))
+	overlay_file = os.path.join(output_dir, "{}-overlay.{}.mp4".format(content_type.name, i))
 	content_file = output_file
 
 	overlay.write_videofile(overlay_file, codec='libx264', fps=FPS)
@@ -209,7 +209,8 @@ if __name__ == "__main__":
 
 	combined_clip = CompositeVideoClip([content_clip, overlay_clip], size=content_clip.size)
 
-	combined_clip.preview()
-
 	# launch preview application, or save
-	# save(args, overlay_clip, content_clip, content_type)
+	if args.preview:
+		combined_clip.preview()
+	else:
+		save(args, overlay_clip, content_clip, content_type)

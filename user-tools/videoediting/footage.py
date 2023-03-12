@@ -68,8 +68,6 @@ class FootagePiece:
 			end_t = self.get_end_timestamp()
 
 		
-		print("\t\tGathering subclip for range ({:.2f}, {:.2f}) in {}".format(start_t, end_t, self.file_name))
-		
 		# video confined to range inside both video and stated range
 		absolute_start_t = max(start_t, self.get_start_timestamp())
 		absolute_end_t = min(end_t, self.get_end_timestamp())
