@@ -65,7 +65,7 @@ def get_base_image(metadata, dslr_image: Image.Image, fmt: Format) -> Image.Imag
 	# todo: add production_id to goo!
 	session_number_text = f"#{metadata['id']}" if metadata['production'] else f"dev#{metadata['id']}"
 	number_font = ImageFont.truetype(FONT, FONT_SIZE_SESSION_NUMBER)
-	w, h = draw.textsize(text=session_number_text, font=number_font)
+	_, _, w, h = draw.textbbox((0, 0), text=session_number_text, font=number_font)
 	draw.text(xy=(number_location[0] - w/2, number_location[1] - h/2), text=session_number_text, fill=WHITE, font=number_font)
 
 	return img
@@ -83,7 +83,7 @@ def generate_intro(metadata, dslr_image: Image.Image, still_format: Format) -> I
 		subtitle_location = (490, 765)
 	if still_format == Format.PORTRAIT:
 		subtitle_location = (img.width / 2, 1675)
-	w, h = draw.textsize(text=INTRO_SUBTITLE, font=subtitle_font)
+	_, _, w, h = draw.textbbox((0, 0), text=INTRO_SUBTITLE, font=subtitle_font)
 	draw.text(xy=(subtitle_location[0] - w/2, subtitle_location[1] - h/2), text=INTRO_SUBTITLE, fill=WHITE, font=subtitle_font, align="center")
 
 	return img
@@ -99,7 +99,7 @@ def generate_outro(metadata, dslr_image, still_format: Format) -> Image.Image:
 	outro_subtitle = "Follow and\nSubscribe\nFor More!" if still_format == Format.LANDSCAPE else "Follow and Subscribe\nFor More!"
 	# Subscribe + follow for more
 	subtitle_location = (490, 675) if still_format == Format.LANDSCAPE else (img.width / 2, 1590)
-	w, h = draw.textsize(text=outro_subtitle, font=subtitle_font)
+	_, _, w, h = draw.textbbox((0, 0), text=outro_subtitle, font=subtitle_font)
 	draw.text(xy=(subtitle_location[0] - w/2, subtitle_location[1] - h/2), text=outro_subtitle, fill=WHITE, font=subtitle_font, align="center")
 
 	# SOCIALS
