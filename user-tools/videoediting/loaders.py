@@ -23,7 +23,7 @@ def get_state_reports(args: argparse.Namespace):
 	print("Loaded {} state report entries\n".format(len(state_reports)))
 	return state_reports
 
-def get_selected_dslr_image(base_dir: str, session_number: int) -> Image.Image:
-	filename = "selected.jpg"
+def get_selected_dslr_image(base_dir: str, session_number: int, image_choice: str) -> Image.Image:
+	filename = f"{image_choice}.jpg"
 	path = os.path.join(base_dir, "session_content", session_number, "dslr/post", filename)
 	return Image.open(path)
