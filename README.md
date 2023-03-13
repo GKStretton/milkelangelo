@@ -42,7 +42,7 @@ Each `session_content` folder has the following format (output content in bold):
 - dslr/
 	- raw/
 	- post/
-	- **selected/**
+		- **selected/**
 - video/
 	- raw/
 		- front/
@@ -52,4 +52,4 @@ Each `session_content` folder has the following format (output content in bold):
 		- **shortform/**
 		- **longform/**
 		- stills/
-- **thumbnails/**
+- **stills/**
