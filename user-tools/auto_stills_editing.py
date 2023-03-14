@@ -63,7 +63,7 @@ def get_base_image(metadata, dslr_image: Image.Image, fmt: Format) -> Image.Imag
 
 	# SESSION NUMBER
 	# todo: add production_id to goo!
-	session_number_text = f"#{metadata['id']}" if metadata['production'] else f"dev#{metadata['id']}"
+	session_number_text = f"#{metadata['production_id']}" if metadata['production'] else f"dev#{metadata['id']}"
 	number_font = ImageFont.truetype(FONT, FONT_SIZE_SESSION_NUMBER)
 	_, _, w, h = draw.textbbox((0, 0), text=session_number_text, font=number_font)
 	draw.text(xy=(number_location[0] - w/2, number_location[1] - h/2), text=session_number_text, fill=WHITE, font=number_font)
@@ -131,8 +131,9 @@ def paste_social_icons(img: Image.Image, loc: typing.Tuple[int, int], size: int,
 
 def save_image(base_dir: str, session_number: int, still_type: StillType, still_format: Format, img: Image.Image):
 	name = f"{still_type.name}-{still_format.name}.jpg"
-	path = os.path.join(base_dir, "session_content", session_number, "stills", name)
-	img.save(path)
+	path = os.path.join(base_dir, "session_content", session_number, "stills")
+	os.makedirs(path, exist_ok=True)
+	img.save(os.path.join(path, name))
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
@@ -161,6 +162,10 @@ if __name__ == "__main__":
 		help="Enum number for the StillFormat",
 		required=True
 	)
+	parser.add_argument("-p", "--preview",
+		action="store_true",
+		help="if true, show image rather than save",
+	)
 	args = parser.parse_args()
 
 	still_type, still_format = StillType.__members__[args.still_type], Format.__members__[args.still_format]
@@ -176,5 +181,7 @@ if __name__ == "__main__":
 	if still_type == StillType.OUTRO:
 		img = generate_outro(metadata, dslr_image, still_format)
 
-	img.show()
-	# save_image(args.base_dir, args.session_number, still_type, still_format, img)
+	if args.preview:
+		img.show()
+	else:
+		save_image(args.base_dir, args.session_number, still_type, still_format, img)
