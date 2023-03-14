@@ -27,3 +27,7 @@ func (s *sqlStorage) matchSession(matcher *SessionMatcher) ([]*Session, error) {
 func (s *sqlStorage) getLatest() (*Session, error) {
 	return nil, fmt.Errorf("not implemented")
 }
+
+func (s *sqlStorage) getLatestProduction() (*Session, error) {
+	return nil, fmt.Errorf("not implemented")
+}

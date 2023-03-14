@@ -12,11 +12,11 @@ import (
 type ID uint64
 
 type Session struct {
-	Id           ID
-	Paused       bool
-	Complete     bool
-	Production   bool
-	ProductionId ID
+	Id           ID   `yaml:"id"`
+	Paused       bool `yaml:"paused"`
+	Complete     bool `yaml:"complete"`
+	Production   bool `yaml:"production"`
+	ProductionId ID   `yaml:"production_id"`
 }
 
 type SessionMatcher struct {
