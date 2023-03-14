@@ -10,7 +10,8 @@ def compositeContentFromFootageSubclips(
 		top_crop: CropConfig,
 		front_subclip: VideoClip,
 		front_crop: CropConfig,
-		props: SectionProperties
+		props: SectionProperties,
+		fmt: Format
 	) -> VideoClip:
 	#! speed and skip are already applied, this is just for layout!
 
@@ -33,7 +34,7 @@ def compositeContentFromFootageSubclips(
 	portrait_dim = (1080, 1920)
 
 	clip: VideoClip = None
-	if props.fmt == Format.LANDSCAPE:
+	if fmt == Format.LANDSCAPE:
 		if props.scene == Scene.DUAL:
 			front_subclip = front_subclip.resize(0.65).set_position((10, 'center'))
 			top_subclip = top_subclip.resize(1.2).set_position((850, 'center'))
@@ -41,7 +42,7 @@ def compositeContentFromFootageSubclips(
 		else:
 			print("scene {} not supported".format(props.scene))
 			exit(1)
-	elif props.fmt == Format.PORTRAIT:
+	elif fmt == Format.PORTRAIT:
 		if props.scene != Scene.UNDEFINED:
 			front_subclip = front_subclip.resize(0.7).set_position(('center', 1150))
 			top_subclip = top_subclip.resize(1.2).set_position(('center', 10))

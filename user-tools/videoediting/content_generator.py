@@ -48,7 +48,7 @@ class ContentGenerator:
 		## Gather resources
 		print("~~~ GATHERING RESOURCES ~~~")
 
-		self.session_metadata = loaders.get_session_metadata(args)
+		self.session_metadata = loaders.get_session_metadata(args.base_dir, args.session_number)
 		self.state_reports = loaders.get_state_reports(args)
 
 		if not args.dry_run:

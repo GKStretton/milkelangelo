@@ -17,6 +17,7 @@ import videoediting.section_properties as properties
 from videoediting.section_properties import SectionProperties
 import pycommon.util as util
 from videoediting.compositor import compositeContentFromFootageSubclips
+from videoediting.stills import add_stills
 
 from enum import Enum
 from abc import ABC, abstractmethod
@@ -28,8 +29,9 @@ FPS = 30
 # This is a descriptor (list of timestamps and video properties) for a single
 # piece of content (video)
 class ContentDescriptor:
-	def __init__(self, content_type: str):
+	def __init__(self, content_type: str, content_fmt: Format):
 		self.content_type = content_type
+		self.fmt = content_fmt
 
 		# [(timestamp_s, sr), ...]
 		self.state_reports = []
@@ -147,7 +149,7 @@ class ContentDescriptor:
 				print("processed subclips are not same duration: {} {} {}, exiting".format(overlay_subclip.duration, top_subclip.duration, front_subclip.duration))
 				exit(1)
 			
-			content_clips.append(compositeContentFromFootageSubclips(top_subclip, top_crop, front_subclip, front_crop, props))
+			content_clips.append(compositeContentFromFootageSubclips(top_subclip, top_crop, front_subclip, front_crop, props, self.fmt))
 			overlay_clips.append(overlay_subclip)
 
 
@@ -171,22 +173,31 @@ def save(args, overlay, content, content_type):
 	overlay.write_videofile(overlay_file, codec='libx264', fps=FPS)
 	content.write_videofile(content_file, codec='libx264', fps=FPS)
 
+def get_format(content_type: ContentType) -> Format:
+	if content_type == ContentType.LONGFORM:
+		return Format.LANDSCAPE
+	elif content_type == ContentType.SHORTFORM:
+		return Format.PORTRAIT
+	else:
+		return Format.UNDEFINED
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata")
-	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5")
-	parser.add_argument("-i", "--inspect", action="store_true", help="If true, detailed information will be shown on the video")
-	parser.add_argument("-x", "--dry-run", action="store_true", help="If true, this will be a dry run and no content will be generated")
+	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata", required=True)
+	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5", required=True)
 	parser.add_argument("-e", "--end-at", action="store", help="If set, content will be ended after this timestamp (s)")
 	parser.add_argument("-p", "--preview", action="store_true", help="If true, final video will be previewed rather than written")
-	parser.add_argument("-s", "--show", action="store", help="If true, show frame at this timestamp (s)")
+	parser.add_argument("-t", "--type", action="store", help="content type of output e.g. SHORTFORM | LONGFORM", required=True)
+	parser.add_argument("-s", "--start-at", action="store", help="set final clip start to this time (s), useful with preview", default=0)
+	# parser.add_argument("-f", "--format", action="store", help="content format of output e.g. LANDSCAPE | PORTRAIT", required=True)
 
 	args = parser.parse_args()
 	print(f"Launching auto_video_post for session {args.session_number} in '{args.base_dir}'\n")
 
-	content_type = ContentType.LONGFORM
+	content_type = ContentType.__members__[args.type]
+	content_fmt = get_format(content_type)
 
-	session_metadata = loaders.get_session_metadata(args)
+	session_metadata = loaders.get_session_metadata(args.base_dir, args.session_number)
 	state_reports = loaders.get_state_reports(args)
 
 	# load camera footage
@@ -196,10 +207,16 @@ if __name__ == "__main__":
 
 	propertyList = {}
 	state = {}
-	descriptor = ContentDescriptor(content_type)
+	descriptor = ContentDescriptor(content_type, content_fmt)
+	start_ts = None
 	for i in range(len(state_reports)):
 		report = ParseDict(state_reports[i], pb.StateReport())
 		report_ts = float(report.timestamp_unix_micros) / 1.0e6
+		if start_ts is None:
+			start_ts = report_ts
+		elif args.end_at:
+			if report_ts - start_ts > float(args.end_at):
+				break
 
 		props = properties.get_section_properties(state, report, content_type)
 		descriptor.set_state_report(report_ts, report)
@@ -207,11 +224,13 @@ if __name__ == "__main__":
 	
 	# content track
 	overlay_clip, content_clip = descriptor.generate_content_clip(top_footage, front_footage)
-
-	combined_clip = CompositeVideoClip([content_clip, overlay_clip], size=content_clip.size)
+	overlay_clip, content_clip = add_stills(content_path, content_type, content_fmt, overlay_clip, content_clip)
 
 	# launch preview application, or save
 	if args.preview:
+		combined_clip = CompositeVideoClip([content_clip, overlay_clip], size=content_clip.size, use_bgclip=True)
+		combined_clip = combined_clip.resize(0.5)
+		combined_clip = combined_clip.subclip(float(args.start_at))
 		combined_clip.preview()
 	else:
 		save(args, overlay_clip, content_clip, content_type)

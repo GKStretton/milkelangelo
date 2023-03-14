@@ -6,13 +6,11 @@ class SectionProperties:
 	scene: Scene = Scene.UNDEFINED
 	speed: float = 1.0
 	skip: bool = False
-	fmt: Format = Format.UNDEFINED
 	crop: bool = True
 	vig_overlay: bool = True
 
 	def __str__(self):
-		return f"""{self.fmt}
-{self.scene.name}
+		return f"""{self.scene.name}
 {self.speed}x
 {"skip" if self.skip else "no-skip"}
 {"crop" if self.crop else "no-crop"}
@@ -28,7 +26,6 @@ def get_section_properties(video_state, state_report, content_type: ContentType)
 		scene = Scene.DUAL,
 		speed = 1.0,
 		skip = False,
-		fmt = Format.UNDEFINED,
 		crop = True,
 		vig_overlay = True,
 	)
@@ -42,11 +39,6 @@ def get_section_properties(video_state, state_report, content_type: ContentType)
 	
 	if state_report.status == pb.Status.IDLE_STATIONARY:
 		props.speed = 10.0
-
-	if content_type == ContentType.LONGFORM:
-		props.fmt = Format.LANDSCAPE
-	else:
-		props.fmt = Format.PORTRAIT
 
 	#! Do state-based editing once requirements are clearer
 	# if state_report.status == pb.WAITING_FOR_DISPENSE:
