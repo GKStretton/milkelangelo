@@ -11,6 +11,8 @@ type storage interface {
 	matchSession(matcher *SessionMatcher) ([]*Session, error)
 	// getLatest returns the latest to be added (highest id)
 	getLatest() (*Session, error)
+	// getLatestProduction returns the latest production session to be added (highest id)
+	getLatestProduction() (*Session, error)
 }
 
 func newStorage(useMemoryStorage bool) storage {

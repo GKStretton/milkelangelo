@@ -58,6 +58,9 @@ func (s *memoryStorage) matchSession(matcher *SessionMatcher) ([]*Session, error
 		if matcher.Production != nil && *matcher.Production != session.Production {
 			continue
 		}
+		if matcher.ProductionId != nil && *matcher.ProductionId != session.ProductionId {
+			continue
+		}
 
 		// add to match because matcher passed
 		matches = append(matches, session)
@@ -73,6 +76,24 @@ func (s *memoryStorage) getLatest() (*Session, error) {
 	}
 	id := s.getMaxID()
 	return s.readSession(id)
+}
+
+func (s *memoryStorage) getLatestProduction() (*Session, error) {
+	var idOfMax ID
+	var maxProductionID ID
+	for id, s := range s.memoryStore {
+		if s.ProductionId > maxProductionID {
+			maxProductionID = s.ProductionId
+			idOfMax = id
+		}
+	}
+
+	// nil if there's none
+	if maxProductionID == 0 {
+		return nil, nil
+	}
+
+	return s.readSession(idOfMax)
 }
 
 func (s *memoryStorage) getMaxID() ID {

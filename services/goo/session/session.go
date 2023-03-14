@@ -12,17 +12,19 @@ import (
 type ID uint64
 
 type Session struct {
-	Id         ID
-	Paused     bool
-	Complete   bool
-	Production bool
+	Id           ID
+	Paused       bool
+	Complete     bool
+	Production   bool
+	ProductionId ID
 }
 
 type SessionMatcher struct {
-	Id         *ID
-	Paused     *bool
-	Complete   *bool
-	Production *bool
+	Id           *ID
+	Paused       *bool
+	Complete     *bool
+	Production   *bool
+	ProductionId *ID
 }
 
 type SessionManager struct {
@@ -76,7 +78,7 @@ func (sm *SessionManager) BeginSession(production bool) (*Session, error) {
 
 	if !sm.inMemory {
 		// Create session folder for content etc.
-		err = filesystem.InitSessionContent(uint64(session.Id))
+		err = filesystem.InitSessionContent(uint64(session.Id), uint64(session.ProductionId))
 		if err != nil {
 			sm.s.deleteSession(session.Id)
 			return nil, fmt.Errorf("failed to InitSession in filesystem: %v", err)
