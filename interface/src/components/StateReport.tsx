@@ -22,14 +22,20 @@ export default function StateReport() {
 		client.on("close", () => {setConnected(false)})
 	}, [])
 
+	useEffect(() => {
+		client.publish("mega/req/state-report", "");
+	}, [])
+
 	return (
 		<>
-		<h2>StateReport</h2>
-		Connection: {String(connected)}
-		<br/>
-		<textarea id="stateReport" readOnly value={stateReport}></textarea>
-		<button onClick={()=>{client.publish("test", "ahh")}}>Pub</button>
-		<br/>
+		<div style={{ display: 'flex', flexDirection: 'column' }}>
+			<h2>StateReport</h2>
+			Connection: {String(connected)}
+			<br/>
+			<textarea id="stateReport" readOnly value={stateReport}></textarea>
+			<button onClick={()=>{client.publish("mega/req/state-report", "")}}>Pub</button>
+			<br/>
+		</div>
 		</>
 	)
 }
