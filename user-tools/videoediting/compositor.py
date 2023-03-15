@@ -44,7 +44,7 @@ def composePortrait(metadata, props: SectionProperties, top_subclip: VideoClip, 
 		text_clip = text_clip.set_position(((portrait_dim[0] - text_size[0]) // 2, 955))
 		text_clip = text_clip.set_duration(top_subclip.duration)
 
-		session_number_text = "#6854" #f"#{metadata['production_id']}" if metadata['production'] else f"dev#{metadata['id']}"
+		session_number_text = f"#{metadata['production_id']}" if metadata['production'] else f"dev#{metadata['id']}"
 		text_clip2 = TextClip(session_number_text, size=(350, 120), fontsize=90, align='west', color='white', font='DejaVu-Serif-Condensed-Italic')
 		text_clip2 = text_clip2.set_position((20, 10))
 		text_clip2 = text_clip2.set_duration(top_subclip.duration)

@@ -37,11 +37,11 @@ def get_section_properties(video_state, state_report, content_type: ContentType)
 		props.skip = True
 		return props
 	
-	if state_report.status == pb.Status.IDLE_MOVING:
-		props.speed = 3.0
+	# if state_report.status == pb.Status.IDLE_MOVING:
+	# 	props.speed = 3.0
 	
-	if state_report.status == pb.Status.IDLE_STATIONARY:
-		props.speed = 10.0
+	# if state_report.status == pb.Status.IDLE_STATIONARY:
+	# 	props.speed = 10.0
 
 	#! Do state-based editing once requirements are clearer
 	# if state_report.status == pb.WAITING_FOR_DISPENSE:

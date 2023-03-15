@@ -158,7 +158,7 @@ class ContentDescriptor:
 		return concatenate_videoclips(overlay_clips), concatenate_videoclips(content_clips)
 
 
-def save(args, overlay, content, content_type):
+def save(args, overlay: VideoClip.VideoClip, content: VideoClip.VideoClip, content_type):
 	output_dir = os.path.join(loaders.get_session_content_path(args), "video/post/")
 	if not os.path.exists(output_dir):
 		os.mkdir(output_dir)
