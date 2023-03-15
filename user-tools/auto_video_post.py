@@ -2,6 +2,7 @@
 # if this becomes too slow, try using nvenc as moviepy ffmpeg codec
 # alternately, at using direct [ffmpeg bindings](https://github.com/kkroening/ffmpeg-python)
 import argparse
+from datetime import datetime
 import os
 
 from moviepy.editor import *
@@ -171,8 +172,12 @@ def save(args, overlay, content, content_type):
 	overlay_file = os.path.join(output_dir, "{}-overlay.{}.mp4".format(content_type.name, i))
 	content_file = output_file
 
+	overlay_render_start = datetime.now()
 	overlay.write_videofile(overlay_file, codec='libx264', fps=FPS)
+	print(f"overlay generation time: {str(datetime.now() - overlay_render_start)}")
+	content_render_start = datetime.now()
 	content.write_videofile(content_file, codec='libx264', fps=FPS)
+	print(f"content generation time: {str(datetime.now() - content_render_start)}")
 
 def get_format(content_type: ContentType) -> Format:
 	if content_type == ContentType.LONGFORM:
@@ -212,6 +217,8 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	print(f"Launching auto_video_post for session {args.session_number} in '{args.base_dir}'\n")
 
+	gen_start = datetime.now()
+
 	content_type = ContentType.__members__[args.type]
 	content_fmt = get_format(content_type)
 
@@ -249,6 +256,8 @@ if __name__ == "__main__":
 	# content track
 	overlay_clip, content_clip = descriptor.generate_content_clip(top_footage, front_footage)
 	overlay_clip, content_clip = add_stills(content_path, content_type, content_fmt, overlay_clip, content_clip)
+
+	print(f"total generation time: {str(datetime.now() - gen_start)}")
 
 	# launch preview application, or save
 	if args.preview:

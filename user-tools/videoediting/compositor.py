@@ -12,8 +12,6 @@ def composeLandscape(metadata, props: SectionProperties, top_subclip: VideoClip,
 	if props.scene == Scene.DUAL:
 		front_subclip = front_subclip.resize(0.7).set_position((50, 'center'))
 		top_subclip = top_subclip.resize(1.05).set_position((960, 'center'))
-		feather_size = 1
-		front_subclip = front_subclip.fx(vfx.fadeout, feather_size, 'north').fx(vfx.fadeout, feather_size, 'south')
 
 
 		text_clip = TextClip("A Study of Light", size=(900, 140), fontsize=115, color='white', font='DejaVu-Serif-Condensed-Italic')
