@@ -51,6 +51,12 @@ func TestSetScene(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestSetSessionNumber(t *testing.T) {
+	initTestClient(t)
+
+	setSessionNumber(3548, true)
+}
+
 func TestStartStream(t *testing.T) {
 	initTestClient(t)
 

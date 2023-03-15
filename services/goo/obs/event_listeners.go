@@ -59,4 +59,13 @@ func handleSessionEvent(e *session.SessionManager) {
 	if err != nil {
 		fmt.Printf("error setting scene in session listener: %v\n", err)
 	}
+
+	if s != nil {
+		if s.Production {
+			setSessionNumber(int(s.ProductionId), true)
+		} else {
+			setSessionNumber(int(s.Id), false)
+		}
+	}
+
 }

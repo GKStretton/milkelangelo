@@ -4,26 +4,33 @@ import (
 	"fmt"
 
 	"github.com/andreykaipov/goobs/api/requests/filters"
+	"github.com/andreykaipov/goobs/api/requests/inputs"
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"gopkg.in/yaml.v3"
 )
 
-// // I can't find a call for v5 websockets in this client api
-// func setSessionNumber(number int) {
-// 	if c == nil {
-// 		fmt.Println("cannot set obs session number because client is nil")
-// 		return
-// 	}
-// 	_, err := c.Sources.SetTextFreetype2Properties(&sources.SetTextFreetype2PropertiesParams{
-// 		Source: "Session Number",
-// 		Text:   fmt.Sprintf("%d", number),
-// 	})
-// 	if err != nil {
-// 		fmt.Printf("error setting obs session number: %v\n", err)
-// 		return
-// 	}
-// }
+func setSessionNumber(number int, production bool) {
+	if c == nil {
+		fmt.Println("cannot set obs session number because client is nil")
+		return
+	}
+	prefix := ""
+	if !production {
+		prefix = "dev"
+	}
+
+	_, err := c.Inputs.SetInputSettings(&inputs.SetInputSettingsParams{
+		InputName: "Session Number",
+		InputSettings: map[string]interface{}{
+			"text": fmt.Sprintf("%s#%d", prefix, number),
+		},
+	})
+	if err != nil {
+		fmt.Printf("error setting obs session number: %v\n", err)
+		return
+	}
+}
 
 func setCropConfig() {
 	if c == nil {
