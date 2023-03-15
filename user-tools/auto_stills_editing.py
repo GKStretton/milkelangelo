@@ -62,7 +62,6 @@ def get_base_image(metadata, dslr_image: Image.Image, fmt: Format) -> Image.Imag
 	draw.text(xy=title_location, text=TITLE, fill=WHITE, font=title_font)
 
 	# SESSION NUMBER
-	# todo: add production_id to goo!
 	session_number_text = f"#{metadata['production_id']}" if metadata['production'] else f"dev#{metadata['id']}"
 	number_font = ImageFont.truetype(FONT, FONT_SIZE_SESSION_NUMBER)
 	_, _, w, h = draw.textbbox((0, 0), text=session_number_text, font=number_font)

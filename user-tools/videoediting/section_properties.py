@@ -8,6 +8,7 @@ class SectionProperties:
 	skip: bool = False
 	crop: bool = True
 	vig_overlay: bool = True
+	front_feather: bool = True
 
 	def __str__(self):
 		return f"""{self.scene.name}
@@ -15,6 +16,7 @@ class SectionProperties:
 {"skip" if self.skip else "no-skip"}
 {"crop" if self.crop else "no-crop"}
 {"vig" if self.vig_overlay else "no-vig"}
+{"feather" if self.front_feather else "no-feather"}
 """
 
 
@@ -28,6 +30,7 @@ def get_section_properties(video_state, state_report, content_type: ContentType)
 		skip = False,
 		crop = True,
 		vig_overlay = True,
+		front_feather=True,
 	)
 
 	if state_report.paused or state_report.status == pb.Status.SLEEPING:

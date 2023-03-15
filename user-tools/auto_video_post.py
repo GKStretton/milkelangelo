@@ -29,7 +29,8 @@ FPS = 30
 # This is a descriptor (list of timestamps and video properties) for a single
 # piece of content (video)
 class ContentDescriptor:
-	def __init__(self, content_type: str, content_fmt: Format):
+	def __init__(self, session_metadata, content_type: str, content_fmt: Format):
+		self.session_metadata = session_metadata
 		self.content_type = content_type
 		self.fmt = content_fmt
 
@@ -149,7 +150,7 @@ class ContentDescriptor:
 				print("processed subclips are not same duration: {} {} {}, exiting".format(overlay_subclip.duration, top_subclip.duration, front_subclip.duration))
 				exit(1)
 			
-			content_clips.append(compositeContentFromFootageSubclips(top_subclip, top_crop, front_subclip, front_crop, props, self.fmt))
+			content_clips.append(compositeContentFromFootageSubclips(top_subclip, top_crop, front_subclip, front_crop, props, self.fmt, self.session_metadata))
 			overlay_clips.append(overlay_subclip)
 
 
@@ -181,13 +182,30 @@ def get_format(content_type: ContentType) -> Format:
 	else:
 		return Format.UNDEFINED
 
+def test(metadata, fmt: Format, timestamp: float, top_footage: FootageWrapper, front_footage: FootageWrapper):
+	top_clip, top_crop = top_footage.get_subclip(timestamp, timestamp + 1)
+	front_clip, front_crop = front_footage.get_subclip(timestamp, timestamp + 1)
+
+	props = SectionProperties(
+		scene = Scene.DUAL,
+		speed = 1.0,
+		skip = False,
+		crop = True,
+		vig_overlay = True,
+	)
+
+	res = compositeContentFromFootageSubclips(top_clip, top_crop, front_clip, front_crop, props, fmt, session_metadata)
+
+	res.resize(0.5).show(interactive=True)
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata", required=True)
 	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5", required=True)
 	parser.add_argument("-e", "--end-at", action="store", help="If set, content will be ended after this timestamp (s)")
 	parser.add_argument("-p", "--preview", action="store_true", help="If true, final video will be previewed rather than written")
-	parser.add_argument("-t", "--type", action="store", help="content type of output e.g. SHORTFORM | LONGFORM", required=True)
+	parser.add_argument("-x", "--test", action="store_true", help="If true, run test code instead of main functionality")
+	parser.add_argument("-t", "--type", action="store", help="content type of output e.g. SHORTFORM | LONGFORM", default="LONGFORM")
 	parser.add_argument("-s", "--start-at", action="store", help="set final clip start to this time (s), useful with preview", default=0)
 	# parser.add_argument("-f", "--format", action="store", help="content format of output e.g. LANDSCAPE | PORTRAIT", required=True)
 
@@ -205,9 +223,15 @@ if __name__ == "__main__":
 	top_footage = FootageWrapper(os.path.join(content_path, "video/raw/" + TOP_CAM))
 	front_footage = FootageWrapper(os.path.join(content_path, "video/raw/" + FRONT_CAM))
 
+	if args.test:
+		report = ParseDict(state_reports[140], pb.StateReport())
+		report_ts = float(report.timestamp_unix_micros) / 1.0e6
+		test(session_metadata, content_fmt, report_ts, top_footage, front_footage)
+		exit(0)
+
 	propertyList = {}
 	state = {}
-	descriptor = ContentDescriptor(content_type, content_fmt)
+	descriptor = ContentDescriptor(session_metadata, content_type, content_fmt)
 	start_ts = None
 	for i in range(len(state_reports)):
 		report = ParseDict(state_reports[i], pb.StateReport())
