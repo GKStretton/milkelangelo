@@ -134,11 +134,12 @@ class Interface(Window):
 	def mouse_handler(self, event, x, y, flags, param):
 		if event == cv2.EVENT_LBUTTONDOWN:
 			xr, yr = self.abs_to_rel(x, y)
-			# reduce to unit length
+			# reduce to max length
 			m = abs(math.hypot(xr, yr))
-			if m > 1:
-				xr /= m
-				yr /= m
+			IK_TARGET_RADIUS_FRAC = 0.8
+			if m > IK_TARGET_RADIUS_FRAC:
+				xr = xr / m * IK_TARGET_RADIUS_FRAC
+				yr = yr / m * IK_TARGET_RADIUS_FRAC
 
 			self.target_x_rel = xr
 			self.target_y_rel = yr
