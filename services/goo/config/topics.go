@@ -19,4 +19,7 @@ const (
 
 	TOPIC_STREAM_START = "asol/stream/begin"
 	TOPIC_STREAM_END   = "asol/stream/end"
+
+	TOPIC_CLOSE_BLIND = "asol/close_bedroom_blind"
+	TOPIC_OPEN_BLIND  = "asol/open_bedroom_blind"
 )
