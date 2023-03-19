@@ -117,7 +117,7 @@ func GetPostDslrDir(sessionId uint64) string {
 func GetIncrementalFileName(outDir string, ext string) string {
 	i := 1
 	for {
-		p := filepath.Join(outDir, strconv.Itoa(i)+"."+ext)
+		p := filepath.Join(outDir, fmt.Sprintf("%04d", i)+"."+ext)
 		if !Exists(p) {
 			return p
 		}
