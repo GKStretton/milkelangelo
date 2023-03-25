@@ -3,6 +3,7 @@ import './App.css';
 import VerticalSlider from './components/VerticalSlider';
 import { Typography, AppBar, Button, Card, CardActions, CardContent, CardMedia, CssBaseline, Grid, Toolbar, Container } from '@mui/material';
 import { Castle, PrecisionManufacturing } from '@mui/icons-material';
+import Test from './components/Test';
 
 const pieces = [
   { num: 1 },
@@ -23,6 +24,7 @@ function App() {
           </Typography>
         </Toolbar>
       </AppBar>
+      <Test/>
       <Container maxWidth="sm">
         <Typography
           variant="h2"
