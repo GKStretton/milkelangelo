@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
-interface Props {
 
-  onValueChange: (value: number) => void;
-}
-
-function VerticalSlider({ onValueChange }: Props) {
+function VerticalSlider() {
   const [value, setValue] = useState(70);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = Number(event.target.value);
     setValue(newValue);
-    onValueChange(newValue);
   };
 
   return (

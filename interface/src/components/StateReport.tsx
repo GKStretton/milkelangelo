@@ -1,29 +1,23 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useContext } from 'react'
 import mqtt from 'precompiled-mqtt'
 import './StateReport.css'
-
-
-const client = mqtt.connect("ws://DEPTH:9001")
-client.subscribe("asol/#", console.log)
+import { TOPIC_STATE_REPORT_JSON, TOPIC_REQUEST_STATE_REPORT as TOPIC_STATE_REPORT_REQUEST } from '../util/topics'
+import MqttContext from '../util/mqttContext'
 
 export default function StateReport() {
-	const [stateReport, setStateReport] = useState("")
-	const [connected, setConnected] = useState(false)
+	const { client: c, messages } = useContext(MqttContext);
+	const stateReport = messages[TOPIC_STATE_REPORT_JSON];
+	const connected = c?.connected;
+
 
 	useEffect(() => {
-		client.on("message", (topic, payload) => {
-			if (topic === "asol/state-report-json") {
-				setStateReport(payload.toString())
-			}
-			console.log(topic, String(payload))
-			console.log(client.connected)
-		})
-		client.on("connect", () => {setConnected(true)})
-		client.on("close", () => {setConnected(false)})
-	}, [])
-
-	useEffect(() => {
-		client.publish("mega/req/state-report", "");
+		if (!c) {
+			return;
+		}
+		c.subscribe(TOPIC_STATE_REPORT_JSON, (m) => {
+			console.log("subsribed to state report", m);
+		});
+		c.publish(TOPIC_STATE_REPORT_REQUEST, "");
 	}, [])
 
 	return (
@@ -33,7 +27,7 @@ export default function StateReport() {
 			Connection: {String(connected)}
 			<br/>
 			<textarea id="stateReport" readOnly value={stateReport}></textarea>
-			<button onClick={()=>{client.publish("mega/req/state-report", "")}}>Pub</button>
+			<button onClick={()=>{c?.publish("mega/req/state-report", "")}}>Pub</button>
 			<br/>
 		</div>
 		</>
