@@ -2,6 +2,7 @@ import {useEffect, useContext } from 'react'
 import './StateReport.css'
 import { TOPIC_STATE_REPORT_JSON, TOPIC_STATE_REPORT_REQUEST } from '../util/topics'
 import MqttContext from '../util/mqttContext'
+import { Grid, Button } from '@mui/material'
 
 export default function StateReport() {
 	const { client: c, messages } = useContext(MqttContext);
@@ -20,12 +21,12 @@ export default function StateReport() {
 
 	return (
 		<>
-		<div style={{ display: 'flex', flexDirection: 'column' }}>
-			<h2>StateReport</h2>
+		<div style={{ display: 'flex', flexDirection: 'column', padding: "5px"}}>
+			<h2>State Report</h2>
 			Connection: {String(connected)}
 			<br/>
 			<textarea id="stateReport" readOnly value={stateReport}></textarea>
-			<button onClick={()=>{c?.publish("mega/req/state-report", "")}}>Pub</button>
+			<Button variant="contained" sx={{width: "100px", margin: "5px"}} onClick={()=>{c?.publish("mega/req/state-report", "")}}>Pub</Button>
 			<br/>
 		</div>
 		</>

@@ -4,15 +4,16 @@ import mqtt, { MqttClient } from 'precompiled-mqtt';
 import MqttContext, { MqttContextValue } from './mqttContext';
 
 interface MqttProviderProps {
+	url: string,
 	children: ReactNode;
 }
 
-const MqttProvider: React.FC<MqttProviderProps> = ({ children }) => {
+const MqttProvider: React.FC<MqttProviderProps> = ({ url, children }) => {
 	const [client, setClient] = useState<MqttClient | null>(null);
 	const [messages, setMessages] = useState<{ [topic: string]: string }>({});
 
 	useEffect(() => {
-		const mqttClient = mqtt.connect('ws://DEPTH:9001');
+		const mqttClient = mqtt.connect(url);
 
 		mqttClient.on('connect', () => {
 			console.log('connected');

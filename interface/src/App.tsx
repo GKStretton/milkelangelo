@@ -4,6 +4,7 @@ import VerticalSlider from './components/VerticalSlider';
 import { Typography, AppBar, Button, Card, CardActions, CardContent, CardMedia, CssBaseline, Grid, Toolbar, Container } from '@mui/material';
 import { Castle, PrecisionManufacturing } from '@mui/icons-material';
 import MqttProvider from './util/MqttProvider';
+import ControlGroup from './components/ControlGroup';
 
 function App() {
   return (
@@ -17,7 +18,8 @@ function App() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <MqttProvider>
+      <MqttProvider url='ws://DEPTH:9001'>
+        <ControlGroup/>
         <StateReport/>
         <VerticalSlider/>
       </MqttProvider>
