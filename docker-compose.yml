@@ -56,5 +56,6 @@ services:
     build:
       context: ./interface
       dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - '5000:5000'
