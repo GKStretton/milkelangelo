@@ -52,3 +52,9 @@ services:
       - 1935:1935
       - 1936:1936
       - 6000:6000/udp
+  interface:
+    build:
+      context: ./interface
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'
