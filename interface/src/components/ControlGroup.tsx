@@ -29,10 +29,11 @@ export default function ControlGroup() {
     const collectingVial = collecting && stateReport.collection_request.vial_number;
 
     const bulkRequests = [
-        {id: 1, name: "Drain"},
-        {id: 2, name: "Water"},
-        {id: 3, name: "Milk"},
-    ]
+        {id: 1, name: "Milk", fluid_type: 3, open_drain: false},
+        {id: 2, name: "Water", fluid_type: 2, open_drain: false},
+        {id: 3, name: "Rinse", fluid_type: 2, open_drain: true},
+        {id: 4, name: "Drain", fluid_type: 1, open_drain: false},
+    ];
 
     return (
         <>
@@ -106,7 +107,7 @@ export default function ControlGroup() {
                     <Button
                         key={request.id}
                         disabled={!isAwake}
-                        onClick={() => c?.publish(FLUID_REQ_TOPIC, `${request.id},${bulkFluidRequestVolume}`)}
+                        onClick={() => c?.publish(FLUID_REQ_TOPIC, `${request.fluid_type},${bulkFluidRequestVolume},${request.open_drain}`)}
                     >
                         {request.name}
                     </Button>

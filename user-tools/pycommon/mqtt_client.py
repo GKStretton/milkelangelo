@@ -133,8 +133,8 @@ def pause_session():
 def resume_session():
     pub(RESUME_SESSION, "")
 
-def fluid_req(req_type, ml):
-    msg = f"{req_type},{ml:.2f}"
+def fluid_req(req_type, ml, open_drain=False):
+    msg = f"{req_type},{ml:.2f},{open_drain}"
     pub(FLUID_REQ_TOPIC, msg)
 
 def start_stream():
