@@ -19,9 +19,11 @@ function App() {
         </Toolbar>
       </AppBar>
       <MqttProvider url='ws://DEPTH:9001'>
-        <ControlGroup/>
-        <StateReport/>
-        <VerticalSlider/>
+        <Container>
+          <ControlGroup/>
+          <StateReport/>
+          <VerticalSlider/>
+        </Container>
       </MqttProvider>
     </>
   );
