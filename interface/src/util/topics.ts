@@ -28,3 +28,9 @@ export const FLUID_REQ_TOPIC = "mega/req/fluid"
 export const FLUID_DRAIN = 1
 export const FLUID_WATER = 2
 export const FLUID_MILK = 3
+
+export const SET_VALVE_TOPIC = "mega/req/set-valve"
+export const VALVE_DRAIN = 1
+export const VALVE_WATER = 2
+export const VALVE_MILK = 3
+export const VALVE_AIR = 4

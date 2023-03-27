@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { SLEEP_TOPIC, TOPIC_STATE_REPORT_JSON, WAKE_TOPIC, SHUTDOWN_TOPIC, COLLECT_TOPIC, DISPENSE_TOPIC, FLUID_REQ_TOPIC } from '../util/topics'
+import { SLEEP_TOPIC, TOPIC_STATE_REPORT_JSON, WAKE_TOPIC, SET_VALVE_TOPIC, SHUTDOWN_TOPIC, COLLECT_TOPIC, DISPENSE_TOPIC, FLUID_REQ_TOPIC, VALVE_DRAIN, VALVE_WATER, VALVE_MILK, VALVE_AIR } from '../util/topics'
 import MqttContext from '../util/mqttContext'
 import { Grid, ButtonGroup, Button, Typography, Slider, Box } from '@mui/material';
 
@@ -33,6 +33,13 @@ export default function ControlGroup() {
         {id: 2, name: "Water", fluid_type: 2, open_drain: false},
         {id: 3, name: "Rinse", fluid_type: 2, open_drain: true},
         {id: 4, name: "Drain", fluid_type: 1, open_drain: false},
+    ];
+
+    const valves = [
+        { id: VALVE_DRAIN, name: "DRAIN" },
+        { id: VALVE_WATER, name: "WATER" },
+        { id: VALVE_MILK, name: "MILK" },
+        { id: VALVE_AIR, name: "AIR" }
     ];
 
     return (
@@ -113,6 +120,15 @@ export default function ControlGroup() {
                     </Button>
                 )}
             </ButtonGroup>
+            <Typography variant="h6">Valve Overrides (Open/Close)</Typography>
+            <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center" sx={{margin: 2}}>
+                {valves.map(valve => (
+                    <ButtonGroup key={valve.id} sx={{margin:1}}>
+                        <Button disabled={!isAwake} onClick={() => c?.publish(SET_VALVE_TOPIC, `${valve.id},true`)}>{valve.name} (O)</Button>
+                        <Button disabled={!isAwake} onClick={() => c?.publish(SET_VALVE_TOPIC, `${valve.id},false`)}>{valve.name} (C)</Button>
+                    </ButtonGroup>
+                ))}
+            </Box>
         </Box>
         </>
     )
