@@ -15,7 +15,7 @@ left=$($SCRIPT_PATH $CONFIG_FILE left_rel)
 echo $top $bottom $right $left
 
 gst-launch-1.0 -v \
-  rtspsrc protocols=tcp location="rtsp://$HOST:8554/$CAMERA" latency=250 ! \
+  rtspsrc protocols=tcp location="rtsp://$HOST:8554/$CAMERA" latency=0 ! \
   queue ! \
   rtph264depay ! \
   avdec_h264 ! \
