@@ -2,9 +2,9 @@
 
 # "top-cam" or "front-cam"
 CAMERA=$1
-CONFIG_FILE="/mnt/md0/light-stores/kv/crop_${CAMERA}"
-HOST="DEPTH"
-SCRIPT_PATH="./getcrop.sh"
+CONFIG_FILE="/config/crop_${CAMERA}"
+HOST="localhost"
+SCRIPT_PATH="/scripts/getcrop.sh"
 
 echo $CONFIG_FILE
 
