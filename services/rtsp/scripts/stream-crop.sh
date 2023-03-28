@@ -15,12 +15,12 @@ left=$($SCRIPT_PATH $CONFIG_FILE left_rel)
 echo $top $bottom $right $left
 
 gst-launch-1.0 -v \
-  rtspsrc protocols=tcp location="rtsp://$HOST:8554/$CAMERA" latency=0 ! \
+  rtspsrc protocols=tcp location="rtsp://$HOST:8554/$CAMERA" latency=250 ! \
   queue ! \
   rtph264depay ! \
   avdec_h264 ! \
   videocrop top=$top bottom=$bottom right=$right left=$left ! \
-  x264enc bitrate=5000 speed-preset=ultrafast tune=zerolatency key-int-max=30 option-string="keyint_min=0" ! \
+  x264enc bitrate=5000 speed-preset=ultrafast key-int-max=30 option-string="keyint_min=0" ! \
   rtspclientsink location=rtsp://$HOST:8554/${CAMERA}-crop protocols=tcp
 
 
