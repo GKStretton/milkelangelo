@@ -28,10 +28,10 @@ function App() {
           padding={2}
         >
           <Grid item xs={12} sm={6}>
-            <VideoPlayer url="DEPTH:8889/top-cam/" name="top"/>
+            <VideoPlayer url="DEPTH:8889/top-cam-crop/" name="top"/>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <VideoPlayer url="DEPTH:8889/front-cam/" name="front"/>
+            <VideoPlayer url="DEPTH:8889/front-cam-crop/" name="front"/>
           </Grid>
         </Grid>
         <Container>

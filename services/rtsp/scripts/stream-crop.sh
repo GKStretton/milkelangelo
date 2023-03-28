@@ -2,12 +2,25 @@
 
 # "top-cam" or "front-cam"
 CAMERA=$1
-CONFIG_FILE="/config/crop_${CAMERA}"
+CONFIG_FILE="/mnt/md0/light-stores/kv/crop_${CAMERA}"
+HOST="DEPTH"
+SCRIPT_PATH="./getcrop.sh"
 
-top=$(/scripts/getcrop.sh $CONFIG_FILE top_rel)
-bottom=$(/scripts/getcrop.sh $CONFIG_FILE bottom_rel)
-right=$(/scripts/getcrop.sh $CONFIG_FILE right_rel)
-left=$(/scripts/getcrop.sh $CONFIG_FILE left_rel)
+echo $CONFIG_FILE
+
+top=$($SCRIPT_PATH $CONFIG_FILE top_rel)
+bottom=$($SCRIPT_PATH $CONFIG_FILE bottom_rel)
+right=$($SCRIPT_PATH $CONFIG_FILE right_rel)
+left=$($SCRIPT_PATH $CONFIG_FILE left_rel)
 echo $top $bottom $right $left
 
-gst-launch-1.0 -v rtspsrc protocols=tcp location="rtsp://localhost:8554/$CAMERA" latency=0 ! queue ! decodebin ! videocrop top=$top bottom=$bottom right=$right left=$left ! rtspclientsink location=rtsp://localhost:8554/${CAMERA}-crop protocols=tcp
+gst-launch-1.0 -v \
+  rtspsrc protocols=tcp location="rtsp://$HOST:8554/$CAMERA" latency=0 ! \
+  queue ! \
+  rtph264depay ! \
+  avdec_h264 ! \
+  videocrop top=$top bottom=$bottom right=$right left=$left ! \
+  x264enc bitrate=10000 speed-preset=ultrafast tune=zerolatency key-int-max=60 option-string="keyint_min=0" ! \
+  rtspclientsink location=rtsp://$HOST:8554/${CAMERA}-crop protocols=tcp
+
+

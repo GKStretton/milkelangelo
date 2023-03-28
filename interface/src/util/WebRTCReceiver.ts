@@ -72,6 +72,10 @@ export class WebRTCReceiver {
       console.log('new track ' + evt.track.kind);
       const video = document.getElementById(this.name) as HTMLVideoElement;
       video.srcObject = evt.streams[0];
+
+      video.addEventListener('loadedmetadata', () => {
+        console.log(`Stream dimensions: ${video.videoWidth}x${video.videoHeight}`);
+      })
     };
 
     const direction = 'sendrecv';
