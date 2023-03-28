@@ -9,6 +9,7 @@ services:
     ports:
       - 8554:8554
       - 8888:8888
+      - 8889:8889
     volumes:
       - ./services/rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
       - ./services/rtsp/scripts:/scripts
