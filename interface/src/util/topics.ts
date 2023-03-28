@@ -37,3 +37,5 @@ export const VALVE_AIR = 4
 
 export const TOPIC_KV_GET_RESP = "asol/kv/get-resp/"
 export const TOPIC_KV_GET = "asol/kv/get/"
+
+export const TOPIC_GOTO_XY = "mega/req/goto-xy"

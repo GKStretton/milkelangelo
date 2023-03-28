@@ -6,6 +6,7 @@ import { PrecisionManufacturing } from '@mui/icons-material';
 import MqttProvider from './util/MqttProvider';
 import ControlGroup from './components/ControlGroup';
 import VideoPlayer from './components/VideoPlayer';
+import TopCamPlayer from './components/TopCamPlayer';
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
           padding={2}
         >
           <Grid item xs={12} sm={6}>
-            <VideoPlayer url="DEPTH:8889/top-cam-crop/" name="top"/>
+            <TopCamPlayer/>
           </Grid>
           <Grid item xs={12} sm={6}>
             <VideoPlayer url="DEPTH:8889/front-cam-crop/" name="front"/>
