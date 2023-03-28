@@ -1,8 +1,8 @@
 import StateReport from './components/StateReport'
 import './App.css';
 import VerticalSlider from './components/VerticalSlider';
-import { Typography, AppBar, Button, Card, CardActions, CardContent, CardMedia, CssBaseline, Grid, Toolbar, Container } from '@mui/material';
-import { Castle, PrecisionManufacturing } from '@mui/icons-material';
+import { Typography, AppBar, CssBaseline, Grid, Toolbar, Container } from '@mui/material';
+import { PrecisionManufacturing } from '@mui/icons-material';
 import MqttProvider from './util/MqttProvider';
 import ControlGroup from './components/ControlGroup';
 import VideoPlayer from './components/VideoPlayer';
@@ -28,10 +28,10 @@ function App() {
           padding={2}
         >
           <Grid item xs={12} sm={6}>
-            <VideoPlayer url="localhost:8889/top-cam/"/>
+            <VideoPlayer url="DEPTH:8889/top-cam/" name="top"/>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <VideoPlayer url="localhost:8889/front-cam/"/>
+            <VideoPlayer url="DEPTH:8889/front-cam/" name="front"/>
           </Grid>
         </Grid>
         <Container>

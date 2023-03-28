@@ -5,9 +5,11 @@ export class WebRTCReceiver {
   private pc: RTCPeerConnection | null;
   private restartTimeout: number | null;
   private restartPause: number = 2000;
+  private name: string;
 
-  constructor(url: string) {
+  constructor(url: string, name: string) {
     this.terminated = false;
+    this.name = name;
     this.ws = null;
     this.pc = null;
     this.restartTimeout = null;
@@ -68,7 +70,7 @@ export class WebRTCReceiver {
 
     this.pc.ontrack = (evt) => {
       console.log('new track ' + evt.track.kind);
-      const video = document.getElementById('video') as HTMLVideoElement;
+      const video = document.getElementById(this.name) as HTMLVideoElement;
       video.srcObject = evt.streams[0];
     };
 

@@ -34,3 +34,6 @@ export const VALVE_DRAIN = 1
 export const VALVE_WATER = 2
 export const VALVE_MILK = 3
 export const VALVE_AIR = 4
+
+export const TOPIC_KV_GET_RESP = "asol/kv/get-resp/"
+export const TOPIC_KV_GET = "asol/kv/get/"

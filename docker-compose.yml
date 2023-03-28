@@ -13,7 +13,7 @@ services:
     volumes:
       - ./services/rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
       - ./services/rtsp/scripts:/scripts
-      - ./config:/config
+      - ${LIGHT_STORES_DIR}/kv:/config
     devices:
       - $TOP_CAM:/dev/top-cam
       - $FRONT_CAM:/dev/front-cam

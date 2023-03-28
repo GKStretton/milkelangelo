@@ -1,7 +1,7 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { SLEEP_TOPIC, TOPIC_STATE_REPORT_JSON, WAKE_TOPIC, SET_VALVE_TOPIC, SHUTDOWN_TOPIC, COLLECT_TOPIC, DISPENSE_TOPIC, FLUID_REQ_TOPIC, VALVE_DRAIN, VALVE_WATER, VALVE_MILK, VALVE_AIR } from '../util/topics'
 import MqttContext from '../util/mqttContext'
-import { Grid, ButtonGroup, Button, Typography, Slider, Box } from '@mui/material';
+import { ButtonGroup, Button, Typography, Slider, Box } from '@mui/material';
 
 export default function ControlGroup() {
     const { client: c, messages } = useContext(MqttContext);
@@ -75,7 +75,7 @@ export default function ControlGroup() {
                     <Button
                         key={vial}
                         disabled={!isAwake || collecting}
-                        variant={collectingVial == vial ? "contained": "outlined"}
+                        variant={collectingVial === vial ? "contained": "outlined"}
                         onClick={() => c?.publish(COLLECT_TOPIC, `${vial.toString()},${collectionVolume}`)}
                     >
                         {vial}
