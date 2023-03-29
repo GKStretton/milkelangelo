@@ -8,13 +8,11 @@ Dark is the supporting system monorepo for [A Study of Light](https://www.youtub
 - [x] Remote camera crop configuration
 - [x] Control interface for system
 - [x] Session management system
+- [x] OBS integration for live streaming
 - [x] Automated video, photo, and state report capture
 - [ ] Automated post-processing of short- & long-form video, and photos.
 - [ ] Automated social media posting
-- [ ] OBS integration for live streaming
-
-## Rough system diagram WIP
-![aSoL System Diagram](https://user-images.githubusercontent.com/40743870/200128178-5fbe5e19-6592-40bc-837a-b243e97f06bd.png)
+- [ ] Link to cloud system for remote control
 
 ## Instructions
 

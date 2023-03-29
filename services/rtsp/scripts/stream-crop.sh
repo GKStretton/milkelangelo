@@ -23,4 +23,6 @@ gst-launch-1.0 -v \
   x264enc bitrate=5000 speed-preset=ultrafast key-int-max=30 option-string="keyint_min=0" ! \
   rtspclientsink location=rtsp://$HOST:8554/${CAMERA}-crop protocols=tcp
 
+  # tune=zerolatency has been removed from x264enc
+
 
