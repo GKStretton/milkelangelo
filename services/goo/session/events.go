@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/gkstretton/dark/services/goo/config"
+	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 )
 
@@ -60,13 +60,13 @@ func (sm *SessionManager) publishToBroker(e *SessionEvent) {
 	var topic string
 	switch e.Type {
 	case SESSION_STARTED:
-		topic = config.TOPIC_SESSION_BEGAN
+		topic = topics_backend.TOPIC_SESSION_BEGAN
 	case SESSION_ENDED:
-		topic = config.TOPIC_SESSION_ENDED
+		topic = topics_backend.TOPIC_SESSION_ENDED
 	case SESSION_PAUSED:
-		topic = config.TOPIC_SESSION_PAUSED
+		topic = topics_backend.TOPIC_SESSION_PAUSED
 	case SESSION_RESUMED:
-		topic = config.TOPIC_SESSION_RESUMED
+		topic = topics_backend.TOPIC_SESSION_RESUMED
 	default:
 		fmt.Printf("unknown event type in publishToBroker: %v\n", e)
 		return
@@ -79,7 +79,7 @@ func (sm *SessionManager) publishToBroker(e *SessionEvent) {
 }
 
 func (sm *SessionManager) subscribeToBrokerTopics() {
-	mqtt.Subscribe(config.TOPIC_SESSION_BEGIN, func(topic string, payload []byte) {
+	mqtt.Subscribe(topics_backend.TOPIC_SESSION_BEGIN, func(topic string, payload []byte) {
 		var production bool
 		if string(payload) == "PRODUCTION" {
 			production = true
@@ -90,21 +90,21 @@ func (sm *SessionManager) subscribeToBrokerTopics() {
 		}
 	})
 
-	mqtt.Subscribe(config.TOPIC_SESSION_END, func(topic string, payload []byte) {
+	mqtt.Subscribe(topics_backend.TOPIC_SESSION_END, func(topic string, payload []byte) {
 		_, err := sm.EndSession()
 		if err != nil {
 			fmt.Printf("cannot end session: %v\n", err)
 		}
 	})
 
-	mqtt.Subscribe(config.TOPIC_SESSION_PAUSE, func(topic string, payload []byte) {
+	mqtt.Subscribe(topics_backend.TOPIC_SESSION_PAUSE, func(topic string, payload []byte) {
 		_, err := sm.PauseSession()
 		if err != nil {
 			fmt.Printf("cannot pause session: %v\n", err)
 		}
 	})
 
-	mqtt.Subscribe(config.TOPIC_SESSION_RESUME, func(topic string, payload []byte) {
+	mqtt.Subscribe(topics_backend.TOPIC_SESSION_RESUME, func(topic string, payload []byte) {
 		_, err := sm.ResumeSession()
 		if err != nil {
 			fmt.Printf("cannot resume session: %v\n", err)

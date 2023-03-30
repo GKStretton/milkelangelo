@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import MqttContext from '../util/mqttContext'
-import { TOPIC_GOTO_XY } from '../util/topics';
+import { TOPIC_GOTO_XY } from '../topics_firmware/topics_firmware';
 import VideoPlayer from './VideoPlayer';
 
 const TopCamPlayer = () => {

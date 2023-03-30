@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/gkstretton/dark/services/goo/config"
+	"github.com/gkstretton/asol-protos/go/topics_backend"
+	"github.com/gkstretton/asol-protos/go/topics_firmware"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 )
@@ -94,7 +95,7 @@ func (sm *SessionManager) BeginSession(production bool) (*Session, error) {
 	fmt.Printf("Began session %d\n", session.Id)
 
 	fmt.Printf("Closing blind...\n")
-	err = mqtt.Publish(config.TOPIC_CLOSE_BLIND, "")
+	err = mqtt.Publish(topics_backend.TOPIC_CLOSE_BLIND, "")
 	if err != nil {
 		fmt.Printf("error publishing close blind: %v\n", err)
 	}
@@ -187,7 +188,7 @@ func (sm *SessionManager) EndSession() (*Session, error) {
 	fmt.Printf("Ended session %d\n", latest.Id)
 
 	fmt.Printf("Opening blind...\n")
-	err = mqtt.Publish(config.TOPIC_OPEN_BLIND, "")
+	err = mqtt.Publish(topics_backend.TOPIC_OPEN_BLIND, "")
 	if err != nil {
 		fmt.Printf("error publishing open blind: %v\n", err)
 	}
@@ -220,7 +221,7 @@ func (sm *SessionManager) clearLatestCache() {
 }
 
 func requestStateReport() {
-	err := mqtt.Publish(config.TOPIC_STATE_REPORT_REQUEST, "")
+	err := mqtt.Publish(topics_firmware.TOPIC_STATE_REPORT_REQUEST, "")
 	if err != nil {
 		fmt.Printf("failed to request state report from firmware: %v\n", err)
 	}

@@ -8,7 +8,8 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
-	"github.com/gkstretton/dark/services/goo/config"
+	"github.com/gkstretton/asol-protos/go/topics_backend"
+	"github.com/gkstretton/asol-protos/go/topics_firmware"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
@@ -21,7 +22,7 @@ var subs = []chan *machinepb.StateReport{}
 var lock sync.Mutex
 
 func Run(sm *session.SessionManager) {
-	mqtt.Subscribe(config.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
+	mqtt.Subscribe(topics_firmware.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
 		t := time.Now().UnixMicro()
 
 		sr := &machinepb.StateReport{}
@@ -80,7 +81,7 @@ func publishStateReport(sr *machinepb.StateReport) {
 		fmt.Printf("error marshalling state report: %v\n", err)
 		return
 	}
-	err = mqtt.Publish(config.TOPIC_STATE_REPORT_JSON, string(b))
+	err = mqtt.Publish(topics_backend.TOPIC_STATE_REPORT_JSON, string(b))
 	if err != nil {
 		fmt.Printf("error publishing json state report: %v\n", err)
 		return

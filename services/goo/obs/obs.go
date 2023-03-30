@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/andreykaipov/goobs"
-	"github.com/gkstretton/dark/services/goo/config"
+	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gorilla/websocket"
@@ -26,8 +26,8 @@ func Run(s *session.SessionManager) {
 	go sessionListener(s)
 	go connectionListener(s)
 
-	mqtt.Subscribe(config.TOPIC_STREAM_START, startStream)
-	mqtt.Subscribe(config.TOPIC_STREAM_END, endStream)
+	mqtt.Subscribe(topics_backend.TOPIC_STREAM_START, startStream)
+	mqtt.Subscribe(topics_backend.TOPIC_STREAM_END, endStream)
 }
 
 func connectionListener(sm *session.SessionManager) {

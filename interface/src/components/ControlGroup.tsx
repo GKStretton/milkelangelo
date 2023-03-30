@@ -1,5 +1,7 @@
 import { useState, useContext } from 'react';
-import { SLEEP_TOPIC, TOPIC_STATE_REPORT_JSON, WAKE_TOPIC, SET_VALVE_TOPIC, SHUTDOWN_TOPIC, COLLECT_TOPIC, DISPENSE_TOPIC, FLUID_REQ_TOPIC, VALVE_DRAIN, VALVE_WATER, VALVE_MILK, VALVE_AIR } from '../util/topics'
+import { TOPIC_SHUTDOWN, TOPIC_SLEEP, TOPIC_WAKE, TOPIC_SET_VALVE, TOPIC_DISPENSE, TOPIC_FLUID, TOPIC_COLLECT } from '../topics_firmware/topics_firmware';
+import { TOPIC_STATE_REPORT_JSON } from '../topics_backend/topics_backend';
+import { SolenoidValve } from '../machinepb/machine_pb';
 import MqttContext from '../util/mqttContext'
 import { ButtonGroup, Button, Typography, Slider, Box } from '@mui/material';
 
@@ -36,10 +38,10 @@ export default function ControlGroup() {
     ];
 
     const valves = [
-        { id: VALVE_DRAIN, name: "DRAIN" },
-        { id: VALVE_WATER, name: "WATER" },
-        { id: VALVE_MILK, name: "MILK" },
-        { id: VALVE_AIR, name: "AIR" }
+        { id: SolenoidValve.VALVE_DRAIN, name: "DRAIN" },
+        { id: SolenoidValve.VALVE_WATER, name: "WATER" },
+        { id: SolenoidValve.VALVE_MILK, name: "MILK" },
+        { id: SolenoidValve.VALVE_AIR, name: "AIR" }
     ];
 
     return (
@@ -53,9 +55,9 @@ export default function ControlGroup() {
         >
             <Typography variant="h6">Basic</Typography>
             <ButtonGroup variant="outlined" aria-label="outlined button group" sx={{margin: 2}}>
-                <Button variant="contained" disabled={isAwake} onClick={() => c?.publish(WAKE_TOPIC, "")}>Wake</Button>
-                <Button disabled={!isAwake} onClick={() => c?.publish(SHUTDOWN_TOPIC, "")}>Shutdown</Button>
-                <Button disabled={!isAwake} variant="contained" color="error" onClick={() => c?.publish(SLEEP_TOPIC, "")}>Kill</Button>
+                <Button variant="contained" disabled={isAwake} onClick={() => c?.publish(TOPIC_WAKE, "")}>Wake</Button>
+                <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_SHUTDOWN, "")}>Shutdown</Button>
+                <Button disabled={!isAwake} variant="contained" color="error" onClick={() => c?.publish(TOPIC_SLEEP, "")}>Kill</Button>
             </ButtonGroup>
             <Typography variant="h6">Collection</Typography>
             <Slider
@@ -76,7 +78,7 @@ export default function ControlGroup() {
                         key={vial}
                         disabled={!isAwake || collecting}
                         variant={collectingVial === vial ? "contained": "outlined"}
-                        onClick={() => c?.publish(COLLECT_TOPIC, `${vial.toString()},${collectionVolume}`)}
+                        onClick={() => c?.publish(TOPIC_COLLECT, `${vial.toString()},${collectionVolume}`)}
                     >
                         {vial}
                     </Button>
@@ -95,7 +97,7 @@ export default function ControlGroup() {
                 aria-label="Dispense volume"
                 sx={{margin: 4, width: "50%"}}
             />
-            <Button disabled={!isAwake || collecting} onClick={() => c?.publish(DISPENSE_TOPIC, dispenseVolume.toString())} sx={{"margin": 2}}>Dispense</Button>
+            <Button disabled={!isAwake || collecting} onClick={() => c?.publish(TOPIC_DISPENSE, dispenseVolume.toString())} sx={{"margin": 2}}>Dispense</Button>
             <Typography variant="h6">Bulk Fluid</Typography>
             <Slider
                 value={bulkFluidRequestVolume}
@@ -114,7 +116,7 @@ export default function ControlGroup() {
                     <Button
                         key={request.id}
                         disabled={!isAwake}
-                        onClick={() => c?.publish(FLUID_REQ_TOPIC, `${request.fluid_type},${bulkFluidRequestVolume},${request.open_drain}`)}
+                        onClick={() => c?.publish(TOPIC_FLUID, `${request.fluid_type},${bulkFluidRequestVolume},${request.open_drain}`)}
                     >
                         {request.name}
                     </Button>
@@ -124,8 +126,8 @@ export default function ControlGroup() {
             <Box display="flex" flexDirection="row" alignItems="center" justifyContent="center" sx={{margin: 2}}>
                 {valves.map(valve => (
                     <ButtonGroup key={valve.id} sx={{margin:1}}>
-                        <Button disabled={!isAwake} onClick={() => c?.publish(SET_VALVE_TOPIC, `${valve.id},true`)}>{valve.name} (O)</Button>
-                        <Button disabled={!isAwake} onClick={() => c?.publish(SET_VALVE_TOPIC, `${valve.id},false`)}>{valve.name} (C)</Button>
+                        <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_SET_VALVE, `${valve.id},true`)}>{valve.name} (O)</Button>
+                        <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_SET_VALVE, `${valve.id},false`)}>{valve.name} (C)</Button>
                     </ButtonGroup>
                 ))}
             </Box>

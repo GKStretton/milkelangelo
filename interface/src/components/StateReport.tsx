@@ -1,6 +1,7 @@
 import {useEffect, useContext } from 'react'
 import './StateReport.css'
-import { TOPIC_STATE_REPORT_JSON, TOPIC_STATE_REPORT_REQUEST } from '../util/topics'
+import { TOPIC_STATE_REPORT_JSON } from '../topics_backend/topics_backend'
+import { TOPIC_STATE_REPORT_REQUEST } from '../topics_firmware/topics_firmware'
 import MqttContext from '../util/mqttContext'
 import { Grid, Button } from '@mui/material'
 

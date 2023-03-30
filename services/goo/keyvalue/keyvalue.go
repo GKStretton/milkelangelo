@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 )
 
-const TOPIC_ROOT = "asol/kv/"
-const TOPIC_SET = TOPIC_ROOT + "set/"
-const TOPIC_SET_RESP = TOPIC_ROOT + "set-resp/"
-const TOPIC_GET = TOPIC_ROOT + "get/"
-const TOPIC_GET_RESP = TOPIC_ROOT + "get-resp/"
+const TOPIC_SET = topics_backend.TOPIC_KV_SET
+const TOPIC_SET_RESP = topics_backend.TOPIC_KV_SET_RESP
+const TOPIC_GET = topics_backend.TOPIC_KV_GET
+const TOPIC_GET_RESP = topics_backend.TOPIC_KV_GET_RESP
 
 var (
 	lock = &sync.Mutex{}

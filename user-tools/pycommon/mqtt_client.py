@@ -1,36 +1,11 @@
 import paho.mqtt.client as mqtt
 from pycommon.const import HOST
+import topics_backend.topics_backend as tb
+import topics_firmware.topics_firmware as tf
 import yaml
 
 CLIENT_ID="py-interfaces"
 DEBUG = False
-
-GOTO_NODE_TOPIC = "mega/req/goto-node"
-GOTO_TOPIC = "mega/req/goto-xy"
-GOTO_RESP_TOPIC = "mega/resp/goto-xy"
-DISPENSE_TOPIC = "mega/req/dispense"
-DISPENSE_RESP_TOPIC = "mega/resp/dispense"
-COLLECT_TOPIC = "mega/req/collect"
-SLEEP_TOPIC = "mega/req/sleep"
-SHUTDOWN_TOPIC = "mega/req/shutdown"
-WAKE_TOPIC = "mega/req/wake"
-UNCALIBRATE_TOPIC = "mega/req/uncalibrate"
-OPEN_DRAIN_TOPIC = "mega/req/open-drain"
-CLOSE_DRAIN_TOPIC = "mega/req/close-drain"
-TOGGLE_MANUAL = "mega/req/manual"
-
-BEGIN_SESSION = "asol/session/begin"
-END_SESSION = "asol/session/end"
-PAUSE_SESSION = "asol/session/pause"
-RESUME_SESSION = "asol/session/resume"
-
-START_STREAM = "asol/stream/begin"
-END_STREAM = "asol/stream/end"
-
-FLUID_REQ_TOPIC = "mega/req/fluid"
-FLUID_DRAIN = 1
-FLUID_WATER = 2
-FLUID_MILK = 3
 
 # mqtt client
 client = None
@@ -70,7 +45,7 @@ def goto_xy(x, y):
     pl = "{:.3f},{:.3f}".format(x, y)
 
     debug("writing goto_xy payload '{}'".format(pl))
-    pub(GOTO_TOPIC, pl)
+    pub(tf.TOPIC_GOTO_XY, pl)
 
     debug("wrote goto_xy payload.")# Listening for response...")
     #! commented out because there's no timeout supported, so it hangs if
@@ -81,7 +56,7 @@ def goto_xy(x, y):
 def dispense(ul):
     pl = "{:.1f}".format(ul)
     debug("writing dispense payload '{}'".format(pl))
-    pub(DISPENSE_TOPIC, pl)
+    pub(tf.TOPIC_DISPENSE, pl)
 
     debug("wrote dispense payload")#. Listening for response...")
     # resp = sub(DISPENSE_RESP_TOPIC)
@@ -90,55 +65,49 @@ def dispense(ul):
 def collect(pos, ul):
     debug("writing collect payload '{}'".format(pos))
     pl = f"{pos},{ul:.1f}"
-    pub(COLLECT_TOPIC, pl)
+    pub(tf.TOPIC_COLLECT, pl)
 
     debug("wrote collect payload")
 
 def sleep():
-    pub(SLEEP_TOPIC, "")
+    pub(tf.TOPIC_SLEEP, "")
 
 def shutdown():
-    pub(SHUTDOWN_TOPIC, "")
+    pub(tf.TOPIC_SHUTDOWN, "")
 
 def wake():
-    pub(WAKE_TOPIC, "")
+    pub(tf.TOPIC_WAKE, "")
 
 def uncalibrate():
-    pub(UNCALIBRATE_TOPIC, "")
+    pub(tf.TOPIC_UNCALIBRATE, "")
 
-def set_drain(b: bool):
-    if b:
-        pub(OPEN_DRAIN_TOPIC, "")
-    else:
-        pub(CLOSE_DRAIN_TOPIC, "")
-    
 def goto_node(node):
-    pub(GOTO_NODE_TOPIC, node)
+    pub(tf.TOPIC_GOTO_NODE, node)
 
 def toggle_manual():
-    pub(TOGGLE_MANUAL, "")
+    pub(tf.TOPIC_TOGGLE_MANUAL, "")
 
 def begin_session(production: bool = False):
     pl = ""
     if production:
         pl = "PRODUCTION"
-    pub(BEGIN_SESSION, pl)
+    pub(tb.TOPIC_SESSION_BEGIN, pl)
 
 def end_session():
-    pub(END_SESSION, "")
+    pub(tb.TOPIC_SESSION_END, "")
 
 def pause_session():
-    pub(PAUSE_SESSION, "")
+    pub(tb.TOPIC_SESSION_PAUSE, "")
 
 def resume_session():
-    pub(RESUME_SESSION, "")
+    pub(tb.TOPIC_SESSION_RESUME, "")
 
 def fluid_req(req_type, ml, open_drain=False):
     msg = f"{req_type},{ml:.2f},{open_drain}"
-    pub(FLUID_REQ_TOPIC, msg)
+    pub(tf.TOPIC_FLUID, msg)
 
 def start_stream():
-    pub(START_STREAM, "")
+    pub(tb.TOPIC_STREAM_START, "")
 
 def end_stream():
-    pub(END_STREAM, "")
+    pub(tb.TOPIC_STREAM_END, "")
