@@ -43,7 +43,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, rende
 
 
   return (
-    <Box display="flex" flexDirection="column" alignItems="flex-start">
+    <Box display="flex" flexDirection="column" alignItems="center">
       <div style={{ position: 'relative' }}>
         <video
           id={name}

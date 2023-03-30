@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { TOPIC_SHUTDOWN, TOPIC_SLEEP, TOPIC_WAKE, TOPIC_SET_VALVE, TOPIC_DISPENSE, TOPIC_FLUID, TOPIC_COLLECT } from '../topics_firmware/topics_firmware';
-import { TOPIC_STATE_REPORT_JSON } from '../topics_backend/topics_backend';
+import { TOPIC_SESSION_BEGIN, TOPIC_SESSION_END, TOPIC_SESSION_PAUSE, TOPIC_SESSION_RESUME, TOPIC_STATE_REPORT_JSON, TOPIC_STREAM_END, TOPIC_STREAM_START } from '../topics_backend/topics_backend';
 import { SolenoidValve } from '../machinepb/machine_pb';
 import MqttContext from '../util/mqttContext'
 import { ButtonGroup, Button, Typography, Slider, Box } from '@mui/material';
@@ -131,6 +131,18 @@ export default function ControlGroup() {
                     </ButtonGroup>
                 ))}
             </Box>
+
+            <Typography variant="h6">Stream / Session</Typography>
+            <ButtonGroup variant="outlined" aria-label="outlined button group" sx={{margin: 2}}>
+                <Button onClick={() => c?.publish(TOPIC_STREAM_START, "")}>Start Stream</Button>
+                <Button onClick={() => c?.publish(TOPIC_STREAM_END, "")}>End Stream</Button>
+            </ButtonGroup>
+            <ButtonGroup variant="outlined" aria-label="outlined button group" sx={{margin: 2}}>
+                <Button onClick={() => c?.publish(TOPIC_SESSION_BEGIN, "")}>Begin Session</Button>
+                <Button onClick={() => c?.publish(TOPIC_SESSION_RESUME, "")}>Resume Session</Button>
+                <Button onClick={() => c?.publish(TOPIC_SESSION_PAUSE, "")}>Pause Session</Button>
+                <Button onClick={() => c?.publish(TOPIC_SESSION_END, "")}>End Session</Button>
+            </ButtonGroup>
         </Box>
         </>
     )

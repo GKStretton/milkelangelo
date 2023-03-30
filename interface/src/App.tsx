@@ -25,13 +25,13 @@ function App() {
           direction="row"
           spacing={2}
           justifyContent="center"
-          alignContent="center"
+          alignItems="center"
           padding={2}
         >
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} justifyContent="center" alignItems="center">
             <TopCamPlayer/>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} justifyContent="center" alignItems="center">
             <VideoPlayer url="DEPTH:8889/front-cam-crop/" name="front"/>
           </Grid>
         </Grid>
