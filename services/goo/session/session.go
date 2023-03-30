@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
@@ -94,12 +93,6 @@ func (sm *SessionManager) BeginSession(production bool) (*Session, error) {
 	requestStateReport()
 	fmt.Printf("Began session %d\n", session.Id)
 
-	fmt.Printf("Closing blind...\n")
-	err = mqtt.Publish(topics_backend.TOPIC_CLOSE_BLIND, "")
-	if err != nil {
-		fmt.Printf("error publishing close blind: %v\n", err)
-	}
-
 	return session, nil
 }
 
@@ -186,12 +179,6 @@ func (sm *SessionManager) EndSession() (*Session, error) {
 		Type:      SESSION_ENDED,
 	}
 	fmt.Printf("Ended session %d\n", latest.Id)
-
-	fmt.Printf("Opening blind...\n")
-	err = mqtt.Publish(topics_backend.TOPIC_OPEN_BLIND, "")
-	if err != nil {
-		fmt.Printf("error publishing open blind: %v\n", err)
-	}
 
 	return latest, nil
 }

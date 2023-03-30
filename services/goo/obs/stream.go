@@ -11,6 +11,7 @@ func startStream(topic string, payload []byte) {
 		fmt.Println("obs client is nil")
 		return
 	}
+
 	handleSessionEvent(sm)
 	setCropConfig()
 
@@ -20,6 +21,8 @@ func startStream(topic string, payload []byte) {
 		return
 	}
 	fmt.Printf("sent start streaming request\n")
+
+	onStreamStart()
 }
 
 func endStream(topic string, payload []byte) {
@@ -27,10 +30,12 @@ func endStream(topic string, payload []byte) {
 		fmt.Println("obs client is nil")
 		return
 	}
+
 	_, err := c.Stream.StopStream()
 	if err != nil {
 		fmt.Printf("failed to stop streaming: %v\n", err)
 		return
 	}
 	fmt.Printf("sent stop streaming request\n")
+	onStreamEnd()
 }
