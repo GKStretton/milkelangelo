@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { TOPIC_SET_IK_Z, TOPIC_STATE_REPORT_JSON, TOPIC_STATE_REPORT_REQUEST } from '../util/topics'
+import { TOPIC_STATE_REPORT_JSON } from '../topics_backend/topics_backend';
+import { TOPIC_SET_IK_Z } from '../topics_firmware/topics_firmware';
 import MqttContext from '../util/mqttContext'
 import { Grid, ButtonGroup, Button } from '@mui/material';
 

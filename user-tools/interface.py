@@ -6,6 +6,7 @@ from pycommon.config_manager_client import read_remote_crop_config
 import pycommon.image as image
 import numpy as np
 import pycommon.mqtt_client as mc
+import machinepb.machine as pb
 
 TOP_MASK = "resources/static_img/top-mask.png"
 # how many microlitres to dispense at a time
@@ -182,12 +183,6 @@ class Interface(Window):
 		if key == ord('u'):
 			print("uncalibrating")
 			mc.uncalibrate()
-		if key == ord('d'):
-			print("open drain...")
-			mc.set_drain(True)
-		if key == ord('p'):
-			print("close drain...")
-			mc.set_drain(False)
 		if key == ord('n'):
 			node = input("goto-node. Specify node number (see firmware for enum): ")
 			mc.goto_node(node)
@@ -202,22 +197,22 @@ class Interface(Window):
 			mc.begin_session(production=True)
 		if key == ord('e'):
 			print("Ending session")
-			mc.pub(mc.END_SESSION, "")
+			mc.end_session()
 		if key == ord('z'):
 			print("Pausing session")
-			mc.pub(mc.PAUSE_SESSION, "")
+			mc.pause_session()
 		if key == ord(','):
 			print("Resuming session")
-			mc.pub(mc.RESUME_SESSION, "")
+			mc.resume_session()
 		if key == ord('v'):
 			print("sending fluid req: drain")
-			mc.fluid_req(mc.FLUID_DRAIN, FLUID_ML)
+			mc.fluid_req(pb.FluidType.FLUID_DRAIN, FLUID_ML)
 		if key == ord('x'):
 			print("sending fluid req: water")
-			mc.fluid_req(mc.FLUID_WATER, FLUID_ML)
+			mc.fluid_req(pb.FluidType.FLUID_WATER, FLUID_ML)
 		if key == ord('y'):
 			print("sending fluid req: milk")
-			mc.fluid_req(mc.FLUID_MILK, FLUID_ML)
+			mc.fluid_req(pb.FluidType.FLUID_MILK, FLUID_ML)
 		if key == ord(';'):
 			print("toggling grid")
 			self.show_grid = not self.show_grid
