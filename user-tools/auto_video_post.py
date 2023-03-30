@@ -13,7 +13,7 @@ from videoediting.footage import FootageWrapper
 import videoediting.loaders as loaders
 from google.protobuf.json_format import ParseDict
 from google.protobuf.json_format import MessageToJson
-import pycommon.machine_pb2 as pb
+import machinepb.machine as pb
 import videoediting.section_properties as properties
 from videoediting.section_properties import SectionProperties
 import pycommon.util as util

@@ -19,6 +19,8 @@ github.com/gkstretton/asol-protos v0.0.8-0.20230330182545-caf12a8c3a90 h1:/HQAn5
 github.com/gkstretton/asol-protos v0.0.8-0.20230330182545-caf12a8c3a90/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/gkstretton/asol-protos v0.0.8-0.20230330184433-27fc6a975131 h1:MDyCrVDIODEb2dOatgpxHhbsYVmCb+5Ontu+6iddJMU=
 github.com/gkstretton/asol-protos v0.0.8-0.20230330184433-27fc6a975131/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230330185708-a65b19f1b1f0 h1:O4lPVAqjdSv3PdqXhCs2xi71Y3IpU52BbRNuGZAX+eY=
+github.com/gkstretton/asol-protos v0.0.8-0.20230330185708-a65b19f1b1f0/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=

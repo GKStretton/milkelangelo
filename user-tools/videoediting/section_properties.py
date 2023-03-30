@@ -1,5 +1,5 @@
 from videoediting.constants import *
-import pycommon.machine_pb2 as pb
+import machinepb.machine as pb
 
 @dataclass
 class SectionProperties:

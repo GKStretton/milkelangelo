@@ -10,7 +10,7 @@ import moviepy.video.fx.all as vfx
 
 from google.protobuf.json_format import ParseDict
 from google.protobuf.json_format import MessageToJson
-import pycommon.machine_pb2 as pb
+import machinepb.machine as pb
 import pycommon.util as util
 import pycommon.image as image
 

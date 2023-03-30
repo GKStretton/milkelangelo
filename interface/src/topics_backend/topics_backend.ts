@@ -16,3 +16,5 @@ export const TOPIC_SESSION_RESUMED: string = "asol/session/resumed";
 export const TOPIC_STATE_REPORT_JSON: string = "asol/state-report-json";
 export const TOPIC_STREAM_END: string = "asol/stream/end";
 export const TOPIC_STREAM_START: string = "asol/stream/begin";
+export const TOPIC_TRIGGER_DSLR: string = "asol/dslr-crop-capture";
+export const TOPIC_TRIGGER_DSLR_RESP: string = "asol/dslr-crop-capture-resp";
