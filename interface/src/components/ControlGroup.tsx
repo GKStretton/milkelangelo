@@ -139,6 +139,7 @@ export default function ControlGroup() {
             </ButtonGroup>
             <ButtonGroup variant="outlined" aria-label="outlined button group" sx={{margin: 2}}>
                 <Button onClick={() => c?.publish(TOPIC_SESSION_BEGIN, "")}>Begin Session</Button>
+                <Button variant="contained" onClick={() => c?.publish(TOPIC_SESSION_BEGIN, "PRODUCTION")}>Begin Prod. Session</Button>
                 <Button onClick={() => c?.publish(TOPIC_SESSION_RESUME, "")}>Resume Session</Button>
                 <Button onClick={() => c?.publish(TOPIC_SESSION_PAUSE, "")}>Pause Session</Button>
                 <Button onClick={() => c?.publish(TOPIC_SESSION_END, "")}>End Session</Button>
