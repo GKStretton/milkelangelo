@@ -49,10 +49,14 @@ func handleSessionStatus(status *machinepb.SessionStatus) {
 	defer mutex.Unlock()
 
 	if isRecording && (status.Complete || status.Paused) {
-		<-stopRecording
+		fmt.Printf("issuing stop recording\n")
+		stopRecording <- true
+		fmt.Printf("stop recording passed\n")
+		return
 	}
 
 	if !isRecording && !status.Complete && !status.Paused {
+		fmt.Printf("launching capture loop\n")
 		go captureLoop(status.Id)
 	}
 }
@@ -65,6 +69,7 @@ func captureLoop(sessionNumber uint64) {
 	for {
 		select {
 		case <-stopRecording:
+			fmt.Printf("stopping recording, returning\n")
 			return
 		case <-next:
 			captureSessionImage(sessionNumber)
@@ -77,4 +82,5 @@ func setIsRecording(b bool) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	isRecording = b
+	fmt.Printf("set recording to %t\n", b)
 }
