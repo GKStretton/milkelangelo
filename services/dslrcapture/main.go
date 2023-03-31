@@ -24,7 +24,7 @@ func main() {
 	mqtt.Start()
 
 	mqtt.Subscribe(topics_backend.TOPIC_SESSION_STATUS_RESP_RAW, func(topic string, payload []byte) {
-		var status *machinepb.SessionStatus
+		status := &machinepb.SessionStatus{}
 		err := proto.Unmarshal(payload, status)
 		if err != nil {
 			fmt.Printf("Error unmarshalling session status response: %v\n", err)
