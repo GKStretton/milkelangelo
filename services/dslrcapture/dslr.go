@@ -6,6 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/gkstretton/dark/services/goo/filesystem"
+	"github.com/gkstretton/dark/services/goo/livecapture"
 	"github.com/gkstretton/dark/services/goo/util"
 )
 
@@ -39,7 +40,7 @@ func captureSessionImage(sessionId uint64) {
 		return
 	}
 
-	err = saveCropConfig(CC_DSLR, p)
+	err = livecapture.SaveCropConfig(CC_DSLR, p)
 	if err != nil {
 		fmt.Println(err)
 		return

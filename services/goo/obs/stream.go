@@ -12,6 +12,8 @@ import (
 )
 
 func startStream(topic string, payload []byte) {
+	lock.Lock()
+	defer lock.Unlock()
 	if c == nil {
 		fmt.Println("obs client is nil")
 		return
@@ -31,6 +33,8 @@ func startStream(topic string, payload []byte) {
 }
 
 func endStream(topic string, payload []byte) {
+	lock.Lock()
+	defer lock.Unlock()
 	if c == nil {
 		fmt.Println("obs client is nil")
 		return
@@ -47,6 +51,8 @@ func endStream(topic string, payload []byte) {
 }
 
 func isStreamLive() bool {
+	lock.Lock()
+	defer lock.Unlock()
 	if c == nil {
 		fmt.Println("obs client is nil")
 		return false

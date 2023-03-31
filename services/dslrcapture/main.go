@@ -9,7 +9,7 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
-	"github.com/gkstretton/dark/services/dslrcapture/mqtt"
+	"github.com/gkstretton/dark/services/goo/mqtt"
 )
 
 var (

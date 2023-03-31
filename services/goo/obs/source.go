@@ -11,6 +11,8 @@ import (
 )
 
 func setSessionNumber(number int, production bool) {
+	lock.Lock()
+	defer lock.Unlock()
 	if c == nil {
 		fmt.Println("cannot set obs session number because client is nil")
 		return
@@ -33,6 +35,8 @@ func setSessionNumber(number int, production bool) {
 }
 
 func setCropConfig() {
+	lock.Lock()
+	defer lock.Unlock()
 	if c == nil {
 		fmt.Println("cannot set obs crop config because client is nil")
 		return

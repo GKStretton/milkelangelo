@@ -1,14 +1,6 @@
 package main
 
-import (
-	"fmt"
-	"os"
-	"time"
-
-	"github.com/gkstretton/asol-protos/go/topics_backend"
-	"github.com/gkstretton/dark/services/dslrcapture/mqtt"
-)
-
+/*
 func saveCropConfig(ccKey string, contentPath string) error {
 	// e.g. 1.mp4.yml
 	ymlPath := contentPath + ".yml"
@@ -27,3 +19,4 @@ func saveCropConfig(ccKey string, contentPath string) error {
 	}
 	return nil
 }
+*/

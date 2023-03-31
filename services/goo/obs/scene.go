@@ -14,6 +14,8 @@ const (
 )
 
 func setScene(sceneName string) error {
+	lock.Lock()
+	defer lock.Unlock()
 	if c == nil {
 		return fmt.Errorf("cannot set obs scene because client is nil")
 	}

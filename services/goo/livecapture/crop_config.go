@@ -7,8 +7,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 )
 
-
-func saveCropConfig(ccKey string, contentPath string) error {
+func SaveCropConfig(ccKey string, contentPath string) error {
 	// e.g. 1.mp4.yml
 	ymlPath := contentPath + ".yml"
 	config := keyvalue.Get(ccKey)

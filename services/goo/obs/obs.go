@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/andreykaipov/goobs"
@@ -15,6 +16,7 @@ import (
 )
 
 var c *goobs.Client
+var lock sync.Mutex
 
 const retryWaitS = 5
 
@@ -41,14 +43,23 @@ func connectionListener(sm *session.SessionManager) {
 	reconnect := make(chan bool)
 	for {
 		fmt.Printf("Attempting connection to OBS...\n")
+
+		lock.Lock()
 		c = nil
+		lock.Unlock()
+
 		var err error
-		c, err = goobs.New(os.Getenv("OBS_LANDSCAPE_URL"))
+		var newClient *goobs.Client
+		newClient, err = goobs.New(os.Getenv("OBS_LANDSCAPE_URL"))
 		for err != nil {
 			fmt.Printf("failed to create obs ws client, retrying in %d seconds: %v\n", retryWaitS, err)
 			time.Sleep(time.Second * time.Duration(retryWaitS))
-			c, err = goobs.New(os.Getenv("OBS_LANDSCAPE_URL"))
+			newClient, err = goobs.New(os.Getenv("OBS_LANDSCAPE_URL"))
 		}
+
+		lock.Lock()
+		c = newClient
+		lock.Unlock()
 
 		resp, err := c.General.GetVersion()
 		if err != nil {
