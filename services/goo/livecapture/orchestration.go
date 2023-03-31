@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	captureInterval = flag.Int("captureInterval", 60, "how many seconds between image captures")
+	captureInterval = flag.Int("captureInterval", 10, "how many seconds between image captures")
 	rec             *recorder
 )
 
