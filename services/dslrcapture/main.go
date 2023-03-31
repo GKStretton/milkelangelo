@@ -36,6 +36,7 @@ func main() {
 	// special handler for the crop config preview capture
 	registerDslrPreviewHandler()
 
+	time.Sleep(time.Second)
 	mqtt.Publish(topics_backend.TOPIC_SESSION_STATUS_GET, "")
 
 	for {
