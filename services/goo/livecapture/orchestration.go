@@ -1,7 +1,6 @@
 package livecapture
 
 import (
-	"flag"
 	"fmt"
 	"sync"
 
@@ -9,8 +8,7 @@ import (
 )
 
 var (
-	captureInterval = flag.Int("captureInterval", 10, "how many seconds between image captures")
-	rec             *recorder
+	rec *recorder
 )
 
 type recorder struct {
