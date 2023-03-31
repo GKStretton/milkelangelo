@@ -15,7 +15,7 @@ import (
 var (
 	isRecording     bool
 	stopRecording   chan bool
-	mutex           *sync.Mutex
+	mutex           sync.Mutex
 	captureInterval = flag.Int("captureInterval", 10, "The interval in seconds between captures")
 )
 
