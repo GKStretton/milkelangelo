@@ -33,7 +33,6 @@ services:
     restart: unless-stopped
     network_mode: host
     environment:
-      MOCK_DSLR: ${MOCK_DSLR:-false}
       OBS_LANDSCAPE_URL: ${OBS_LANDSCAPE_URL}
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
@@ -41,6 +40,19 @@ services:
       - ./user-tools:/src/user-tools
       - ./resources:/src/resources
     user: "1000:1000"
+  dslrcapture:
+    build: services/dslrcapture
+    command: -basePath ${LIGHT_STORES_DIR}
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      MOCK_DSLR: ${MOCK_DSLR:-false}
+      OBS_LANDSCAPE_URL: ${OBS_LANDSCAPE_URL}
+    volumes:
+      - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
+      - /dev:/dev
+      - ./user-tools:/src/user-tools
+      - ./resources:/src/resources
   restreamer:
     image: "datarhei/restreamer:latest"
     restart: unless-stopped

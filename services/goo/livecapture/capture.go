@@ -3,17 +3,12 @@ package livecapture
 import (
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/session"
 )
 
 func (r *recorder) record(id session.ID) {
-	// after testing, it seems that this isn't needed:
-	// setDslrState(true)
-	// defer setDslrState(false)
-
 	r.setIsRecording(true)
 	defer r.setIsRecording(false)
 
@@ -44,16 +39,5 @@ func (r *recorder) record(id session.ID) {
 		go frontRecording.Stop()
 	}()
 
-	// Regular image capture
-
-	next := time.After(0)
-	for {
-		select {
-		case <-next:
-			next = time.After(time.Second * time.Duration(*captureInterval))
-			captureSessionImage(uint64(id))
-		case <-r.stopRecording:
-			return
-		}
-	}
+	<-r.stopRecording
 }

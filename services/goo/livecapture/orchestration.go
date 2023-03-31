@@ -43,9 +43,6 @@ func (r *recorder) setIsRecording(b bool) {
 }
 
 func (r *recorder) run() {
-	// special handler for the crop config preview capture
-	registerDslrPreviewHandler()
-
 	r.evaluateAction()
 
 	// Listen for ongoing begin/end session events

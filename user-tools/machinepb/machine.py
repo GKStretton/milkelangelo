@@ -114,3 +114,17 @@ class StateReport(betterproto.Message):
 @dataclass
 class StateReportList(betterproto.Message):
     state_reports: List["StateReport"] = betterproto.message_field(1)
+
+
+@dataclass
+class SessionStatus(betterproto.Message):
+    id: int = betterproto.uint64_field(1)
+    paused: bool = betterproto.bool_field(2)
+    complete: bool = betterproto.bool_field(3)
+    production: bool = betterproto.bool_field(4)
+    production_id: int = betterproto.uint64_field(5)
+
+
+@dataclass
+class StreamStatus(betterproto.Message):
+    live: bool = betterproto.bool_field(1)

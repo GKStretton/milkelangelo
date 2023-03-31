@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/gkstretton/dark/services/goo/filesystem"
+	"github.com/gkstretton/dark/services/goo/mqtt"
 )
 
 func setKeyValue(key string, value []byte) error {
@@ -25,6 +27,13 @@ func setKeyValue(key string, value []byte) error {
 	if err != nil {
 		return fmt.Errorf("failed to write value to key %s at %s: %v", key, p, err)
 	}
+
+	go func() {
+		time.Sleep(respDelay)
+		mqtt.Publish(TOPIC_SET_RESP+key, []byte("ack"))
+		sendToSubs(key)
+	}()
+
 	return nil
 }
 

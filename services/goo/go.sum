@@ -23,6 +23,14 @@ github.com/gkstretton/asol-protos v0.0.8-0.20230330185708-a65b19f1b1f0 h1:O4lPVA
 github.com/gkstretton/asol-protos v0.0.8-0.20230330185708-a65b19f1b1f0/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/gkstretton/asol-protos v0.0.8-0.20230330194520-7eb33e43c0fa h1:1l/eY/AQekWcZd9vXhB7Pospl2nItoBotTHflOkG31o=
 github.com/gkstretton/asol-protos v0.0.8-0.20230330194520-7eb33e43c0fa/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230331061823-254a23357925 h1:rwWAIQ7dv4XOEJiKLKAUHrR3pqUQSkq6jsCy3hJNt7c=
+github.com/gkstretton/asol-protos v0.0.8-0.20230331061823-254a23357925/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230331182515-70d92325b95a h1:BMdw7l2ABSHFP4/ouliPnAODudGU5omRF2pQ9LaCcKo=
+github.com/gkstretton/asol-protos v0.0.8-0.20230331182515-70d92325b95a/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230331184945-1aef9dc65dd5 h1:2GSzA1D+IG9AcOMTWjBlVar+ikh4amjyj1ur6sdrllM=
+github.com/gkstretton/asol-protos v0.0.8-0.20230331184945-1aef9dc65dd5/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230331185456-7163a6e915d4 h1:FET0zOtFjbq1JuRcY7P7Mn50qe1HBoWzpWw0NRuLhjs=
+github.com/gkstretton/asol-protos v0.0.8-0.20230331185456-7163a6e915d4/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=

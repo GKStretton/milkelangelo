@@ -1,4 +1,4 @@
-package livecapture
+package main
 
 import (
 	"fmt"

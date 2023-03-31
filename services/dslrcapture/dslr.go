@@ -1,14 +1,16 @@
-package livecapture
+package main
 
 import (
 	"fmt"
 	"os"
 	"os/exec"
 
-	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/util"
 )
+
+// key name for dslr crop config
+const CC_DSLR = "crop_dslr"
 
 // After testing it seems like this isn't necessary
 func setDslrState(b bool) {
@@ -37,7 +39,7 @@ func captureSessionImage(sessionId uint64) {
 		return
 	}
 
-	err = saveCropConfig(config.CC_DSLR, p)
+	err = saveCropConfig(CC_DSLR, p)
 	if err != nil {
 		fmt.Println(err)
 		return

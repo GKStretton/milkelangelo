@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
@@ -17,6 +18,16 @@ type Session struct {
 	Complete     bool `yaml:"complete"`
 	Production   bool `yaml:"production"`
 	ProductionId ID   `yaml:"production_id"`
+}
+
+func (s *Session) ToProto() *machinepb.SessionStatus {
+	return &machinepb.SessionStatus{
+		Id:           uint64(s.Id),
+		Paused:       s.Paused,
+		Complete:     s.Complete,
+		Production:   s.Production,
+		ProductionId: uint64(s.ProductionId),
+	}
 }
 
 type SessionMatcher struct {

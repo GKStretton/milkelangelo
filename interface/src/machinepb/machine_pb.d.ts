@@ -243,6 +243,62 @@ export namespace StateReportList {
   }
 }
 
+export class SessionStatus extends jspb.Message {
+  getId(): number;
+  setId(value: number): void;
+
+  getPaused(): boolean;
+  setPaused(value: boolean): void;
+
+  getComplete(): boolean;
+  setComplete(value: boolean): void;
+
+  getProduction(): boolean;
+  setProduction(value: boolean): void;
+
+  getProductionId(): number;
+  setProductionId(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SessionStatus.AsObject;
+  static toObject(includeInstance: boolean, msg: SessionStatus): SessionStatus.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: SessionStatus, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SessionStatus;
+  static deserializeBinaryFromReader(message: SessionStatus, reader: jspb.BinaryReader): SessionStatus;
+}
+
+export namespace SessionStatus {
+  export type AsObject = {
+    id: number,
+    paused: boolean,
+    complete: boolean,
+    production: boolean,
+    productionId: number,
+  }
+}
+
+export class StreamStatus extends jspb.Message {
+  getLive(): boolean;
+  setLive(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): StreamStatus.AsObject;
+  static toObject(includeInstance: boolean, msg: StreamStatus): StreamStatus.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: StreamStatus, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): StreamStatus;
+  static deserializeBinaryFromReader(message: StreamStatus, reader: jspb.BinaryReader): StreamStatus;
+}
+
+export namespace StreamStatus {
+  export type AsObject = {
+    live: boolean,
+  }
+}
+
 export interface SolenoidValveMap {
   VALVE_UNDEFINED: 0;
   VALVE_DRAIN: 1;

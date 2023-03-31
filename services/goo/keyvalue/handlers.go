@@ -15,12 +15,7 @@ func setCallback(topic string, payload []byte) {
 	err := setKeyValue(key, payload)
 	if err != nil {
 		fmt.Printf("failed to set key %s to %v: %v\n", key, payload, err)
-	} else {
-		go func() {
-			time.Sleep(respDelay)
-			mqtt.Publish(TOPIC_SET_RESP+key, []byte("ack"))
-			sendToSubs(key)
-		}()
+		return
 	}
 }
 

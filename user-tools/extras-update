@@ -19,5 +19,8 @@ cp -r $PROTOS_REPO_DIR/typescript/* ./interface/src/
 
 # GO
 cd $CURRENT_DIR/services/goo
-./update-protos.sh
+go get -u github.com/gkstretton/asol-protos@main
+
+cd $CURRENT_DIR/services/dslrcapture
+go get -u github.com/gkstretton/asol-protos@main
 

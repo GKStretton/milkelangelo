@@ -1,4 +1,6 @@
 
+export const PAYLOAD_SMART_SWITCH_OFF: string = "OFF";
+export const PAYLOAD_SMART_SWITCH_ON: string = "ON";
 export const TOPIC_CLOSE_BLIND: string = "asol/close_bedroom_blind";
 export const TOPIC_KV_GET: string = "asol/kv/get/";
 export const TOPIC_KV_GET_RESP: string = "asol/kv/get-resp/";
@@ -15,8 +17,15 @@ export const TOPIC_SESSION_PAUSE: string = "asol/session/pause";
 export const TOPIC_SESSION_PAUSED: string = "asol/session/paused";
 export const TOPIC_SESSION_RESUME: string = "asol/session/resume";
 export const TOPIC_SESSION_RESUMED: string = "asol/session/resumed";
+export const TOPIC_SESSION_STATUS_GET: string = "asol/session/status-get";
+export const TOPIC_SESSION_STATUS_RESP_JSON: string = "asol/session/status-resp-json";
+export const TOPIC_SESSION_STATUS_RESP_RAW: string = "asol/session/status-resp-raw";
+export const TOPIC_SMART_SWITCH: string = "cmnd/tasmota_sw1/Power1";
 export const TOPIC_STATE_REPORT_JSON: string = "asol/state-report-json";
 export const TOPIC_STREAM_END: string = "asol/stream/end";
 export const TOPIC_STREAM_START: string = "asol/stream/begin";
+export const TOPIC_STREAM_STATUS_GET: string = "asol/stream/status-get";
+export const TOPIC_STREAM_STATUS_RESP_JSON: string = "asol/stream/status-resp-json";
+export const TOPIC_STREAM_STATUS_RESP_RAW: string = "asol/stream/status-resp-raw";
 export const TOPIC_TRIGGER_DSLR: string = "asol/dslr-crop-capture";
 export const TOPIC_TRIGGER_DSLR_RESP: string = "asol/dslr-crop-capture-resp";

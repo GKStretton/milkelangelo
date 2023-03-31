@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/andreykaipov/goobs"
+	"github.com/andreykaipov/goobs/api/events"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
@@ -28,6 +29,12 @@ func Run(s *session.SessionManager) {
 
 	mqtt.Subscribe(topics_backend.TOPIC_STREAM_START, startStream)
 	mqtt.Subscribe(topics_backend.TOPIC_STREAM_END, endStream)
+
+	mqtt.Subscribe(topics_backend.TOPIC_STREAM_STATUS_GET, func(topic string, payload []byte) {
+		publishStreamStatus()
+	})
+
+	publishStreamStatus()
 }
 
 func connectionListener(sm *session.SessionManager) {
@@ -60,10 +67,16 @@ func connectionListener(sm *session.SessionManager) {
 				wsErr, ok := innerErr.(*websocket.CloseError)
 				if ok {
 					fmt.Printf("websocket closed: %v\n", wsErr)
+					publishStreamStatus()
 					reconnect <- true
 				} else {
 					fmt.Printf("misc obs error: %v\n", innerErr)
+					publishStreamStatus()
 				}
+			}
+			_, ok = i.(*events.StreamStateChanged)
+			if ok {
+				publishStreamStatus()
 			}
 		})
 

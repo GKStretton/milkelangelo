@@ -44,6 +44,12 @@ func TestEventListener(t *testing.T) {
 	t.Log("test")
 }
 
+func TestGetStreamStatus(t *testing.T) {
+	initTestClient(t)
+
+	fmt.Println(isStreamLive())
+}
+
 func TestSetScene(t *testing.T) {
 	initTestClient(t)
 

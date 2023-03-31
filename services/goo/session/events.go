@@ -6,6 +6,8 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/dark/services/goo/mqtt"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
 )
 
 var eventLock sync.Mutex
@@ -76,6 +78,37 @@ func (sm *SessionManager) publishToBroker(e *SessionEvent) {
 	if err != nil {
 		fmt.Printf("error publishing session event: %v\n", err)
 	}
+
+	sm.publishSessionStatus()
+}
+
+func (sm *SessionManager) publishSessionStatus() {
+	session, _ := sm.GetLatestSession()
+	s := session.ToProto()
+
+	// protobuf
+	b, err := proto.Marshal(s)
+	if err != nil {
+		fmt.Printf("error marshalling session status as protobuf: %v\n", err)
+	}
+	if err = mqtt.Publish(topics_backend.TOPIC_SESSION_STATUS_RESP_RAW, b); err != nil {
+		fmt.Printf("error publishing session status: %v\n", err)
+	}
+
+	// json
+	m := protojson.MarshalOptions{
+		Multiline:       true,
+		UseProtoNames:   true,
+		Indent:          "\t",
+		EmitUnpopulated: true,
+	}
+	j, err := m.Marshal(s)
+	if err != nil {
+		fmt.Printf("error marshalling session status to json: %v\n", err)
+	}
+	if err = mqtt.Publish(topics_backend.TOPIC_SESSION_STATUS_RESP_JSON, j); err != nil {
+		fmt.Printf("error publishing session status: %v\n", err)
+	}
 }
 
 func (sm *SessionManager) subscribeToBrokerTopics() {
@@ -109,5 +142,9 @@ func (sm *SessionManager) subscribeToBrokerTopics() {
 		if err != nil {
 			fmt.Printf("cannot resume session: %v\n", err)
 		}
+	})
+
+	mqtt.Subscribe(topics_backend.TOPIC_SESSION_STATUS_GET, func(topic string, payload []byte) {
+		sm.publishSessionStatus()
 	})
 }
