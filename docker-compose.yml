@@ -44,6 +44,7 @@ services:
     build: services/dslrcapture
     command: -basePath ${LIGHT_STORES_DIR}
     restart: unless-stopped
+    privileged: true
     network_mode: host
     environment:
       MOCK_DSLR: ${MOCK_DSLR:-false}
