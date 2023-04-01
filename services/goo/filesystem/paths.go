@@ -48,6 +48,7 @@ func GetMetadataDir() string {
 	if err != nil {
 		panic(fmt.Errorf("failed to create metadata path: %v", err))
 	}
+	SetPerms(p)
 	return p
 }
 
@@ -61,6 +62,7 @@ func GetStateReportPath(sessionId uint64) string {
 	if err != nil {
 		panic(fmt.Errorf("failed to create state report path: %v", err))
 	}
+	SetPerms(p)
 	return filepath.Join(p, *stateReportFileName)
 }
 
@@ -79,6 +81,7 @@ func GetRawVideoDir(sessionId uint64, rtspPath string) string {
 	if err != nil {
 		panic(fmt.Errorf("failed to create raw video path: %v", err))
 	}
+	SetPerms(p)
 	return p
 }
 
@@ -93,6 +96,7 @@ func GetRawDslrDir(sessionId uint64) string {
 	if err != nil {
 		panic(fmt.Errorf("failed to create raw dslr path: %v", err))
 	}
+	SetPerms(p)
 	return p
 }
 
@@ -107,6 +111,7 @@ func GetPostDslrDir(sessionId uint64) string {
 	if err != nil {
 		panic(fmt.Errorf("failed to create post dslr path: %v", err))
 	}
+	SetPerms(p)
 	return p
 }
 

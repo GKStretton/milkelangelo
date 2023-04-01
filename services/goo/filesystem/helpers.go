@@ -16,6 +16,7 @@ func CreateSymlink(original, new string) error {
 	if err := os.Symlink(original, new); err != nil {
 		return fmt.Errorf("failed to symlink latest: %v", err)
 	}
+	SetPerms(new)
 	return nil
 }
 
@@ -43,9 +44,11 @@ func WriteCreationTimeUsingMetadata(filePath string) error {
 	ts.Truncate(ts.Len() - 1)
 
 	// fmt.Printf("got creation timestamp %s\n", ts.Bytes())
-	if err := os.WriteFile(filePath+".creationtime", ts.Bytes(), 0666); err != nil {
+	name := filePath + ".creationtime"
+	if err := os.WriteFile(name, ts.Bytes(), 0666); err != nil {
 		return fmt.Errorf("error writing creation time for %s: %v", filePath, err)
 	}
+	SetPerms(name)
 	return nil
 }
 
@@ -53,8 +56,17 @@ func WriteCreationTimeUsingNow(filePath string) error {
 	now := time.Now()
 	ts := fmt.Sprintf("%d.%d", now.Unix(), now.Nanosecond())
 
-	if err := os.WriteFile(filePath+".creationtime", []byte(ts), 0666); err != nil {
+	name := filePath + ".creationtime"
+	if err := os.WriteFile(name, []byte(ts), 0666); err != nil {
 		return fmt.Errorf("error writing creation time for %s: %v", filePath, err)
 	}
+	SetPerms(name)
 	return nil
+}
+
+func SetPerms(p string) {
+	// chown to 1000:1000 (host user)
+	if err := os.Chown(p, 1000, 1000); err != nil {
+		fmt.Printf("failed to chown %s: %v\n", p, err)
+	}
 }

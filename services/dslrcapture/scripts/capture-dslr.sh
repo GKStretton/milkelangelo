@@ -5,3 +5,5 @@ gphoto2\
 	--capture-image-and-download \
 	--force-overwrite \
 	--filename $1
+
+chown 1000:1000 $1
