@@ -23,4 +23,5 @@ go get -u github.com/gkstretton/asol-protos@main
 
 cd $CURRENT_DIR/services/dslrcapture
 go get -u github.com/gkstretton/asol-protos@main
+go get -u github.com/gkstretton/dark/services/goo@main
 
