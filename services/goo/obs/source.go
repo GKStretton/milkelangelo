@@ -56,6 +56,9 @@ func setCropConfig() {
 func setSourceCrop(sourceName, cropConfigKey string) error {
 	cc := &config.CropConfig{}
 	b := keyvalue.Get(cropConfigKey)
+	if len(b) == 0 {
+		return fmt.Errorf("config key %s is empty", cropConfigKey)
+	}
 	err := yaml.Unmarshal(b, cc)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshall crop config: %v", err)

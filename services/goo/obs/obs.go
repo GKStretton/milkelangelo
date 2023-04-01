@@ -42,7 +42,7 @@ func Run(s *session.SessionManager) {
 func connectionListener(sm *session.SessionManager) {
 	reconnect := make(chan bool)
 	for {
-		fmt.Printf("Attempting connection to OBS...\n")
+		fmt.Printf("Attempting connection to OBS @ %s...\n", os.Getenv("OBS_LANDSCAPE_URL"))
 
 		lock.Lock()
 		c = nil
@@ -85,8 +85,9 @@ func connectionListener(sm *session.SessionManager) {
 					publishStreamStatus()
 				}
 			}
-			_, ok = i.(*events.StreamStateChanged)
+			state, ok := i.(*events.StreamStateChanged)
 			if ok {
+				fmt.Printf("stream state changed to %t\n", state.OutputActive)
 				publishStreamStatus()
 			}
 		})
