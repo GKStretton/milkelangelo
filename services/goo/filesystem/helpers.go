@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"time"
 )
 
@@ -73,15 +72,7 @@ func SetPerms(p string) {
 }
 
 func chownRecursive(path string, uid, gid int) error {
-	err := filepath.Walk(path, func(currentPath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		err = os.Chown(currentPath, uid, gid)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	cmd := exec.Command("chown", "-R", fmt.Sprintf("%d:%d", uid, gid), path)
+	_, err := cmd.CombinedOutput()
 	return err
 }
