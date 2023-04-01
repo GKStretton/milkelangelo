@@ -13,6 +13,8 @@ github.com/gkstretton/dark/services/goo v0.0.0-20230331211249-6d50852a35b3 h1:Lg
 github.com/gkstretton/dark/services/goo v0.0.0-20230331211249-6d50852a35b3/go.mod h1:epq83l+VPRIkPn1rvTN8jPMUVxif0kfUIQaEyc/AXjA=
 github.com/gkstretton/dark/services/goo v0.0.0-20230401055224-0e0a50b8fe81 h1:SyqR/SQdQj6Dxg9lzq4JR7QtAyQkWD55baH4QK1XAD0=
 github.com/gkstretton/dark/services/goo v0.0.0-20230401055224-0e0a50b8fe81/go.mod h1:epq83l+VPRIkPn1rvTN8jPMUVxif0kfUIQaEyc/AXjA=
+github.com/gkstretton/dark/services/goo v0.0.0-20230401062025-9eec3cce6865 h1:usbRWahA29vsphodd1k4b2l5u92jrgufrusgTg3RmrA=
+github.com/gkstretton/dark/services/goo v0.0.0-20230401062025-9eec3cce6865/go.mod h1:epq83l+VPRIkPn1rvTN8jPMUVxif0kfUIQaEyc/AXjA=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
