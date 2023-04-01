@@ -33,10 +33,10 @@ func Run(s *session.SessionManager) {
 	mqtt.Subscribe(topics_backend.TOPIC_STREAM_END, endStream)
 
 	mqtt.Subscribe(topics_backend.TOPIC_STREAM_STATUS_GET, func(topic string, payload []byte) {
-		publishStreamStatus()
+		publishStreamStatus(isStreamLive())
 	})
 
-	publishStreamStatus()
+	publishStreamStatus(isStreamLive())
 }
 
 func connectionListener(sm *session.SessionManager) {
@@ -78,17 +78,17 @@ func connectionListener(sm *session.SessionManager) {
 				wsErr, ok := innerErr.(*websocket.CloseError)
 				if ok {
 					fmt.Printf("websocket closed: %v\n", wsErr)
-					publishStreamStatus()
+					publishStreamStatus(false)
 					reconnect <- true
 				} else {
 					fmt.Printf("misc obs error: %v\n", innerErr)
-					publishStreamStatus()
+					publishStreamStatus(isStreamLive())
 				}
 			}
 			state, ok := i.(*events.StreamStateChanged)
 			if ok {
 				fmt.Printf("stream state changed to %t\n", state.OutputActive)
-				publishStreamStatus()
+				publishStreamStatus(state.OutputActive)
 			}
 		})
 

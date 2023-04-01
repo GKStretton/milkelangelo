@@ -13,13 +13,13 @@ export class WebRTCReceiver {
     this.ws = null;
     this.pc = null;
     this.restartTimeout = null;
-    this.start(url);
+    this.start(`ws://${url}ws`);
   }
 
   start(url: string) {
     console.log('connecting');
 
-    const fullUrl = `ws://${url}ws`;
+    const fullUrl = url;
 
     this.ws = new WebSocket(fullUrl);
 

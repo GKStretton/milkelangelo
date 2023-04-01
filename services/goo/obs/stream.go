@@ -67,9 +67,9 @@ func isStreamLive() bool {
 	return resp.OutputActive
 }
 
-func publishStreamStatus() {
+func publishStreamStatus(isLive bool) {
 	s := &machinepb.StreamStatus{
-		Live: isStreamLive(),
+		Live: isLive,
 	}
 
 	// protobuf
