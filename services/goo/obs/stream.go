@@ -12,15 +12,15 @@ import (
 )
 
 func startStream(topic string, payload []byte) {
+	handleSessionEvent(sm)
+	setCropConfig()
+
 	lock.Lock()
 	defer lock.Unlock()
 	if c == nil {
 		fmt.Println("obs client is nil")
 		return
 	}
-
-	handleSessionEvent(sm)
-	setCropConfig()
 
 	_, err := c.Stream.StartStream(&stream.StartStreamParams{})
 	if err != nil {
