@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -66,7 +67,21 @@ func WriteCreationTimeUsingNow(filePath string) error {
 
 func SetPerms(p string) {
 	// chown to 1000:1000 (host user)
-	if err := os.Chown(p, 1000, 1000); err != nil {
+	if err := chownRecursive(p, 1000, 1000); err != nil {
 		fmt.Printf("failed to chown %s: %v\n", p, err)
 	}
+}
+
+func chownRecursive(path string, uid, gid int) error {
+	err := filepath.Walk(path, func(currentPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		err = os.Chown(currentPath, uid, gid)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
 }

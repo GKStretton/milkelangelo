@@ -10,6 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestSetPerms(t *testing.T) {
+	SetPerms("/mnt/md0/light-stores/session_content/34/dslr/raw/0002.jpg.yml")
+}
+
 func TestWriteCreationTime(t *testing.T) {
 	os.Chdir("../")
 	start := time.Now()

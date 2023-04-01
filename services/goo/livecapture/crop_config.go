@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 )
 
@@ -18,5 +19,6 @@ func SaveCropConfig(ccKey string, contentPath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to write cropConfig of %s to '%s': %v", ccKey, ymlPath, err)
 	}
+	filesystem.SetPerms(ymlPath)
 	return nil
 }
