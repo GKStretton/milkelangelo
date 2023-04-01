@@ -4,15 +4,15 @@
 import argparse
 from datetime import datetime
 import os
+import json
 
+from betterproto import Casing
 from moviepy.editor import *
 import moviepy.video.VideoClip as VideoClip
 from moviepy.editor import concatenate_videoclips
 from videoediting.constants import *
 from videoediting.footage import FootageWrapper
 import videoediting.loaders as loaders
-from google.protobuf.json_format import ParseDict
-from google.protobuf.json_format import MessageToJson
 import machinepb.machine as pb
 import videoediting.section_properties as properties
 from videoediting.section_properties import SectionProperties
@@ -26,7 +26,6 @@ import typing
 
 FPS = 30
 
-
 # This is a descriptor (list of timestamps and video properties) for a single
 # piece of content (video)
 class ContentDescriptor:
@@ -36,11 +35,11 @@ class ContentDescriptor:
 		self.fmt = content_fmt
 
 		# [(timestamp_s, sr), ...]
-		self.state_reports = []
+		self.state_reports: typing.List[typing.Tuple[float, pb.StateReport]] = []
 		# [(timestamp_s, props), ...]
 		self.properties: typing.List[typing.Tuple[float, SectionProperties]] = []
 
-	def set_state_report(self, timestamp: float, state_report):
+	def set_state_report(self, timestamp: float, state_report: pb.StateReport):
 		if len(self.state_reports) > 0 and self.state_reports[-1][0] > timestamp:
 			print(f"set_state_report with timestamp {timestamp}, but previously seen state report has timestamp {self.state_reports[-1][0]}")
 			exit(1)
@@ -86,8 +85,13 @@ class ContentDescriptor:
 				next_timestamp, _ = self.state_reports[i+1]
 				duration = next_timestamp - timestamp
 			
-			text_str = "STATE REPORT:\n"+util.ts_format(timestamp) + "\n" + MessageToJson(sr, including_default_value_fields=True, preserving_proto_field_name=True, sort_keys=True)
-			txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=20, color='white', align='West')
+			sr_fmt = json.dumps(
+				sr.to_dict(include_default_values=True, casing=Casing.SNAKE),
+				indent=4,
+				sort_keys=True,
+		    )
+			text_str = "STATE REPORT:\n"+util.ts_format(timestamp) + "\n" + sr_fmt
+			txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=10, color='white', align='West')
 			txt = txt.set_duration(duration)
 
 			sr_clips.append(txt)
@@ -231,9 +235,6 @@ if __name__ == "__main__":
 	front_footage = FootageWrapper(os.path.join(content_path, "video/raw/" + FRONT_CAM))
 
 	if args.test:
-		report = ParseDict(state_reports[140], pb.StateReport())
-		report_ts = float(report.timestamp_unix_micros) / 1.0e6
-		test(session_metadata, content_fmt, report_ts, top_footage, front_footage)
 		exit(0)
 
 	propertyList = {}
@@ -241,7 +242,7 @@ if __name__ == "__main__":
 	descriptor = ContentDescriptor(session_metadata, content_type, content_fmt)
 	start_ts = None
 	for i in range(len(state_reports)):
-		report = ParseDict(state_reports[i], pb.StateReport())
+		report = pb.StateReport().from_dict(state_reports[i])
 		report_ts = float(report.timestamp_unix_micros) / 1.0e6
 		if start_ts is None:
 			start_ts = report_ts

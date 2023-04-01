@@ -23,7 +23,7 @@ class SectionProperties:
 # returns properties for this section. if the second parameter is not 0, 
 # this is a "forced_duration". a forced duration requires these properties be
 # maintained for this time, even if the state reports change.
-def get_section_properties(video_state, state_report, content_type: ContentType) -> SectionProperties:
+def get_section_properties(video_state, state_report: pb.StateReport, content_type: ContentType) -> SectionProperties:
 	props = SectionProperties(
 		scene = Scene.DUAL,
 		speed = 1.0,
