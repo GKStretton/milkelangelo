@@ -77,6 +77,9 @@ func SetPerms(p string) {
 
 func chownRecursive(path string, uid, gid int) error {
 	cmd := exec.Command("chown", "-R", fmt.Sprintf("%d:%d", uid, gid), path)
-	_, err := cmd.CombinedOutput()
-	return err
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("chown failed: %v, %s", err, string(out))
+	}
+	return nil
 }
