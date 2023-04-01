@@ -1,4 +1,12 @@
 #stateReport {
 	width: 550px;
-	height: 560px;
+	height: 600px;
+}
+#streamStatus {
+	width: 550px;
+	height: 160px;
+}
+#sessionStatus {
+	width: 550px;
+	height: 160px;
 }
