@@ -66,6 +66,10 @@ func WriteCreationTimeUsingNow(filePath string) error {
 
 func SetPerms(p string) {
 	// chown to 1000:1000 (host user)
+	// just do everything to be sure
+	if err := chownRecursive(GetBasePath()+*contentPath, 1000, 1000); err != nil {
+		fmt.Printf("failed to chown %s: %v\n", p, err)
+	}
 	if err := chownRecursive(p, 1000, 1000); err != nil {
 		fmt.Printf("failed to chown %s: %v\n", p, err)
 	}
