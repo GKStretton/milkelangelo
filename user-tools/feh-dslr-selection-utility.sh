@@ -3,6 +3,11 @@
 # key 1 will do the selection inside feh. arrow keys
 # to navigate. q to quit. stills will be generated on quit
 
+if [ -z "$1" ]; then
+	echo "Usage: $0 <session>"
+	exit 1
+fi
+
 DIR=$(pwd)
 DSLR_DIR=/mnt/md0/light-stores/session_content/$1/dslr/post
 cd $DSLR_DIR
