@@ -11,8 +11,9 @@ from pycommon.crop_util import CropConfig
 # timestamps. It supports getting subclips by absolute timestamp, wrapping
 # moviepy's file-relative timestamps.
 class FootagePiece:
-	def __init__(self, path):
+	def __init__(self, path, timeOffset: float=0):
 		self.file_name = os.path.basename(path)
+		self.timeOffset = timeOffset
 		print("\tLoading FootagePiece:", path)
 
 		# create VideoClip 
@@ -25,7 +26,7 @@ class FootagePiece:
 			unixtime = f.readline()
 
 			# timestamp unix in seconds with decimal
-			self.start_timestamp = float(unixtime)
+			self.start_timestamp = float(unixtime) + self.timeOffset
 		
 		print("\t\tcc:\t\t x1={}; x2={}; y1={}; y2={}".format(self.crop_config.x1, self.crop_config.x2, self.crop_config.y1, self.crop_config.y2))
 		print("\t\trange:\t\t {:.2f} - {:.2f}".format(self.get_start_timestamp(), self.get_end_timestamp()))
@@ -96,7 +97,9 @@ class FootagePiece:
 # FootageWrapper abstracts out any separate video recordings from paused sessions
 # it will return crop information with the subclips.
 class FootageWrapper:
-	def __init__(self, footagePath):
+	# timeOffset is how many seconds to offset the footage absolute time by
+	def __init__(self, footagePath, timeOffset: float=0):
+		self.timeOffset = timeOffset
 		print("Loading footage from directory:", footagePath)
 		self.clips: typing.List[FootagePiece] = []
 		for file in sorted(os.listdir(footagePath)):
@@ -104,7 +107,7 @@ class FootageWrapper:
 			if file.endswith(".mp4"):
 				# create a FootagePiece for each
 				path = os.path.join(footagePath, file)
-				self.clips.append(FootagePiece(path))
+				self.clips.append(FootagePiece(path, timeOffset=timeOffset))
 		print()
 	
 	def get_start_timestamp(self):
@@ -166,8 +169,3 @@ class FootageWrapper:
 
 		return concatenate_videoclips(subclips_with_padding), crop_config
 	
-	def test(self):
-		start = self.clips[0].start_timestamp + 8
-		end = start + 3.5
-		c, _ = self.get_subclip(start, end)
-		c.preview()

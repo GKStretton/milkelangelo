@@ -25,6 +25,10 @@ from abc import ABC, abstractmethod
 import typing
 
 FPS = 30
+# how much time to offset the start timestamp of the footage.
+# this is basically the latency of the streaming + recording pipeline
+TOP_CAM_TIME_OFFSET=-1.233
+FRONT_CAM_TIME_OFFSET=-1.233
 
 # This is a descriptor (list of timestamps and video properties) for a single
 # piece of content (video)
@@ -231,8 +235,8 @@ if __name__ == "__main__":
 
 	# load camera footage
 	content_path = loaders.get_session_content_path(args)
-	top_footage = FootageWrapper(os.path.join(content_path, "video/raw/" + TOP_CAM))
-	front_footage = FootageWrapper(os.path.join(content_path, "video/raw/" + FRONT_CAM))
+	top_footage = FootageWrapper(os.path.join(content_path, "video/raw/" + TOP_CAM), timeOffset=TOP_CAM_TIME_OFFSET)
+	front_footage = FootageWrapper(os.path.join(content_path, "video/raw/" + FRONT_CAM), timeOffset=FRONT_CAM_TIME_OFFSET)
 
 	if args.test:
 		exit(0)
