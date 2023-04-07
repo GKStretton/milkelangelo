@@ -71,12 +71,12 @@ export default function ControlGroup() {
         {tabValue === 0 &&
         <>
             <Typography variant="h6">Basic</Typography>
-            <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{margin: 0.5}}>
+            <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{margin: 1}}>
                 <Button variant="contained" disabled={isAwake} onClick={() => c?.publish(TOPIC_WAKE, "")}>Wake</Button>
                 <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_SHUTDOWN, "")}>Shutdown</Button>
                 <Button disabled={!isAwake} variant="contained" color="error" onClick={() => c?.publish(TOPIC_SLEEP, "")}>Kill</Button>
             </ButtonGroup>
-            <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{margin: 0.5}}>
+            <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{margin: 1}}>
                 <Button disabled={!streamStatus || streamStatus.getLive()}
                     onClick={() => c?.publish(TOPIC_STREAM_START, "")}
                 >Start Stream</Button>
@@ -84,7 +84,7 @@ export default function ControlGroup() {
                     onClick={() => c?.publish(TOPIC_STREAM_END, "")}
                 >End Stream</Button>
             </ButtonGroup>
-            <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{margin: 0.5}}>
+            <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{margin: 1}}>
                 <Button disabled={!sessionStatus || !sessionStatus.getComplete() || sessionStatus.getPaused()}
                     onClick={() => c?.publish(TOPIC_SESSION_BEGIN, "")}
                 > Begin Session</Button>
@@ -93,11 +93,36 @@ export default function ControlGroup() {
                 <Button disabled={!sessionStatus || !sessionStatus.getPaused()}
                     onClick={() => c?.publish(TOPIC_SESSION_RESUME, "")}>Resume Session</Button>
             </ButtonGroup>
-            <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{margin: 0.5}}>
+            <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{margin: 1}}>
                 <Button disabled={!sessionStatus || sessionStatus.getComplete() || sessionStatus.getPaused()}
                     onClick={() => c?.publish(TOPIC_SESSION_PAUSE, "")}>Pause Session</Button>
                 <Button disabled={!sessionStatus || sessionStatus.getComplete()}
                     onClick={() => c?.publish(TOPIC_SESSION_END, "")}>End Session</Button>
+            </ButtonGroup>
+
+            <Typography variant="h6">Bulk Fluid</Typography>
+            <Slider
+                value={bulkFluidRequestVolume}
+                onChange={(e, value) => typeof value === "number" ? setBulkFluidRequestVolume(value): null}
+                min={25}
+                max={300} // Adjust the max value according to your requirements
+                step={25}
+                marks={marks_ml}
+                valueLabelDisplay="auto"
+                valueLabelFormat={(value) => `${value}ml`}
+                aria-label="Bulk Fluid Request volume"
+                sx={{margin: 2, width: "50%"}}
+            />
+            <ButtonGroup variant="outlined" aria-label="outlined button group" sx={{margin: 2}}>
+                {bulkRequests.map((request) => 
+                    <Button
+                        key={request.id}
+                        disabled={!isAwake}
+                        onClick={() => c?.publish(TOPIC_FLUID, `${request.fluid_type},${bulkFluidRequestVolume},${request.open_drain}`)}
+                    >
+                        {request.name}
+                    </Button>
+                )}
             </ButtonGroup>
 
             <Typography variant="h6">Collection</Typography>
@@ -139,30 +164,7 @@ export default function ControlGroup() {
                 sx={{margin: 2, width: "50%"}}
             />
             <Button disabled={!isAwake || collecting} onClick={() => c?.publish(TOPIC_DISPENSE, dispenseVolume.toString())} sx={{"margin": 2}}>Dispense</Button>
-            <Typography variant="h6">Bulk Fluid</Typography>
-            <Slider
-                value={bulkFluidRequestVolume}
-                onChange={(e, value) => typeof value === "number" ? setBulkFluidRequestVolume(value): null}
-                min={25}
-                max={300} // Adjust the max value according to your requirements
-                step={25}
-                marks={marks_ml}
-                valueLabelDisplay="auto"
-                valueLabelFormat={(value) => `${value}ml`}
-                aria-label="Bulk Fluid Request volume"
-                sx={{margin: 2, width: "50%"}}
-            />
-            <ButtonGroup variant="outlined" aria-label="outlined button group" sx={{margin: 2}}>
-                {bulkRequests.map((request) => 
-                    <Button
-                        key={request.id}
-                        disabled={!isAwake}
-                        onClick={() => c?.publish(TOPIC_FLUID, `${request.fluid_type},${bulkFluidRequestVolume},${request.open_drain}`)}
-                    >
-                        {request.name}
-                    </Button>
-                )}
-            </ButtonGroup>
+
             <Typography variant="h6">Z-Level</Typography>
             <Slider
                 value={zLevel}
