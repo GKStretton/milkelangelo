@@ -1,0 +1,7 @@
+#!/bin/bash
+# runs post-session, takes session number $1, initiates post-pipelines
+
+cd ~/asol/software/asol-backend
+urxvt -e bash -ic "./user-tools/feh-dslr-selection-utility.sh $1"
+mosquitto_pub -h DEPTH -t "asol/stills-generated" -m "$1"
+

@@ -27,8 +27,9 @@ import typing
 FPS = 30
 # how much time to offset the start timestamp of the footage.
 # this is basically the latency of the streaming + recording pipeline
-TOP_CAM_TIME_OFFSET=-1.233
-FRONT_CAM_TIME_OFFSET=-1.233
+#* if the lights come on before the state report says so, decrease this magnitude (increase number).
+TOP_CAM_TIME_OFFSET=-1.18
+FRONT_CAM_TIME_OFFSET=-1.18
 
 # This is a descriptor (list of timestamps and video properties) for a single
 # piece of content (video)
