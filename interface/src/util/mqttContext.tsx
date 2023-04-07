@@ -4,7 +4,7 @@ import { MqttClient } from 'precompiled-mqtt';
 
 export interface MqttContextValue {
   client: MqttClient | null;
-  messages: { [topic: string]: string };
+  messages: { [topic: string]: Buffer };
 }
 
 const MqttContext = createContext<MqttContextValue>({

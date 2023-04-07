@@ -10,7 +10,7 @@ interface MqttProviderProps {
 
 const MqttProvider: React.FC<MqttProviderProps> = ({ url, children }) => {
 	const [client, setClient] = useState<MqttClient | null>(null);
-	const [messages, setMessages] = useState<{ [topic: string]: string }>({});
+	const [messages, setMessages] = useState<{ [topic: string]: Buffer }>({});
 
 	useEffect(() => {
 		const mqttClient = mqtt.connect(url);
@@ -24,7 +24,7 @@ const MqttProvider: React.FC<MqttProviderProps> = ({ url, children }) => {
 			console.log("got message %s %s", topic, message.toString());
 			setMessages((prevMessages) => ({
 				...prevMessages,
-				[topic]: message.toString(),
+				[topic]: message,
 			}));
 		});
 

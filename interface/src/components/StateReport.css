@@ -1,12 +1,15 @@
+textarea {
+	font-size: small;
+}
 #stateReport {
-	width: 550px;
-	height: 600px;
+	width: 450px;
+	height: 520px;
 }
 #streamStatus {
-	width: 550px;
-	height: 160px;
+	width: 350px;
+	height: 120px;
 }
 #sessionStatus {
-	width: 550px;
-	height: 160px;
+	width: 350px;
+	height: 120px;
 }

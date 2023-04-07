@@ -23,6 +23,7 @@ const TopCamPlayer = () => {
   };
 
   const renderOverlay = (videoDimensions: { width: number; height: number }) => (
+    <>
     <div
       style={{
         position: 'absolute',
@@ -35,15 +36,32 @@ const TopCamPlayer = () => {
         transform: 'translate(-50%, -50%)',
       }}
     ></div>
+    <img
+      src="/mask_alpha.png"
+      alt="alpha mask"
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: `${videoDimensions.width+1}px`,
+        height: `${videoDimensions.height+1}px`,
+      }}
+    />
+    </>
   );
 
   return (
-    <VideoPlayer
-	  url="DEPTH:8889/top-cam-crop/"
-      name="top"
-      handleClick={handleClick}
-      renderOverlay={renderOverlay}
-    />
+    <>
+      <div style={{ position: 'relative' }}>
+        <VideoPlayer
+        url="DEPTH:8889/top-cam-crop/"
+          name="top"
+          handleClick={handleClick}
+          renderOverlay={renderOverlay}
+          show={false}
+        />
+      </div>
+    </>
   );
 };
 
