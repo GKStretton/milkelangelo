@@ -45,6 +45,7 @@ const TopCamPlayer = () => {
         left: 0,
         width: `${videoDimensions.width+1}px`,
         height: `${videoDimensions.height+1}px`,
+        pointerEvents: 'none',
       }}
     />
     </>
