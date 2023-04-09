@@ -1,5 +1,5 @@
-import { useState, useContext } from 'react';
-import { TOPIC_SHUTDOWN, TOPIC_SLEEP, TOPIC_WAKE, TOPIC_SET_VALVE, TOPIC_DISPENSE, TOPIC_FLUID, TOPIC_COLLECT } from '../topics_firmware/topics_firmware';
+import { useState, useContext, useEffect } from 'react';
+import { TOPIC_SHUTDOWN, TOPIC_SLEEP, TOPIC_WAKE, TOPIC_SET_VALVE, TOPIC_DISPENSE, TOPIC_FLUID, TOPIC_COLLECT, TOPIC_SET_IK_Z } from '../topics_firmware/topics_firmware';
 import { TOPIC_SESSION_BEGIN, TOPIC_SESSION_END, TOPIC_SESSION_PAUSE, TOPIC_SESSION_RESUME, TOPIC_STATE_REPORT_JSON, TOPIC_STREAM_END, TOPIC_STREAM_START } from '../topics_backend/topics_backend';
 import { SessionStatus, SolenoidValve, StateReport, Status, StreamStatus } from '../machinepb/machine_pb';
 import MqttContext from '../util/mqttContext'
@@ -21,6 +21,11 @@ export default function ControlGroup() {
     const [collectionVolume, setCollectionVolume] = useState(30.0);
     const [bulkFluidRequestVolume, setBulkFluidRequestVolume] = useState(200.0);
     const [zLevel, setZLevel] = useState(42);
+
+    useEffect(() => {
+        c?.publish(TOPIC_SET_IK_Z, zLevel.toString());
+    });
+
     // Create an array of marks with a 5µl interval
     const marks = Array.from({ length: 21 }, (_, i) => {
         return { value: i * 10, label: `${i * 10}µl` };
@@ -130,7 +135,7 @@ export default function ControlGroup() {
                 value={collectionVolume}
                 onChange={(e, value) => typeof value === "number" ? setCollectionVolume(value): null}
                 min={1}
-                max={50} // Adjust the max value according to your requirements
+                max={100} // Adjust the max value according to your requirements
                 step={1}
                 marks={marks}
                 valueLabelDisplay="auto"
