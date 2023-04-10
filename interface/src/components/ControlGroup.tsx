@@ -92,7 +92,7 @@ export default function ControlGroup() {
         return () => {
             window.removeEventListener('keydown', keyDownHandler);
         };
-    }, [c]);
+    }, [c, dispenseVolume, collectionVolume]);
 
     return (
         <>
