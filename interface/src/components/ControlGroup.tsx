@@ -5,6 +5,7 @@ import { SessionStatus, SolenoidValve, StateReport, Status, StreamStatus } from 
 import MqttContext from '../util/mqttContext'
 import { ButtonGroup, Button, Typography, Slider, Box, Tabs, Tab } from '@mui/material';
 import { useSessionStatus, useStateReport, useStreamStatus } from '../util/hooks';
+import CollectDispense from './CollectDispense';
 
 export default function ControlGroup() {
 	const [tabValue, setTabValue] = useState(0);
@@ -72,9 +73,6 @@ export default function ControlGroup() {
         }
 
         switch (key) {
-            case ' ':
-                c?.publish(TOPIC_DISPENSE, dispenseVolume.toString());
-                break;
             case 'w':
                 c?.publish(TOPIC_WAKE, "");
                 break;
@@ -162,45 +160,7 @@ export default function ControlGroup() {
                 )}
             </ButtonGroup>
 
-            <Typography variant="h6">Collection</Typography>
-            <Slider
-                value={collectionVolume}
-                onChange={(e, value) => typeof value === "number" ? setCollectionVolume(value): null}
-                min={1}
-                max={100} // Adjust the max value according to your requirements
-                step={1}
-                marks={marks}
-                valueLabelDisplay="auto"
-                valueLabelFormat={(value) => `${value}µl`}
-                aria-label="Dispense volume"
-                sx={{margin: 2, width: "50%"}}
-            />
-            <ButtonGroup variant="outlined" aria-label="outlined button group" sx={{margin: 2}}>
-                {vials.map((vial) => 
-                    <Button
-                        key={vial}
-                        disabled={!isAwake || collecting}
-                        variant={collectingVial === vial ? "contained": "outlined"}
-                        onClick={() => c?.publish(TOPIC_COLLECT, `${vial.toString()},${collectionVolume}`)}
-                    >
-                        {vial}
-                    </Button>
-                )}
-            </ButtonGroup>
-            <Typography variant="h6">Dispense</Typography>
-            <Slider
-                value={dispenseVolume}
-                onChange={(e, value) => typeof value === "number" ? setDispenseVolume(value): null}
-                min={1}
-                max={collectionVolume} // Adjust the max value according to your requirements
-                step={1}
-                marks={marks}
-                valueLabelDisplay="auto"
-                valueLabelFormat={(value) => `${value}µl`}
-                aria-label="Dispense volume"
-                sx={{margin: 2, width: "50%"}}
-            />
-            <Button disabled={!isAwake || collecting} onClick={() => c?.publish(TOPIC_DISPENSE, dispenseVolume.toString())} sx={{"margin": 2}}>Dispense</Button>
+            <CollectDispense/>
 
             <Typography variant="h6">Z-Level</Typography>
             <Slider
@@ -236,6 +196,48 @@ export default function ControlGroup() {
                     ))}
                 </ButtonGroup>
             </Box>
+
+            <Typography variant="h6">Collection</Typography>
+            <Slider
+                value={collectionVolume}
+                onChange={(e, value) => typeof value === "number" ? setCollectionVolume(value): null}
+                min={1}
+                max={100} // Adjust the max value according to your requirements
+                step={1}
+                marks={marks}
+                valueLabelDisplay="auto"
+                valueLabelFormat={(value) => `${value}µl`}
+                aria-label="Dispense volume"
+                sx={{margin: 2, width: "50%"}}
+            />
+            <ButtonGroup variant="outlined" aria-label="outlined button group" sx={{margin: 2}}>
+                {vials.map((vial) => 
+                    <Button
+                        key={vial}
+                        disabled={!isAwake || collecting}
+                        variant={collectingVial === vial ? "contained": "outlined"}
+                        onClick={() => c?.publish(TOPIC_COLLECT, `${vial.toString()},${collectionVolume}`)}
+                    >
+                        {vial}
+                    </Button>
+                )}
+            </ButtonGroup>
+
+            <Typography variant="h6">Dispense</Typography>
+            <Slider
+                value={dispenseVolume}
+                onChange={(e, value) => typeof value === "number" ? setDispenseVolume(value): null}
+                min={1}
+                max={collectionVolume} // Adjust the max value according to your requirements
+                step={1}
+                marks={marks}
+                valueLabelDisplay="auto"
+                valueLabelFormat={(value) => `${value}µl`}
+                aria-label="Dispense volume"
+                sx={{margin: 2, width: "50%"}}
+            />
+
+            <Button disabled={!isAwake || collecting} onClick={() => c?.publish(TOPIC_DISPENSE, dispenseVolume.toString())} sx={{"margin": 2}}>Dispense</Button>
         </>}
 
         {tabValue === 2 &&
