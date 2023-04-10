@@ -62,6 +62,38 @@ export default function ControlGroup() {
         { id: SolenoidValve.VALVE_AIR, name: "AIR" }
     ];
 
+    const keyDownHandler = (event: KeyboardEvent) => {
+        const key = event.key;
+
+        const num = parseInt(key, 10);
+        if (num >= 1 && num <= 7) {
+            c?.publish(TOPIC_COLLECT, `${key},${collectionVolume}`);
+            return;
+        }
+
+        switch (key) {
+            case ' ':
+                c?.publish(TOPIC_DISPENSE, dispenseVolume.toString());
+                break;
+            case 'w':
+                c?.publish(TOPIC_WAKE, "");
+                break;
+            case 's':
+                c?.publish(TOPIC_SHUTDOWN, "");
+                break;
+            case 'k':
+                c?.publish(TOPIC_SLEEP, "");
+                break;
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('keydown', keyDownHandler);
+        return () => {
+            window.removeEventListener('keydown', keyDownHandler);
+        };
+    }, [c]);
+
     return (
         <>
         <Tabs value={tabValue}

@@ -7,12 +7,15 @@ import MqttProvider from './util/MqttProvider';
 import ControlGroup from './components/ControlGroup';
 import VideoPlayer from './components/VideoPlayer';
 import TopCamPlayer from './components/TopCamPlayer';
+import KeyPressHandler from './KeyPressHandler';
 
 function App() {
+
   return (
     <>
       <CssBaseline />
       <MqttProvider url='ws://DEPTH:9001'>
+        <KeyPressHandler/>
         <Header/>
         <Grid container
           direction="row"
