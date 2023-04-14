@@ -4,6 +4,7 @@ import { SessionStatus, SolenoidValve, StateReport, Status, StreamStatus } from 
 import MqttContext from '../util/mqttContext'
 import { ButtonGroup, Button, Typography, Slider, Box, Tabs, Tab } from '@mui/material';
 import { useSessionStatus, useStateReport, useStreamStatus } from '../util/hooks';
+import { TOPIC_MARK_FAILED_DISPENSE } from '../topics_backend/topics_backend';
 
 export default function CollectDispense() {
     const noVials = 7
@@ -87,6 +88,7 @@ export default function CollectDispense() {
 			<Typography variant="body1">Dispenses remaining: {getDispensesRemaining()}</Typography>
 			<Typography variant="body1">Auto-Dispense Volume: {getAutoDispenseVolume()}µl</Typography>
             <Button disabled={!isAwake || collecting || stateReport?.getPipetteState()?.getSpent()} onClick={() => c?.publish(TOPIC_DISPENSE, getAutoDispenseVolume().toString())} sx={{"margin": 2}}>Auto-Dispense</Button>
+            <Button color="error" disabled={!isAwake} onClick={() => c?.publish(TOPIC_MARK_FAILED_DISPENSE, "")} sx={{"margin": 2}}>Mark Failed Dispense</Button>
 		</>
 		);
 	}
