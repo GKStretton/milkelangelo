@@ -10,13 +10,14 @@ import (
 )
 
 var (
-	basePath            = flag.String("basePath", "/mnt/md0/light-stores/", "base path for storage data")
-	contentPath         = flag.String("sessionPath", "session_content", "path for session content")
-	metadataPath        = flag.String("metadataPath", "session_metadata", "path for session metadata")
-	rawVideoPath        = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
-	rawDslrPath         = flag.String("rawDslrPath", "dslr/raw", "path within session, of raw dslr captures")
-	postDslrPath        = flag.String("postDslrPath", "dslr/post", "path within session, of post dslr captures")
-	stateReportFileName = flag.String("stateReportFileName", "state-reports.yml", "filename for list of state reports")
+	basePath                = flag.String("basePath", "/mnt/md0/light-stores/", "base path for storage data")
+	contentPath             = flag.String("sessionPath", "session_content", "path for session content")
+	metadataPath            = flag.String("metadataPath", "session_metadata", "path for session metadata")
+	rawVideoPath            = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
+	rawDslrPath             = flag.String("rawDslrPath", "dslr/raw", "path within session, of raw dslr captures")
+	postDslrPath            = flag.String("postDslrPath", "dslr/post", "path within session, of post dslr captures")
+	stateReportFileName     = flag.String("stateReportFileName", "state-reports.yml", "filename for list of state reports")
+	failedDispensesFileName = flag.String("failedDispensesFileName", "failed-dispenses.yml", "filename for list of failed dispenses")
 )
 
 func AssertBasePaths() {
@@ -64,6 +65,20 @@ func GetStateReportPath(sessionId uint64) string {
 	}
 	SetPerms(p)
 	return filepath.Join(p, *stateReportFileName)
+}
+
+func GetFailedDispensesPath(sessionId uint64) string {
+	p := filepath.Join(
+		*basePath,
+		*contentPath,
+		strconv.Itoa(int(sessionId)),
+	)
+	err := os.MkdirAll(p, 0777)
+	if err != nil {
+		panic(fmt.Errorf("failed to create state report path: %v", err))
+	}
+	SetPerms(p)
+	return filepath.Join(p, *failedDispensesFileName)
 }
 
 // GetRawVideoDir mkdirAlls the path if it doesn't exist.

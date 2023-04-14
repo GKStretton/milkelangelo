@@ -53,6 +53,8 @@ class PipetteState(betterproto.Message):
     spent: bool = betterproto.bool_field(1)
     vial_held: int = betterproto.uint32_field(2)
     volume_target_ul: float = betterproto.float_field(3)
+    # incremented every time a dispense is requested
+    dispense_request_number: int = betterproto.uint32_field(4)
 
 
 @dataclass
@@ -97,6 +99,8 @@ class StateReport(betterproto.Message):
     # timestamp in microseconds since unix epoch, UTC. Added by gateway since
     # firmware doesn't know real time.
     timestamp_unix_micros: int = betterproto.uint64_field(2)
+    # incremented on startup, currently 1 byte
+    startup_counter: int = betterproto.uint64_field(3)
     mode: "Mode" = betterproto.enum_field(4)
     status: "Status" = betterproto.enum_field(5)
     # Useful for synchronisation with footage

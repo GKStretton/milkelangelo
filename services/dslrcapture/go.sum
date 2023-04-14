@@ -9,6 +9,10 @@ github.com/eclipse/paho.mqtt.golang v1.4.2 h1:66wOzfUHSSI1zamx7jR6yMEI5EuHnT1G6r
 github.com/eclipse/paho.mqtt.golang v1.4.2/go.mod h1:JGt0RsEwEX+Xa/agj90YJ9d9DH2b7upDZMK9HRbFvCA=
 github.com/gkstretton/asol-protos v0.0.8-0.20230331185456-7163a6e915d4 h1:FET0zOtFjbq1JuRcY7P7Mn50qe1HBoWzpWw0NRuLhjs=
 github.com/gkstretton/asol-protos v0.0.8-0.20230331185456-7163a6e915d4/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230414174902-b7405ef5bfbc h1:xlu/9zBdw+7PSsmwbmSrdvciAIUInFBFagU8rCNg1QM=
+github.com/gkstretton/asol-protos v0.0.8-0.20230414174902-b7405ef5bfbc/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230414175703-8d4259118c02 h1:JuzjATzA65mZB7QNg1MvIKEe8+CQHMsI6pA8bGYd5IA=
+github.com/gkstretton/asol-protos v0.0.8-0.20230414175703-8d4259118c02/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/gkstretton/dark/services/goo v0.0.0-20230331211249-6d50852a35b3 h1:LgqziAneYsCuRbPDT1YtdFD4hVT3p0ojGXBlApuLips=
 github.com/gkstretton/dark/services/goo v0.0.0-20230331211249-6d50852a35b3/go.mod h1:epq83l+VPRIkPn1rvTN8jPMUVxif0kfUIQaEyc/AXjA=
 github.com/gkstretton/dark/services/goo v0.0.0-20230401055224-0e0a50b8fe81 h1:SyqR/SQdQj6Dxg9lzq4JR7QtAyQkWD55baH4QK1XAD0=
@@ -23,6 +27,8 @@ github.com/gkstretton/dark/services/goo v0.0.0-20230401140259-6e01048942a7 h1:bP
 github.com/gkstretton/dark/services/goo v0.0.0-20230401140259-6e01048942a7/go.mod h1:epq83l+VPRIkPn1rvTN8jPMUVxif0kfUIQaEyc/AXjA=
 github.com/gkstretton/dark/services/goo v0.0.0-20230401141239-44fcdbdb260e h1:bVIp/ZryNlhfUhjmnZBpkCBaAaGRSHvTfA0PxQyhxco=
 github.com/gkstretton/dark/services/goo v0.0.0-20230401141239-44fcdbdb260e/go.mod h1:epq83l+VPRIkPn1rvTN8jPMUVxif0kfUIQaEyc/AXjA=
+github.com/gkstretton/dark/services/goo v0.0.0-20230410143324-c8359bbe23d8 h1:NzTkwz/FJP3prL+hNPMEJPonsAY+k59h20/GyKqxlOQ=
+github.com/gkstretton/dark/services/goo v0.0.0-20230410143324-c8359bbe23d8/go.mod h1:PAcdOGDhURLDdSUW0oV35XzCm8DcsBbsZ8qYX/ph+R4=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
@@ -42,6 +48,8 @@ golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACk
 golang.org/x/net v0.0.0-20200425230154-ff2c4b7c35a0/go.mod h1:qpuaurCH72eLCgpAm/N6yyVIVM9cpaDIP3A8BGJEC5A=
 golang.org/x/net v0.8.0 h1:Zrh2ngAOFYneWTAIAPethzeaQLuHwhuBkuV6ZiRnUaQ=
 golang.org/x/net v0.8.0/go.mod h1:QVkue5JL9kW//ek3r6jTKnTFis1tRmNAW2P1shuFdJc=
+golang.org/x/net v0.9.0 h1:aWJ/m6xSmxWBx+V0XRHTlrYrPG56jKsLdTFmsSsCzOM=
+golang.org/x/net v0.9.0/go.mod h1:d48xBJpPfHeWQsugry2m+kC02ZBRGRgulfHnEXEuWns=
 golang.org/x/sync v0.0.0-20210220032951-036812b2e83c/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sync v0.1.0 h1:wsuoTGHzEhffawBOhz5CYhcrV4IdKZbEyZjBMuTp12o=
 golang.org/x/sync v0.1.0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=

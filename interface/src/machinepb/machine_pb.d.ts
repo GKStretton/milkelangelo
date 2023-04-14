@@ -13,6 +13,9 @@ export class PipetteState extends jspb.Message {
   getVolumeTargetUl(): number;
   setVolumeTargetUl(value: number): void;
 
+  getDispenseRequestNumber(): number;
+  setDispenseRequestNumber(value: number): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PipetteState.AsObject;
   static toObject(includeInstance: boolean, msg: PipetteState): PipetteState.AsObject;
@@ -28,6 +31,7 @@ export namespace PipetteState {
     spent: boolean,
     vialHeld: number,
     volumeTargetUl: number,
+    dispenseRequestNumber: number,
   }
 }
 
@@ -155,6 +159,9 @@ export class StateReport extends jspb.Message {
   getTimestampUnixMicros(): number;
   setTimestampUnixMicros(value: number): void;
 
+  getStartupCounter(): number;
+  setStartupCounter(value: number): void;
+
   getMode(): ModeMap[keyof ModeMap];
   setMode(value: ModeMap[keyof ModeMap]): void;
 
@@ -208,6 +215,7 @@ export class StateReport extends jspb.Message {
 export namespace StateReport {
   export type AsObject = {
     timestampUnixMicros: number,
+    startupCounter: number,
     mode: ModeMap[keyof ModeMap],
     status: StatusMap[keyof StatusMap],
     lightsOn: boolean,

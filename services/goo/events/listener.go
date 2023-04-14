@@ -16,10 +16,18 @@ import (
 	"github.com/gkstretton/dark/services/goo/util/protoyaml"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
+	"gopkg.in/yaml.v2"
 )
+
+var latest_state_report *machinepb.StateReport
 
 var subs = []chan *machinepb.StateReport{}
 var lock sync.Mutex
+
+type FailedDispense struct {
+	StartupCounter uint64 `yaml:"startup_counter"`
+	DispenseNumber uint64 `yaml:"dispense_number"`
+}
 
 func Run(sm *session.SessionManager) {
 	mqtt.Subscribe(topics_firmware.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
@@ -35,16 +43,28 @@ func Run(sm *session.SessionManager) {
 		sr.TimestampReadable = time.UnixMicro(t).
 			Format("2006-03-02 15:04:05.000000")
 
-		// Abort unless session is active or paused
 		session, _ := sm.GetLatestSession()
 		if session != nil {
 			sr.Paused = session.Paused
 		}
 
+		latest_state_report = sr
 		publishStateReport(sr)
 
+		// Abort unless session is active or paused
 		if session != nil && !session.Complete {
 			saveSessionStateReport(session, sr)
+		}
+	})
+
+	mqtt.Subscribe(topics_backend.TOPIC_MARK_FAILED_DISPENSE, func(topic string, payload []byte) {
+		session, _ := sm.GetLatestSession()
+		if session != nil && !session.Complete {
+			appendFailedDispense(
+				uint64(session.Id),
+				latest_state_report.StartupCounter,
+				uint64(latest_state_report.PipetteState.DispenseRequestNumber),
+			)
 		}
 	})
 }
@@ -109,4 +129,43 @@ func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
 	}
 	defer f.Close()
 	f.Write([]byte(result))
+}
+
+func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
+	p := filesystem.GetFailedDispensesPath(sessionId)
+
+	var failedDispenses []FailedDispense
+
+	data, err := os.ReadFile(p)
+	if err != nil && !os.IsNotExist(err) {
+		fmt.Printf("Error reading failed dispenses file: %v\n", err)
+		return
+	}
+
+	if len(data) > 0 {
+		err = yaml.Unmarshal(data, &failedDispenses)
+		if err != nil {
+			fmt.Printf("Error unmarshalling failed dispenses: %v\n", err)
+			return
+		}
+	}
+
+	failedDispenses = append(failedDispenses, FailedDispense{
+		StartupCounter: startupCounter,
+		DispenseNumber: dispenseNumber,
+	})
+
+	data, err = yaml.Marshal(failedDispenses)
+	if err != nil {
+		fmt.Printf("Error marshalling failed dispenses: %v\n", err)
+		return
+	}
+
+	err = os.WriteFile(p, data, 0644)
+	if err != nil {
+		fmt.Printf("Error writing failed dispenses file: %v\n", err)
+		return
+	}
+
+	fmt.Printf("wrote failed dispense to file (session %d, startup %d, dispense %d)\n", sessionId, startupCounter, dispenseNumber)
 }

@@ -22,6 +22,9 @@ export default function CollectDispense() {
     const collectingVial = collecting && stateReport?.getCollectionRequest()?.getVialNumber();
 
 	// DROP VOLUMES
+    // water = 20ul
+    // temporary emulsifier = 12ul
+    // dye (green) = 14ul
 	const dropVolumeFromVial = (vial: number|undefined) => vial === 4 ? 12.0 : 14.0;
 
     const getAutoDispenseVolume = () => {
