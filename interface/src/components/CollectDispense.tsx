@@ -87,8 +87,8 @@ export default function CollectDispense() {
             </ButtonGroup>
 			<Typography variant="body1">Dispenses remaining: {getDispensesRemaining()}</Typography>
 			<Typography variant="body1">Auto-Dispense Volume: {getAutoDispenseVolume()}µl</Typography>
-            <Button disabled={!isAwake || collecting || stateReport?.getPipetteState()?.getSpent()} onClick={() => c?.publish(TOPIC_DISPENSE, getAutoDispenseVolume().toString())} sx={{"margin": 2}}>Auto-Dispense</Button>
-            <Button color="error" disabled={!isAwake} onClick={() => c?.publish(TOPIC_MARK_FAILED_DISPENSE, "")} sx={{"margin": 2}}>Mark Failed Dispense</Button>
+            <Button disabled={!isAwake || collecting || stateReport?.getPipetteState()?.getSpent()} onClick={() => c?.publish(TOPIC_DISPENSE, getAutoDispenseVolume().toString())} sx={{"margin": 1}}>Auto-Dispense</Button>
+            <Button color="error" disabled={!isAwake} onClick={() => c?.publish(TOPIC_MARK_FAILED_DISPENSE, "")}>Mark Failed Dispense</Button>
 		</>
 		);
 	}
