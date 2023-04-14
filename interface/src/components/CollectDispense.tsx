@@ -58,6 +58,12 @@ export default function CollectDispense() {
         };
     }, [c, stateReport?.getPipetteState()?.getVialHeld()]);
 
+    const [latestFailedDispense, setLatestFailedDispense] = useState(-1);
+    const markFailedDispense = () => {
+        setLatestFailedDispense(stateReport?.getPipetteState()?.getDispenseRequestNumber() ?? -1);
+        c?.publish(TOPIC_MARK_FAILED_DISPENSE, "")
+    }
+
 	return (
 		<>
             <Typography variant="h6">Collection & Dispense</Typography>
@@ -88,7 +94,7 @@ export default function CollectDispense() {
 			<Typography variant="body1">Dispenses remaining: {getDispensesRemaining()}</Typography>
 			<Typography variant="body1">Auto-Dispense Volume: {getAutoDispenseVolume()}µl</Typography>
             <Button disabled={!isAwake || collecting || stateReport?.getPipetteState()?.getSpent()} onClick={() => c?.publish(TOPIC_DISPENSE, getAutoDispenseVolume().toString())} sx={{"margin": 1}}>Auto-Dispense</Button>
-            <Button color="error" disabled={!isAwake} onClick={() => c?.publish(TOPIC_MARK_FAILED_DISPENSE, "")}>Mark Failed Dispense</Button>
+            <Button color="error" disabled={!isAwake || stateReport?.getPipetteState()?.getDispenseRequestNumber() == latestFailedDispense} onClick={markFailedDispense}>Mark Failed Dispense</Button>
 		</>
 		);
 	}
