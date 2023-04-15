@@ -24,7 +24,7 @@ from enum import Enum
 from abc import ABC, abstractmethod
 import typing
 
-FPS = 30
+FPS = 60
 # how much time to offset the start timestamp of the footage.
 # this is basically the latency of the streaming + recording pipeline
 #* if the lights come on before the state report says so, decrease this magnitude (increase number).
