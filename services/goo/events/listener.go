@@ -16,18 +16,12 @@ import (
 	"github.com/gkstretton/dark/services/goo/util/protoyaml"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v2"
 )
 
 var latest_state_report *machinepb.StateReport
 
 var subs = []chan *machinepb.StateReport{}
 var lock sync.Mutex
-
-type FailedDispense struct {
-	StartupCounter uint64 `yaml:"startup_counter"`
-	DispenseNumber uint64 `yaml:"dispense_number"`
-}
 
 func Run(sm *session.SessionManager) {
 	mqtt.Subscribe(topics_firmware.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
@@ -119,9 +113,13 @@ func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
 		fmt.Printf("error marshalling state report to yaml: %v\n", err)
 	}
 
-	result := strings.Replace(string(output), "StateReports:\n", "", 1)
-
 	p := filesystem.GetStateReportPath(uint64(s.Id))
+
+	var result = string(output)
+	// remove the main key from additional reports
+	if _, err := os.Stat(p); err == nil {
+		result = strings.Replace(result, "StateReports:\n", "", 1)
+	}
 
 	f, err := os.OpenFile(p, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -134,7 +132,7 @@ func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
 func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
 	p := filesystem.GetFailedDispensesPath(sessionId)
 
-	var failedDispenses []FailedDispense
+	failedDispenses := &machinepb.DispenseMetadataMap{}
 
 	data, err := os.ReadFile(p)
 	if err != nil && !os.IsNotExist(err) {
@@ -143,19 +141,30 @@ func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
 	}
 
 	if len(data) > 0 {
-		err = yaml.Unmarshal(data, &failedDispenses)
+		err = protoyaml.Unmarshal(data, failedDispenses)
 		if err != nil {
 			fmt.Printf("Error unmarshalling failed dispenses: %v\n", err)
 			return
 		}
 	}
 
-	failedDispenses = append(failedDispenses, FailedDispense{
-		StartupCounter: startupCounter,
-		DispenseNumber: dispenseNumber,
-	})
+	if failedDispenses.DispenseMetadata == nil {
+		failedDispenses.DispenseMetadata = map[string]*machinepb.DispenseMetadata{}
+	}
 
-	data, err = yaml.Marshal(failedDispenses)
+	key := fmt.Sprintf("%d_%d", startupCounter, dispenseNumber)
+
+	if _, ok := failedDispenses.DispenseMetadata[key]; ok {
+		failedDispenses.DispenseMetadata[key].FailedDispense = true
+	} else {
+		failedDispenses.DispenseMetadata[key] = &machinepb.DispenseMetadata{
+			StartupCounter:        startupCounter,
+			DispenseRequestNumber: dispenseNumber,
+			FailedDispense:        true,
+		}
+	}
+
+	data, err = protoyaml.Marshal(failedDispenses)
 	if err != nil {
 		fmt.Printf("Error marshalling failed dispenses: %v\n", err)
 		return

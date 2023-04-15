@@ -307,6 +307,53 @@ export namespace StreamStatus {
   }
 }
 
+export class DispenseMetadataMap extends jspb.Message {
+  getDispenseMetadataMap(): jspb.Map<string, DispenseMetadata>;
+  clearDispenseMetadataMap(): void;
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DispenseMetadataMap.AsObject;
+  static toObject(includeInstance: boolean, msg: DispenseMetadataMap): DispenseMetadataMap.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: DispenseMetadataMap, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DispenseMetadataMap;
+  static deserializeBinaryFromReader(message: DispenseMetadataMap, reader: jspb.BinaryReader): DispenseMetadataMap;
+}
+
+export namespace DispenseMetadataMap {
+  export type AsObject = {
+    dispenseMetadataMap: Array<[string, DispenseMetadata.AsObject]>,
+  }
+}
+
+export class DispenseMetadata extends jspb.Message {
+  getStartupcounter(): number;
+  setStartupcounter(value: number): void;
+
+  getDispenserequestnumber(): number;
+  setDispenserequestnumber(value: number): void;
+
+  getFaileddispense(): boolean;
+  setFaileddispense(value: boolean): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DispenseMetadata.AsObject;
+  static toObject(includeInstance: boolean, msg: DispenseMetadata): DispenseMetadata.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: DispenseMetadata, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DispenseMetadata;
+  static deserializeBinaryFromReader(message: DispenseMetadata, reader: jspb.BinaryReader): DispenseMetadata;
+}
+
+export namespace DispenseMetadata {
+  export type AsObject = {
+    startupcounter: number,
+    dispenserequestnumber: number,
+    faileddispense: boolean,
+  }
+}
+
 export interface SolenoidValveMap {
   VALVE_UNDEFINED: 0;
   VALVE_DRAIN: 1;

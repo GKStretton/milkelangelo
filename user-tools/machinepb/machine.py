@@ -2,7 +2,7 @@
 # sources: machine.proto
 # plugin: python-betterproto
 from dataclasses import dataclass
-from typing import List
+from typing import Dict, List
 
 import betterproto
 
@@ -132,3 +132,18 @@ class SessionStatus(betterproto.Message):
 @dataclass
 class StreamStatus(betterproto.Message):
     live: bool = betterproto.bool_field(1)
+
+
+@dataclass
+class DispenseMetadataMap(betterproto.Message):
+    # [startupCounter]_[dispenseRequestNumber]
+    dispense_metadata: Dict[str, "DispenseMetadata"] = betterproto.map_field(
+        1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
+
+
+@dataclass
+class DispenseMetadata(betterproto.Message):
+    startup_counter: int = betterproto.uint64_field(1)
+    dispense_request_number: int = betterproto.uint64_field(2)
+    failed_dispense: bool = betterproto.bool_field(3)
