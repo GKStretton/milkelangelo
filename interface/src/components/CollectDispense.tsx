@@ -4,7 +4,7 @@ import { SessionStatus, SolenoidValve, StateReport, Status, StreamStatus } from 
 import MqttContext from '../util/mqttContext'
 import { ButtonGroup, Button, Typography, Slider, Box, Tabs, Tab } from '@mui/material';
 import { useSessionStatus, useStateReport, useStreamStatus } from '../util/hooks';
-import { TOPIC_MARK_FAILED_DISPENSE } from '../topics_backend/topics_backend';
+import { TOPIC_MARK_DELAYED_DISPENSE, TOPIC_MARK_FAILED_DISPENSE } from '../topics_backend/topics_backend';
 
 export default function CollectDispense() {
     const noVials = 7
@@ -61,7 +61,14 @@ export default function CollectDispense() {
     const [latestFailedDispense, setLatestFailedDispense] = useState(-1);
     const markFailedDispense = () => {
         setLatestFailedDispense(stateReport?.getPipetteState()?.getDispenseRequestNumber() ?? -1);
+        setLatestDelayedDispense(-1);
         c?.publish(TOPIC_MARK_FAILED_DISPENSE, "")
+    }
+    const [latestDelayedDispense, setLatestDelayedDispense] = useState(-1);
+    const markDelayedDispense = () => {
+        setLatestDelayedDispense(stateReport?.getPipetteState()?.getDispenseRequestNumber() ?? -1);
+        setLatestFailedDispense(-1);
+        c?.publish(TOPIC_MARK_DELAYED_DISPENSE, "")
     }
 
 	return (
@@ -95,6 +102,7 @@ export default function CollectDispense() {
 			<Typography variant="body1">Auto-Dispense Volume: {getAutoDispenseVolume()}µl</Typography>
             <Button disabled={!isAwake || collecting || stateReport?.getPipetteState()?.getSpent()} onClick={() => c?.publish(TOPIC_DISPENSE, getAutoDispenseVolume().toString())} sx={{"margin": 1}}>Auto-Dispense</Button>
             <Button color="error" disabled={!isAwake || stateReport?.getPipetteState()?.getDispenseRequestNumber() == latestFailedDispense} onClick={markFailedDispense}>Mark Failed Dispense</Button>
+            <Button color="error" disabled={!isAwake || stateReport?.getPipetteState()?.getDispenseRequestNumber() == latestDelayedDispense} onClick={markDelayedDispense}>Mark Delayed Dispense</Button>
 		</>
 		);
 	}

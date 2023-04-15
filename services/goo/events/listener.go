@@ -61,6 +61,21 @@ func Run(sm *session.SessionManager) {
 			)
 		}
 	})
+
+	mqtt.Subscribe(topics_backend.TOPIC_MARK_DELAYED_DISPENSE, func(topic string, payload []byte) {
+		// could change to payload in future
+		delayMs := uint64(1000)
+
+		session, _ := sm.GetLatestSession()
+		if session != nil && !session.Complete {
+			appendDelayedDispense(
+				uint64(session.Id),
+				latest_state_report.StartupCounter,
+				uint64(latest_state_report.PipetteState.DispenseRequestNumber),
+				delayMs,
+			)
+		}
+	})
 }
 
 func Subscribe() chan *machinepb.StateReport {
@@ -158,9 +173,57 @@ func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
 		failedDispenses.DispenseMetadata[key].FailedDispense = true
 	} else {
 		failedDispenses.DispenseMetadata[key] = &machinepb.DispenseMetadata{
-			StartupCounter:        startupCounter,
-			DispenseRequestNumber: dispenseNumber,
-			FailedDispense:        true,
+			FailedDispense: true,
+		}
+	}
+
+	data, err = protoyaml.Marshal(failedDispenses)
+	if err != nil {
+		fmt.Printf("Error marshalling failed dispenses: %v\n", err)
+		return
+	}
+
+	err = os.WriteFile(p, data, 0644)
+	if err != nil {
+		fmt.Printf("Error writing failed dispenses file: %v\n", err)
+		return
+	}
+
+	fmt.Printf("wrote failed dispense to file (session %d, startup %d, dispense %d)\n", sessionId, startupCounter, dispenseNumber)
+}
+
+func appendDelayedDispense(sessionId, startupCounter, dispenseNumber, delayMs uint64) {
+	p := filesystem.GetFailedDispensesPath(sessionId)
+
+	failedDispenses := &machinepb.DispenseMetadataMap{}
+
+	data, err := os.ReadFile(p)
+	if err != nil && !os.IsNotExist(err) {
+		fmt.Printf("Error reading failed dispenses file: %v\n", err)
+		return
+	}
+
+	if len(data) > 0 {
+		err = protoyaml.Unmarshal(data, failedDispenses)
+		if err != nil {
+			fmt.Printf("Error unmarshalling failed dispenses: %v\n", err)
+			return
+		}
+	}
+
+	if failedDispenses.DispenseMetadata == nil {
+		failedDispenses.DispenseMetadata = map[string]*machinepb.DispenseMetadata{}
+	}
+
+	key := fmt.Sprintf("%d_%d", startupCounter, dispenseNumber)
+
+	if _, ok := failedDispenses.DispenseMetadata[key]; ok {
+		failedDispenses.DispenseMetadata[key].FailedDispense = false
+		failedDispenses.DispenseMetadata[key].DispenseDelayMs = delayMs
+	} else {
+		failedDispenses.DispenseMetadata[key] = &machinepb.DispenseMetadata{
+			FailedDispense:  false,
+			DispenseDelayMs: delayMs,
 		}
 	}
 

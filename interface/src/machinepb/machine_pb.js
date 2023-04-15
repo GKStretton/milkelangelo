@@ -2578,9 +2578,8 @@ proto.machine.DispenseMetadata.prototype.toObject = function(opt_includeInstance
  */
 proto.machine.DispenseMetadata.toObject = function(includeInstance, msg) {
   var f, obj = {
-    startupcounter: jspb.Message.getFieldWithDefault(msg, 1, 0),
-    dispenserequestnumber: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    faileddispense: jspb.Message.getBooleanFieldWithDefault(msg, 3, false)
+    faileddispense: jspb.Message.getBooleanFieldWithDefault(msg, 1, false),
+    dispensedelayms: jspb.Message.getFieldWithDefault(msg, 2, 0)
   };
 
   if (includeInstance) {
@@ -2618,16 +2617,12 @@ proto.machine.DispenseMetadata.deserializeBinaryFromReader = function(msg, reade
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {number} */ (reader.readUint64());
-      msg.setStartupcounter(value);
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setFaileddispense(value);
       break;
     case 2:
       var value = /** @type {number} */ (reader.readUint64());
-      msg.setDispenserequestnumber(value);
-      break;
-    case 3:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setFaileddispense(value);
+      msg.setDispensedelayms(value);
       break;
     default:
       reader.skipField();
@@ -2658,72 +2653,29 @@ proto.machine.DispenseMetadata.prototype.serializeBinary = function() {
  */
 proto.machine.DispenseMetadata.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getStartupcounter();
-  if (f !== 0) {
-    writer.writeUint64(
+  f = message.getFaileddispense();
+  if (f) {
+    writer.writeBool(
       1,
       f
     );
   }
-  f = message.getDispenserequestnumber();
+  f = message.getDispensedelayms();
   if (f !== 0) {
     writer.writeUint64(
       2,
       f
     );
   }
-  f = message.getFaileddispense();
-  if (f) {
-    writer.writeBool(
-      3,
-      f
-    );
-  }
 };
 
 
 /**
- * optional uint64 startupCounter = 1;
- * @return {number}
- */
-proto.machine.DispenseMetadata.prototype.getStartupcounter = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.machine.DispenseMetadata} returns this
- */
-proto.machine.DispenseMetadata.prototype.setStartupcounter = function(value) {
-  return jspb.Message.setProto3IntField(this, 1, value);
-};
-
-
-/**
- * optional uint64 dispenseRequestNumber = 2;
- * @return {number}
- */
-proto.machine.DispenseMetadata.prototype.getDispenserequestnumber = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.machine.DispenseMetadata} returns this
- */
-proto.machine.DispenseMetadata.prototype.setDispenserequestnumber = function(value) {
-  return jspb.Message.setProto3IntField(this, 2, value);
-};
-
-
-/**
- * optional bool failedDispense = 3;
+ * optional bool failedDispense = 1;
  * @return {boolean}
  */
 proto.machine.DispenseMetadata.prototype.getFaileddispense = function() {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 3, false));
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 1, false));
 };
 
 
@@ -2732,7 +2684,25 @@ proto.machine.DispenseMetadata.prototype.getFaileddispense = function() {
  * @return {!proto.machine.DispenseMetadata} returns this
  */
 proto.machine.DispenseMetadata.prototype.setFaileddispense = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 3, value);
+  return jspb.Message.setProto3BooleanField(this, 1, value);
+};
+
+
+/**
+ * optional uint64 dispenseDelayMs = 2;
+ * @return {number}
+ */
+proto.machine.DispenseMetadata.prototype.getDispensedelayms = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.machine.DispenseMetadata} returns this
+ */
+proto.machine.DispenseMetadata.prototype.setDispensedelayms = function(value) {
+  return jspb.Message.setProto3IntField(this, 2, value);
 };
 
 

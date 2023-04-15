@@ -6,6 +6,7 @@ export const TOPIC_KV_GET: string = "asol/kv/get/";
 export const TOPIC_KV_GET_RESP: string = "asol/kv/get-resp/";
 export const TOPIC_KV_SET: string = "asol/kv/set/";
 export const TOPIC_KV_SET_RESP: string = "asol/kv/set-resp/";
+export const TOPIC_MARK_DELAYED_DISPENSE: string = "asol/mark-failed-dispense";
 export const TOPIC_MARK_FAILED_DISPENSE: string = "asol/mark-failed-dispense";
 export const TOPIC_MONITOR_OFF: string = "asol/monitor_off";
 export const TOPIC_MONITOR_ON: string = "asol/monitor_on";

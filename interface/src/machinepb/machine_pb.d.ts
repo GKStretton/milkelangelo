@@ -327,14 +327,11 @@ export namespace DispenseMetadataMap {
 }
 
 export class DispenseMetadata extends jspb.Message {
-  getStartupcounter(): number;
-  setStartupcounter(value: number): void;
-
-  getDispenserequestnumber(): number;
-  setDispenserequestnumber(value: number): void;
-
   getFaileddispense(): boolean;
   setFaileddispense(value: boolean): void;
+
+  getDispensedelayms(): number;
+  setDispensedelayms(value: number): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DispenseMetadata.AsObject;
@@ -348,9 +345,8 @@ export class DispenseMetadata extends jspb.Message {
 
 export namespace DispenseMetadata {
   export type AsObject = {
-    startupcounter: number,
-    dispenserequestnumber: number,
     faileddispense: boolean,
+    dispensedelayms: number,
   }
 }
 
