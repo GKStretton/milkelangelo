@@ -20,13 +20,14 @@ class SectionProperties:
 """
 
 
-# returns properties for this section. if the second parameter is not 0, 
-# this is a "forced_duration". a forced duration requires these properties be
-# maintained for this time, even if the state reports change.
-def get_section_properties(video_state, state_report: pb.StateReport, content_type: ContentType) -> SectionProperties:
+# returns for this section,
+# 1. SectionProperties
+# 2. delay before the properties should come into effect
+# 3. min_duration of these properties
+def get_section_properties(video_state, state_report: pb.StateReport, content_type: ContentType) -> typing.Tuple[SectionProperties, float, float]:
 	props = SectionProperties(
 		scene = Scene.DUAL,
-		speed = 11.53,
+		speed = 1.0,
 		skip = False,
 		crop = True,
 		vig_overlay = True,
@@ -36,7 +37,9 @@ def get_section_properties(video_state, state_report: pb.StateReport, content_ty
 	if state_report.paused or state_report.status == pb.Status.SLEEPING:
 		props.skip = True
 		return props
-	
+
+	return props, 0, 0
+
 	# if state_report.status == pb.Status.IDLE_MOVING:
 	# 	props.speed = 3.0
 	
@@ -57,4 +60,3 @@ def get_section_properties(video_state, state_report: pb.StateReport, content_ty
 	# 	props['scene'] = SCENE_DUAL
 	# 	props['speed'] = 10.0
 	
-	return props

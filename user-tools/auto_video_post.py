@@ -243,22 +243,41 @@ if __name__ == "__main__":
 	if args.test:
 		exit(0)
 
-	propertyList = {}
+	# unused
 	state = {}
-	descriptor = ContentDescriptor(session_metadata, content_type, content_fmt)
-	start_ts = None
-	for i in range(len(state_reports)):
-		report = pb.StateReport().from_dict(state_reports[i])
-		report_ts = float(report.timestamp_unix_micros) / 1.0e6
-		if start_ts is None:
-			start_ts = report_ts
-		elif args.end_at:
-			if report_ts - start_ts > float(args.end_at):
-				break
 
-		props = properties.get_section_properties(state, report, content_type)
+	start_ts = state_reports[0][0]
+	descriptor = ContentDescriptor(session_metadata, content_type, content_fmt)
+	# no properties may be set until after this time
+	generated_until = 0
+
+	# Iterate state reports
+	for i, (report_ts, report) in enumerate(state_reports):
+		# Always set state report in descriptor for use in the overlays
 		descriptor.set_state_report(report_ts, report)
-		descriptor.set_properties(report_ts, props)
+
+		# Get section properties
+		props, delay, min_duration = properties.get_section_properties(state, report, content_type)
+
+		# if we've generated beyond everything this report covers, skip it
+		if (
+			i+1 < len(state_reports) and
+			generated_until >= state_reports[i+1][0] and
+			generated_until >= report_ts + delay + min_duration
+		):
+			continue
+
+		# only change properties after generated_until
+		ts = max(generated_until, report_ts + delay)
+		descriptor.set_properties(ts, props)
+
+		# generated_until represents the earliest time the properties are
+		# allowed to change
+		generated_until = report_ts + delay + min_duration
+
+		# stop early if enabled for testing 
+		if args.end_at and report_ts - start_ts > float(args.end_at):
+			break
 	
 	# content track
 	overlay_clip, content_clip = descriptor.generate_content_clip(top_footage, front_footage)
