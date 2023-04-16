@@ -1,5 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import typing
+
+def dur_fmt(seconds: float) -> str:
+	return str(timedelta(seconds=seconds))
 
 def ts_format(ts: float) -> str:
 	if ts is None:

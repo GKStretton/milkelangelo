@@ -221,6 +221,7 @@ if __name__ == "__main__":
 	parser.add_argument("-x", "--test", action="store_true", help="If true, run test code instead of main functionality")
 	parser.add_argument("-t", "--type", action="store", help="content type of output e.g. SHORTFORM | LONGFORM", default="LONGFORM")
 	parser.add_argument("-s", "--start-at", action="store", help="set final clip start to this time (s), useful with preview", default=0)
+	parser.add_argument("-y", "--yes", action="store_true", help="auto-yes to render confirmation", default=False)
 	# parser.add_argument("-f", "--format", action="store", help="content format of output e.g. LANDSCAPE | PORTRAIT", required=True)
 
 	args = parser.parse_args()
@@ -261,14 +262,21 @@ if __name__ == "__main__":
 	
 	# content track
 	overlay_clip, content_clip = descriptor.generate_content_clip(top_footage, front_footage)
+	print(f"length without stills: {util.dur_fmt(content_clip.duration)}")
 	overlay_clip, content_clip = add_stills(content_path, content_type, content_fmt, overlay_clip, content_clip)
-
+	print(f"length with stills: {util.dur_fmt(content_clip.duration)}")
 	print(f"total generation time: {str(datetime.now() - gen_start)}")
+
+	if not args.yes:
+		confirm = input("Render? [y/N] ")
+		if confirm != "y":
+			print("Exiting")
+			exit(0)
 
 	# launch preview application, or save
 	if args.preview:
 		combined_clip = CompositeVideoClip([content_clip, overlay_clip], size=content_clip.size, use_bgclip=True)
-		combined_clip = combined_clip.resize(0.5)
+		combined_clip = combined_clip.resize(1)
 		combined_clip = combined_clip.subclip(float(args.start_at))
 		combined_clip.preview()
 	else:

@@ -26,7 +26,7 @@ class SectionProperties:
 def get_section_properties(video_state, state_report: pb.StateReport, content_type: ContentType) -> SectionProperties:
 	props = SectionProperties(
 		scene = Scene.DUAL,
-		speed = 1.0,
+		speed = 11.53,
 		skip = False,
 		crop = True,
 		vig_overlay = True,
