@@ -14,8 +14,7 @@ from videoediting.constants import *
 from videoediting.footage import FootageWrapper
 import videoediting.loaders as loaders
 import machinepb.machine as pb
-import videoediting.section_properties as properties
-from videoediting.section_properties import SectionProperties
+from videoediting.properties.content_property_manager import *
 import pycommon.util as util
 from videoediting.compositor import compositeContentFromFootageSubclips
 from videoediting.stills import add_stills
@@ -188,14 +187,6 @@ def save(args, overlay: VideoClip.VideoClip, content: VideoClip.VideoClip, conte
 	content.write_videofile(content_file, codec='libx264', fps=FPS)
 	print(f"content generation time: {str(datetime.now() - content_render_start)}")
 
-def get_format(content_type: ContentType) -> Format:
-	if content_type == ContentType.LONGFORM:
-		return Format.LANDSCAPE
-	elif content_type == ContentType.SHORTFORM:
-		return Format.PORTRAIT
-	else:
-		return Format.UNDEFINED
-
 def test(metadata, fmt: Format, timestamp: float, top_footage: FootageWrapper, front_footage: FootageWrapper):
 	top_clip, top_crop = top_footage.get_subclip(timestamp, timestamp + 1)
 	front_clip, front_crop = front_footage.get_subclip(timestamp, timestamp + 1)
@@ -230,7 +221,8 @@ if __name__ == "__main__":
 	gen_start = datetime.now()
 
 	content_type = ContentType.__members__[args.type]
-	content_fmt = get_format(content_type)
+	property_manager = create_property_manager(content_type)
+	content_fmt = property_manager.get_format()
 
 	session_metadata = loaders.get_session_metadata(args.base_dir, args.session_number)
 	state_reports = loaders.get_state_reports(args)
@@ -257,7 +249,7 @@ if __name__ == "__main__":
 		descriptor.set_state_report(report_ts, report)
 
 		# Get section properties
-		props, delay, min_duration = properties.get_section_properties(state, report, content_type)
+		props, delay, min_duration = property_manager.get_section_properties(state, report)
 
 		# if we've generated beyond everything this report covers, skip it
 		if (
