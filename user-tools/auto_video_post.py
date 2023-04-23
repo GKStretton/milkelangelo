@@ -15,9 +15,11 @@ from videoediting.footage import FootageWrapper
 import videoediting.loaders as loaders
 import machinepb.machine as pb
 from videoediting.properties.content_property_manager import *
+from videoediting.properties.factory import *
 import pycommon.util as util
 from videoediting.compositor import compositeContentFromFootageSubclips
 from videoediting.stills import add_stills
+from videoediting.dispense_metadata import DispenseMetadataWrapper
 
 from enum import Enum
 from abc import ABC, abstractmethod
@@ -226,6 +228,7 @@ if __name__ == "__main__":
 
 	session_metadata = loaders.get_session_metadata(args.base_dir, args.session_number)
 	state_reports = loaders.get_state_reports(args)
+	dispense_metadata_wrapper = DispenseMetadataWrapper(args.base_dir, args.session_number)
 
 	# load camera footage
 	content_path = loaders.get_session_content_path(args)
@@ -249,7 +252,7 @@ if __name__ == "__main__":
 		descriptor.set_state_report(report_ts, report)
 
 		# Get section properties
-		props, delay, min_duration = property_manager.get_section_properties(state, report)
+		props, delay, min_duration = property_manager.get_section_properties(state, report, dispense_metadata_wrapper)
 
 		# if we've generated beyond everything this report covers, skip it
 		if (

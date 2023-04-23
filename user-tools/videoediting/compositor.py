@@ -1,5 +1,5 @@
 import moviepy.video.VideoClip as VideoClip
-from videoediting.section_properties import SectionProperties
+from videoediting.properties.content_property_manager import SectionProperties
 from pycommon.crop_util import CropConfig
 from videoediting.constants import *
 from videoediting.compositor_helpers import *

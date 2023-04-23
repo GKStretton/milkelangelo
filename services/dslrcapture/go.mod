@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/gkstretton/asol-protos v0.0.8-0.20230415181348-21f25760787a
-	github.com/gkstretton/dark/services/goo v0.0.0-20230415114645-7b1bbe17bf2d
+	github.com/gkstretton/dark/services/goo v0.0.0-20230416200915-97d42dc66bfa
 	google.golang.org/protobuf v1.30.0
 )
 

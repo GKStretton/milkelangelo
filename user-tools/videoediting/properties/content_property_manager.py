@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from videoediting.section_properties import SectionProperties
+import typing
 from videoediting.constants import *
 import machinepb.machine as pb
-from videoediting.properties.longform import LongFormPropertyManager
-from videoediting.properties.shortform import ShortFormPropertyManager
+from videoediting.dispense_metadata import DispenseMetadataWrapper
 
 @dataclass
 class SectionProperties:
@@ -31,7 +30,7 @@ class BasePropertyManager(ABC):
 		pass
 
 	@abstractmethod
-	def get_section_properties(self, video_state, state_report: pb.StateReport) -> SectionProperties:
+	def get_section_properties(self, video_state, state_report: pb.StateReport, dm_wrapper: DispenseMetadataWrapper) -> SectionProperties:
 		pass
 
 	# returns for this section,
@@ -47,17 +46,11 @@ class BasePropertyManager(ABC):
 			vig_overlay = True,
 			front_feather=True,
 		)
+		delay, min_duration = 0, 0
 
 		if state_report.paused or state_report.status == pb.Status.SLEEPING:
 			props.skip = True
-			return props
+			return props, delay, min_duration
 
-		return props
 
-def create_property_manager(content_type: ContentType) -> BasePropertyManager:
-	if content_type == ContentType.LONGFORM:
-		return LongFormPropertyManager()
-	elif content_type == ContentType.SHORTFORM:
-		return ShortFormPropertyManager()
-	else:
-		raise ValueError(f"Invalid content type: {content_type}")
+		return props, delay, min_duration

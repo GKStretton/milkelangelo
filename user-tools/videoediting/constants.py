@@ -4,6 +4,8 @@ from enum import Enum
 TOP_CAM = "top-cam"
 FRONT_CAM = "front-cam"
 
+EMULSIFIER_VIAL = 4
+
 # Scenes for defining composition of top and front cams
 class Scene(Enum):
 	UNDEFINED = 1

@@ -145,9 +145,9 @@ func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
 }
 
 func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
-	p := filesystem.GetFailedDispensesPath(sessionId)
+	p := filesystem.GetDispenseMetadataPath(sessionId)
 
-	failedDispenses := &machinepb.DispenseMetadataMap{}
+	meta := &machinepb.DispenseMetadataMap{}
 
 	data, err := os.ReadFile(p)
 	if err != nil && !os.IsNotExist(err) {
@@ -156,28 +156,28 @@ func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
 	}
 
 	if len(data) > 0 {
-		err = protoyaml.Unmarshal(data, failedDispenses)
+		err = protoyaml.Unmarshal(data, meta)
 		if err != nil {
 			fmt.Printf("Error unmarshalling failed dispenses: %v\n", err)
 			return
 		}
 	}
 
-	if failedDispenses.DispenseMetadata == nil {
-		failedDispenses.DispenseMetadata = map[string]*machinepb.DispenseMetadata{}
+	if meta.DispenseMetadata == nil {
+		meta.DispenseMetadata = map[string]*machinepb.DispenseMetadata{}
 	}
 
 	key := fmt.Sprintf("%d_%d", startupCounter, dispenseNumber)
 
-	if _, ok := failedDispenses.DispenseMetadata[key]; ok {
-		failedDispenses.DispenseMetadata[key].FailedDispense = true
+	if _, ok := meta.DispenseMetadata[key]; ok {
+		meta.DispenseMetadata[key].FailedDispense = true
 	} else {
-		failedDispenses.DispenseMetadata[key] = &machinepb.DispenseMetadata{
+		meta.DispenseMetadata[key] = &machinepb.DispenseMetadata{
 			FailedDispense: true,
 		}
 	}
 
-	data, err = protoyaml.Marshal(failedDispenses)
+	data, err = protoyaml.Marshal(meta)
 	if err != nil {
 		fmt.Printf("Error marshalling failed dispenses: %v\n", err)
 		return
@@ -193,9 +193,9 @@ func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
 }
 
 func appendDelayedDispense(sessionId, startupCounter, dispenseNumber, delayMs uint64) {
-	p := filesystem.GetFailedDispensesPath(sessionId)
+	p := filesystem.GetDispenseMetadataPath(sessionId)
 
-	failedDispenses := &machinepb.DispenseMetadataMap{}
+	meta := &machinepb.DispenseMetadataMap{}
 
 	data, err := os.ReadFile(p)
 	if err != nil && !os.IsNotExist(err) {
@@ -204,30 +204,30 @@ func appendDelayedDispense(sessionId, startupCounter, dispenseNumber, delayMs ui
 	}
 
 	if len(data) > 0 {
-		err = protoyaml.Unmarshal(data, failedDispenses)
+		err = protoyaml.Unmarshal(data, meta)
 		if err != nil {
 			fmt.Printf("Error unmarshalling failed dispenses: %v\n", err)
 			return
 		}
 	}
 
-	if failedDispenses.DispenseMetadata == nil {
-		failedDispenses.DispenseMetadata = map[string]*machinepb.DispenseMetadata{}
+	if meta.DispenseMetadata == nil {
+		meta.DispenseMetadata = map[string]*machinepb.DispenseMetadata{}
 	}
 
 	key := fmt.Sprintf("%d_%d", startupCounter, dispenseNumber)
 
-	if _, ok := failedDispenses.DispenseMetadata[key]; ok {
-		failedDispenses.DispenseMetadata[key].FailedDispense = false
-		failedDispenses.DispenseMetadata[key].DispenseDelayMs = delayMs
+	if _, ok := meta.DispenseMetadata[key]; ok {
+		meta.DispenseMetadata[key].FailedDispense = false
+		meta.DispenseMetadata[key].DispenseDelayMs = delayMs
 	} else {
-		failedDispenses.DispenseMetadata[key] = &machinepb.DispenseMetadata{
+		meta.DispenseMetadata[key] = &machinepb.DispenseMetadata{
 			FailedDispense:  false,
 			DispenseDelayMs: delayMs,
 		}
 	}
 
-	data, err = protoyaml.Marshal(failedDispenses)
+	data, err = protoyaml.Marshal(meta)
 	if err != nil {
 		fmt.Printf("Error marshalling failed dispenses: %v\n", err)
 		return
