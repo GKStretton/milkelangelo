@@ -6,10 +6,17 @@ class LongFormPropertyManager(BasePropertyManager):
 	def get_format(self) -> Format:
 		return Format.LANDSCAPE
 
-	def get_section_properties(self, video_state, state_report: pb.StateReport, dm_wrapper: DispenseMetadataWrapper) -> typing.Tuple[SectionProperties, float, float]:
+	def get_section_properties(self, video_state: VideoState, state_report: pb.StateReport, dm_wrapper: DispenseMetadataWrapper) -> typing.Tuple[SectionProperties, float, float]:
 		props, delay, min_duration = self.common_get_section_properties(video_state, state_report)
 		if props.skip:
 			return props, delay, min_duration
+
+		# todo: first generate to check the video_state gets shown in the overlay
+		# todo: then, do this and check it blanks out stuff correctly
+		#if video_state.canvas_status != CanvasStatus.DURING:
+		#	props.skip = True
+		#	return props, delay, min_duration
+
 		
 		# DISPENSE
 		if state_report.status == pb.Status.DISPENSING:
@@ -23,7 +30,7 @@ class LongFormPropertyManager(BasePropertyManager):
 				props.speed = 1
 			else:
 				min_duration = 2
-				props.speed = 2
+				props.speed = 5
 
 			return props, delay, min_duration
 

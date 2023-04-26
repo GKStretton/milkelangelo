@@ -5,6 +5,7 @@ import argparse
 from datetime import datetime
 import os
 import json
+import dataclasses
 
 from betterproto import Casing
 from moviepy.editor import *
@@ -41,16 +42,16 @@ class ContentDescriptor:
 		self.fmt = content_fmt
 
 		# [(timestamp_s, sr), ...]
-		self.state_reports: typing.List[typing.Tuple[float, pb.StateReport]] = []
+		self.state_reports: typing.List[typing.Tuple[float, pb.StateReport, VideoState]] = []
 		# [(timestamp_s, props), ...]
 		self.properties: typing.List[typing.Tuple[float, SectionProperties]] = []
 
-	def set_state_report(self, timestamp: float, state_report: pb.StateReport):
+	def set_state_report(self, timestamp: float, state_report: pb.StateReport, video_state: VideoState):
 		if len(self.state_reports) > 0 and self.state_reports[-1][0] > timestamp:
 			print(f"set_state_report with timestamp {timestamp}, but previously seen state report has timestamp {self.state_reports[-1][0]}")
 			exit(1)
 		
-		self.state_reports.append((timestamp, state_report))
+		self.state_reports.append((timestamp, state_report, dataclasses.replace(video_state)))
 
 	def set_properties(self, timestamp: float, properties: SectionProperties):
 		if len(self.properties) > 0 and self.properties[-1][0] > timestamp:
@@ -83,7 +84,7 @@ class ContentDescriptor:
 		sr_clips = []
 		for i in range(len(self.state_reports)):
 			print(i)
-			timestamp, sr = self.state_reports[i]
+			timestamp, sr, video_state = self.state_reports[i]
 
 			# show last one for this long
 			duration = FINAL_DURATION
@@ -97,6 +98,7 @@ class ContentDescriptor:
 				sort_keys=True,
 		    )
 			text_str = "STATE REPORT:\n"+util.ts_format(timestamp) + "\n" + sr_fmt
+			text_str += "\n\nVIDEO STATE:\n" + str(video_state)
 			txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=10, color='white', align='West')
 			txt = txt.set_duration(duration)
 
@@ -239,7 +241,7 @@ if __name__ == "__main__":
 		exit(0)
 
 	# unused
-	state = {}
+	state = VideoState()
 
 	start_ts = state_reports[0][0]
 	descriptor = ContentDescriptor(session_metadata, content_type, content_fmt)
@@ -248,11 +250,11 @@ if __name__ == "__main__":
 
 	# Iterate state reports
 	for i, (report_ts, report) in enumerate(state_reports):
-		# Always set state report in descriptor for use in the overlays
-		descriptor.set_state_report(report_ts, report)
-
 		# Get section properties
 		props, delay, min_duration = property_manager.get_section_properties(state, report, dispense_metadata_wrapper)
+
+		# Always set state report in descriptor for use in the overlays
+		descriptor.set_state_report(report_ts, report, state)
 
 		# if we've generated beyond everything this report covers, skip it
 		if (
