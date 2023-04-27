@@ -2,8 +2,9 @@ from moviepy.video.VideoClip import TextClip
 import typing
 
 def build_title(pos: typing.Tuple[int, int], duration: float) -> TextClip:
-	text_clip = TextClip("A Study of Light", size=(900, 140), fontsize=115, color='white', font='DejaVu-Serif-Condensed-Italic')
-	text_clip = text_clip.set_position(pos)
+	text_size=(900, 140)
+	text_clip = TextClip("A Study of Light", size=text_size, fontsize=115, color='white', font='DejaVu-Serif-Condensed-Italic')
+	text_clip = text_clip.set_position((pos[0] - text_size[0] // 2, pos[1]))
 	text_clip = text_clip.set_duration(duration)
 
 	return text_clip
