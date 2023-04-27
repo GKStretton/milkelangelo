@@ -237,11 +237,13 @@ if __name__ == "__main__":
 	top_footage = FootageWrapper(os.path.join(content_path, "video/raw/" + TOP_CAM), timeOffset=TOP_CAM_TIME_OFFSET)
 	front_footage = FootageWrapper(os.path.join(content_path, "video/raw/" + FRONT_CAM), timeOffset=FRONT_CAM_TIME_OFFSET)
 
+	misc_data = loaders.get_misc_data(args.base_dir, args.session_number)
+
 	if args.test:
 		exit(0)
 
 	# unused
-	state = VideoState()
+	videoState = VideoState()
 
 	start_ts = state_reports[0][0]
 	descriptor = ContentDescriptor(session_metadata, content_type, content_fmt)
@@ -251,10 +253,10 @@ if __name__ == "__main__":
 	# Iterate state reports
 	for i, (report_ts, report) in enumerate(state_reports):
 		# Get section properties
-		props, delay, min_duration = property_manager.get_section_properties(state, report, dispense_metadata_wrapper)
+		props, delay, min_duration = property_manager.get_section_properties(videoState, report, dispense_metadata_wrapper, misc_data)
 
 		# Always set state report in descriptor for use in the overlays
-		descriptor.set_state_report(report_ts, report, state)
+		descriptor.set_state_report(report_ts, report, videoState)
 
 		# if we've generated beyond everything this report covers, skip it
 		if (

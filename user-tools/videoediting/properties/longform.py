@@ -1,17 +1,20 @@
 from videoediting.constants import *
 from videoediting.properties.content_property_manager import *
-from videoediting.constants import *
+from videoediting.loaders import MiscData
 
 class LongFormPropertyManager(BasePropertyManager):
 	def get_format(self) -> Format:
 		return Format.LANDSCAPE
 
-	def get_section_properties(self, video_state: VideoState, state_report: pb.StateReport, dm_wrapper: DispenseMetadataWrapper) -> typing.Tuple[SectionProperties, float, float]:
+	def get_section_properties(self, video_state: VideoState, state_report: pb.StateReport, dm_wrapper: DispenseMetadataWrapper, misc_data: MiscData) -> typing.Tuple[SectionProperties, float, float]:
 		props, delay, min_duration = self.common_get_section_properties(video_state, state_report)
 		if props.skip:
 			return props, delay, min_duration
 
-		if video_state.canvas_status != CanvasStatus.DURING:
+		if (
+			video_state.canvas_status != CanvasStatus.DURING or
+			state_report.latest_dslr_file_number >= misc_data.selected_dslr_number
+		):
 			props.skip = True
 			return props, delay, min_duration
 

@@ -4,6 +4,8 @@ import os
 import argparse
 from PIL import Image
 import machinepb.machine as pb
+from dataclasses import dataclass
+from pathlib import Path
 
 def get_session_metadata(base_dir: str, session_number: int):
 	filename = "{}_session.yml".format(session_number)
@@ -38,18 +40,27 @@ def get_selected_dslr_image(base_dir: str, session_number: int, image_choice: st
 	return Image.open(path)
 
 # look up creationtime of selected.jpg dslr/post image
-def get_selected_dslr_image_creation_time(base_dir: str, session_number: int) -> typing.Optional[float]:
+def get_selected_dslr_image_number(base_dir: str, session_number: int) -> int:
 	linkname = f"selected.jpg"
 	path = os.path.join(base_dir, "session_content", str(session_number), "dslr/post", linkname)
 
-	# resolves symlink and adds .creationtime extension
-	creationtime_path = os.path.realpath(path) + ".creationtime"
+	# resolves symlink
+	real_path = ""
+	try:
+		real_path = os.path.realpath(path)
+	except:
+		print("Error: could not resolve symlink {}".format(path))
+		exit(1)
 
-	# calculate absolute start timestamp
-	with open(creationtime_path, 'r') as f:
-		unixtime = f.readline()
+	name = Path(real_path).stem
 
-		# timestamp unix in seconds with decimal
-		return unixtime
+	return int(name)
 
-	return None
+@dataclass
+class MiscData:
+	selected_dslr_number: int = 0
+
+def get_misc_data(base_dir: str, session_number: int) -> MiscData:
+	return MiscData(
+		selected_dslr_number=get_selected_dslr_image_number(base_dir, session_number)
+	)

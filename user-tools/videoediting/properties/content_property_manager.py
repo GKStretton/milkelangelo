@@ -3,6 +3,7 @@ import typing
 from videoediting.constants import *
 import machinepb.machine as pb
 from videoediting.dispense_metadata import DispenseMetadataWrapper
+from videoediting.loaders import MiscData
 
 # for keeping track of our state when iterating state reports
 @dataclass
@@ -40,7 +41,7 @@ class BasePropertyManager(ABC):
 		pass
 
 	@abstractmethod
-	def get_section_properties(self, video_state: VideoState, state_report: pb.StateReport, dm_wrapper: DispenseMetadataWrapper) -> SectionProperties:
+	def get_section_properties(self, video_state: VideoState, state_report: pb.StateReport, dm_wrapper: DispenseMetadataWrapper, misc_data: MiscData) -> SectionProperties:
 		pass
 
 	# returns for this section,

@@ -4,8 +4,8 @@
 import yaml
 import machinepb.machine as pb
 
-INPUT = "/mnt/md0/light-stores/session_content/59/state-reports.yml"
-OUTPUT = "/mnt/md0/light-stores/session_content/59/state-reports_modified.yml"
+INPUT = "/home/greg/Downloads/session_content/59/state-reports.yml"
+OUTPUT = "/home/greg/Downloads/session_content/59/state-reports_modified.yml"
 
 def get_state_reports():
 	state_reports = None
@@ -21,20 +21,14 @@ print()
 reports = get_state_reports()
 new_reports = []
 
-isDispensing = False
-dispenseCounter = 0
 for i in range(len(reports)):
 	print(i)
 	report = pb.StateReport().from_dict(reports[i])
 
-	if not isDispensing and report.status == pb.Status.DISPENSING:
-		isDispensing = True
-		dispenseCounter += 1
-	
-	if isDispensing and report.status != pb.Status.DISPENSING:
-		isDispensing = False
-
-	report.pipette_state.dispense_request_number = dispenseCounter
+	if report.timestamp_unix_micros / 1000000.0 > 1681149877.765481586:
+		report.latest_dslr_file_number = 90 + 5
+	else:
+		report.latest_dslr_file_number = 1
 
 	new_reports.append(report.to_dict(include_default_values=True))
 
