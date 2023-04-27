@@ -19,6 +19,10 @@ github.com/gkstretton/asol-protos v0.0.8-0.20230415175457-a791ed904391 h1:SYKl/A
 github.com/gkstretton/asol-protos v0.0.8-0.20230415175457-a791ed904391/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/gkstretton/asol-protos v0.0.8-0.20230415181348-21f25760787a h1:E1D6/RPUaQey0bgqRenoNd/nGsr5iS5A2DZJxRF6FAw=
 github.com/gkstretton/asol-protos v0.0.8-0.20230415181348-21f25760787a/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230427183333-8b3d70bed57c h1:Ykek1eOruP9wpRJujquihdGaxLY2JGpPdSr9Fvl7aho=
+github.com/gkstretton/asol-protos v0.0.8-0.20230427183333-8b3d70bed57c/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230427184724-168176490dd4 h1:8HkPo8nPvxF0JcVFtlvoX/kAY4UnmOF6Ffv49w4LKnE=
+github.com/gkstretton/asol-protos v0.0.8-0.20230427184724-168176490dd4/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/gkstretton/dark/services/goo v0.0.0-20230331211249-6d50852a35b3 h1:LgqziAneYsCuRbPDT1YtdFD4hVT3p0ojGXBlApuLips=
 github.com/gkstretton/dark/services/goo v0.0.0-20230331211249-6d50852a35b3/go.mod h1:epq83l+VPRIkPn1rvTN8jPMUVxif0kfUIQaEyc/AXjA=
 github.com/gkstretton/dark/services/goo v0.0.0-20230401055224-0e0a50b8fe81 h1:SyqR/SQdQj6Dxg9lzq4JR7QtAyQkWD55baH4QK1XAD0=
@@ -41,6 +45,8 @@ github.com/gkstretton/dark/services/goo v0.0.0-20230415114645-7b1bbe17bf2d h1:hc
 github.com/gkstretton/dark/services/goo v0.0.0-20230415114645-7b1bbe17bf2d/go.mod h1:ANU/+R5fGAKZbvrZ2jtZtIEx1vbj8gMCzi9HPibeEWs=
 github.com/gkstretton/dark/services/goo v0.0.0-20230416200915-97d42dc66bfa h1:TxkhjqYwXp+vR9P7MzJGRJ7E/qSL8CCy9XR92eNZRVU=
 github.com/gkstretton/dark/services/goo v0.0.0-20230416200915-97d42dc66bfa/go.mod h1:ardNmU7Ea/Jpfesaek5PFmSW4Z4rq1eInkLf12vh80o=
+github.com/gkstretton/dark/services/goo v0.0.0-20230423192157-8d8a652c3657 h1:1C6XoxG7kDariUgRbjcOq5akwBY3q1LDoaB1/Vo52i4=
+github.com/gkstretton/dark/services/goo v0.0.0-20230423192157-8d8a652c3657/go.mod h1:ardNmU7Ea/Jpfesaek5PFmSW4Z4rq1eInkLf12vh80o=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=

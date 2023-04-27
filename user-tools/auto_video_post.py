@@ -89,7 +89,7 @@ class ContentDescriptor:
 			# show last one for this long
 			duration = FINAL_DURATION
 			if i < len(self.state_reports) - 1:
-				next_timestamp, _ = self.state_reports[i+1]
+				next_timestamp, _, _ = self.state_reports[i+1]
 				duration = next_timestamp - timestamp
 			
 			sr_fmt = json.dumps(
@@ -98,7 +98,7 @@ class ContentDescriptor:
 				sort_keys=True,
 		    )
 			text_str = "STATE REPORT:\n"+util.ts_format(timestamp) + "\n" + sr_fmt
-			text_str += "\n\nVIDEO STATE:\n" + str(video_state)
+			text_str += "\n\nVIDEO STATE:\n" + str(video_state) + "\n"
 			txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=10, color='white', align='West')
 			txt = txt.set_duration(duration)
 
@@ -141,7 +141,7 @@ class ContentDescriptor:
 			# commenting out this line in /etc/ImageMagick-6/policy.xml was required:
 			# <policy domain="path" rights="none" pattern="@*" />
 			# https://github.com/Zulko/moviepy/issues/401#issuecomment-278679961
-			txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=20, color='white', align='West')
+			txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=10, color='white', align='West')
 			txt = txt.set_duration(overlay_raw_subclip.duration)
 			overlay_subclip = clips_array([[overlay_raw_subclip], [txt]])
 

@@ -1,9 +1,9 @@
 import yaml
-import machinepb.machine as pb
 import typing
 import os
 import argparse
 from PIL import Image
+import machinepb.machine as pb
 
 def get_session_metadata(base_dir: str, session_number: int):
 	filename = "{}_session.yml".format(session_number)
@@ -36,3 +36,20 @@ def get_selected_dslr_image(base_dir: str, session_number: int, image_choice: st
 	filename = f"{image_choice}.jpg"
 	path = os.path.join(base_dir, "session_content", session_number, "dslr/post", filename)
 	return Image.open(path)
+
+# look up creationtime of selected.jpg dslr/post image
+def get_selected_dslr_image_creation_time(base_dir: str, session_number: int) -> typing.Optional[float]:
+	linkname = f"selected.jpg"
+	path = os.path.join(base_dir, "session_content", str(session_number), "dslr/post", linkname)
+
+	# resolves symlink and adds .creationtime extension
+	creationtime_path = os.path.realpath(path) + ".creationtime"
+
+	# calculate absolute start timestamp
+	with open(creationtime_path, 'r') as f:
+		unixtime = f.readline()
+
+		# timestamp unix in seconds with decimal
+		return unixtime
+
+	return None

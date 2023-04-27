@@ -11,11 +11,9 @@ class LongFormPropertyManager(BasePropertyManager):
 		if props.skip:
 			return props, delay, min_duration
 
-		# todo: first generate to check the video_state gets shown in the overlay
-		# todo: then, do this and check it blanks out stuff correctly
-		#if video_state.canvas_status != CanvasStatus.DURING:
-		#	props.skip = True
-		#	return props, delay, min_duration
+		if video_state.canvas_status != CanvasStatus.DURING:
+			props.skip = True
+			return props, delay, min_duration
 
 		
 		# DISPENSE

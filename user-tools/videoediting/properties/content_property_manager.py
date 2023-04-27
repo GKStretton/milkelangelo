@@ -48,7 +48,7 @@ class BasePropertyManager(ABC):
 	# 2. delay before the properties should come into effect
 	# 3. min_duration of these properties
 	def common_get_section_properties(self, video_state: VideoState, state_report: pb.StateReport) -> typing.Tuple[SectionProperties, float, float]:
-		update_state(self, video_state, state_report)
+		self.update_state(video_state, state_report)
 
 		props = SectionProperties(
 			scene = Scene.DUAL,

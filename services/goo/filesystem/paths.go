@@ -131,7 +131,7 @@ func GetPostDslrDir(sessionId uint64) string {
 }
 
 // GetIncrementalFile considers 'outDir' and returns the **full path to** the
-// next incremental file name on disk (w/ .'ext'). E.g:
+// NEXT incremental file name on disk (w/ .'ext'). E.g:
 //
 //	1.mp4 2.mp4 3.mp4 -> [outDir]/4.mp4
 func GetIncrementalFileName(outDir string, ext string) string {
@@ -144,6 +144,22 @@ func GetIncrementalFileName(outDir string, ext string) string {
 		i++
 		if i > 10000 {
 			panic("bug in GetIncrementalFileName: filename should likely not exceed 10000")
+		}
+	}
+}
+
+func GetLatestDslrFileNumber(sessionId uint64) uint64 {
+	outDir := GetRawDslrDir(sessionId)
+	ext := "jpg"
+	i := uint64(1)
+	for {
+		p := filepath.Join(outDir, fmt.Sprintf("%04d", i)+"."+ext)
+		if !Exists(p) {
+			return i - 1
+		}
+		i++
+		if i > 10000 {
+			panic("bug in GetLatestDslrFilename: filename should likely not exceed 10000")
 		}
 	}
 }

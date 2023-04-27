@@ -1350,7 +1350,8 @@ proto.machine.StateReport.toObject = function(includeInstance, msg) {
     fluidRequest: (f = msg.getFluidRequest()) && proto.machine.FluidRequest.toObject(includeInstance, f),
     fluidDetails: (f = msg.getFluidDetails()) && proto.machine.FluidDetails.toObject(includeInstance, f),
     paused: jspb.Message.getBooleanFieldWithDefault(msg, 50, false),
-    timestampReadable: jspb.Message.getFieldWithDefault(msg, 51, "")
+    timestampReadable: jspb.Message.getFieldWithDefault(msg, 51, ""),
+    latestDslrFileNumber: jspb.Message.getFieldWithDefault(msg, 52, 0)
   };
 
   if (includeInstance) {
@@ -1439,6 +1440,10 @@ proto.machine.StateReport.deserializeBinaryFromReader = function(msg, reader) {
     case 51:
       var value = /** @type {string} */ (reader.readString());
       msg.setTimestampReadable(value);
+      break;
+    case 52:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setLatestDslrFileNumber(value);
       break;
     default:
       reader.skipField();
@@ -1555,6 +1560,13 @@ proto.machine.StateReport.serializeBinaryToWriter = function(message, writer) {
   if (f.length > 0) {
     writer.writeString(
       51,
+      f
+    );
+  }
+  f = message.getLatestDslrFileNumber();
+  if (f !== 0) {
+    writer.writeUint64(
+      52,
       f
     );
   }
@@ -1869,6 +1881,24 @@ proto.machine.StateReport.prototype.getTimestampReadable = function() {
  */
 proto.machine.StateReport.prototype.setTimestampReadable = function(value) {
   return jspb.Message.setProto3StringField(this, 51, value);
+};
+
+
+/**
+ * optional uint64 latest_dslr_file_number = 52;
+ * @return {number}
+ */
+proto.machine.StateReport.prototype.getLatestDslrFileNumber = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 52, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.machine.StateReport} returns this
+ */
+proto.machine.StateReport.prototype.setLatestDslrFileNumber = function(value) {
+  return jspb.Message.setProto3IntField(this, 52, value);
 };
 
 

@@ -40,6 +40,7 @@ func Run(sm *session.SessionManager) {
 		session, _ := sm.GetLatestSession()
 		if session != nil {
 			sr.Paused = session.Paused
+			sr.LatestDslrFileNumber = filesystem.GetLatestDslrFileNumber(uint64(session.Id))
 		}
 
 		latest_state_report = sr

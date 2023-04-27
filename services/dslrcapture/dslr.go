@@ -5,8 +5,10 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/gkstretton/asol-protos/go/topics_firmware"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/livecapture"
+	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/util"
 )
 
@@ -32,6 +34,11 @@ func captureSessionImage(sessionId uint64) {
 	if err != nil {
 		fmt.Println(err)
 		return
+	}
+
+	err = mqtt.Publish(topics_firmware.TOPIC_STATE_REPORT_REQUEST, "")
+	if err != nil {
+		fmt.Printf("failed to publish state report request: %v\n", err)
 	}
 
 	err = filesystem.WriteCreationTimeUsingNow(p)
