@@ -3,6 +3,12 @@ from videoediting.properties.content_property_manager import *
 from videoediting.loaders import MiscData
 
 class ShortFormPropertyManager(BasePropertyManager):
+	def get_stills_config(self) -> StillsConfig:
+		return StillsConfig(
+			intro_duration=1,
+			outro_duration=5,
+		)
+
 	def get_format(self) -> Format:
 		return Format.PORTRAIT
 
@@ -47,6 +53,8 @@ class ShortFormPropertyManager(BasePropertyManager):
 		elif state_report.pipette_state.dispense_request_number < 1:
 			# initial collection and movement is slower
 			props.speed = 4
+		elif state_report.status == pb.Status.NAVIGATING_IK:
+			props.speed = 10
 		elif state_report.status == pb.Status.IDLE_STATIONARY:
 			props.speed = 100
 		else:

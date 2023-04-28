@@ -34,7 +34,16 @@ class SectionProperties:
 			"feather" if self.front_feather else "no-feather",
 		])
 
+@dataclass
+class StillsConfig:
+	intro_duration: float = 1
+	outro_duration: float = 1
+
 class BasePropertyManager(ABC):
+
+	@abstractmethod
+	def get_stills_config(self) -> StillsConfig:
+		pass
 
 	@abstractmethod
 	def get_format(self) -> Format:

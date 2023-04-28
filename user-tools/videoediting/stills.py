@@ -1,20 +1,21 @@
 import moviepy.video.VideoClip as VideoClip
 from moviepy.editor import concatenate_videoclips
 from videoediting.constants import *
+from videoediting.properties.content_property_manager import *
 import os
 import typing
 
-def add_stills(content_path: str, content_type: ContentType, content_fmt: Format, overlay_clip: VideoClip, content_clip: VideoClip) -> typing.Tuple[VideoClip.VideoClip, VideoClip.VideoClip]:
+def add_stills(content_path: str, content_type: ContentType, content_fmt: Format, overlay_clip: VideoClip, content_clip: VideoClip, property_manager: BasePropertyManager) -> typing.Tuple[VideoClip.VideoClip, VideoClip.VideoClip]:
 	path = os.path.join(content_path, "stills")
 
-	introDuration = 1 if content_type == ContentType.SHORTFORM else 3
+	introDuration = property_manager.get_stills_config().intro_duration
 	introClip = VideoClip.ImageClip(
 		img=os.path.join(path, f"INTRO-{content_fmt.name}.jpg"),
 		duration=introDuration,
 	)
 	introClip = introClip.fadeout(introDuration / 5)
 
-	outroDuration = 2 if content_type == ContentType.SHORTFORM else 5
+	outroDuration = property_manager.get_stills_config().outro_duration
 	outroClip = VideoClip.ImageClip(
 		img=os.path.join(path, f"OUTRO-{content_fmt.name}.jpg"),
 		duration=outroDuration,

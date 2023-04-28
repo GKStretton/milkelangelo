@@ -3,6 +3,12 @@ from videoediting.properties.content_property_manager import *
 from videoediting.loaders import MiscData
 
 class LongFormPropertyManager(BasePropertyManager):
+	def get_stills_config(self) -> StillsConfig:
+		return StillsConfig(
+			intro_duration=3,
+			outro_duration=5,
+		)
+
 	def get_format(self) -> Format:
 		return Format.LANDSCAPE
 

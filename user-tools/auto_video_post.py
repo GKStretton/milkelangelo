@@ -282,7 +282,7 @@ if __name__ == "__main__":
 	# content track
 	overlay_clip, content_clip = descriptor.generate_content_clip(top_footage, front_footage)
 	print(f"length without stills: {util.dur_fmt(content_clip.duration)}")
-	overlay_clip, content_clip = add_stills(content_path, content_type, content_fmt, overlay_clip, content_clip)
+	overlay_clip, content_clip = add_stills(content_path, content_type, content_fmt, overlay_clip, content_clip, property_manager)
 	print(f"length with stills: {util.dur_fmt(content_clip.duration)}")
 	print(f"total generation time: {str(datetime.now() - gen_start)}")
 
