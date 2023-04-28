@@ -12,7 +12,7 @@ class ShortFormPropertyManager(BasePropertyManager):
 			return props, delay, min_duration
 
 		if (
-			video_state.canvas_status != CanvasStatus.DURING or
+			video_state.canvas_status == CanvasStatus.AFTER or
 			state_report.latest_dslr_file_number >= misc_data.selected_dslr_number
 		):
 			props.skip = True
@@ -29,14 +29,25 @@ class ShortFormPropertyManager(BasePropertyManager):
 			if state_report.pipette_state.vial_held == EMULSIFIER_VIAL:
 				min_duration = 2
 				props.speed = 1
-			else:
+			else: # dye
 				min_duration = 2
-				props.speed = 5
+				if state_report.pipette_state.dispense_request_number <= 1:
+					# first dispense
+					props.speed = 1
+				else:
+					props.speed = 5
 
 			return props, delay, min_duration
 
 		# OTHER
-		if state_report.status == pb.Status.IDLE_STATIONARY:
+		if state_report.collection_request.request_number < 1:
+			props.skip = True
+		elif state_report.status == pb.Status.WAITING_FOR_DISPENSE:
+			props.speed = 50
+		elif state_report.pipette_state.dispense_request_number < 1:
+			# initial collection and movement is slower
+			props.speed = 4
+		elif state_report.status == pb.Status.IDLE_STATIONARY:
 			props.speed = 100
 		else:
 			props.speed = 50

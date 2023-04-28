@@ -26,6 +26,7 @@ from enum import Enum
 from abc import ABC, abstractmethod
 import typing
 
+# FPS for the final video, not directly related to the source footage
 FPS = 60
 # how much time to offset the start timestamp of the footage.
 # this is basically the latency of the streaming + recording pipeline
