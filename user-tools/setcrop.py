@@ -108,6 +108,12 @@ class CropWindow(window.Window):
         self.y1 = max(0, self.y1)
         self.x2 = min(self.frame_width, self.x2)
         self.y2 = min(self.frame_height, self.y2)
+
+        # dimensions must be halvable for x264
+        if (self.x2 - self.x1) % 2 == 1:
+            self.x2-=1
+        if (self.y2 - self.y1) % 2 == 1:
+            self.y2-=1
     
     def keyboard_handler(self, key):
         super().keyboard_handler(key)
