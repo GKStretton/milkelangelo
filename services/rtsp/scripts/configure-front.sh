@@ -36,7 +36,7 @@ exposure_absolute=300
 
 # wait so focus set happens while camera is up (streamcam bug?)
 sleep 1.5
-v4l2-ctl --device $path --set-ctrl focus_absolute=20,\
+v4l2-ctl --device $path --set-ctrl focus_absolute=20\
 
 # Fix for red camera effect?
 sleep 0.05
