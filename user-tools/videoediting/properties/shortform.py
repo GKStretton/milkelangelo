@@ -52,12 +52,12 @@ class ShortFormPropertyManager(BasePropertyManager):
 		if state_report.collection_request.request_number < 1:
 			props.skip = True
 		elif state_report.status == pb.Status.WAITING_FOR_DISPENSE:
-			props.speed = 20
+			props.speed = 15
 		elif state_report.pipette_state.dispense_request_number < 1:
 			# initial collection and movement is slower
 			props.speed = 5
 		elif state_report.status == pb.Status.NAVIGATING_IK:
-			props.speed = 20
+			props.speed = 15
 		elif state_report.status == pb.Status.IDLE_STATIONARY:
 			props.speed = 100
 		else:
