@@ -40,6 +40,9 @@ class StillsConfig:
 	outro_duration: float = 1
 
 class BasePropertyManager(ABC):
+	# if set, content will be sped up to fit this duration
+	def get_max_content_duration(self) -> typing.Optional[float]:
+		return None
 
 	@abstractmethod
 	def get_stills_config(self) -> StillsConfig:

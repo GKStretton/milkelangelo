@@ -170,6 +170,73 @@ class ContentDescriptor:
 
 		return concatenate_videoclips(overlay_clips), concatenate_videoclips(content_clips)
 
+	def limit_duration(self, property_manager: BasePropertyManager):
+		"""
+		Adjusts the speed of applicable sections in a video to meet a maximum duration constraint.
+		
+		This function calculates the total duration of a video, including stills, and compares it 
+		to the maximum allowed duration specified in the property manager. If the total duration 
+		exceeds the maximum allowed duration, the function increases the playback speed of 
+		applicable sections (based on the `is_applicable` criteria) to reduce the total duration.
+		
+		The function skips sections marked with the 'skip' property and only considers sections 
+		with speeds between 3.0 and 40.0 for adjustment.
+		
+		Parameters:
+		- property_manager (BasePropertyManager): An object containing properties and configurations,
+		including the maximum allowed duration for the video.
+
+		Returns:
+		None
+		"""
+
+		max_duration = property_manager.get_max_content_duration()
+		if max_duration is None:
+			return
+
+		def is_applicable(props: SectionProperties):
+			if props.skip:
+				return False
+			if props.speed >= 3.0 and props.speed <= 40:
+				return True
+			return False
+
+		# calculate existing durations
+		total_duration = 0
+		applicable_duration = 0
+		for i in range(len(self.properties) - 1):
+			ts, props = self.properties[i]
+			ts_next, props_next = self.properties[i+1]
+
+			if not props.skip:
+				total_duration += (ts_next - ts) / props.speed
+			
+			if is_applicable(props):
+				applicable_duration += (ts_next - ts) / props.speed
+
+		stills_time = property_manager.get_stills_config().intro_duration + property_manager.get_stills_config().outro_duration
+		full_total = total_duration + stills_time
+
+		reduction = full_total - max_duration
+		threshold = 0.1
+		if reduction <= threshold:
+			print(f"No duration reduction needed: {full_total:.2f}s <= {max_duration + threshold:.2f}s")
+			return
+		
+		new_applicable_time = applicable_duration - reduction
+		# Find speed factor to achieve the reduction
+		speed_factor = applicable_duration / new_applicable_time
+		
+		print(f"Target reduction of {reduction:.2f}s, {speed_factor:.2f} factor per applicable property")
+		print(f"Calculated total duration: {full_total:.2f}s, applicable: {applicable_duration:.2f}s.")
+
+		# apply reduction
+		for i in range(len(self.properties)):
+			ts, props = self.properties[i]
+			if not is_applicable(props):
+				continue
+			props.speed *= speed_factor
+
 
 def save(args, overlay: VideoClip.VideoClip, content: VideoClip.VideoClip, content_type):
 	output_dir = os.path.join(loaders.get_session_content_path(args), "video/post/")
@@ -278,6 +345,9 @@ if __name__ == "__main__":
 		# stop early if enabled for testing 
 		if args.end_at and report_ts - start_ts > float(args.end_at):
 			break
+	
+	# if it's over the maximium time, do some speed up
+	descriptor.limit_duration(property_manager)
 	
 	# content track
 	overlay_clip, content_clip = descriptor.generate_content_clip(top_footage, front_footage)

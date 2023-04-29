@@ -17,14 +17,20 @@ def build_session_number(metadata: typing.Dict[str, typing.Any], pos: typing.Tup
 
 	return text_clip
 
+def closest_rounded_speed(speed: float) -> str:
+    valid_speeds = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 300, 400, 500, 750, 1000]
+	# minimum difference between speed and one of valid_speeds
+    closest_speed = min(valid_speeds, key=lambda x: abs(x - speed))
+
+    if closest_speed == 1 or closest_speed == 2:
+        return f"{closest_speed:.0f}x"
+    elif closest_speed < 3.0:
+        return f"{closest_speed:.1f}x"
+    else:
+        return f"{closest_speed:.0f}x"
+
 def build_speed(speed: float, pos: typing.Tuple[int, int], duration: float) -> TextClip:
-	speed_text = ""
-	if speed == 1.0:
-		speed_text = "1x"
-	elif speed < 3.0:
-		speed_text = f"{speed:.1f}x"
-	else:
-		speed_text = f"{speed:.0f}x"
+	speed_text = closest_rounded_speed(speed)
 
 	text_clip = TextClip(speed_text, size=(200, 100), fontsize=70, align='west', color='white', font='DejaVu-Serif-Condensed-Italic')
 	text_clip = text_clip.set_position(pos)
