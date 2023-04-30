@@ -15,7 +15,7 @@ def composeLandscape(metadata, props: SectionProperties, top_subclip: VideoClip,
 			top_subclip.resize(1.05).set_position((960, 'center')),
 
 			build_title((490, 10), top_subclip.duration),
-			build_session_number(metadata, (20, 920), top_subclip.duration),
+			build_session_number(metadata, (195, 920), top_subclip.duration),
 			build_speed(props.speed, (1700, 20), top_subclip.duration),
 		], size=landscape_dim)
 
@@ -31,7 +31,7 @@ def composePortrait(metadata, props: SectionProperties, top_subclip: VideoClip, 
 			top_subclip.resize(1.05).set_position(('center', 50)),
 
 			build_title((portrait_dim[0] // 2, 955), top_subclip.duration),
-			build_session_number(metadata, (20, 10), top_subclip.duration),
+			build_session_number(metadata, (195, 10), top_subclip.duration),
 			build_speed(props.speed, (900, 20), top_subclip.duration),
 		], size=portrait_dim)
 

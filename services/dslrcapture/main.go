@@ -73,9 +73,9 @@ func captureLoop(sessionNumber uint64) {
 			fmt.Printf("stopping recording, returning\n")
 			return
 		case <-next:
+			next = time.After(time.Duration(*captureInterval) * time.Second)
 			captureSessionImage(sessionNumber)
 		}
-		next = time.After(time.Duration(*captureInterval) * time.Second)
 	}
 }
 
