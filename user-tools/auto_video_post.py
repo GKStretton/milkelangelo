@@ -136,6 +136,11 @@ class ContentDescriptor:
 				ts2_abs = self.properties[i+1][0]
 				ts2_rel = ts2_abs - start_timestamp
 			
+			# enforce max_duration by limiting ts2
+			if self.properties[i][1].max_duration is not None:
+				ts2_abs = min(ts2_abs, ts1_abs + self.properties[i][1].max_duration)
+				ts2_rel = ts2_abs - start_timestamp
+			
 			# build overlay subclip
 			overlay_raw_subclip = raw_overlay.subclip(ts1_rel, ts2_rel)
 			text_str = "PROPS:\n"+util.ts_format(self.properties[i][0]) + "\n" + props.__str__()
@@ -194,13 +199,6 @@ class ContentDescriptor:
 		if max_duration is None:
 			return
 
-		def is_applicable(props: SectionProperties):
-			if props.skip:
-				return False
-			if props.speed >= 3.0 and props.speed <= 40:
-				return True
-			return False
-
 		# calculate existing durations
 		total_duration = 0
 		applicable_duration = 0
@@ -209,10 +207,11 @@ class ContentDescriptor:
 			ts_next, props_next = self.properties[i+1]
 
 			if not props.skip:
-				total_duration += (ts_next - ts) / props.speed
-			
-			if is_applicable(props):
-				applicable_duration += (ts_next - ts) / props.speed
+				maximum = props.max_duration if props.max_duration is not None else 1e10
+				duration = min(maximum, ts_next - ts) / props.speed
+				total_duration += duration
+				if property_manager.is_applicable(props):
+					applicable_duration += duration
 
 		stills_time = property_manager.get_stills_config().intro_duration + property_manager.get_stills_config().outro_duration
 		full_total = total_duration + stills_time
@@ -233,7 +232,7 @@ class ContentDescriptor:
 		# apply reduction
 		for i in range(len(self.properties)):
 			ts, props = self.properties[i]
-			if not is_applicable(props):
+			if props.skip or not property_manager.is_applicable(props):
 				continue
 			props.speed *= speed_factor
 

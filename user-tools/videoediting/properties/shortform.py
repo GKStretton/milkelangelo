@@ -3,6 +3,13 @@ from videoediting.properties.content_property_manager import *
 from videoediting.loaders import MiscData
 
 class ShortFormPropertyManager(BasePropertyManager):
+	def is_applicable(self, props: SectionProperties) -> bool:
+		if props.skip:
+			return False
+		if props.speed >= 3.0 and props.speed <= 40:
+			return True
+		return False
+
 	def get_max_content_duration(self) -> typing.Optional[float]:
 		return 59.0
 

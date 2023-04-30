@@ -27,3 +27,5 @@ class Format(Enum):
 class ContentType(Enum):
 	LONGFORM = 1
 	SHORTFORM = 2
+	CLEANING = 3
+	

@@ -19,6 +19,7 @@ class VideoState:
 class SectionProperties:
 	scene: Scene = Scene.UNDEFINED
 	speed: float = 1.0
+	max_duration: typing.Optional[float] = None
 	skip: bool = False
 	crop: bool = True
 	vig_overlay: bool = True
@@ -26,8 +27,9 @@ class SectionProperties:
 
 	def __str__(self):
 		return "\n".join([
-			f"{self.scene.name}",
-			f"{self.speed}x",
+			f"scene: {self.scene.name}",
+			f"speed: {self.speed}x",
+			f"max_duration: {self.max_duration}",
 			"skip" if self.skip else "no-skip",
 			"crop" if self.crop else "no-crop",
 			"vig" if self.vig_overlay else "no-vig",
@@ -40,6 +42,10 @@ class StillsConfig:
 	outro_duration: float = 1
 
 class BasePropertyManager(ABC):
+	# determines whether a given clip with props may be sped up by the duration limiter
+	def is_applicable(self, props: SectionProperties) -> bool:
+		return True
+
 	# if set, content will be sped up to fit this duration
 	def get_max_content_duration(self) -> typing.Optional[float]:
 		return None
