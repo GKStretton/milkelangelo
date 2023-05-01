@@ -4,23 +4,18 @@ from videoediting.loaders import MiscData
 
 class LongFormPropertyManager(BasePropertyManager):
 	def is_applicable(self, props: SectionProperties) -> bool:
-		return True
-
-		# todo: Implement logic specific to LONGFORM ContentType
-		if props.skip:
-			return False
-		if props.speed >= 3.0 and props.speed <= 40:
+		if props.speed > 1.1:
 			return True
 		return False
 
 	def get_max_content_duration(self) -> typing.Optional[float]:
-		# todo: 15 mins?
 		return None
+		return 20*60.0
 
 	def get_stills_config(self) -> StillsConfig:
 		return StillsConfig(
 			intro_duration=3,
-			outro_duration=5,
+			outro_duration=10,
 		)
 
 	def get_format(self) -> Format:
@@ -31,5 +26,25 @@ class LongFormPropertyManager(BasePropertyManager):
 		if props.skip:
 			return props, delay, min_duration
 
-		# todo: Implement logic specific to LONGFORM ContentType
+		# DISPENSE
+		if state_report.status == pb.Status.DISPENSING:
+			dispense_metadata = dm_wrapper.get_dispense_metadata_from_sr(state_report)
+			if dispense_metadata:
+				props.skip = dispense_metadata.failed_dispense
+				delay = dispense_metadata.dispense_delay_ms / 1000.0
+
+			min_duration = 3
+		
+		if state_report.status == pb.Status.WAITING_FOR_DISPENSE:
+			# we shouldn't be waiting for dispense. In future could add a timeout
+			# that forces dispense after being still a certain time. liquid should
+			# be "hot" in this way. also, speed 1 adds to the suspense.
+			props.speed = 1
+		
+		if (
+			state_report.status == pb.Status.IDLE_STATIONARY and
+			video_state.canvas_status == CanvasStatus.DURING
+		):
+			props.speed = 20
+		
 		return props, delay, min_duration
