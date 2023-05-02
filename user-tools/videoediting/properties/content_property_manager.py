@@ -85,8 +85,6 @@ class BasePropertyManager(ABC):
 		video_state: VideoState,
 		state_report: pb.StateReport
 	) -> typing.Tuple[SectionProperties, float, float]:
-		self.update_state(video_state, state_report)
-
 		props = SectionProperties(
 			scene = Scene.DUAL,
 			speed = 1.0,
