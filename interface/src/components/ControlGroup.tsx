@@ -252,6 +252,8 @@ export default function ControlGroup() {
             <Typography>
                 Not implemented: post to social media
             </Typography>
+
+            <Button onClick={() => c?.publish("asol/videos-generated", "")}>Signal videos generated (do upload)</Button>
         </>}
         </>
     )
