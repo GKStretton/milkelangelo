@@ -34,9 +34,12 @@ FPS = 60
 TOP_CAM_TIME_OFFSET=-1.18
 FRONT_CAM_TIME_OFFSET=-1.18
 
-# This is a descriptor (list of timestamps and video properties) for a single
-# piece of content (video)
 class ContentDescriptor:
+	"""
+		This is a descriptor (list of timestamps and video properties) for a single
+		piece of content (video). It is used to generate the moviepy aggregate
+		clips for the overlay and content.
+	"""
 	def __init__(self, session_metadata, content_type: str, content_fmt: Format):
 		self.session_metadata = session_metadata
 		self.content_type = content_type

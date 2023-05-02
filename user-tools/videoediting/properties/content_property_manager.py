@@ -19,6 +19,9 @@ class VideoState:
 
 @dataclass
 class SectionProperties:
+	"""
+	SectionProperties represents the properties of a section of footage.
+	"""
 	scene: Scene = Scene.UNDEFINED
 	speed: float = 1.0
 	max_duration: typing.Optional[float] = None
@@ -44,6 +47,14 @@ class StillsConfig:
 	outro_duration: float = 1
 
 class BasePropertyManager(ABC):
+	"""
+		Base class for property managers. A property manager is responsible for 
+		determining the properties of a section of footage based on:
+
+		- The current state report
+		- a video state that is updated by this class to keep track of things
+		- other data
+	"""
 	# determines whether a given clip with props may be sped up by the duration limiter
 	def is_applicable(self, props: SectionProperties) -> bool:
 		return True
