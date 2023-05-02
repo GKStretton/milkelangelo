@@ -9,6 +9,8 @@ from videoediting.loaders import MiscData
 @dataclass
 class VideoState:
 	canvas_status: CanvasStatus = CanvasStatus.BEFORE
+	# true if the previous state report was paused
+	was_paused: bool = True
 
 	def __str__(self):
 		return "\n".join([
@@ -58,15 +60,31 @@ class BasePropertyManager(ABC):
 	def get_format(self) -> Format:
 		pass
 
-	@abstractmethod
-	def get_section_properties(self, video_state: VideoState, state_report: pb.StateReport, dm_wrapper: DispenseMetadataWrapper, misc_data: MiscData) -> SectionProperties:
-		pass
+	def get_section_properties(
+		self,
+		video_state: VideoState,
+		state_report: pb.StateReport,
+		dm_wrapper: DispenseMetadataWrapper,
+		misc_data: MiscData
+	) -> typing.Tuple[SectionProperties, float, float]:
+		self._update_state_pre(video_state, state_report)
+
+		props, delay, min_duration = self._common_get_section_properties(video_state, state_report)
+		props, delay, min_duration = self._get_specific_section_properties((props, delay, min_duration), video_state, state_report, dm_wrapper, misc_data)
+
+		self._update_state_post(video_state, state_report)
+
+		return props, delay, min_duration
 
 	# returns for this section,
 	# 1. SectionProperties
 	# 2. delay before the properties should come into effect
 	# 3. min_duration of these properties
-	def common_get_section_properties(self, video_state: VideoState, state_report: pb.StateReport) -> typing.Tuple[SectionProperties, float, float]:
+	def _common_get_section_properties(
+		self,
+		video_state: VideoState,
+		state_report: pb.StateReport
+	) -> typing.Tuple[SectionProperties, float, float]:
 		self.update_state(video_state, state_report)
 
 		props = SectionProperties(
@@ -75,7 +93,7 @@ class BasePropertyManager(ABC):
 			skip = False,
 			crop = True,
 			vig_overlay = True,
-			front_feather=True,
+			front_feather = True,
 		)
 		delay, min_duration = 0, 0
 
@@ -83,10 +101,27 @@ class BasePropertyManager(ABC):
 			props.skip = True
 			return props, delay, min_duration
 
+		# delay so that webcam pipelines have started and there is stable footage
+		if video_state.was_paused:
+			delay = 1
 
 		return props, delay, min_duration
 
-	def update_state(self, video_state: VideoState, state_report: pb.StateReport):
+	@abstractmethod
+	def _get_specific_section_properties(
+		self,
+		current: typing.Tuple[SectionProperties, float, float],
+		props: SectionProperties,
+		video_state: VideoState,
+		state_report: pb.StateReport,
+		dm_wrapper: DispenseMetadataWrapper,
+		misc_data: MiscData
+	) -> SectionProperties:
+		""" content-type specific properties logic """
+		pass
+
+	# for state changes that should happen before this state report has been parsed
+	def _update_state_pre(self, video_state: VideoState, state_report: pb.StateReport):
 		# canvas status
 		if video_state.canvas_status == CanvasStatus.BEFORE:
 			if (
@@ -101,3 +136,7 @@ class BasePropertyManager(ABC):
 				state_report.fluid_request.open_drain
 			):
 				video_state.canvas_status = CanvasStatus.AFTER
+
+	# for state changes that should happen after this state report has been parsed
+	def _update_state_post(self, video_state: VideoState, state_report: pb.StateReport):
+		video_state.was_paused = state_report.paused
