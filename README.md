@@ -12,12 +12,25 @@ This is the supporting system monorepo for [A Study of Light](https://www.youtub
 - [x] Automated video, photo, and state report capture
 - [x] Automated post-processing of photos and short- & long-form video content.
 - [ ] Automated social media posting
-- [ ] Link to cloud system for remote control
 
 ## Instructions
 
-Fill out the .env file in root of repo with your configuration
+Fill out the .env file in root of repo with your configuration. This wasn't initially
+built to be used by others so let me know any problems or missing information!
 
+## Sub-Systems
+
+- [interface](interface/) - A React.JS interface for local control of embedded and backend systems.
+- [services](services/)
+	- [pygateway](services/pygateway/) - Serial-MQTT bridge for the firmware interface
+	- [rtsp](services/rtsp/) - [MediaMTX](https://github.com/aler9/mediamtx) instance for video stream multiplexing
+	- [goo](services/goo/) - Bulk of the runtime backend logic is here
+	- [dslrcapture](services/dslrcapture/) - Separate service for capturing DSLR images in a loop while session is live.
+- [tools](user-tools/)
+	- [auto_image_post.py](user-tools/auto_image_post.py) - for post-processing of the dslr images
+	- [auto_stills_editing.py](user-tools/auto_stills_editing.py) - for generating "thumbnails"
+	- [auto_video_post.py](user-tools/auto_video_post.py) - for generating video content
+	- [auto_dslr_timelapse.py](user-tools/auto_dslr_timelapse.py) - for generating timelapses from all the top-down dslr images
 
 ## Storage
 
