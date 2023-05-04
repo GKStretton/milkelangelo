@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./interface
-          file: Dockerfile
+          file: ./interface/Dockerfile
           push: true
           tags: gkstretton/asol-dev-interface:latest
           cache-from: type=gha
