@@ -2,7 +2,7 @@
 
 This is the new local control interface for the project. Functionality will be
 gradually migrated here. This is also a test ground for developing the components
-that will eventually be used in the public facing site.
+that will eventually be used in the public facing site
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
