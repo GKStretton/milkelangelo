@@ -19,13 +19,8 @@ RUN npm run build
 # Stage 2: Serve the app with Nginx
 FROM nginx:alpine
 
-WORKDIR /usr/share/nginx/html
-
-# remove default static assets
-RUN rm -rf *
-
 # Copy the React build output from the previous stage
-COPY --from=build /app/build .
+COPY --from=build /app/build /usr/share/nginx/html
 
 # Copy the Nginx configuration file
 COPY nginx.conf /etc/nginx/conf.d/default.conf
