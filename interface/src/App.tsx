@@ -10,11 +10,13 @@ import TopCamPlayer from './components/TopCamPlayer';
 import KeyPressHandler from './KeyPressHandler';
 
 function App() {
+  const mqtt_url = process.env.REACT_APP_MQTT_URL ?? "ws://DEPTH:9001";
+  console.log(mqtt_url);
 
   return (
     <>
       <CssBaseline />
-      <MqttProvider url='ws://DEPTH:9001'>
+      <MqttProvider url={mqtt_url}>
         <KeyPressHandler/>
         <Header/>
         <Grid container

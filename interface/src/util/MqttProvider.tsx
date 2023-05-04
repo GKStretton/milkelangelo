@@ -8,12 +8,37 @@ interface MqttProviderProps {
 	children: ReactNode;
 }
 
+interface Credentials {
+	username: string,
+	password: string,
+}
+
 const MqttProvider: React.FC<MqttProviderProps> = ({ url, children }) => {
 	const [client, setClient] = useState<MqttClient | null>(null);
 	const [messages, setMessages] = useState<{ [topic: string]: Buffer }>({});
+	const [credentials, setCredentials] = useState<Credentials>({ username: "", password: "" });
+
+	const do_auth: boolean = process.env.REACT_APP_MQTT_AUTHENTICATE === "true";
 
 	useEffect(() => {
-		const mqttClient = mqtt.connect(url);
+		if (!do_auth || (credentials.username && credentials.password)) return;
+
+		// Ask for username and password using prompts
+		const username = prompt("Username") ?? "";
+		const password = prompt("Password") ?? "";
+
+		setCredentials({ username, password });
+	}, []);
+
+	useEffect(() => {
+		if (do_auth && (!credentials.username || !credentials.password)) return;
+
+		const options = {
+			username: credentials.username,
+			password: credentials.password,
+		}
+
+		const mqttClient = mqtt.connect(url, do_auth ? options : undefined);
 
 		mqttClient.on('connect', () => {
 			console.log('connected');
@@ -31,7 +56,7 @@ const MqttProvider: React.FC<MqttProviderProps> = ({ url, children }) => {
 		return () => {
 			mqttClient.end();
 		};
-	}, []);
+	}, [credentials]);
 
 	const contextValue: MqttContextValue = { client, messages };
 

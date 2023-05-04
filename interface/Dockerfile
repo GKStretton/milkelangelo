@@ -13,6 +13,9 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+ARG REACT_APP_MQTT_URL
+ARG REACT_APP_MQTT_AUTHENTICATE
+
 # Build the React app
 RUN npm run build
 
