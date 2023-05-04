@@ -1,5 +1,5 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18
+# Stage 1: Build the React app
+FROM node:18 AS build
 
 # Set the working directory to /app
 WORKDIR /app
@@ -16,11 +16,22 @@ COPY . .
 # Build the React app
 RUN npm run build
 
-# Install serve to serve the build files
-RUN npm install -g serve
+# Stage 2: Serve the app with Nginx
+FROM nginx:alpine
+
+WORKDIR /usr/share/nginx/html
+
+# remove default static assets
+RUN rm -rf *
+
+# Copy the React build output from the previous stage
+COPY --from=build /app/build .
+
+# Copy the Nginx configuration file
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 80
 
-# Define the command to run the app
-CMD ["serve", "-s", "build", "-l", "5000"]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
