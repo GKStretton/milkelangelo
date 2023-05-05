@@ -3,7 +3,11 @@ import MqttContext from '../util/mqttContext'
 import { TOPIC_GOTO_XY } from '../topics_firmware/topics_firmware';
 import VideoPlayer from './VideoPlayer';
 
-const TopCamPlayer = () => {
+interface TopCamProps {
+  url: string;
+}
+
+const TopCamPlayer = ({ url }: TopCamProps) => {
   const [circlePos, setCirclePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 	const { client: c, messages } = useContext(MqttContext);
 
@@ -55,11 +59,10 @@ const TopCamPlayer = () => {
     <>
       <div style={{ position: 'relative' }}>
         <VideoPlayer
-        url="DEPTH:8889/top-cam-crop/"
+        url={`${url}/top-cam-crop/`}
           name="top"
           handleClick={handleClick}
           renderOverlay={renderOverlay}
-          show={false}
         />
       </div>
     </>

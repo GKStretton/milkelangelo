@@ -7,10 +7,9 @@ interface VideoPlayerProps {
   name: string;
   handleClick?: (e: React.MouseEvent<HTMLVideoElement>) => void;
   renderOverlay?: (videoDimensions: { width: number; height: number }) => React.ReactNode;
-  show: boolean;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, renderOverlay, show }: VideoPlayerProps) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, renderOverlay }: VideoPlayerProps) => {
   const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   useEffect(() => {

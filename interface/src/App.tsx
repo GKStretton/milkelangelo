@@ -11,6 +11,7 @@ import KeyPressHandler from './KeyPressHandler';
 
 function App() {
   const mqtt_url = process.env.REACT_APP_MQTT_URL ?? "ws://DEPTH:9001";
+  const webrtc_url = process.env.REACT_APP_WEBRTC_URL ?? "ws://DEPTH:8889";
   console.log(mqtt_url);
 
   return (
@@ -37,10 +38,10 @@ function App() {
           </Grid>
           <Grid item container direction="column" xs={3} justifyContent="flex-start">
             <Grid item xs={12} sm={6} justifyContent="center" alignItems="center">
-              <TopCamPlayer/>
+              <TopCamPlayer url={webrtc_url}/>
             </Grid>
             <Grid item xs={12} sm={6} justifyContent="center" alignItems="center">
-              <VideoPlayer url="DEPTH:8889/front-cam-crop/" name="front" show={false}/>
+              <VideoPlayer url={`${webrtc_url}/front-cam-crop/`} name="front"/>
             </Grid>
           </Grid>
         </Grid>

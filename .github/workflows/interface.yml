@@ -31,6 +31,7 @@ jobs:
           build-args: |
             "REACT_APP_MQTT_URL=wss://mqtt.gregstretton.org"
             "REACT_APP_MQTT_AUTHENTICATE=true"
+            "REACT_APP_WEBRTC_URL=wss://webrtc.gregstretton.org:8889"
           push: true
           tags: gkstretton/asol-dev-interface:latest
           cache-from: type=gha

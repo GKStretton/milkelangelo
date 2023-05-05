@@ -13,7 +13,7 @@ export class WebRTCReceiver {
     this.ws = null;
     this.pc = null;
     this.restartTimeout = null;
-    this.start(`ws://${url}ws`);
+    this.start(`${url}ws`);
   }
 
   start(url: string) {
