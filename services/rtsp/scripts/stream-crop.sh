@@ -20,7 +20,7 @@ gst-launch-1.0 \
   rtph264depay ! \
   avdec_h264 ! \
   videocrop top=$top bottom=$bottom right=$right left=$left ! \
-  x264enc bitrate=5000 speed-preset=ultrafast tune=zerolatency key-int-max=30 option-string="keyint_min=0" ! \
+  x264enc bitrate=1500 speed-preset=ultrafast tune=zerolatency key-int-max=30 option-string="keyint_min=0" ! \
   rtspclientsink location=rtsp://$HOST:8554/${CAMERA}-crop protocols=tcp
 
   # tune=zerolatency has been removed from x264enc
