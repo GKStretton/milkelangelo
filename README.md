@@ -1,6 +1,11 @@
 # A Study of Light - Backend Systems
 
-This is the supporting system monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLight). Also see [Light](https://github.com/GKStretton/Light). Scope includes:
+This is the supporting system monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLight). Also see the other repos:
+
+- [Firmware](https://github.com/GKStretton/asol-firmware)
+- [Protos](https://github.com/GKStretton/asol-protos)
+
+Backend scope includes:
 
 - [x] Serial-MQTT bridge supporting an event driven architecture
 - [x] RTSP streaming for multiple consumers of webcam feeds
