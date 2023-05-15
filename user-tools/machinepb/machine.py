@@ -48,6 +48,25 @@ class FluidType(betterproto.Enum):
     FLUID_MILK = 3
 
 
+class ContentType(betterproto.Enum):
+    CONTENT_TYPE_UNDEFINED = 0
+    CONTENT_TYPE_LONGFORM = 1
+    CONTENT_TYPE_SHORTFORM = 2
+    CONTENT_TYPE_CLEANING = 3
+    CONTENT_TYPE_DSLR = 4
+    CONTENT_TYPE_STILL = 5
+
+
+class SocialPlatform(betterproto.Enum):
+    SOCIAL_PLATFORM_UNDEFINED = 0
+    SOCIAL_PLATFORM_YOUTUBE = 1
+    SOCIAL_PLATFORM_TIKTOK = 2
+    SOCIAL_PLATFORM_INSTAGRAM = 3
+    SOCIAL_PLATFORM_FACEBOOK = 4
+    SOCIAL_PLATFORM_TWITTER = 5
+    SOCIAL_PLATFORM_REDDIT = 6
+
+
 @dataclass
 class PipetteState(betterproto.Message):
     spent: bool = betterproto.bool_field(1)
@@ -149,3 +168,37 @@ class DispenseMetadata(betterproto.Message):
     failed_dispense: bool = betterproto.bool_field(1)
     # how many ms later than expected the dispense happened
     dispense_delay_ms: int = betterproto.uint64_field(2)
+
+
+@dataclass
+class ContentTypeStatuses(betterproto.Message):
+    """statuses for all the content types for a specific session"""
+
+    # str(ContentType) -> ContentTypeStatus
+    content_statuses: Dict[str, "ContentTypeStatus"] = betterproto.map_field(
+        1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
+    )
+
+
+@dataclass
+class ContentTypeStatus(betterproto.Message):
+    raw_title: str = betterproto.string_field(1)
+    raw_description: str = betterproto.string_field(2)
+    caption: str = betterproto.string_field(3)
+    posts: List["Post"] = betterproto.message_field(4)
+
+
+@dataclass
+class Post(betterproto.Message):
+    platform: "SocialPlatform" = betterproto.enum_field(1)
+    # e.g. subreddit
+    sub_platform: str = betterproto.string_field(2)
+    title: str = betterproto.string_field(3)
+    description: str = betterproto.string_field(4)
+    uploaded: bool = betterproto.bool_field(5)
+    url: str = betterproto.string_field(6)
+    # if true and relevant, crosspost rather than reuploading, e.g. for reddit
+    crosspost: bool = betterproto.bool_field(7)
+    # seconds ts of when to publish. If 0, publish immediately, because 0 is in
+    # the past.
+    scheduled_unix_timetamp: int = betterproto.uint64_field(8)

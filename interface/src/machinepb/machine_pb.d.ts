@@ -354,6 +354,107 @@ export namespace DispenseMetadata {
   }
 }
 
+export class ContentTypeStatuses extends jspb.Message {
+  getContentStatusesMap(): jspb.Map<string, ContentTypeStatus>;
+  clearContentStatusesMap(): void;
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ContentTypeStatuses.AsObject;
+  static toObject(includeInstance: boolean, msg: ContentTypeStatuses): ContentTypeStatuses.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ContentTypeStatuses, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ContentTypeStatuses;
+  static deserializeBinaryFromReader(message: ContentTypeStatuses, reader: jspb.BinaryReader): ContentTypeStatuses;
+}
+
+export namespace ContentTypeStatuses {
+  export type AsObject = {
+    contentStatusesMap: Array<[string, ContentTypeStatus.AsObject]>,
+  }
+}
+
+export class ContentTypeStatus extends jspb.Message {
+  getRawTitle(): string;
+  setRawTitle(value: string): void;
+
+  getRawDescription(): string;
+  setRawDescription(value: string): void;
+
+  getCaption(): string;
+  setCaption(value: string): void;
+
+  clearPostsList(): void;
+  getPostsList(): Array<Post>;
+  setPostsList(value: Array<Post>): void;
+  addPosts(value?: Post, index?: number): Post;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ContentTypeStatus.AsObject;
+  static toObject(includeInstance: boolean, msg: ContentTypeStatus): ContentTypeStatus.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ContentTypeStatus, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ContentTypeStatus;
+  static deserializeBinaryFromReader(message: ContentTypeStatus, reader: jspb.BinaryReader): ContentTypeStatus;
+}
+
+export namespace ContentTypeStatus {
+  export type AsObject = {
+    rawTitle: string,
+    rawDescription: string,
+    caption: string,
+    postsList: Array<Post.AsObject>,
+  }
+}
+
+export class Post extends jspb.Message {
+  getPlatform(): SocialPlatformMap[keyof SocialPlatformMap];
+  setPlatform(value: SocialPlatformMap[keyof SocialPlatformMap]): void;
+
+  getSubPlatform(): string;
+  setSubPlatform(value: string): void;
+
+  getTitle(): string;
+  setTitle(value: string): void;
+
+  getDescription(): string;
+  setDescription(value: string): void;
+
+  getUploaded(): boolean;
+  setUploaded(value: boolean): void;
+
+  getUrl(): string;
+  setUrl(value: string): void;
+
+  getCrosspost(): boolean;
+  setCrosspost(value: boolean): void;
+
+  getScheduledUnixTimetamp(): number;
+  setScheduledUnixTimetamp(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Post.AsObject;
+  static toObject(includeInstance: boolean, msg: Post): Post.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: Post, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Post;
+  static deserializeBinaryFromReader(message: Post, reader: jspb.BinaryReader): Post;
+}
+
+export namespace Post {
+  export type AsObject = {
+    platform: SocialPlatformMap[keyof SocialPlatformMap],
+    subPlatform: string,
+    title: string,
+    description: string,
+    uploaded: boolean,
+    url: string,
+    crosspost: boolean,
+    scheduledUnixTimetamp: number,
+  }
+}
+
 export interface SolenoidValveMap {
   VALVE_UNDEFINED: 0;
   VALVE_DRAIN: 1;
@@ -400,4 +501,27 @@ export interface FluidTypeMap {
 }
 
 export const FluidType: FluidTypeMap;
+
+export interface ContentTypeMap {
+  CONTENT_TYPE_UNDEFINED: 0;
+  CONTENT_TYPE_LONGFORM: 1;
+  CONTENT_TYPE_SHORTFORM: 2;
+  CONTENT_TYPE_CLEANING: 3;
+  CONTENT_TYPE_DSLR: 4;
+  CONTENT_TYPE_STILL: 5;
+}
+
+export const ContentType: ContentTypeMap;
+
+export interface SocialPlatformMap {
+  SOCIAL_PLATFORM_UNDEFINED: 0;
+  SOCIAL_PLATFORM_YOUTUBE: 1;
+  SOCIAL_PLATFORM_TIKTOK: 2;
+  SOCIAL_PLATFORM_INSTAGRAM: 3;
+  SOCIAL_PLATFORM_FACEBOOK: 4;
+  SOCIAL_PLATFORM_TWITTER: 5;
+  SOCIAL_PLATFORM_REDDIT: 6;
+}
+
+export const SocialPlatform: SocialPlatformMap;
 
