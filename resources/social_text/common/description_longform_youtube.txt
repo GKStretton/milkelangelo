@@ -6,7 +6,7 @@ Every session is live streamed on Twitch and Youtube! https://www.twitch.tv/astu
 🎥 SESSION HIGHLIGHTS
 Short cuts are made from each session and posted on Youtube, Tiktok, and others:
 https://www.tiktok.com/@astudyoflight
-https://www.instagram.com/astudyoflight_/
+https://www.instagram.com/astudyoflight_
 https://twitter.com/AStudyOfLight
 
 🔧 TECHNICAL
@@ -15,3 +15,5 @@ We're aiming for full automation of all the supporting systems for the project. 
 Leave a comment with any questions or suggestions and thank you for watching!
 
 A Study of Light automates exploration into the effects of changes in surface tension in fluid mixtures. This experiment is often known as the "Magic Milk Experiment". The emulsifier (dish soap) changes the surface tension and interacts with the fats in the milk, causing incredible patterns to emerge.
+
+Please drop a comment with any questions or suggestions and thank you for watching!

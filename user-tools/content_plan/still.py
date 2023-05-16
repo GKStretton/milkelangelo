@@ -1,4 +1,4 @@
 from machinepb import machine as pb
 
-def buildStill(n: int) -> pb.ContentTypeStatus:
+def buildStill(n_str: str) -> pb.ContentTypeStatus:
 	return None

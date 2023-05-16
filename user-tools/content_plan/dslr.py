@@ -1,4 +1,4 @@
 from machinepb import machine as pb
 
-def buildDslr(n: int) -> pb.ContentTypeStatus:
+def buildDslr(n_str: str) -> pb.ContentTypeStatus:
 	return None

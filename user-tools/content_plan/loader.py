@@ -2,10 +2,11 @@ import typing
 import os
 import random
 from machinepb import machine as pb
+import pandas as pd
 
 SOCIAL_TEXT_PATH = "./resources/social_text"
 
-YOUTUBE_SHORT_TITLE_MAX_LENGTH = 100
+YOUTUBE_SHORT_TITLE_MAX_LENGTH = 90 # actually 100 but that's a bit long
 
 def get_schedule_timestamp(ct: pb.ContentType) -> int:
 	# todo: implement
@@ -21,20 +22,53 @@ def load_titles_and_descriptions(t: pb.ContentType) -> typing.List[typing.Tuple[
 		lines = [line.strip().split("\t") for line in lines]
 		return lines
 
-def get_common(name: str) -> str:
+def get_common_text(name: str) -> str:
 	p = os.path.join(SOCIAL_TEXT_PATH, "common", f"{name}.txt")
 	with open(p, 'r') as f:
 		return f.read().strip()
 
 
 def append_title_hashtags(title: str, ct: pb.ContentType, platform: pb.SocialPlatform) -> str:
+	max_length = 1000
+	if ct == pb.ContentType.CONTENT_TYPE_SHORTFORM and platform == pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE:
+		max_length = YOUTUBE_SHORT_TITLE_MAX_LENGTH
+
+
 	tags = get_hashtags_list(ct, platform)
-	# todo: add hashtags until title is full
-	return title + " " + " ".join(tags)
+
+	i = 0
+	while i < len(tags) and len(title) + 1 + len(tags[i]) <= max_length:
+		title += " " + tags[i]
+		i += 1
+
+	return title
 
 def get_hashtags(ct: pb.ContentType, platform: pb.SocialPlatform) -> str:
 	return " ".join(get_hashtags_list(ct, platform))
 
 def get_hashtags_list(ct: pb.ContentType, platform: pb.SocialPlatform) -> typing.List[str]:
-	# todo: load hashtags from file and do selection
-	return ["#implementme"]
+	# tab separated value file
+	p = os.path.join(SOCIAL_TEXT_PATH, "hashtags.csv")
+
+	# Load the TSV file into a pandas DataFrame
+	df = pd.read_csv(p, sep=',')
+
+	tags = []
+
+	# Append all entries from the "ALL" column
+	tags.extend(['#' + tag for tag in df['ALL'].dropna()])
+
+	# If there's a column matching ct.name, add all from that column
+	if ct.name in df.columns:
+		tags.extend(['#' + random.choice(df[ct.name].dropna())])
+
+	# Add one tag from any columns labeled A-Z
+	for letter in list(map(chr, range(65, 91))):  # Generate list of uppercase letters
+		if letter in df.columns:
+			tags.append('#' + random.choice(df[letter].dropna()))
+
+	# Shuffle the tags
+	random.shuffle(tags)
+
+	# Return the tags
+	return tags

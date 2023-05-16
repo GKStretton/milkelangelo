@@ -1,4 +1,4 @@
 from machinepb import machine as pb
 
-def buildCleaning(n: int) -> pb.ContentTypeStatus:
+def buildCleaning(n_str: str) -> pb.ContentTypeStatus:
 	return None
