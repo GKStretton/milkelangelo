@@ -16,16 +16,26 @@ def get_random_title_and_description(ct: pb.ContentType) -> typing.Tuple[str, st
 	return random.choice(load_titles_and_descriptions(ct))
 
 def load_titles_and_descriptions(t: pb.ContentType) -> typing.List[typing.Tuple[str, str]]:
-	p = os.path.join(SOCIAL_TEXT_PATH, f"{t.name}.tsv")
+	p = os.path.join(SOCIAL_TEXT_PATH, f"{t.name}.csv")
 	with open(p, 'r') as f:
 		lines = f.readlines()[1:]
 		lines = [line.strip().split("\t") for line in lines]
 		return lines
 
-def get_common_text(name: str) -> str:
-	p = os.path.join(SOCIAL_TEXT_PATH, "common", f"{name}.txt")
-	with open(p, 'r') as f:
-		return f.read().strip()
+def get_common_text(ct: pb.ContentType, platform: pb.SocialPlatform) -> str:
+	# tab separated value file, as csv
+	p = os.path.join(SOCIAL_TEXT_PATH, "standard_descriptions", f"{ct.name}.csv")
+
+	# Load the csv file into a pandas DataFrame
+	df = pd.read_csv(p, sep='\t')
+
+	# If there's a column matching platform.name, return every cell as a new line
+	if platform.name in df.columns:
+		lines = df[platform.name].fillna('').tolist()
+		return "\n".join(map(str, lines)).strip()  # convert the column to a list and join
+
+	print(f"No column {platform.name} in {p}")
+	return ""
 
 
 def append_title_hashtags(title: str, ct: pb.ContentType, platform: pb.SocialPlatform) -> str:
@@ -47,10 +57,10 @@ def get_hashtags(ct: pb.ContentType, platform: pb.SocialPlatform) -> str:
 	return " ".join(get_hashtags_list(ct, platform))
 
 def get_hashtags_list(ct: pb.ContentType, platform: pb.SocialPlatform) -> typing.List[str]:
-	# tab separated value file
+	# comma separated value file
 	p = os.path.join(SOCIAL_TEXT_PATH, "hashtags.csv")
 
-	# Load the TSV file into a pandas DataFrame
+	# Load the csv file into a pandas DataFrame
 	df = pd.read_csv(p, sep=',')
 
 	tags = []

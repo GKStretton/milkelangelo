@@ -25,7 +25,6 @@ if __name__ == "__main__":
 
 	print(f"Launching publish_helpers for session {args.session_number} in '{args.base_dir}'\n")
 
-
 	content_statuses = pb.ContentTypeStatuses()
 
 	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_LONGFORM.name] = buildLongform(session_number_text)
