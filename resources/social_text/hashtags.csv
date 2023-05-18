@@ -1,8 +1,8 @@
-ALL,CONTENT_TYPE_SHORTFORM,CONTENT_TYPE_CLEANING,CONTENT_TYPE_DSLR,A,B,C
-art,experiment,cleaning,timelapse,colors,relaxing,satisfying
-robot,science,,photography,generativeart,calm,oddlysatisfying
-magicmilk,sciencetricks,,,fluidart,chill,
-,scienceexperiment,,,creative,peaceful,
-,automation,,,,,
-,engineering,,,,,
-,technology,,,,,
+ALL	CONTENT_TYPE_SHORTFORM	CONTENT_TYPE_CLEANING	CONTENT_TYPE_STILL	CONTENT_TYPE_DSLR	A	B	C
+art	experiment	cleaning	photography	timelapse	colors	relaxing	satisfying
+robot	science			photography	generativeart	calm	oddlysatisfying
+magicmilk	sciencetricks				fluidart	chill	
+	scienceexperiment				creative	peaceful	
+	automation						
+	engineering						
+	technology						
