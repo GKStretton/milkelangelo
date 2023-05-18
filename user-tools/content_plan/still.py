@@ -1,4 +1,5 @@
 from machinepb import machine as pb
+from content_plan.loader import *
 
 def buildStill(n_str: str) -> pb.ContentTypeStatus:
 	ct = pb.ContentType.CONTENT_TYPE_STILL

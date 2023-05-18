@@ -61,7 +61,7 @@ def get_hashtags_list(ct: pb.ContentType, platform: pb.SocialPlatform) -> typing
 	p = os.path.join(SOCIAL_TEXT_PATH, "hashtags.csv")
 
 	# Load the csv file into a pandas DataFrame
-	df = pd.read_csv(p, sep=',')
+	df = pd.read_csv(p, sep='\t')
 
 	tags = []
 

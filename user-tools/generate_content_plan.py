@@ -9,6 +9,7 @@ from content_plan.cleaning import *
 from content_plan.dslr import *
 from content_plan.longform import *
 from content_plan.shortform import *
+from content_plan.still import *
 
 from content_plan.loader import *
 
@@ -29,9 +30,9 @@ if __name__ == "__main__":
 
 	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_LONGFORM.name] = buildLongform(session_number_text)
 	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_SHORTFORM.name] = buildShortform(session_number_text)
-	# content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_CLEANING.name] = buildCleaning(session_number_text)
-	# content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_DSLR.name] = buildDslr(session_number_text)
-	# content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_STILL.name] = buildStill(session_number_text)
+	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_CLEANING.name] = buildCleaning(session_number_text)
+	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_DSLR.name] = buildDslr(session_number_text)
+	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_STILL.name] = buildStill(session_number_text)
 
 	d = content_statuses.to_dict(casing=Casing.SNAKE, include_default_values=True)
 	with open(output_path, 'w') as f:
