@@ -3,14 +3,34 @@ import os
 import random
 from machinepb import machine as pb
 import pandas as pd
+from datetime import datetime, timedelta
+import pytz
 
 SOCIAL_TEXT_PATH = "./resources/social_text"
 
 YOUTUBE_SHORT_TITLE_MAX_LENGTH = 90 # actually 100 but that's a bit long
 
 def get_schedule_timestamp(ct: pb.ContentType) -> int:
-	# todo: implement
-	return 0
+	schedule_hour = 18
+	schedule_minute = 30
+
+	now = datetime.now(pytz.utc)
+
+	# schedule for the next day at schedule_hour
+	next_schedule = (now + timedelta(days=1)).replace(hour=schedule_hour, minute=schedule_minute, second=0, microsecond=0)
+
+	if ct == pb.ContentType.CONTENT_TYPE_STILL:
+		return 0
+	elif ct == pb.ContentType.CONTENT_TYPE_LONGFORM:
+		return 0
+	elif ct == pb.ContentType.CONTENT_TYPE_SHORTFORM:
+		return int((next_schedule).timestamp())
+	elif ct == pb.ContentType.CONTENT_TYPE_CLEANING:
+		return int((next_schedule + timedelta(days=1)).timestamp())
+	elif ct == pb.ContentType.CONTENT_TYPE_DSLR:
+		return int((next_schedule + timedelta(days=2)).timestamp())
+	else:
+		return 0
 
 def get_random_title_and_description(ct: pb.ContentType) -> typing.Tuple[str, str]:
 	return random.choice(load_titles_and_descriptions(ct))
