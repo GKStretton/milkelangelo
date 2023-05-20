@@ -1,8 +1,4 @@
-config/crop.yml
 */__pycache__/*
 *.pyc
 .env
-update-depth
-mount-md0
-unmount-md0
 */package-lock.json

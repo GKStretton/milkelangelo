@@ -1,0 +1,4 @@
+#!/bin/bash
+# force unmount of depth's disk
+
+fusermount -u /mnt/md0
