@@ -30,7 +30,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata", required=True)
 	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5", required=True)
-	parser.add_argument("-f", "--fps", action="store", type=int, help="dslr frames per second in uninterpolated video, default is 20", default=20)
+	parser.add_argument("-f", "--fps", action="store", type=int, help="dslr frames per second in uninterpolated video, default is 10", default=10)
 
 	args = parser.parse_args()
 	print(f"Launching auto_dslr_timelapse.py for session {args.session_number} in '{args.base_dir}'\n")

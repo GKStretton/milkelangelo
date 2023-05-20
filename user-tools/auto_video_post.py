@@ -275,7 +275,7 @@ def test(metadata, fmt: Format, timestamp: float, top_footage: FootageWrapper, f
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata", required=True)
+	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata", default="/mnt/md0/light-stores")
 	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5", required=True)
 	parser.add_argument("-e", "--end-at", action="store", help="If set, content will be ended after this timestamp (s)")
 	parser.add_argument("-p", "--preview", action="store_true", help="If true, final video will be previewed rather than written")
