@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { TOPIC_SHUTDOWN, TOPIC_SLEEP, TOPIC_WAKE, TOPIC_SET_VALVE, TOPIC_DISPENSE, TOPIC_FLUID, TOPIC_COLLECT, TOPIC_SET_IK_Z } from '../topics_firmware/topics_firmware';
+import { TOPIC_SHUTDOWN, TOPIC_SLEEP, TOPIC_WAKE, TOPIC_SET_VALVE, TOPIC_DISPENSE, TOPIC_FLUID, TOPIC_COLLECT, TOPIC_SET_IK_Z, TOPIC_MARK_SAFE_TO_CALIBRATE } from '../topics_firmware/topics_firmware';
 import { TOPIC_SESSION_BEGIN, TOPIC_SESSION_END, TOPIC_SESSION_PAUSE, TOPIC_SESSION_RESUME, TOPIC_STATE_REPORT_JSON, TOPIC_STREAM_END, TOPIC_STREAM_START } from '../topics_backend/topics_backend';
 import { SessionStatus, SolenoidValve, StateReport, Status, StreamStatus } from '../machinepb/machine_pb';
 import MqttContext from '../util/mqttContext'
@@ -238,6 +238,9 @@ export default function ControlGroup() {
             />
 
             <Button disabled={!isAwake || collecting} onClick={() => c?.publish(TOPIC_DISPENSE, dispenseVolume.toString())} sx={{"margin": 2}}>Dispense</Button>
+
+            <Typography variant="h6">Other</Typography>
+            <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_MARK_SAFE_TO_CALIBRATE, dispenseVolume.toString())} sx={{"margin": 2}}>Mark Safe to Calibrate</Button>
         </>}
 
         {tabValue === 2 &&
