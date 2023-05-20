@@ -22,3 +22,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+replace (
+	// /goo is mounted by docker compose
+	github.com/gkstretton/dark/services/goo => /goo
+)

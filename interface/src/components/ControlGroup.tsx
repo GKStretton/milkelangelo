@@ -240,7 +240,7 @@ export default function ControlGroup() {
             <Button disabled={!isAwake || collecting} onClick={() => c?.publish(TOPIC_DISPENSE, dispenseVolume.toString())} sx={{"margin": 2}}>Dispense</Button>
 
             <Typography variant="h6">Other</Typography>
-            <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_MARK_SAFE_TO_CALIBRATE, dispenseVolume.toString())} sx={{"margin": 2}}>Mark Safe to Calibrate</Button>
+            <Button disabled={!isAwake} variant="contained" color="error" onClick={() => c?.publish(TOPIC_MARK_SAFE_TO_CALIBRATE, dispenseVolume.toString())} sx={{"margin": 2}}>Mark Safe to Calibrate</Button>
         </>}
 
         {tabValue === 2 &&

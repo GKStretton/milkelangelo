@@ -54,6 +54,7 @@ services:
       - /dev:/dev
       - ./user-tools:/src/user-tools
       - ./resources:/src/resources
+      - ./services/goo:/goo
   restreamer:
     image: "datarhei/restreamer:latest"
     restart: unless-stopped
