@@ -10,14 +10,21 @@ class DispenseMetadataWrapper:
 
 		self.metadata = self.load_dispense_metadata(base_dir, session_number)
 	
-	def load_dispense_metadata(self, base_dir: str, session_number: int) -> pb.DispenseMetadataMap:
+	def load_dispense_metadata(self, base_dir: str, session_number: int) -> Optional[pb.DispenseMetadataMap]:
 		path = os.path.join(base_dir, "session_content", session_number, "dispense-metadata.yml")
-		with open(path, 'r') as f:
-			yml = yaml.load(f, Loader=yaml.FullLoader)
-			meta: pb.DispenseMetadataMap = pb.DispenseMetadataMap().from_dict(value=yml)
-			return meta
+		try:
+			with open(path, 'r') as f:
+				yml = yaml.load(f, Loader=yaml.FullLoader)
+				meta: pb.DispenseMetadataMap = pb.DispenseMetadataMap().from_dict(value=yml)
+				return meta
+		except FileNotFoundError:
+			print("no dispense metadata found")
+			return None
 	
 	def get_dispense_metadata(self, startup_counter: int, dispense_request_number: int) -> Optional[pb.DispenseMetadata]:
+		if self.metadata is None:
+			return None
+
 		key = f"{startup_counter}_{dispense_request_number}"
 		return self.metadata.dispense_metadata.get(key)
 	

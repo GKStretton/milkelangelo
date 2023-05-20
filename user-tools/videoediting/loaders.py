@@ -24,11 +24,13 @@ def get_state_reports(args: argparse.Namespace) -> typing.Tuple[float, pb.StateR
 	raw_state_reports = None
 	with open(os.path.join(content_path, "state-reports.yml"), 'r') as f:
 		raw_state_reports = yaml.load(f, yaml.FullLoader)
-	print("Loaded {} state report entries\n".format(len(raw_state_reports)))
 	
+	state_report_list = pb.StateReportList().from_dict(raw_state_reports).state_reports
+	print("Loaded {} state report entries\n".format(len(state_report_list)))
+
 	state_reports: typing.Tuple[float, pb.StateReport] = []
-	for i in range(len(raw_state_reports)):
-		report = pb.StateReport().from_dict(raw_state_reports[i])
+	for i in range(len(state_report_list)):
+		report = state_report_list[i]
 		report_ts = float(report.timestamp_unix_micros) / 1.0e6
 		state_reports.append((report_ts, report))
 

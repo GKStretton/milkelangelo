@@ -75,10 +75,6 @@ class ContentDescriptor:
 			print("_generate_raw_overlay_clip found no properties / state_reports")
 			exit(1)
 		
-		if self.properties[0][0] != self.state_reports[0][0]:
-			print("assumed first timestamps equal, but not")
-			exit(1)
-
 		FINAL_DURATION = 2
 		
 		start_timestamp = self.state_reports[0][0]
