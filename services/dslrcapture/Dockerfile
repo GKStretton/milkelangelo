@@ -10,12 +10,13 @@ RUN python3 -m pip install --pre betterproto==2.0.0b5
 
 WORKDIR /src
 
-COPY ./go.mod ./go.mod
-COPY ./go.sum ./go.sum
+COPY ./dslrcapture/go.mod ./go.mod
+COPY ./dslrcapture/go.sum ./go.sum
+COPY ./goo ../goo
 
 RUN go mod download
 
-COPY . .
+COPY ./dslrcapture .
 
 RUN go build -race
 

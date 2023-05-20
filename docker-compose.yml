@@ -41,7 +41,9 @@ services:
       - ./resources:/src/resources
     user: "1000:1000"
   dslrcapture:
-    build: services/dslrcapture
+    build:
+      context: ./services
+      dockerfile: dslrcapture/Dockerfile
     command: -basePath ${LIGHT_STORES_DIR}
     restart: unless-stopped
     privileged: true
