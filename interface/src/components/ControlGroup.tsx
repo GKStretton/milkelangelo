@@ -253,8 +253,11 @@ export default function ControlGroup() {
                 Not implemented: post to social media
             </Typography>
 
-            <Button onClick={() => c?.publish("asol/videos-generated", "")}>Signal videos generated (do upload)</Button>
-        </>}
+            <Button onClick={
+                () => c?.publish("asol/videos-generated", sessionStatus?.getId() === 0 ? "" : String(sessionStatus?.getId()))
+            }>Signal videos generated (do upload)</Button>
+        </>
+        }
         </>
     )
 }

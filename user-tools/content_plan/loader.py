@@ -1,14 +1,32 @@
 import typing
+import yaml
 import os
 import random
 from machinepb import machine as pb
 import pandas as pd
 from datetime import datetime, timedelta
 import pytz
+from betterproto import Casing
 
 SOCIAL_TEXT_PATH = "./resources/social_text"
 
 YOUTUBE_SHORT_TITLE_MAX_LENGTH = 90 # actually 100 but that's a bit long
+
+def load_content_statuses(base_dir: str, session_number: int) -> typing.Optional[pb.ContentTypeStatuses]:
+	path = os.path.join(base_dir, "session_content", session_number, "content_plan.yml")
+	try:
+		with open(path, 'r') as f:
+			yml = yaml.load(f, Loader=yaml.FullLoader)
+			meta: pb.ContentTypeStatuses = pb.ContentTypeStatuses().from_dict(value=yml)
+			return meta
+	except FileNotFoundError:
+		return None
+
+def write_content_statuses(content_statuses: pb.ContentTypeStatuses, base_dir: str, session_number: int):
+	output_path = os.path.join(base_dir, "session_content", session_number, "content_plan.yml")
+	d = content_statuses.to_dict(casing=Casing.SNAKE, include_default_values=True)
+	with open(output_path, 'w') as f:
+		yaml.dump(d, f)
 
 def get_schedule_timestamp(ct: pb.ContentType) -> int:
 	schedule_hour = 18

@@ -1,6 +1,5 @@
 import argparse
 from machinepb import machine as pb
-from betterproto import Casing
 import yaml
 import os
 import videoediting.loaders as loaders
@@ -18,13 +17,18 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata", required=True)
 	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5", required=True)
+	parser.add_argument("-o", "--override", action="store_true", help="if true, override rather than quitting if already exists", default=False)
 	args = parser.parse_args()
 
-	output_path = os.path.join(args.base_dir, "session_content", args.session_number, "content_plan.yml")
 	metadata = loaders.get_session_metadata(args.base_dir, args.session_number)
 	session_number_text = f"#{metadata['production_id']}" if metadata['production'] else f"dev#{metadata['id']}"
 
 	print(f"Launching publish_helpers for session {args.session_number} in '{args.base_dir}'\n")
+
+	content_statuses = load_content_statuses(args.base_dir, args.session_number)
+	if content_statuses is not None and not args.override:
+		print("Error: content statuses already exist for this session. Use -o / --override to overwrite.")
+		exit(1)
 
 	content_statuses = pb.ContentTypeStatuses()
 
@@ -34,6 +38,4 @@ if __name__ == "__main__":
 	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_DSLR.name] = buildDslr(session_number_text)
 	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_STILL.name] = buildStill(session_number_text)
 
-	d = content_statuses.to_dict(casing=Casing.SNAKE, include_default_values=True)
-	with open(output_path, 'w') as f:
-		yaml.dump(d, f)
+	write_content_statuses(content_statuses, args.base_dir, args.session_number)
