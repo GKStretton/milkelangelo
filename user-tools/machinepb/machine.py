@@ -178,6 +178,8 @@ class ContentTypeStatuses(betterproto.Message):
     content_statuses: Dict[str, "ContentTypeStatus"] = betterproto.map_field(
         1, betterproto.TYPE_STRING, betterproto.TYPE_MESSAGE
     )
+    # splashtext for this session
+    splashtext: str = betterproto.string_field(2)
 
 
 @dataclass
@@ -185,7 +187,7 @@ class ContentTypeStatus(betterproto.Message):
     raw_title: str = betterproto.string_field(1)
     raw_description: str = betterproto.string_field(2)
     caption: str = betterproto.string_field(3)
-    posts: List["Post"] = betterproto.message_field(4)
+    posts: List["Post"] = betterproto.message_field(5)
 
 
 @dataclass

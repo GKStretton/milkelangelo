@@ -2836,7 +2836,8 @@ proto.machine.ContentTypeStatuses.prototype.toObject = function(opt_includeInsta
  */
 proto.machine.ContentTypeStatuses.toObject = function(includeInstance, msg) {
   var f, obj = {
-    contentStatusesMap: (f = msg.getContentStatusesMap()) ? f.toObject(includeInstance, proto.machine.ContentTypeStatus.toObject) : []
+    contentStatusesMap: (f = msg.getContentStatusesMap()) ? f.toObject(includeInstance, proto.machine.ContentTypeStatus.toObject) : [],
+    splashtext: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -2879,6 +2880,10 @@ proto.machine.ContentTypeStatuses.deserializeBinaryFromReader = function(msg, re
         jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.machine.ContentTypeStatus.deserializeBinaryFromReader, "", new proto.machine.ContentTypeStatus());
          });
       break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setSplashtext(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -2912,6 +2917,13 @@ proto.machine.ContentTypeStatuses.serializeBinaryToWriter = function(message, wr
   if (f && f.getLength() > 0) {
     f.serializeBinary(1, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.machine.ContentTypeStatus.serializeBinaryToWriter);
   }
+  f = message.getSplashtext();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
 };
 
 
@@ -2938,13 +2950,31 @@ proto.machine.ContentTypeStatuses.prototype.clearContentStatusesMap = function()
 };
 
 
+/**
+ * optional string splashtext = 2;
+ * @return {string}
+ */
+proto.machine.ContentTypeStatuses.prototype.getSplashtext = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.machine.ContentTypeStatuses} returns this
+ */
+proto.machine.ContentTypeStatuses.prototype.setSplashtext = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
 
 /**
  * List of repeated fields within this message type.
  * @private {!Array<number>}
  * @const
  */
-proto.machine.ContentTypeStatus.repeatedFields_ = [4];
+proto.machine.ContentTypeStatus.repeatedFields_ = [5];
 
 
 
@@ -3030,7 +3060,7 @@ proto.machine.ContentTypeStatus.deserializeBinaryFromReader = function(msg, read
       var value = /** @type {string} */ (reader.readString());
       msg.setCaption(value);
       break;
-    case 4:
+    case 5:
       var value = new proto.machine.Post;
       reader.readMessage(value,proto.machine.Post.deserializeBinaryFromReader);
       msg.addPosts(value);
@@ -3088,7 +3118,7 @@ proto.machine.ContentTypeStatus.serializeBinaryToWriter = function(message, writ
   f = message.getPostsList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
-      4,
+      5,
       f,
       proto.machine.Post.serializeBinaryToWriter
     );
@@ -3151,12 +3181,12 @@ proto.machine.ContentTypeStatus.prototype.setCaption = function(value) {
 
 
 /**
- * repeated Post posts = 4;
+ * repeated Post posts = 5;
  * @return {!Array<!proto.machine.Post>}
  */
 proto.machine.ContentTypeStatus.prototype.getPostsList = function() {
   return /** @type{!Array<!proto.machine.Post>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.machine.Post, 4));
+    jspb.Message.getRepeatedWrapperField(this, proto.machine.Post, 5));
 };
 
 
@@ -3165,7 +3195,7 @@ proto.machine.ContentTypeStatus.prototype.getPostsList = function() {
  * @return {!proto.machine.ContentTypeStatus} returns this
 */
 proto.machine.ContentTypeStatus.prototype.setPostsList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 4, value);
+  return jspb.Message.setRepeatedWrapperField(this, 5, value);
 };
 
 
@@ -3175,7 +3205,7 @@ proto.machine.ContentTypeStatus.prototype.setPostsList = function(value) {
  * @return {!proto.machine.Post}
  */
 proto.machine.ContentTypeStatus.prototype.addPosts = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 4, opt_value, proto.machine.Post, opt_index);
+  return jspb.Message.addToRepeatedWrapperField(this, 5, opt_value, proto.machine.Post, opt_index);
 };
 
 

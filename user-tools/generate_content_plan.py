@@ -32,6 +32,8 @@ if __name__ == "__main__":
 
 	content_statuses = pb.ContentTypeStatuses()
 
+	content_statuses.splashtext = get_splashtext()
+
 	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_LONGFORM.name] = buildLongform(session_number_text)
 	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_SHORTFORM.name] = buildShortform(session_number_text)
 	content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_CLEANING.name] = buildCleaning(session_number_text)

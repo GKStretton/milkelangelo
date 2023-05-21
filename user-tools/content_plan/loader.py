@@ -120,3 +120,12 @@ def get_hashtags_list(ct: pb.ContentType, platform: pb.SocialPlatform) -> typing
 
 	# Return the tags
 	return tags
+
+def get_splashtext() -> str:
+	# comma separated value file
+	p = os.path.join(SOCIAL_TEXT_PATH, "splashtext.csv")
+
+	# Load the csv file into a pandas DataFrame
+	df = pd.read_csv(p, sep='\t')
+
+	return random.choice(df["TEXT"].dropna())
