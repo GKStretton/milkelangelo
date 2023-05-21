@@ -230,15 +230,15 @@ func appendDelayedDispense(sessionId, startupCounter, dispenseNumber, delayMs ui
 
 	data, err = protoyaml.Marshal(meta)
 	if err != nil {
-		fmt.Printf("Error marshalling failed dispenses: %v\n", err)
+		fmt.Printf("Error marshalling delayed dispenses: %v\n", err)
 		return
 	}
 
 	err = os.WriteFile(p, data, 0644)
 	if err != nil {
-		fmt.Printf("Error writing failed dispenses file: %v\n", err)
+		fmt.Printf("Error writing delayed dispenses file: %v\n", err)
 		return
 	}
 
-	fmt.Printf("wrote failed dispense to file (session %d, startup %d, dispense %d)\n", sessionId, startupCounter, dispenseNumber)
+	fmt.Printf("wrote delayed dispense to file (session %d, startup %d, dispense %d)\n", sessionId, startupCounter, dispenseNumber)
 }
