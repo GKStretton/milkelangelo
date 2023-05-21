@@ -53,6 +53,11 @@ func Run(sm *session.SessionManager) {
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_MARK_FAILED_DISPENSE, func(topic string, payload []byte) {
+		if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
+			fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
+			return
+		}
+
 		session, _ := sm.GetLatestSession()
 		if session != nil && !session.Complete {
 			appendFailedDispense(
@@ -64,6 +69,11 @@ func Run(sm *session.SessionManager) {
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_MARK_DELAYED_DISPENSE, func(topic string, payload []byte) {
+		if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
+			fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
+			return
+		}
+
 		// could change to payload in future
 		delayMs := uint64(1000)
 

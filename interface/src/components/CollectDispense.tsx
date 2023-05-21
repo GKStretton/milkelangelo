@@ -101,8 +101,8 @@ export default function CollectDispense() {
 			<Typography variant="body1">Dispenses remaining: {getDispensesRemaining()}</Typography>
 			<Typography variant="body1">Auto-Dispense Volume: {getAutoDispenseVolume()}µl</Typography>
             <Button disabled={!isAwake || collecting || stateReport?.getPipetteState()?.getSpent()} onClick={() => c?.publish(TOPIC_DISPENSE, getAutoDispenseVolume().toString())} sx={{"margin": 1}}>Auto-Dispense</Button>
-            <Button color="error" disabled={!isAwake || stateReport?.getPipetteState()?.getDispenseRequestNumber() == latestFailedDispense} onClick={markFailedDispense}>Mark Failed Dispense</Button>
-            <Button color="error" disabled={!isAwake || stateReport?.getPipetteState()?.getDispenseRequestNumber() == latestDelayedDispense} onClick={markDelayedDispense}>Mark Delayed Dispense</Button>
+            <Button color="error" disabled={!isAwake || stateReport?.getPipetteState()?.getDispenseRequestNumber() == latestFailedDispense || stateReport?.getPipetteState()?.getDispenseRequestNumber() === 0} onClick={markFailedDispense}>Mark Failed Dispense</Button>
+            <Button color="error" disabled={!isAwake || stateReport?.getPipetteState()?.getDispenseRequestNumber() == latestDelayedDispense || stateReport?.getPipetteState()?.getDispenseRequestNumber() === 0} onClick={markDelayedDispense}>Mark Delayed Dispense</Button>
 		</>
 		);
 	}
