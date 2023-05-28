@@ -1,15 +1,6 @@
 import { useState, useContext, useEffect } from "react";
-import {
-  TOPIC_SHUTDOWN,
-  TOPIC_SLEEP,
-  TOPIC_WAKE,
-  TOPIC_SET_VALVE,
-  TOPIC_DISPENSE,
-  TOPIC_FLUID,
-  TOPIC_COLLECT,
-  TOPIC_SET_IK_Z,
-} from "../topics_firmware/topics_firmware";
-import { SessionStatus, SolenoidValve, StateReport, Status, StreamStatus } from "../machinepb/machine_pb";
+import { TOPIC_DISPENSE, TOPIC_COLLECT } from "../topics_firmware/topics_firmware";
+import { StateReport, Status } from "../machinepb/machine_pb";
 import MqttContext from "../util/mqttContext";
 import { ButtonGroup, Button, Typography, Slider, Box, Tabs, Tab } from "@mui/material";
 import { useSessionStatus, useStateReport, useStreamStatus } from "../util/hooks";

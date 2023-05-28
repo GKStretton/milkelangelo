@@ -16,7 +16,6 @@ import {
   TOPIC_SESSION_END,
   TOPIC_SESSION_PAUSE,
   TOPIC_SESSION_RESUME,
-  TOPIC_STATE_REPORT_JSON,
   TOPIC_STREAM_END,
   TOPIC_STREAM_START,
 } from "../topics_backend/topics_backend";
@@ -45,7 +44,6 @@ import {
 } from "@mui/material";
 import { useSessionStatus, useStateReport, useStreamStatus } from "../util/hooks";
 import CollectDispense from "./CollectDispense";
-import { pbkdf2 } from "crypto";
 
 export default function ControlGroup() {
   const [tabValue, setTabValue] = useState(0);
