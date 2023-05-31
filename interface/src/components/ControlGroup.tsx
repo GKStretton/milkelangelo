@@ -10,6 +10,7 @@ import {
   TOPIC_SET_IK_Z,
   TOPIC_MARK_SAFE_TO_CALIBRATE,
   TOPIC_GOTO_NODE,
+  TOPIC_TOGGLE_MANUAL,
 } from "../topics_firmware/topics_firmware";
 import {
   TOPIC_SESSION_BEGIN,
@@ -359,6 +360,15 @@ export default function ControlGroup() {
             onClick={() => c?.publish(TOPIC_GOTO_NODE, String(selectedNode))}
           >
             Go to node
+          </Button>
+
+          <Button
+            disabled={!isAwake}
+            variant="contained"
+            color="error"
+            onClick={() => c?.publish(TOPIC_TOGGLE_MANUAL, "")}
+          >
+            Toggle Manual
           </Button>
         </>
       )}
