@@ -240,3 +240,13 @@ class Post(betterproto.Message):
     # seconds ts of when to publish. If 0, publish immediately, because 0 is in
     # the past.
     scheduled_unix_timetamp: int = betterproto.uint64_field(8)
+
+
+@dataclass
+class Email(betterproto.Message):
+    """
+    emails used for administration, not intended for audience distribution
+    """
+
+    subject: str = betterproto.string_field(1)
+    body: str = betterproto.string_field(2)

@@ -15,3 +15,4 @@ feh --action1 "; $DIR/user-tools/select-dslr-image.sh %F" --scale-down --draw-fi
 
 cd $DIR
 ./user-tools/generate-all-stills.sh $1
+read

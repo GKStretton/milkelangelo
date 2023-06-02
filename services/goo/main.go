@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
@@ -30,6 +31,7 @@ func main() {
 
 	mqtt.Start()
 	keyvalue.Start()
+	email.Start()
 
 	sm := session.NewSessionManager(false)
 

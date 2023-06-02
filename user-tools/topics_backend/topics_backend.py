@@ -3,6 +3,7 @@ from typing import Literal
 PAYLOAD_SMART_SWITCH_OFF: Literal["OFF"] = "OFF"
 PAYLOAD_SMART_SWITCH_ON: Literal["ON"] = "ON"
 TOPIC_CLOSE_BLIND: Literal["asol/close_bedroom_blind"] = "asol/close_bedroom_blind"
+TOPIC_EMAIL_SEND: Literal["asol/send-email"] = "asol/send-email"
 TOPIC_KV_GET: Literal["asol/kv/get/"] = "asol/kv/get/"
 TOPIC_KV_GET_RESP: Literal["asol/kv/get-resp/"] = "asol/kv/get-resp/"
 TOPIC_KV_SET: Literal["asol/kv/set/"] = "asol/kv/set/"

@@ -459,6 +459,30 @@ export namespace Post {
   }
 }
 
+export class Email extends jspb.Message {
+  getSubject(): string;
+  setSubject(value: string): void;
+
+  getBody(): string;
+  setBody(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Email.AsObject;
+  static toObject(includeInstance: boolean, msg: Email): Email.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: Email, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Email;
+  static deserializeBinaryFromReader(message: Email, reader: jspb.BinaryReader): Email;
+}
+
+export namespace Email {
+  export type AsObject = {
+    subject: string,
+    body: string,
+  }
+}
+
 export interface NodeMap {
   UNDEFINED: 0;
   HOME: 4;

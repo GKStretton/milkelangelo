@@ -2,6 +2,7 @@
 export const PAYLOAD_SMART_SWITCH_OFF: string = "OFF";
 export const PAYLOAD_SMART_SWITCH_ON: string = "ON";
 export const TOPIC_CLOSE_BLIND: string = "asol/close_bedroom_blind";
+export const TOPIC_EMAIL_SEND: string = "asol/send-email";
 export const TOPIC_KV_GET: string = "asol/kv/get/";
 export const TOPIC_KV_GET_RESP: string = "asol/kv/get-resp/";
 export const TOPIC_KV_SET: string = "asol/kv/set/";

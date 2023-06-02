@@ -1,6 +1,5 @@
 version: "3.7"
 
-
 services:
   rtsp:
     build: services/rtsp
@@ -34,6 +33,7 @@ services:
     network_mode: host
     environment:
       OBS_LANDSCAPE_URL: ${OBS_LANDSCAPE_URL}
+      EMAIL_RECIPIENT: ${EMAIL_RECIPIENT}
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev
@@ -75,4 +75,4 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
-      - '5000:80'
+      - "5000:80"
