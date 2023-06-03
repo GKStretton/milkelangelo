@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
 	"github.com/gkstretton/dark/services/goo/filesystem"
@@ -47,7 +48,7 @@ func captureSessionImage(sessionId uint64) {
 		return
 	}
 
-	err = livecapture.SaveCropConfig(CC_DSLR, p)
+	err = livecapture.SaveCropConfig(CC_DSLR, filepath.Join(filesystem.GetRawDslrDir(sessionId), CC_DSLR))
 	if err != nil {
 		fmt.Println(err)
 		return

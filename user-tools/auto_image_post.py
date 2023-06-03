@@ -40,7 +40,7 @@ def process_image(raw, crop_config=None):
 
 	#! Best go to the source, should the shutter time/aperture size be greater?
 
-	# saturation_factor=1.3
+	# saturation_factor=1.1
 
 	# hsv = color.rgb2hsv(post)
 	# hsv[:,:,1] = hsv[:,:,1] * saturation_factor
@@ -59,6 +59,7 @@ def handle_directory(in_path, out_path):
 def handle_image(in_file, out_dir):
 	raw = load_image(in_file)
 	crop_config = load_crop_config(args.input)
+	print(crop_config)
 
 	cropped, post = process_image(raw, crop_config=crop_config)
 
@@ -84,11 +85,12 @@ def preview_image(raw, cropped, post):
 	cv.namedWindow("win", cv.WINDOW_NORMAL)
 	cv.imshow("win", res)
 
-	while cv.waitKey() != ord('x'):
+	while cv.waitKey() != ord('q'):
 		time.sleep(0.01)
 	cv.destroyAllWindows()
 
 def load_image(path):
+	print(f"load {path}")
 	img = cv.imread(path, cv.IMREAD_UNCHANGED)
 	img = cv.rotate(img, cv.ROTATE_180)
 	return img / 255.0
@@ -99,11 +101,13 @@ def save_image(in_file, out_dir, image):
 	print("saving...", cv.imwrite(write_path, image*255))
 
 def load_crop_config(path):
+	d = os.path.dirname(path)
 	config = None
 	try:
-		with open(path + ".yml", 'r') as f:
+		with open(os.path.join(d, "crop_dslr.yml"), 'r') as f:
 			config = yaml.load(f, Loader=yaml.FullLoader)
 	except FileNotFoundError as err:
+		print(err)
 		pass
 
 	return config
