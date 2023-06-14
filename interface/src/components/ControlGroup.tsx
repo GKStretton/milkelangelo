@@ -11,6 +11,8 @@ import {
   TOPIC_MARK_SAFE_TO_CALIBRATE,
   TOPIC_GOTO_NODE,
   TOPIC_TOGGLE_MANUAL,
+  TOPIC_SET_COVER_OPEN,
+  TOPIC_SET_COVER_CLOSE,
 } from "../topics_firmware/topics_firmware";
 import {
   TOPIC_SESSION_BEGIN,
@@ -367,8 +369,29 @@ export default function ControlGroup() {
             variant="contained"
             color="error"
             onClick={() => c?.publish(TOPIC_TOGGLE_MANUAL, "")}
+            sx={{ margin: 2 }}
           >
             Toggle Manual
+          </Button>
+
+          <Button
+            disabled={!isAwake}
+            variant="contained"
+            color="error"
+            onClick={() => c?.publish(TOPIC_SET_COVER_OPEN, "")}
+            sx={{ margin: 2 }}
+          >
+            Open Cover
+          </Button>
+
+          <Button
+            disabled={!isAwake}
+            variant="contained"
+            color="error"
+            onClick={() => c?.publish(TOPIC_SET_COVER_CLOSE, "")}
+            sx={{ margin: 2 }}
+          >
+            Close Cover
           </Button>
         </>
       )}
