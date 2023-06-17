@@ -40,6 +40,7 @@ class CleaningPropertyManager(BasePropertyManager):
 			state_report.fluid_request.fluid_type == pb.FluidType.FLUID_DRAIN and
 			not state_report.fluid_request.complete
 		):
+			delay = 4
 			props.max_duration = 30
 			props.speed = 2
 			return props, delay, min_duration

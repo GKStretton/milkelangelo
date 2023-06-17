@@ -1,0 +1,11 @@
+moviepy==1.0.3
+betterproto==2.0.0b5
+opencv-python
+Pillow
+paho-mqtt
+protobuf
+PyYAML
+scikit-image
+matplotlib
+pandas
+pytz

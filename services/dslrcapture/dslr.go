@@ -79,6 +79,7 @@ func captureImage(p string) error {
 			return fmt.Errorf("failed to run capture-dslr: %v", err)
 		}
 	}
+	filesystem.SetPerms(p)
 
 	return nil
 }
@@ -93,5 +94,6 @@ func processImage(imgPath, outDir string) error {
 	if err != nil {
 		return fmt.Errorf("failed to start imagePost cmd: %v", err)
 	}
+	filesystem.SetPerms(filepath.Join(outDir, filepath.Base(imgPath)))
 	return nil
 }
