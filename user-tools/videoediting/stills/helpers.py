@@ -14,7 +14,7 @@ FONT = "./resources/fonts/DejaVuSerifCondensed-Italic.ttf"
 FONT_SIZE_TITLE = 130
 FONT_SIZE_SUBTITLE = 130
 FONT_SIZE_SUBTITLE_OUTRO = 100
-FONT_SIZE_SESSION_NUMBER = 200
+FONT_SIZE_SESSION_NUMBER = 170
 WHITE = (255, 255, 255)
 # SOCIAL ICONS
 SI_BASEPATH = "resources/social_icons"
@@ -63,26 +63,6 @@ def get_base_image(metadata, fmt: Format) -> Image.Image:
     _, _, w, h = draw.textbbox((0, 0), text=session_number_text, font=number_font)
     draw.text(xy=number_location,
               text=session_number_text, fill=WHITE, font=number_font)
-
-    return img
-
-
-def generate_intro(metadata, dslr_image: Image.Image, still_format: Format) -> Image.Image:
-    img = get_base_image(metadata, still_format)
-
-    # Robotic art generation
-    draw = ImageDraw.Draw(img)
-    # TITLE
-    subtitle_font = ImageFont.truetype(FONT, FONT_SIZE_SUBTITLE)
-
-    subtitle_location = (0, 0)
-    if still_format == Format.LANDSCAPE:
-        subtitle_location = (490, 765)
-    if still_format == Format.PORTRAIT:
-        subtitle_location = (img.width / 2, 1675)
-    _, _, w, h = draw.textbbox((0, 0), text=INTRO_SUBTITLE, font=subtitle_font)
-    draw.text(xy=(subtitle_location[0] - w/2, subtitle_location[1] - h/2),
-              text=INTRO_SUBTITLE, fill=WHITE, font=subtitle_font, align="center")
 
     return img
 
