@@ -41,10 +41,13 @@ def get_state_reports(base_dir: str, session_number: int) -> typing.Tuple[float,
     return state_reports
 
 
-def get_selected_dslr_image(base_dir: str, session_number: int, image_choice: str) -> Image.Image:
+def get_selected_dslr_image_path(base_dir: str, session_number: int, image_choice: str) -> str:
     filename = f"{image_choice}.jpg"
-    path = os.path.join(base_dir, "session_content", session_number, "dslr/post", filename)
-    return Image.open(path)
+    return os.path.join(base_dir, "session_content", str(session_number), "dslr/post", filename)
+
+
+def get_selected_dslr_image(base_dir: str, session_number: int, image_choice: str) -> Image.Image:
+    return Image.open(get_selected_dslr_image_path(base_dir, session_number, image_choice))
 
 # look up creationtime of selected.jpg dslr/post image
 
