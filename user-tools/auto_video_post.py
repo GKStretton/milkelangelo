@@ -72,8 +72,13 @@ def render(
         i += 1
         output_file = os.path.join(output_dir, f"{content_type.name}.{i}.mp4")
 
+    thumbnail_file = os.path.join(output_dir, f"{content_type.name}-thumbnail.{i}.jpg")
     overlay_file = os.path.join(output_dir, f"{content_type.name}-overlay.{i}.mp4")
     content_file = output_file
+
+    # todo: configure thumbnail time
+    content.save_frame(thumbnail_file, t=0)
+    print(f"wrote thumbnail to {thumbnail_file}")
 
     overlay_render_start = datetime.now()
     overlay.write_videofile(overlay_file, codec='libx264', fps=FPS)

@@ -1,9 +1,10 @@
 FROM golang:1.19
 
-RUN apt update
-RUN apt install -y ffmpeg
-RUN apt install -y gphoto2
-RUN apt install -y python3 python3-pip
+RUN apt update && apt install -y \
+    ffmpeg \
+    gphoto2 \
+    python3 \
+    python3-pip
 
 RUN python3 -m pip install opencv-python scikit-image matplotlib pyyaml pandas
 
