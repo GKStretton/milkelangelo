@@ -31,9 +31,9 @@ def add_stills(content_path: str, content_type: pb.ContentType, content_fmt: For
     overlayPadding = ColorClip(overlay_clip.size, color=(0, 0, 0), duration=1)
 
     overlay_clip = concatenate_videoclips([
-        overlayPadding.set_duration(introDuration),
+        overlayPadding.with_duration(introDuration),
         overlay_clip,
-        overlayPadding.set_duration(outroDuration),
+        overlayPadding.with_duration(outroDuration),
     ])
     content_clip = concatenate_videoclips([
         introClip,

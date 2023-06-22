@@ -11,19 +11,20 @@ from videoediting.loaders import get_session_metadata, get_selected_dslr_image_p
 from videoediting.compositor_helpers import build_subtitle, build_title, build_session_number
 
 # PIXEL_FONT = "../resources/fonts/MinecraftRegular-Bmg3.otf"
-PIXEL_FONT = "../resources/fonts/Comic-Sans-MS.ttf"
+PIXEL_FONT = "../resources/fonts/monogram.ttf"
+CS_FONT = "../resources/fonts/Comic-Sans-MS.ttf"
 MAIN_FONT = "../resources/fonts/DejaVuSerifCondensed-Italic.ttf"
 FONT_SIZE_SUBTITLE = 110
 FONT_SIZE_TITLE = 135
 FONT_SIZE_SESSION_NUMBER = 170
-FONT_RESCALE = 5
+FONT_RESCALE = 3
 
 
 def pulse(t):
     """
     Function to create a pulse effect.
 
-    1. Sine wave
+    1. Cosine wave
     2. Take absolute value
     3. 1-curve to make it upside down
     4. trim the bottom off with a max function
@@ -50,8 +51,8 @@ def get_size_from_format(fmt: Format) -> typing.Tuple[int, int]:
 
 
 def calculate_splashtext_font_size(text):
-    base_size = 80
-    base_length = 18  # length of text where font size is at base size
+    base_size = 80 if get_splashfont(text) == CS_FONT else 100
+    base_length = 20  # length of text where font size is at base size
 
     if len(text) <= base_length:
         return base_size
@@ -62,56 +63,68 @@ def calculate_splashtext_font_size(text):
 
 def generate_hue():
     """
-    generate a hue for the splashtext, excluding a certain colour used in a 
-    certain game...
+    generate a hue for the splashtext, excluding yellow and dark blue
     """
-    if random.random() < (40 / 205):  # 40 out of 205 numbers are in range 0-29
-        return random.randint(0, 39)
-    else:
-        return random.randint(91, 255)
+    choices = []
+    for i in range(0, 360):
+        if i >= 50 and i <= 80:
+            continue
+        if i >= 225 and i <= 260:
+            continue
+        choices.append(i)
+    return random.choice(choices)
+
+
+def get_splashfont(text: str) -> str:
+    cs_texts = ["Now in your favorite font!", "Dare to be different!"]
+    if text in cs_texts:
+        return CS_FONT
+    return PIXEL_FONT
 
 
 def build_splashtext(splash_text, pos, duration) -> typing.Tuple[VideoClip, VideoClip]:
     """returns main text and shadow"""
     angle = -15
-    color = f"hsv({generate_hue()}, 255, 255)"
+    hue = generate_hue()
+    color = f"hsv({hue}, 255, 255)"
+    shadow_color = f"hsv({hue}, 50, 40)"
     print(color)
 
     font_size = calculate_splashtext_font_size(splash_text)
     splash_clip_main = TextClip(splash_text, font_size=font_size*FONT_RESCALE, color=color,
-                                font=PIXEL_FONT).with_duration(duration)
-    # splash_clip_shadow = TextClip(splash_text, fontsize=font_size, color='#'+'1'*6,
-    #   font=PIXEL_FONT).set_duration(duration)
+                                font=get_splashfont(splash_text)).with_duration(duration)
+    splash_clip_shadow = TextClip(splash_text, font_size=font_size*FONT_RESCALE, color=shadow_color,
+                                  font=get_splashfont(splash_text)).with_duration(duration)
 
     splash_clip_main = splash_clip_main.rotate(angle, resample='bilinear')
     splash_clip_main = resize(splash_clip_main, pulse)
 
     w, h = splash_clip_main.size
     x, y = pos
-    splash_clip_main = splash_clip_main.set_position(lambda t: (x-(w*pulse(t))/2, y-(h*pulse(t))/2))
+    splash_clip_main = splash_clip_main.with_position(lambda t: (
+        x-(w*pulse(t)*FONT_RESCALE)/2, y-(h*pulse(t)*FONT_RESCALE)/2))
 
-    splash_clip_main.preview()
+    # Apply the pulse effect to shadow
+    xoffset = -4
+    yoffset = 3
+    pulsing_shadow = resize(splash_clip_shadow, pulse).rotate(angle, resample='bicubic')
+    w, h = pulsing_shadow.size
+    x2, y2 = pos[0]+xoffset, pos[1]+yoffset
+    pulsing_shadow = pulsing_shadow.with_position(lambda t: (
+        x2-(w*pulse(t)*FONT_RESCALE)/2, y2-(h*pulse(t)*FONT_RESCALE)/2))
 
-    # # Apply the pulse effect to shadow
-    # xoffset = 5
-    # yoffset = -3
-    # pulsing_shadow = resize(splash_clip_shadow, pulse).rotate(angle, resample='bicubic')
-    # w, h = pulsing_shadow.size
-    # x2, y2 = pos[0]+xoffset, pos[1]+yoffset
-    # pulsing_shadow = pulsing_shadow.set_position(lambda t: (x2-(w*pulse(t))/2, y2-(h*pulse(t))/2))
-
-    return splash_clip_main, None
+    return splash_clip_main, pulsing_shadow
 
 
 def build_dslr_image(base_dir: str, session_number: int, duration: float, fmt: Format, pos) -> VideoClip:
     dslr_img = get_selected_dslr_image_path(base_dir, session_number, "selected")
-    dslr_clip = ImageClip(dslr_img).set_duration(duration)
+    dslr_clip = ImageClip(dslr_img).with_duration(duration)
     dslr_start_size = min(*get_size_from_format(fmt)) * 0.95
     return (
         dslr_clip
         .fx(resize, (dslr_start_size, dslr_start_size))
         .fx(resize, slow_grow)
-        .set_position(pos)
+        .with_position(pos)
     )
 
 
@@ -143,7 +156,7 @@ def build_shortform_intro(
     offset = 0.25
     # masking bug with loop
     loader = ImageSequenceClip("../resources/static_img/loader", fps=60, with_mask=False)
-    loader = loop(loader, duration=duration+offset).subclip(offset).set_position((0, 1570))
+    loader = loop(loader, duration=duration+offset).subclip(offset).with_position((0, 1570))
 
     # Create a composite video clip
     clips = [
@@ -155,8 +168,8 @@ def build_shortform_intro(
     ]
 
     if splash_text != "":
-        splash, splash_shadow = build_splashtext(splash_text, (700, 320), duration)
-        # clips.append(splash_shadow)
+        splash, splash_shadow = build_splashtext(splash_text, (660, 300), duration)
+        clips.append(splash_shadow)
         clips.append(splash)
     return CompositeVideoClip(clips, size=get_size_from_format(fmt))
 
@@ -172,8 +185,8 @@ if __name__ == "__main__":
         Format.PORTRAIT,
         3.5,
         "Robotic\nArt\nGeneration",
-        splash_text="Super!"
+        splash_text="Dancing is not science!"
     )
-    # video.write_videofile("splash.mp4", fps=60)
+    # video.write_videofile("splash2.mp4", fps=60)
     video.resize(1).preview()
     # video.resize(0.5).show(interactive=True)

@@ -91,8 +91,8 @@ class ContentDescriptor:
             )
             text_str = "STATE REPORT:\n"+ts_format(timestamp) + "\n" + sr_fmt
             text_str += "\n\nVIDEO STATE:\n" + str(video_state) + "\n"
-            txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=10, color='white', align='West')
-            txt = txt.set_duration(duration)
+            txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', font_size=10, color='white', align='West')
+            txt = txt.with_duration(duration)
 
             sr_clips.append(txt)
 
@@ -138,8 +138,8 @@ class ContentDescriptor:
             # commenting out this line in /etc/ImageMagick-6/policy.xml was required:
             # <policy domain="path" rights="none" pattern="@*" />
             # https://github.com/Zulko/moviepy/issues/401#issuecomment-278679961
-            txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', fontsize=10, color='white', align='West')
-            txt = txt.set_duration(overlay_raw_subclip.duration)
+            txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', font_size=10, color='white', align='West')
+            txt = txt.with_duration(overlay_raw_subclip.duration)
             if props.speed != 1.0:
                 overlay_raw_subclip = overlay_raw_subclip.speedx(props.speed)
                 txt = txt.speedx(props.speed)

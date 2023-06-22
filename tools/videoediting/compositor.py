@@ -18,8 +18,8 @@ def composeLandscape(metadata, props: SectionProperties, top_subclip: VideoClip,
 
     if props.scene == Scene.DUAL:
         return CompositeVideoClip([
-            front_subclip.resize(0.7).set_position((50, 'center')),
-            top_subclip.resize(1.05).set_position((960, 'center')),
+            front_subclip.resize(0.7).with_position((50, 'center')),
+            top_subclip.resize(1.05).with_position((960, 'center')),
 
             build_title((490, 110), top_subclip.duration),
             build_session_number(metadata, (195, 990), top_subclip.duration),
@@ -35,8 +35,8 @@ def composePortrait(metadata, props: SectionProperties, top_subclip: VideoClip, 
 
     if props.scene != Scene.UNDEFINED:
         return CompositeVideoClip([
-            front_subclip.resize(0.75).set_position(('center', 1120)),
-            top_subclip.resize(1.05).set_position(('center', 50)),
+            front_subclip.resize(0.75).with_position(('center', 1120)),
+            top_subclip.resize(1.05).with_position(('center', 50)),
 
             build_title((portrait_dim[0] // 2, 1055), top_subclip.duration),
             build_session_number(metadata, (195, 80), top_subclip.duration),

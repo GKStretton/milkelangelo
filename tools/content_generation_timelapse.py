@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     print("Compositing video...")
     final_clip = CompositeVideoClip([
-        clip.resize(FOOTAGE_DIMENSIONS).set_position(('center', 'center')),
+        clip.resize(FOOTAGE_DIMENSIONS).with_position(('center', 'center')),
 
         build_title((FULL_DIMENSIONS[0] // 2, 150), clip.duration),
         build_session_number(session_metadata, (FULL_DIMENSIONS[0] // 2, 290), clip.duration, center_align=True),
