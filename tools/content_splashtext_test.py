@@ -6,7 +6,11 @@ from videoediting.constants import Format
 from videoediting.loaders import get_session_metadata, get_selected_dslr_image_path
 from videoediting.compositor_helpers import build_subtitle, build_title, build_session_number
 
-pixel_font = "./resources/fonts/MinecraftRegular-Bmg3.otf"
+PIXEL_FONT = "../resources/fonts/MinecraftRegular-Bmg3.otf"
+MAIN_FONT = "../resources/fonts/DejaVuSerifCondensed-Italic.ttf"
+FONT_SIZE_SUBTITLE = 110
+FONT_SIZE_TITLE = 135
+FONT_SIZE_SESSION_NUMBER = 170
 
 
 def pulse(t):
@@ -50,18 +54,12 @@ def calculate_splashtext_font_size(text):
         return int(base_size * (base_length / len(text)))
 
 
-FONT = "./resources/fonts/DejaVuSerifCondensed-Italic.ttf"
-FONT_SIZE_SUBTITLE = 120
-FONT_SIZE_TITLE = 135
-FONT_SIZE_SESSION_NUMBER = 170
-
-
 def build_splashtext(splash_text, pos, duration) -> VideoClip:
     font_size = calculate_splashtext_font_size(splash_text)
     splash_clip_main = TextClip(splash_text, fontsize=font_size, color='yellow',
-                                font=pixel_font).set_duration(duration)
+                                font=PIXEL_FONT).set_duration(duration)
     splash_clip_shadow = TextClip(splash_text, fontsize=font_size, color='gray',
-                                  font=pixel_font).set_duration(duration).set_position((4, 4))
+                                  font=PIXEL_FONT).set_duration(duration).set_position((4, 4))
     final_text = CompositeVideoClip([splash_clip_shadow, splash_clip_main], use_bgclip=True)
 
     # Apply the pulse effect
@@ -137,6 +135,6 @@ if __name__ == "__main__":
         "Robotic\nArt\nGeneration",
         splash_text="Non-trivial!"
     )
-    video.write_videofile("splash.mp4", fps=60)
-    # video.resize(0.5).preview()
+    # video.write_videofile("splash.mp4", fps=60)
+    video.resize(0.5).preview()
     # video.resize(0.5).show(interactive=True)

@@ -1,7 +1,7 @@
 from moviepy.video.VideoClip import TextClip
 import typing
 
-MAIN_FONT = "./resources/fonts/DejaVuSerifCondensed-Italic.ttf"
+MAIN_FONT = "../resources/fonts/DejaVuSerifCondensed-Italic.ttf"
 
 
 def build_title(pos: typing.Tuple[int, int], duration: float, font_size=115) -> TextClip:
@@ -45,7 +45,7 @@ def build_session_number(
 
 
 def build_subtitle(text: str, pos: typing.Tuple[int, int], duration: float, font_size=80) -> TextClip:
-    text_size = (1080, 400)
+    text_size = (1080, 500)
     text_clip = TextClip(text, size=text_size, fontsize=font_size, align='center',
                          color='white', font=MAIN_FONT)
 

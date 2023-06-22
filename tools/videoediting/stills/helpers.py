@@ -10,7 +10,7 @@ from videoediting.constants import Format
 
 from PIL import Image, ImageDraw, ImageFont
 
-FONT = "./resources/fonts/DejaVuSerifCondensed-Italic.ttf"
+FONT = "../resources/fonts/DejaVuSerifCondensed-Italic.ttf"
 FONT_SIZE_SUBTITLE_OUTRO = 100
 
 # SOCIAL ICONS
