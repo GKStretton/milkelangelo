@@ -1,7 +1,8 @@
 import numpy as np
 import typing
-from moviepy.editor import TextClip, CompositeVideoClip, ImageClip, VideoClip
+from moviepy.editor import TextClip, CompositeVideoClip, ImageClip, VideoClip, ImageSequenceClip
 from moviepy.video.fx.resize import resize
+from moviepy.video.fx.loop import loop
 from videoediting.constants import Format
 from videoediting.loaders import get_session_metadata, get_selected_dslr_image_path
 from videoediting.compositor_helpers import build_subtitle, build_title, build_session_number
@@ -26,7 +27,7 @@ def pulse(t):
     """
     mag = 0.1
     hz = 2
-    scale = 1 + mag * max(1-abs(np.sin(hz * np.pi * t)), 0.2)
+    scale = 1 + mag * max(1-abs(np.cos(hz * np.pi * t)), 0.2)
     return scale
 
 
@@ -54,20 +55,29 @@ def calculate_splashtext_font_size(text):
         return int(base_size * (base_length / len(text)))
 
 
-def build_splashtext(splash_text, pos, duration) -> VideoClip:
+def build_splashtext(splash_text, pos, duration) -> typing.Tuple[VideoClip, VideoClip]:
+    """returns main text and shadow"""
     font_size = calculate_splashtext_font_size(splash_text)
     splash_clip_main = TextClip(splash_text, fontsize=font_size, color='yellow',
                                 font=PIXEL_FONT).set_duration(duration)
-    splash_clip_shadow = TextClip(splash_text, fontsize=font_size, color='gray',
-                                  font=PIXEL_FONT).set_duration(duration).set_position((4, 4))
-    final_text = CompositeVideoClip([splash_clip_shadow, splash_clip_main], use_bgclip=True)
+    splash_clip_shadow = TextClip(splash_text, fontsize=font_size, color='#'+'3'*6,
+                                  font=PIXEL_FONT).set_duration(duration)
 
     # Apply the pulse effect
-    pulsing_clip = resize(final_text, pulse).rotate(20, resample='bicubic')
+    pulsing_clip = resize(splash_clip_main, pulse).rotate(20, resample='bicubic')
     w, h = pulsing_clip.size
     x, y = pos
+    pulsing_clip = pulsing_clip.set_position(lambda t: (x-(w*pulse(t))/2, y-(h*pulse(t))/2))
 
-    return pulsing_clip.set_position(lambda t: (x-(w*pulse(t))/2, y-(h*pulse(t))/2))
+    # Apply the pulse effect to shadow
+    xoffset = 8
+    yoffset = 3
+    pulsing_shadow = resize(splash_clip_shadow, pulse).rotate(20, resample='bicubic')
+    w, h = pulsing_shadow.size
+    x2, y2 = pos[0]+xoffset, pos[1]+yoffset
+    pulsing_shadow = pulsing_shadow.set_position(lambda t: (x2-(w*pulse(t))/2, y2-(h*pulse(t))/2))
+
+    return pulsing_clip, pulsing_shadow
 
 
 def build_dslr_image(base_dir: str, session_number: int, duration: float, fmt: Format, pos) -> VideoClip:
@@ -107,18 +117,24 @@ def build_shortform_intro(
         font_size=FONT_SIZE_SUBTITLE
     )
 
+    offset = 0.25
+    # masking bug with loop
+    loader = ImageSequenceClip("../resources/static_img/loader", fps=60, with_mask=False)
+    loader = loop(loader, duration=duration+offset).subclip(offset).set_position((0, 1570))
+
     # Create a composite video clip
     clips = [
         build_dslr_image(base_dir, session_number, duration, fmt, 'center'),
         title,
         session_number_clip,
         subtitle,
+        loader,
     ]
 
     if splash_text != "":
-        pulsing_clip = build_splashtext(splash_text, (700, 320), duration)
-        clips.append(pulsing_clip)
-
+        splash, splash_shadow = build_splashtext(splash_text, (700, 320), duration)
+        clips.append(splash_shadow)
+        clips.append(splash)
     return CompositeVideoClip(clips, size=get_size_from_format(fmt))
 
 
@@ -133,7 +149,7 @@ if __name__ == "__main__":
         Format.PORTRAIT,
         3.5,
         "Robotic\nArt\nGeneration",
-        splash_text="Non-trivial!"
+        splash_text="Supercalifragilisticexpialidocious!"
     )
     # video.write_videofile("splash.mp4", fps=60)
     video.resize(0.5).preview()
