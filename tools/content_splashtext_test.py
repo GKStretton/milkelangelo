@@ -1,5 +1,8 @@
-import numpy as np
+import random
 import typing
+import numpy as np
+from PIL import Image
+
 from moviepy.editor import TextClip, CompositeVideoClip, ImageClip, VideoClip, ImageSequenceClip
 from moviepy.video.fx.resize import resize
 from moviepy.video.fx.loop import loop
@@ -7,11 +10,13 @@ from videoediting.constants import Format
 from videoediting.loaders import get_session_metadata, get_selected_dslr_image_path
 from videoediting.compositor_helpers import build_subtitle, build_title, build_session_number
 
-PIXEL_FONT = "../resources/fonts/MinecraftRegular-Bmg3.otf"
+# PIXEL_FONT = "../resources/fonts/MinecraftRegular-Bmg3.otf"
+PIXEL_FONT = "../resources/fonts/Comic-Sans-MS.ttf"
 MAIN_FONT = "../resources/fonts/DejaVuSerifCondensed-Italic.ttf"
 FONT_SIZE_SUBTITLE = 110
 FONT_SIZE_TITLE = 135
 FONT_SIZE_SESSION_NUMBER = 170
+FONT_RESCALE = 5
 
 
 def pulse(t):
@@ -28,7 +33,7 @@ def pulse(t):
     mag = 0.1
     hz = 2
     scale = 1 + mag * max(1-abs(np.cos(hz * np.pi * t)), 0.2)
-    return scale
+    return scale / FONT_RESCALE
 
 
 def slow_grow(t):
@@ -55,29 +60,47 @@ def calculate_splashtext_font_size(text):
         return int(base_size * (base_length / len(text)))
 
 
+def generate_hue():
+    """
+    generate a hue for the splashtext, excluding a certain colour used in a 
+    certain game...
+    """
+    if random.random() < (40 / 205):  # 40 out of 205 numbers are in range 0-29
+        return random.randint(0, 39)
+    else:
+        return random.randint(91, 255)
+
+
 def build_splashtext(splash_text, pos, duration) -> typing.Tuple[VideoClip, VideoClip]:
     """returns main text and shadow"""
+    angle = -15
+    color = f"hsv({generate_hue()}, 255, 255)"
+    print(color)
+
     font_size = calculate_splashtext_font_size(splash_text)
-    splash_clip_main = TextClip(splash_text, fontsize=font_size, color='yellow',
-                                font=PIXEL_FONT).set_duration(duration)
-    splash_clip_shadow = TextClip(splash_text, fontsize=font_size, color='#'+'3'*6,
-                                  font=PIXEL_FONT).set_duration(duration)
+    splash_clip_main = TextClip(splash_text, font_size=font_size*FONT_RESCALE, color=color,
+                                font=PIXEL_FONT).with_duration(duration)
+    # splash_clip_shadow = TextClip(splash_text, fontsize=font_size, color='#'+'1'*6,
+    #   font=PIXEL_FONT).set_duration(duration)
 
-    # Apply the pulse effect
-    pulsing_clip = resize(splash_clip_main, pulse).rotate(20, resample='bicubic')
-    w, h = pulsing_clip.size
+    splash_clip_main = splash_clip_main.rotate(angle, resample='bilinear')
+    splash_clip_main = resize(splash_clip_main, pulse)
+
+    w, h = splash_clip_main.size
     x, y = pos
-    pulsing_clip = pulsing_clip.set_position(lambda t: (x-(w*pulse(t))/2, y-(h*pulse(t))/2))
+    splash_clip_main = splash_clip_main.set_position(lambda t: (x-(w*pulse(t))/2, y-(h*pulse(t))/2))
 
-    # Apply the pulse effect to shadow
-    xoffset = 8
-    yoffset = 3
-    pulsing_shadow = resize(splash_clip_shadow, pulse).rotate(20, resample='bicubic')
-    w, h = pulsing_shadow.size
-    x2, y2 = pos[0]+xoffset, pos[1]+yoffset
-    pulsing_shadow = pulsing_shadow.set_position(lambda t: (x2-(w*pulse(t))/2, y2-(h*pulse(t))/2))
+    splash_clip_main.preview()
 
-    return pulsing_clip, pulsing_shadow
+    # # Apply the pulse effect to shadow
+    # xoffset = 5
+    # yoffset = -3
+    # pulsing_shadow = resize(splash_clip_shadow, pulse).rotate(angle, resample='bicubic')
+    # w, h = pulsing_shadow.size
+    # x2, y2 = pos[0]+xoffset, pos[1]+yoffset
+    # pulsing_shadow = pulsing_shadow.set_position(lambda t: (x2-(w*pulse(t))/2, y2-(h*pulse(t))/2))
+
+    return splash_clip_main, None
 
 
 def build_dslr_image(base_dir: str, session_number: int, duration: float, fmt: Format, pos) -> VideoClip:
@@ -133,7 +156,7 @@ def build_shortform_intro(
 
     if splash_text != "":
         splash, splash_shadow = build_splashtext(splash_text, (700, 320), duration)
-        clips.append(splash_shadow)
+        # clips.append(splash_shadow)
         clips.append(splash)
     return CompositeVideoClip(clips, size=get_size_from_format(fmt))
 
@@ -149,8 +172,8 @@ if __name__ == "__main__":
         Format.PORTRAIT,
         3.5,
         "Robotic\nArt\nGeneration",
-        splash_text="Supercalifragilisticexpialidocious!"
+        splash_text="Super!"
     )
     # video.write_videofile("splash.mp4", fps=60)
-    video.resize(0.5).preview()
+    video.resize(1).preview()
     # video.resize(0.5).show(interactive=True)
