@@ -4,7 +4,7 @@ from moviepy.editor import TextClip, CompositeVideoClip, ImageClip, VideoClip
 from moviepy.video.fx.resize import resize
 from videoediting.constants import Format
 from videoediting.loaders import get_session_metadata, get_selected_dslr_image_path
-from videoediting.stills.helpers import get_base_image
+from videoediting.compositor_helpers import build_subtitle, build_title, build_session_number
 
 pixel_font = "./resources/fonts/MinecraftRegular-Bmg3.otf"
 
@@ -27,7 +27,7 @@ def pulse(t):
 
 
 def slow_grow(t):
-    return 1+t/30
+    return 1+t/15
 
 
 def get_size_from_format(fmt: Format) -> typing.Tuple[int, int]:
@@ -52,6 +52,8 @@ def calculate_splashtext_font_size(text):
 
 FONT = "./resources/fonts/DejaVuSerifCondensed-Italic.ttf"
 FONT_SIZE_SUBTITLE = 120
+FONT_SIZE_TITLE = 135
+FONT_SIZE_SESSION_NUMBER = 170
 
 
 def build_splashtext(splash_text, pos, duration) -> VideoClip:
@@ -91,20 +93,28 @@ def build_shortform_intro(
     subtitle_text: str,
     splash_text: str = "",
 ) -> VideoClip:
-    base = np.array(get_base_image(metadata, fmt))
-    base_clip = ImageClip(base).set_duration(duration)
+    title = build_title(('center', 85), duration, font_size=FONT_SIZE_TITLE)
 
-    # subtitle
-    subtitle = (TextClip(subtitle_text, fontsize=FONT_SIZE_SUBTITLE, font=FONT, color='white')
-                .set_duration(duration)
-                .set_position(('center', 1500))
-                )
+    session_number_clip = build_session_number(
+        metadata,
+        (20, 230),
+        duration,
+        font_size=FONT_SIZE_SESSION_NUMBER,
+    )
+
+    subtitle = build_subtitle(
+        subtitle_text,
+        ('center', 1700),
+        duration,
+        font_size=FONT_SIZE_SUBTITLE
+    )
 
     # Create a composite video clip
     clips = [
-        base_clip,
         build_dslr_image(base_dir, session_number, duration, fmt, 'center'),
-        subtitle
+        title,
+        session_number_clip,
+        subtitle,
     ]
 
     if splash_text != "":
@@ -127,6 +137,6 @@ if __name__ == "__main__":
         "Robotic\nArt\nGeneration",
         splash_text="Non-trivial!"
     )
-    # video.write_videofile("splash2.mp4", fps=60)
-    video.resize(0.5).preview()
-    # video.preview()
+    video.write_videofile("splash.mp4", fps=60)
+    # video.resize(0.5).preview()
+    # video.resize(0.5).show(interactive=True)

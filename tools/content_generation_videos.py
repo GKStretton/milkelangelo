@@ -77,7 +77,7 @@ def render(
     content_file = output_file
 
     # todo: configure thumbnail time
-    content.save_frame(thumbnail_file, t=0)
+    content.save_frame(thumbnail_file, t=1)
     print(f"wrote thumbnail to {thumbnail_file}")
 
     overlay_render_start = datetime.now()

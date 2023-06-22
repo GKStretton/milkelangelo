@@ -11,11 +11,8 @@ from videoediting.constants import Format
 from PIL import Image, ImageDraw, ImageFont
 
 FONT = "./resources/fonts/DejaVuSerifCondensed-Italic.ttf"
-FONT_SIZE_TITLE = 130
-FONT_SIZE_SUBTITLE = 130
 FONT_SIZE_SUBTITLE_OUTRO = 100
-FONT_SIZE_SESSION_NUMBER = 170
-WHITE = (255, 255, 255)
+
 # SOCIAL ICONS
 SI_BASEPATH = "resources/social_icons"
 SI_PATHS = [f"{SI_BASEPATH}/youtube.png", f"{SI_BASEPATH}/tiktok.png",
@@ -30,41 +27,11 @@ class StillType(Enum):
     OUTRO = 2
 
 
-def get_size_from_format(fmt: Format) -> typing.Tuple[int, int]:
-    if fmt == Format.LANDSCAPE:
-        return (1920, 1080)
-    elif fmt == Format.PORTRAIT:
-        return (1080, 1920)
-    else:
-        return None
-
-
-def get_base_image(metadata, fmt: Format) -> Image.Image:
-    size = get_size_from_format(fmt)
-    img = Image.new("RGB", size, (0, 0, 0))
-
-    title_location = (0, 0)
-    number_location = (0, 0)
+"""
     if fmt == Format.LANDSCAPE:
         title_location = (40, 20)
         number_location = (480, 350)
-    if fmt == Format.PORTRAIT:
-        title_location = (60, 20)
-        number_location = (20, 180)
-
-    draw = ImageDraw.Draw(img)
-    # TITLE
-    title_font = ImageFont.truetype(FONT, FONT_SIZE_TITLE)
-    draw.text(xy=title_location, text=TITLE, fill=WHITE, font=title_font)
-
-    # SESSION NUMBER
-    session_number_text = f"#{metadata['production_id']}" if metadata['production'] else f"dev#{metadata['id']}"
-    number_font = ImageFont.truetype(FONT, FONT_SIZE_SESSION_NUMBER)
-    _, _, w, h = draw.textbbox((0, 0), text=session_number_text, font=number_font)
-    draw.text(xy=number_location,
-              text=session_number_text, fill=WHITE, font=number_font)
-
-    return img
+"""
 
 
 def generate_outro(metadata, dslr_image, still_format: Format) -> Image.Image:
