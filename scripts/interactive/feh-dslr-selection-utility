@@ -11,8 +11,6 @@ fi
 DIR=$(pwd)
 DSLR_DIR=/mnt/md0/light-stores/session_content/$1/dslr/post
 cd $DSLR_DIR
-feh --action1 "; $DIR/user-tools/select-dslr-image.sh %F" --scale-down --draw-filename .
+feh --action1 "; $DIR/tools/util/select-dslr-image %F" --scale-down --draw-filename .
 
-cd $DIR
-./user-tools/generate-all-stills.sh $1
 read

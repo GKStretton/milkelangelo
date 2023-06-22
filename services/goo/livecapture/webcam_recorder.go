@@ -24,14 +24,14 @@ func startWebcamRecording(rtspPath string, sessionId uint64) (*webcamRecorder, e
 	dir := filesystem.GetRawVideoDir(sessionId, rtspPath)
 	filePath := filesystem.GetIncrementalFileName(dir, "mp4")
 
-	fmt.Printf("Calling capture-rtsp.sh with '%s' and '%s'\n", url, filePath)
+	fmt.Printf("Calling capture-rtsp with '%s' and '%s'\n", url, filePath)
 
 	wr := &webcamRecorder{
 		sessionId: sessionId,
 		name:      rtspPath,
 		filePath:  filePath,
 	}
-	wr.cmd = exec.Command("./scripts/capture-rtsp.sh", url, filePath)
+	wr.cmd = exec.Command("./scripts/capture-rtsp", url, filePath)
 
 	// wr.cmd.Stdout = os.Stdout
 	// wr.cmd.Stderr = os.Stderr

@@ -9,9 +9,9 @@ docker-compose up
 
 # PYTHON
 cd $CURRENT_DIR
-cp -r $PROTOS_REPO_DIR/python/* ./user-tools/
-touch ./user-tools/topics_backend/__init__.py
-touch ./user-tools/topics_firmware/__init__.py
+cp -r $PROTOS_REPO_DIR/python/* ./tools/
+touch ./tools/topics_backend/__init__.py
+touch ./tools/topics_firmware/__init__.py
 
 # TYPESCRIPT
 cd $CURRENT_DIR

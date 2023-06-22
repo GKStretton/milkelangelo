@@ -73,7 +73,7 @@ def flash_mega(client: mqtt.Client, userdata, msg: mqtt.MQTTMessage):
 	serialConn.close()
 	time.sleep(0.2)
 
-	res = subprocess.run(["/bin/sh", "/src/flash.sh", FIRMWARE_LOCATION])
+	res = subprocess.run(["/bin/sh", "/src/flash", FIRMWARE_LOCATION])
 	if res.returncode != 0:
 		print("Flash command failed.")
 		client.publish("mega/flashresp", "Flash failed")

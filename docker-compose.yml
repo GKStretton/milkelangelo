@@ -37,7 +37,7 @@ services:
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev
-      - ./user-tools:/src/user-tools
+      - ./tools:/src/tools
       - ./resources:/src/resources
     user: "1000:1000"
   dslrcapture:
@@ -54,7 +54,7 @@ services:
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev
-      - ./user-tools:/src/user-tools
+      - ./tools:/src/tools
       - ./resources:/src/resources
       - ./services/goo:/goo
   restreamer:

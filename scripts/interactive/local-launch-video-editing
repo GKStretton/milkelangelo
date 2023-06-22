@@ -2,6 +2,6 @@
 # launch the video editing bulk script in a new window
 
 cd ~/asol/software/asol-backend
-urxvt -e bash -ic "./user-tools/generate-video-post.sh $1"
+urxvt -e bash -ic "./scripts/generation/generate-videos $1"
 mosquitto_pub -h DEPTH -t "asol/videos-generated" -m "$1"
 

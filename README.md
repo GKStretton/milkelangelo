@@ -31,11 +31,10 @@ built to be used by others so let me know any problems or missing information!
 	- [rtsp](services/rtsp/) - [MediaMTX](https://github.com/aler9/mediamtx) instance for video stream multiplexing
 	- [goo](services/goo/) - Bulk of the runtime backend logic is here
 	- [dslrcapture](services/dslrcapture/) - Separate service for capturing DSLR images in a loop while session is live.
-- [tools](user-tools/)
-	- [auto_image_post.py](user-tools/auto_image_post.py) - for post-processing of the dslr images
-	- [auto_stills_editing.py](user-tools/auto_stills_editing.py) - for generating "thumbnails"
-	- [auto_video_post.py](user-tools/auto_video_post.py) - for generating video content
-	- [auto_dslr_timelapse.py](user-tools/auto_dslr_timelapse.py) - for generating timelapses from all the top-down dslr images
+- [tools](tools/)
+	- [content_generation_dslr_edit.py](tools/content_generation_dslr_edit.py) - for post-processing of the dslr images
+	- [content_generation_video.py](tools/content_generation_video.py) - for generating video content
+	- [content_generation_timelapse.py](tools/content_generation_timelapse.py) - for generating timelapses from all the top-down dslr images
 
 ## Storage
 
@@ -77,11 +76,11 @@ Each `session_content` folder has the following format (output content in bold):
 
 ### How it works
 
-This diagram may be of use. Also please see the python code in user-tools/auto_... and user-tools/videoediting/...
+This diagram may be of use. Also please see the python code in tools/auto_... and tools/videoediting/...
 
 ![Diagram](./architecture.dio.svg)
 
-The `for` loop in `__main__` of [auto_video_post.py](user-tools/auto_video_post.py)
+The `for` loop in `__main__` of [auto_video_post.py](tools/auto_video_post.py)
 is the most complex part. It handles iteration of state reports in order to get
 all the SectionProperties. There is a `delay` concept which delays the property
 change, and a `min_duration` concept which forces those properties to persist

@@ -17,4 +17,4 @@ google-chrome --profile-directory="Profile 3" --new-window \
 
 cd ~/asol/software/asol-backend
 
-urxvt -e bash -ic "python3 ./user-tools/upload_helper.py -n $1 -d /home/greg/Downloads" #-d /mnt/md0/light-stores"
+urxvt -e bash -ic "python3 ./tools/content_upload_helper.py -n $1 -d /mnt/md0/light-stores"

@@ -22,7 +22,7 @@ func setDslrState(b bool) {
 	if b {
 		state = "on"
 	}
-	cmd := exec.Command("./scripts/set-dslr-state.sh", state)
+	cmd := exec.Command("./scripts/set-dslr-state", state)
 	err := cmd.Run()
 	if err != nil {
 		fmt.Printf("failed to run set-dslr-state: %v\n", err)
@@ -70,7 +70,7 @@ func captureImage(p string) error {
 		}
 		fmt.Println("copied mock dslr image")
 	} else {
-		captureCmd := exec.Command("./scripts/capture-dslr.sh", p)
+		captureCmd := exec.Command("./scripts/capture-dslr", p)
 		// cmd.Stdout = os.Stdout
 		captureCmd.Stderr = os.Stderr
 
@@ -85,7 +85,7 @@ func captureImage(p string) error {
 }
 
 func processImage(imgPath, outDir string) error {
-	postCmd := exec.Command("python3", "./user-tools/auto_image_post.py",
+	postCmd := exec.Command("python3", "./tools/content_generation_dslr_edit.py",
 		"-i", imgPath, "-o", outDir,
 	)
 	postCmd.Stderr = os.Stdout

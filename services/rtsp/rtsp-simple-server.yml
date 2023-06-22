@@ -224,27 +224,27 @@ webrtcICETCPMuxAddress:
 paths:
   top-cam-crop:
     # fallback: /fallback
-    runOnDemand: bash /scripts/stream-crop.sh top-cam
+    runOnDemand: bash /scripts/stream-crop top-cam
     runOnDemandRestart: no
     runOnDemandStartTimeout: 10s
     # 1 or 0 so config gets reloaded after the api kick off feature
     runOnDemandCloseAfter: 10s
   front-cam-crop:
     # fallback: /fallback
-    runOnDemand: bash /scripts/stream-crop.sh front-cam
+    runOnDemand: bash /scripts/stream-crop front-cam
     runOnDemandRestart: no
     runOnDemandStartTimeout: 10s
     # 1 or 0 so config gets reloaded after the api kick off feature
     runOnDemandCloseAfter: 10s
   top-cam:
     # fallback: /fallback
-    runOnDemand: bash /scripts/stream-top.sh
+    runOnDemand: bash /scripts/stream-top
     runOnDemandRestart: no
     runOnDemandStartTimeout: 10s
     runOnDemandCloseAfter: 10s
   front-cam:
     # fallback: /fallback
-    runOnDemand: bash /scripts/stream-front.sh
+    runOnDemand: bash /scripts/stream-front
     runOnDemandRestart: no
     runOnDemandStartTimeout: 10s
     runOnDemandCloseAfter: 10s

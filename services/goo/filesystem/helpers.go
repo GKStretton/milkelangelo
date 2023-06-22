@@ -34,7 +34,7 @@ func removeSymlink(symlinkPath string) error {
 }
 
 func WriteCreationTimeUsingMetadata(filePath string) error {
-	cmd := exec.Command("./scripts/get-creation-timestamp.sh", filePath)
+	cmd := exec.Command("./scripts/get-creation-timestamp", filePath)
 	var ts bytes.Buffer
 	cmd.Stdout = &ts
 	if err := cmd.Run(); err != nil {
