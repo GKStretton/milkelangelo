@@ -7,6 +7,10 @@ EMULSIFIER_VIAL = 4
 
 # before, during, or after stable milk in the bowl
 
+PIXEL_FONT = "../resources/fonts/monogram.ttf"
+CS_FONT = "../resources/fonts/Comic-Sans-MS.ttf"
+MAIN_FONT = "../resources/fonts/DejaVuSerifCondensed-Italic.ttf"
+
 
 class CanvasStatus(Enum):
     BEFORE = 1
