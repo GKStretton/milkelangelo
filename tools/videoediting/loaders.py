@@ -20,7 +20,7 @@ def get_session_metadata(base_dir: str, session_number: int):
 
 
 def get_session_content_path(base_dir: str, session_number: int):
-    return os.path.join(base_dir, "session_content", session_number)
+    return os.path.join(base_dir, "session_content", str(session_number))
 
 
 def get_state_reports(base_dir: str, session_number: int) -> typing.Tuple[float, pb.StateReport]:
@@ -39,6 +39,14 @@ def get_state_reports(base_dir: str, session_number: int) -> typing.Tuple[float,
         state_reports.append((report_ts, report))
 
     return state_reports
+
+
+def get_content_plan(base_dir: str, session_number: int) -> pb.ContentTypeStatuses:
+    content_path = get_session_content_path(base_dir, session_number)
+    with open(os.path.join(content_path, "content_plan.yml"), 'r') as f:
+        raw_plan = yaml.load(f, yaml.FullLoader)
+
+    return pb.ContentTypeStatuses().from_dict(raw_plan)
 
 
 def get_selected_dslr_image_path(base_dir: str, session_number: int, image_choice: str) -> str:

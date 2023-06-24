@@ -4,7 +4,7 @@ from moviepy.video.fx import mirror_x, resize, rotate
 import machinepb.machine as pb
 
 from videoediting.constants import Format
-from videoediting.loaders import get_session_metadata
+from videoediting.loaders import get_session_metadata, get_content_plan
 from videoediting.splashtext import build_splashtext, splashtext_pulse
 from videoediting.compositor_helpers import (
     build_subtitle,
@@ -15,6 +15,7 @@ from videoediting.compositor_helpers import (
     get_size_from_format,
     water_resize_pulse,
     sponge_animation,
+    slow_grow_effect,
     # broom_angle_pulse,
 )
 
@@ -32,19 +33,24 @@ ROBOT_FOREARM_PATH = "../resources/static_img/robot-forearm.png"
 ROBOT_UPPERARM_PATH = "../resources/static_img/robot-upperarm.png"
 
 
-def build_base_intro(metadata, duration, subtitle_text):
-    title = build_title(('center', 85), duration, font_size=FONT_SIZE_TITLE)
+def build_base_intro(metadata, duration, subtitle_text, portrait: bool = False):
+    title = build_title(
+        ('center', 85) if portrait else (500, 80),
+        duration,
+        font_size=FONT_SIZE_TITLE if portrait else FONT_SIZE_TITLE - 10
+    )
 
     session_number_clip = build_session_number(
         metadata,
-        (20, 230),
+        (20, 230) if portrait else (470, 300),
         duration,
         font_size=FONT_SIZE_SESSION_NUMBER,
+        center_align=not portrait
     )
 
     subtitle = build_subtitle(
         subtitle_text,
-        ('center', 1700),
+        ('center', 1700) if portrait else (470, 870),
         duration,
         font_size=FONT_SIZE_SUBTITLE
     )
@@ -52,53 +58,72 @@ def build_base_intro(metadata, duration, subtitle_text):
     return title, session_number_clip, subtitle
 
 
-def build_shortform_intro(
+def build_main_intro(
     base_dir: str,
     session_number: int,
     metadata,
     duration: float,
-    splash_text: str = "",
+    fmt: Format,
+    splash_text: str,
+    splash_hue: int,
 ) -> VideoClip:
-    fmt = Format.PORTRAIT
+    portrait = fmt == Format.PORTRAIT
 
     title, session_number_clip, subtitle = build_base_intro(
         metadata,
         duration,
-        "Robotic\nArt\nGeneration"
+        "Robotic\nArt\nGeneration",
+        portrait=portrait
     )
 
-    loader_bounce, loader_countdown = build_loader(duration, (-37, 1600))
+    loader_bounce, loader_countdown = build_loader(
+        duration,
+        (-37, 1600) if portrait else (-40, 770),
+    )
 
     # Create a composite video clip
     clips = [
-        build_dslr_image(base_dir, session_number, duration, fmt, 'center'),
+        build_dslr_image(
+            base_dir,
+            session_number,
+            duration,
+            fmt,
+            'center' if portrait else lambda t: (870 + (1-slow_grow_effect(t))*500, 'center'),
+        ),
+        loader_bounce,
+        loader_countdown,
         title,
         session_number_clip,
         subtitle,
-        loader_bounce,
-        loader_countdown
     ]
 
     if splash_text != "":
-        splash, splash_shadow = build_splashtext(splash_text, (660, 300), duration)
+        splash, splash_shadow = build_splashtext(
+            splash_text,
+            splash_hue,
+            (660, 300) if portrait else (470, 515),
+            duration)
         clips.append(splash_shadow)
         clips.append(splash)
 
     def arm_pos(t):
-        return 820, 1520 + np.cos(t*np.pi)*5
+        if portrait:
+            return 820, 1520 + np.cos(t*np.pi)*5
+        else:
+            return 1715, 870 + np.cos(t*np.pi)*5
 
-    arm_scale = 0.5
+    arm_scale = 0.5 if portrait else 0.4
     clips.append(
         ImageClip(ROBOT_FOREARM_PATH)
         .fx(resize, arm_scale)
         .with_duration(duration)
         .with_position(arm_pos)
-        .fx(rotate, lambda t: np.cos((t+0.25)*np.pi*2)*16+3, center=(88*arm_scale, 431*arm_scale), expand=False)
+        .fx(rotate, lambda t: np.cos((t+0.5)*np.pi)*16+3, center=(88*arm_scale, 431*arm_scale), expand=False)
     )
 
     clips.append(
         ImageClip(ROBOT_UPPERARM_PATH)
-        .fx(resize, 0.5)
+        .fx(resize, arm_scale)
         .with_duration(duration)
         .with_position(arm_pos)
     )
@@ -117,7 +142,8 @@ def build_cleaning_intro(
     title, session_number_clip, subtitle = build_base_intro(
         metadata,
         duration,
-        "Milk\nArt\nCleanup"
+        "Milk\nArt\nCleanup",
+        fmt
     )
 
     loader_bounce, loader_countdown = build_loader(duration, (910, 1600))
@@ -179,14 +205,41 @@ def build_cleaning_intro(
     return CompositeVideoClip(clips, size=get_size_from_format(fmt))
 
 
-if __name__ == "__main__":
-    num = 60
-    bd = "/mnt/md0/light-stores"
-    dur = 3.33
-    metadata = get_session_metadata(bd, num)
+def build_intro(
+    base_dir: str,
+    session_number: int,
+    metadata,
+    content_type: pb.ContentType,
+    content_plan: pb.ContentTypeStatuses,
+    duration: int
+):
+    splash_text = content_plan.splashtext
+    splash_hue = content_plan.splashtext_hue
 
-    cleaning = build_cleaning_intro(bd, num, metadata, dur)
-    shortform = build_shortform_intro(bd, num, metadata, dur, splash_text="Don't have a cow, man!")
-    # video.write_videofile("splash.mp4", fps=60)
-    cleaning.resize(0.5).preview()
-    # video.resize(0.5).show(1, interactive=True)
+    if content_type == pb.ContentType.CONTENT_TYPE_LONGFORM:
+        return build_main_intro(
+            base_dir,
+            session_number,
+            metadata,
+            duration,
+            Format.LANDSCAPE,
+            splash_text,
+            splash_hue
+        )
+    if content_type == pb.ContentType.CONTENT_TYPE_SHORTFORM:
+        return build_main_intro(
+            base_dir,
+            session_number,
+            metadata,
+            duration,
+            Format.PORTRAIT,
+            splash_text,
+            splash_hue
+        )
+    if content_type == pb.ContentType.CONTENT_TYPE_CLEANING:
+        return build_cleaning_intro(
+            base_dir,
+            session_number,
+            metadata,
+            duration,
+        )

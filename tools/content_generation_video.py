@@ -16,6 +16,7 @@ from videoediting.constants import TOP_CAM, FRONT_CAM
 from videoediting.dispense_metadata import DispenseMetadataWrapper
 from videoediting.properties.factory import create_property_manager
 from videoediting.content_descriptor import ContentDescriptor
+from videoediting.still import add_stills
 
 import machinepb.machine as pb
 
@@ -92,19 +93,22 @@ def render(
 def run():
     gen_start = datetime.now()
     args = get_args()
-    print(f"Launching auto_video_post for session {args.session_number} in '{args.base_dir}'\n")
+    base_dir, session_number = args.base_dir, int(args.session_number)
+    print(f"Launching auto_video_post for session {session_number} in '{base_dir}'\n")
 
     # the type we're generating for
     content_type = pb.ContentType.from_string(args.type)
+    property_manager = create_property_manager(content_type)
 
     # load data
-    session_metadata = loaders.get_session_metadata(args.base_dir, args.session_number)
-    state_reports = loaders.get_state_reports(args.base_dir, args.session_number)
-    dispense_metadata_wrapper = DispenseMetadataWrapper(args.base_dir, args.session_number)
-    misc_data = loaders.get_misc_data(args.base_dir, args.session_number)
+    session_metadata = loaders.get_session_metadata(base_dir, session_number)
+    state_reports = loaders.get_state_reports(base_dir, session_number)
+    dispense_metadata_wrapper = DispenseMetadataWrapper(base_dir, session_number)
+    misc_data = loaders.get_misc_data(base_dir, session_number)
+    content_plan = loaders.get_content_plan(base_dir, session_number)
 
     # load webcam footage
-    content_path = loaders.get_session_content_path(args.base_dir, args.session_number)
+    content_path = loaders.get_session_content_path(base_dir, session_number)
     top_footage = FootageWrapper(
         os.path.join(content_path, "video/raw/" + TOP_CAM),
         timeOffset=TOP_CAM_TIME_OFFSET
@@ -116,7 +120,7 @@ def run():
 
     descriptor = ContentDescriptor(
         session_metadata,
-        create_property_manager(content_type),
+        property_manager,
         dispense_metadata_wrapper,
         misc_data
     )
@@ -132,8 +136,16 @@ def run():
         top_footage, front_footage)
     print(f"length without stills: {dur_fmt(content_clip.duration)}")
 
-    # overlay_clip, content_clip = add_stills(
-    # content_path, content_type, content_fmt, overlay_clip, content_clip, property_manager)
+    overlay_clip, content_clip = add_stills(
+        base_dir,
+        session_number,
+        session_metadata,
+        content_type,
+        property_manager,
+        content_plan,
+        overlay_clip,
+        content_clip,
+    )
 
     print(f"length with stills: {dur_fmt(content_clip.duration)}")
     print(f"total generation time: {str(datetime.now() - gen_start)}")
@@ -155,7 +167,7 @@ def run():
         combined_clip = combined_clip.subclip(float(args.start_at))
         combined_clip.preview()
     else:
-        render(args.base_dir, args.session_number, overlay_clip, content_clip, content_type)
+        render(base_dir, session_number, overlay_clip, content_clip, content_type)
 
 
 if __name__ == "__main__":

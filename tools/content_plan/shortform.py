@@ -1,5 +1,5 @@
 from machinepb import machine as pb
-from loader import get_hashtags, get_random_title_and_description, get_schedule_timestamp, get_common_text, append_title_hashtags
+from content_plan.loader import get_hashtags, get_random_title_and_description, get_schedule_timestamp, get_common_text, append_title_hashtags
 
 
 def buildShortform(n_str: str) -> pb.ContentTypeStatus:

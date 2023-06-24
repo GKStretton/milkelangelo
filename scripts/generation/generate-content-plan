@@ -1,0 +1,6 @@
+#!/bin/bash
+# generate content plan for session $1
+
+cd tools
+source .venv/bin/activate
+python3 content_generation_plan.py -n $1

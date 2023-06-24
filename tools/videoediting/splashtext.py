@@ -38,20 +38,6 @@ def calculate_splashtext_font_size(text):
         return int(base_size * (base_length / len(text)))
 
 
-def generate_hue():
-    """
-    generate a hue for the splashtext, excluding yellow and dark blue
-    """
-    choices = []
-    for i in range(0, 360):
-        if i >= 50 and i <= 80:
-            continue
-        if i >= 225 and i <= 260:
-            continue
-        choices.append(i)
-    return random.choice(choices)
-
-
 def get_splashfont(text: str) -> str:
     cs_texts = ["Now in your favorite font!", "Dare to be different!"]
     if text in cs_texts:
@@ -59,10 +45,9 @@ def get_splashfont(text: str) -> str:
     return PIXEL_FONT
 
 
-def build_splashtext(splash_text, pos, duration) -> typing.Tuple[VideoClip, VideoClip]:
+def build_splashtext(splash_text: str, hue: int, pos, duration) -> typing.Tuple[VideoClip, VideoClip]:
     """returns main text and shadow"""
     angle = -15
-    hue = generate_hue()
     color = f"hsv({hue}, 255, 255)"
     shadow_color = f"hsv({hue}, 50, 40)"
     print(color)

@@ -2,43 +2,58 @@ import os
 import typing
 
 from moviepy.editor import VideoClip, ImageClip, ColorClip, concatenate_videoclips
+from moviepy.video.fx import fadein, fadeout
 
 from videoediting.constants import Format
 from videoediting.properties.content_property_manager import BasePropertyManager
+from videoediting.intro import build_intro
+from videoediting.outro import build_outro
 
 import machinepb.machine as pb
 
 
-def add_stills(content_path: str, content_type: pb.ContentType, content_fmt: Format, overlay_clip: VideoClip, content_clip: VideoClip, property_manager: BasePropertyManager) -> typing.Tuple[VideoClip, VideoClip]:
-    path = os.path.join(content_path, "stills")
+def add_stills(
+    base_dir: str,
+    session_number: int,
+    metadata,
+    content_type: pb.ContentType,
+    property_manager: BasePropertyManager,
+    content_plan: pb.ContentTypeStatuses,
+    overlay_clip: VideoClip,
+    content_clip: VideoClip,
+) -> typing.Tuple[VideoClip, VideoClip]:
+    FADE_FACTOR = 10
 
-    introDuration = property_manager.get_stills_config().intro_duration
-    introClip = ImageClip(
-        img=os.path.join(path, f"INTRO-{content_fmt.name}.jpg"),
-        duration=introDuration,
+    intro = build_intro(
+        base_dir,
+        session_number,
+        metadata,
+        content_type,
+        content_plan,
+        property_manager.get_stills_config().intro_duration
     )
-    # pylint: disable=E1101
-    introClip = introClip.fadeout(introDuration / 5)
+    intro = intro.fx(fadeout, intro.duration / FADE_FACTOR)
 
-    outroDuration = property_manager.get_stills_config().outro_duration
-    outroClip = ImageClip(
-        img=os.path.join(path, f"OUTRO-{content_fmt.name}.jpg"),
-        duration=outroDuration,
+    outro = build_outro(
+        base_dir,
+        session_number,
+        metadata,
+        content_type,
+        property_manager.get_stills_config().outro_duration
     )
-    # pylint: disable=E1101
-    outroClip = outroClip.fadein(outroDuration / 5)
+    outro = outro.fx(fadein, outro.duration / FADE_FACTOR)
 
-    overlayPadding = ColorClip(overlay_clip.size, color=(0, 0, 0), duration=1)
+    overlay_padding = ColorClip(overlay_clip.size, color=(0, 0, 0))
 
     overlay_clip = concatenate_videoclips([
-        overlayPadding.with_duration(introDuration),
+        overlay_padding.with_duration(intro.duration),
         overlay_clip,
-        overlayPadding.with_duration(outroDuration),
+        overlay_padding.with_duration(outro.duration),
     ])
     content_clip = concatenate_videoclips([
-        introClip,
-        content_clip.fadein(0.5).fadeout(0.5),
-        outroClip,
+        intro,
+        content_clip.fadein(intro.duration / FADE_FACTOR).fadeout(outro.duration / FADE_FACTOR),
+        outro,
     ])
 
     return overlay_clip, content_clip

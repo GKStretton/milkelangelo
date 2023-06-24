@@ -216,6 +216,7 @@ class ContentTypeStatuses(betterproto.Message):
     )
     # splashtext for this session
     splashtext: str = betterproto.string_field(2)
+    splashtext_hue: int = betterproto.uint64_field(3)
 
 
 @dataclass

@@ -16,7 +16,7 @@ class ShortFormPropertyManager(BasePropertyManager):
 
     def get_stills_config(self) -> StillsConfig:
         return StillsConfig(
-            intro_duration=1,
+            intro_duration=3.33,
             outro_duration=4,
         )
 

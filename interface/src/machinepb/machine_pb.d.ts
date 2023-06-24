@@ -360,6 +360,9 @@ export class ContentTypeStatuses extends jspb.Message {
   getSplashtext(): string;
   setSplashtext(value: string): void;
 
+  getSplashtextHue(): number;
+  setSplashtextHue(value: number): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ContentTypeStatuses.AsObject;
   static toObject(includeInstance: boolean, msg: ContentTypeStatuses): ContentTypeStatuses.AsObject;
@@ -374,6 +377,7 @@ export namespace ContentTypeStatuses {
   export type AsObject = {
     contentStatusesMap: Array<[string, ContentTypeStatus.AsObject]>,
     splashtext: string,
+    splashtextHue: number,
   }
 }
 

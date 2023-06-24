@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import pytz
 from betterproto import Casing
 
-SOCIAL_TEXT_PATH = "./resources/social_text"
+SOCIAL_TEXT_PATH = "../resources/social_text"
 
 YOUTUBE_SHORT_TITLE_MAX_LENGTH = 90  # actually 100 but that's a bit long
 
@@ -138,3 +138,17 @@ def get_splashtext() -> str:
     df = pd.read_csv(p, sep='\t')
 
     return random.choice(df["TEXT"].dropna())
+
+
+def generate_splashtext_hue():
+    """
+    generate a hue for the splashtext, excluding yellow and dark blue
+    """
+    choices = []
+    for i in range(0, 360):
+        if i >= 50 and i <= 80:
+            continue
+        if i >= 225 and i <= 260:
+            continue
+        choices.append(i)
+    return random.choice(choices)

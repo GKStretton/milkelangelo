@@ -2860,7 +2860,8 @@ proto.machine.ContentTypeStatuses.prototype.toObject = function(opt_includeInsta
 proto.machine.ContentTypeStatuses.toObject = function(includeInstance, msg) {
   var f, obj = {
     contentStatusesMap: (f = msg.getContentStatusesMap()) ? f.toObject(includeInstance, proto.machine.ContentTypeStatus.toObject) : [],
-    splashtext: jspb.Message.getFieldWithDefault(msg, 2, "")
+    splashtext: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    splashtextHue: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
   if (includeInstance) {
@@ -2907,6 +2908,10 @@ proto.machine.ContentTypeStatuses.deserializeBinaryFromReader = function(msg, re
       var value = /** @type {string} */ (reader.readString());
       msg.setSplashtext(value);
       break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSplashtextHue(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -2944,6 +2949,13 @@ proto.machine.ContentTypeStatuses.serializeBinaryToWriter = function(message, wr
   if (f.length > 0) {
     writer.writeString(
       2,
+      f
+    );
+  }
+  f = message.getSplashtextHue();
+  if (f !== 0) {
+    writer.writeUint64(
+      3,
       f
     );
   }
@@ -2988,6 +3000,24 @@ proto.machine.ContentTypeStatuses.prototype.getSplashtext = function() {
  */
 proto.machine.ContentTypeStatuses.prototype.setSplashtext = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional uint64 splashtext_hue = 3;
+ * @return {number}
+ */
+proto.machine.ContentTypeStatuses.prototype.getSplashtextHue = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.machine.ContentTypeStatuses} returns this
+ */
+proto.machine.ContentTypeStatuses.prototype.setSplashtextHue = function(value) {
+  return jspb.Message.setProto3IntField(this, 3, value);
 };
 
 
