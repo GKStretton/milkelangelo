@@ -2,6 +2,7 @@
 
 import argparse
 from datetime import datetime
+import os
 
 from moviepy.editor import ImageClip, CompositeVideoClip, TextClip
 from videoediting.loaders import get_selected_dslr_realpath
@@ -94,4 +95,9 @@ if __name__ == "__main__":
         session_number_clip,
         date
     ], use_bgclip=True)
-    clip.resize((1000, 1000)).show(interactive=True)
+
+    # clip.resize((1000, 1000)).show(interactive=True)
+
+    filename = f"{metadata['production_id']}" if metadata['production'] else f"dev{metadata['id']}"
+    still_path = os.path.join(base_dir, "session_content", str(session_number), "dslr", f"{filename}.jpg")
+    clip.save_frame(still_path, t=0.5)
