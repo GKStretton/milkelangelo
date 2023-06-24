@@ -50,6 +50,7 @@ class SectionProperties:
 class StillsConfig:
     intro_duration: float = 1
     outro_duration: float = 1
+    thumbnail_time: float = 1
 
 
 class BasePropertyManager(ABC):

@@ -1,0 +1,14 @@
+#!/bin/bash
+# generate all video content for session $1
+
+cd tools
+source .venv/bin/activate
+
+python3 tools/content_generation_still.py -n $1
+
+python3 tools/content_generation_video.py -y -n $1 -t CONTENT_TYPE_LONGFORM
+python3 tools/content_generation_video.py -y -n $1 -t CONTENT_TYPE_SHORTFORM
+python3 tools/content_generation_video.py -y -n $1 -t CONTENT_TYPE_CLEANING
+
+# decommissioning timelapse because it's not very good
+# python3 tools/content_generation_timelapse.py -n $1 -d /mnt/md0/light-stores

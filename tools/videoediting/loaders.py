@@ -60,18 +60,16 @@ def get_selected_dslr_image(base_dir: str, session_number: int, image_choice: st
 # look up creationtime of selected.jpg dslr/post image
 
 
-def get_selected_dslr_image_number(base_dir: str, session_number: int) -> int:
+def get_selected_dslr_realpath(base_dir: str, session_number: int) -> float:
     linkname = f"selected.jpg"
     path = os.path.join(base_dir, "session_content", str(session_number), "dslr/post", linkname)
 
     # resolves symlink
-    real_path = ""
-    try:
-        real_path = os.path.realpath(path)
-    except:
-        print("Error: could not resolve symlink {}".format(path))
-        exit(1)
+    return os.path.realpath(path)
 
+
+def get_selected_dslr_image_number(base_dir: str, session_number: int) -> int:
+    real_path = get_selected_dslr_realpath(base_dir, session_number)
     name = Path(real_path).stem
 
     return int(name)

@@ -59,7 +59,8 @@ def render(
     session_number: int,
     overlay: VideoClip,
     content: VideoClip,
-    content_type: pb.ContentType
+    content_type: pb.ContentType,
+    thumbnail_time: int
 ):
     """ Render overlay, then content, outputting to files """
 
@@ -78,7 +79,7 @@ def render(
     content_file = output_file
 
     # todo: configure thumbnail time
-    content.save_frame(thumbnail_file, t=1)
+    content.save_frame(thumbnail_file, t=thumbnail_time)
     print(f"wrote thumbnail to {thumbnail_file}")
 
     overlay_render_start = datetime.now()
@@ -167,7 +168,14 @@ def run():
         combined_clip = combined_clip.subclip(float(args.start_at))
         combined_clip.preview()
     else:
-        render(base_dir, session_number, overlay_clip, content_clip, content_type)
+        render(
+            base_dir,
+            session_number,
+            overlay_clip,
+            content_clip,
+            content_type,
+            property_manager.get_stills_config().thumbnail_time
+        )
 
 
 if __name__ == "__main__":
