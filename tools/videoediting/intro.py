@@ -33,7 +33,7 @@ ROBOT_FOREARM_PATH = "../resources/static_img/robot-forearm.png"
 ROBOT_UPPERARM_PATH = "../resources/static_img/robot-upperarm.png"
 
 
-def build_base_intro(metadata, duration, subtitle_text, portrait: bool = False):
+def build_base(metadata, duration, subtitle_text, portrait: bool = False):
     title = build_title(
         ('center', 85) if portrait else (500, 80),
         duration,
@@ -69,7 +69,7 @@ def build_main_intro(
 ) -> VideoClip:
     portrait = fmt == Format.PORTRAIT
 
-    title, session_number_clip, subtitle = build_base_intro(
+    title, session_number_clip, subtitle = build_base(
         metadata,
         duration,
         "Robotic\nArt\nGeneration",
@@ -139,7 +139,7 @@ def build_cleaning_intro(
 ) -> VideoClip:
     fmt = Format.PORTRAIT
 
-    title, session_number_clip, subtitle = build_base_intro(
+    title, session_number_clip, subtitle = build_base(
         metadata,
         duration,
         "Milk\nArt\nCleanup",
