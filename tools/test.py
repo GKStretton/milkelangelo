@@ -22,7 +22,7 @@ def intros():
 def outros():
     """Manually generate and preview an intro"""
     session_number = 60
-    content_type = pb.ContentType.CONTENT_TYPE_LONGFORM
+    content_type = pb.ContentType.CONTENT_TYPE_SHORTFORM
 
     bd = "/mnt/md0/light-stores"
     metadata = get_session_metadata(bd, session_number)
@@ -33,4 +33,4 @@ def outros():
 
 
 if __name__ == "__main__":
-    intros()
+    outros()
