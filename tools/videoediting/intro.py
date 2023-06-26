@@ -35,7 +35,7 @@ ROBOT_UPPERARM_PATH = "../resources/static_img/robot-upperarm.png"
 
 def build_base(metadata, duration, subtitle_text, portrait: bool = False):
     title = build_title(
-        ('center', 85) if portrait else (500, 80),
+        (540, 85) if portrait else (500, 80),
         duration,
         font_size=FONT_SIZE_TITLE if portrait else FONT_SIZE_TITLE - 10
     )
@@ -55,7 +55,7 @@ def build_base(metadata, duration, subtitle_text, portrait: bool = False):
         font_size=FONT_SIZE_SUBTITLE
     )
 
-    return title, session_number_clip, subtitle
+    return [*title, *session_number_clip, subtitle]
 
 
 def build_main_intro(
@@ -69,7 +69,7 @@ def build_main_intro(
 ) -> VideoClip:
     portrait = fmt == Format.PORTRAIT
 
-    title, session_number_clip, subtitle = build_base(
+    base = build_base(
         metadata,
         duration,
         "Robotic\nArt\nGeneration",
@@ -92,10 +92,8 @@ def build_main_intro(
         ),
         loader_bounce,
         loader_countdown,
-        title,
-        session_number_clip,
-        subtitle,
     ]
+    clips.extend(base)
 
     if splash_text != "":
         splash, splash_shadow = build_splashtext(
@@ -139,7 +137,7 @@ def build_cleaning_intro(
 ) -> VideoClip:
     fmt = Format.PORTRAIT
 
-    title, session_number_clip, subtitle = build_base(
+    base = build_base(
         metadata,
         duration,
         "Milk\nArt\nCleanup",
@@ -151,12 +149,10 @@ def build_cleaning_intro(
     # Create a composite video clip
     clips = [
         build_dslr_image(base_dir, session_number, duration, fmt, 'center', do_drain_effect=True),
-        title,
-        session_number_clip,
-        subtitle,
-        loader_bounce,
-        loader_countdown
     ]
+    clips.extend(base)
+    clips.append(loader_bounce)
+    clips.append(loader_countdown)
 
     whirlpool_clip = (
         ImageClip(WHIRLPOOL_PATH)

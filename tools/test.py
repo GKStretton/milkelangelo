@@ -8,7 +8,7 @@ from moviepy.video.fx import resize
 def intros():
     """Manually generate and preview an intro"""
     session_number = 60
-    content_type = pb.ContentType.CONTENT_TYPE_LONGFORM
+    content_type = pb.ContentType.CONTENT_TYPE_CLEANING
 
     bd = "/mnt/md0/light-stores"
     metadata = get_session_metadata(bd, session_number)
@@ -22,15 +22,15 @@ def intros():
 def outros():
     """Manually generate and preview an intro"""
     session_number = 60
-    content_type = pb.ContentType.CONTENT_TYPE_LONGFORM
+    content_type = pb.ContentType.CONTENT_TYPE_SHORTFORM
 
     bd = "/mnt/md0/light-stores"
     metadata = get_session_metadata(bd, session_number)
 
     outro = build_outro(bd, session_number, metadata, content_type, 13.33)
-    # intro.write_videofile("outro.mp4", fps=60)
+    # outro.write_videofile("outro.mp4", fps=60)
     outro.fx(resize, 0.5).preview()
 
 
 if __name__ == "__main__":
-    outros()
+    intros()

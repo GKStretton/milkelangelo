@@ -21,8 +21,8 @@ def composeLandscape(metadata, props: SectionProperties, top_subclip: VideoClip,
             front_subclip.resize(0.7).with_position((50, 'center')),
             top_subclip.resize(1.05).with_position((960, 'center')),
 
-            build_title((490, 110), top_subclip.duration),
-            build_session_number(metadata, (195, 990), top_subclip.duration),
+            *build_title((490, 110), top_subclip.duration),
+            *build_session_number(metadata, (195, 990), top_subclip.duration),
             build_speed(props.speed, (1700, 20), top_subclip.duration),
         ], size=landscape_dim)
 
@@ -38,8 +38,8 @@ def composePortrait(metadata, props: SectionProperties, top_subclip: VideoClip, 
             front_subclip.resize(0.75).with_position(('center', 1120)),
             top_subclip.resize(1.05).with_position(('center', 50)),
 
-            build_title((portrait_dim[0] // 2, 1055), top_subclip.duration),
-            build_session_number(metadata, (195, 80), top_subclip.duration),
+            *build_title((portrait_dim[0] // 2, 1055), top_subclip.duration),
+            *build_session_number(metadata, (195, 80), top_subclip.duration),
             build_speed(props.speed, (900, 20), top_subclip.duration),
         ], size=portrait_dim)
 
@@ -61,10 +61,10 @@ def compositeContentFromFootageSubclips(
     # CROP & OVERLAY
     if props.crop:
         if top_crop is not None:
-            top_subclip = crop.crop(top_subclip, x1=top_crop.x1, y1=top_crop.y1, x2=top_crop.x2, y2=top_crop.y2)
+            top_subclip = crop(top_subclip, x1=top_crop.x1, y1=top_crop.y1, x2=top_crop.x2, y2=top_crop.y2)
         if front_crop is not None:
-            front_subclip = crop.crop(front_subclip, x1=front_crop.x1, y1=front_crop.y1,
-                                      x2=front_crop.x2, y2=front_crop.y2)
+            front_subclip = crop(front_subclip, x1=front_crop.x1, y1=front_crop.y1,
+                                 x2=front_crop.x2, y2=front_crop.y2)
 
         def add_top_overlay(img):
             i = img.copy()

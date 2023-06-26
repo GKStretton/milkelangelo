@@ -53,8 +53,8 @@ if __name__ == "__main__":
     final_clip = CompositeVideoClip([
         clip.resize(FOOTAGE_DIMENSIONS).with_position(('center', 'center')),
 
-        build_title((FULL_DIMENSIONS[0] // 2, 150), clip.duration),
-        build_session_number(session_metadata, (FULL_DIMENSIONS[0] // 2, 290), clip.duration, center_align=True),
+        *build_title((FULL_DIMENSIONS[0] // 2, 150), clip.duration),
+        *build_session_number(session_metadata, (FULL_DIMENSIONS[0] // 2, 290), clip.duration, center_align=True),
         build_subtitle("Robotic Art Generation\n\nMotion-Interpolated\nDSLR Timelapse",
                        (FULL_DIMENSIONS[0] // 2, 1700), clip.duration),
     ], size=FULL_DIMENSIONS)

@@ -10,17 +10,25 @@ from videoediting.constants import Format, MAIN_FONT, PIXEL_FONT
 from videoediting.loaders import get_selected_dslr_image_path
 
 
-def build_title(pos: typing.Tuple[int, int], duration: float, font_size=115) -> TextClip:
+def build_title(pos: typing.Tuple[int, int], duration: float, font_size=115) -> typing.List[TextClip]:
+    shadow_offset = 3
     text_size = (1080, 200)
     text_clip = TextClip("A Study of Light", size=text_size, font_size=font_size,
                          color='white', font=MAIN_FONT)
+    shadow_clip = TextClip("A Study of Light", size=text_size, font_size=font_size,
+                           color='black', font=MAIN_FONT)
 
     x = pos[0] if isinstance(pos[0], str) else pos[0] - text_size[0] // 2
     y = pos[1] if isinstance(pos[1], str) else pos[1] - text_size[1] // 2
-    text_clip = text_clip.with_position((x, y))
     text_clip = text_clip.with_duration(duration)
+    text_clip = text_clip.with_position((x, y))
+    shadow_clip = (
+        shadow_clip
+        .with_duration(duration)
+        .with_position((x+shadow_offset, y+shadow_offset))
+    )
 
-    return text_clip
+    return [shadow_clip, text_clip]
 
 
 def build_session_number(
@@ -30,8 +38,9 @@ def build_session_number(
         duration: float,
         center_align: bool = False,
         font_size=115
-) -> TextClip:
+) -> typing.List[TextClip]:
     text_size = (350, 140)
+    shadow_offset = 3
     session_number_text = f"#{metadata['production_id']}" if metadata['production'] else f"dev#{metadata['id']}"
     text_clip = TextClip(
         session_number_text,
@@ -41,13 +50,24 @@ def build_session_number(
         color='white',
         font=MAIN_FONT
     )
+    shadow_clip = TextClip(
+        session_number_text,
+        size=text_size,
+        font_size=font_size,
+        align='center' if center_align else 'west',
+        color='black',
+        font=MAIN_FONT
+    )
 
     x = pos[0] if (isinstance(pos[0], str) or not center_align) else pos[0] - text_size[0] // 2
     y = pos[1] if (isinstance(pos[1], str) or not center_align) else pos[1] - text_size[1] // 2
     text_clip = text_clip.with_position((x, y))
     text_clip = text_clip.with_duration(duration)
 
-    return text_clip
+    shadow_clip = shadow_clip.with_position((x+shadow_offset, y+shadow_offset))
+    shadow_clip = shadow_clip.with_duration(duration)
+
+    return [shadow_clip, text_clip]
 
 
 def build_subtitle(text: str, pos: typing.Tuple[int, int], duration: float, font_size=80) -> TextClip:

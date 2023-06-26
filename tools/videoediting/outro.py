@@ -1,11 +1,14 @@
+import numpy as np
 import machinepb.machine as pb
-from moviepy.editor import ColorClip, CompositeVideoClip, TextClip
+from moviepy.editor import ColorClip, CompositeVideoClip, TextClip, ImageClip, ImageSequenceClip
+from moviepy.video.fx import resize, rotate, loop
 from videoediting.constants import Format, MAIN_FONT, PIXEL_FONT
-from videoediting.intro import build_base
 from videoediting.compositor_helpers import (
     get_size_from_format,
     build_dslr_image,
-    slow_grow_effect
+    slow_grow_effect,
+    build_title,
+    build_session_number,
 )
 
 
@@ -21,12 +24,12 @@ def timezones():
     zones = [
         'America/Los_Angeles',
         'America/New_York',
-        'America/Sao_Paulo',
+        # 'America/Sao_Paulo',
         'UTC',
         'Europe/London',
         'Europe/Berlin',
         # 'Asia/Shanghai',
-        'Asia/Kolkata',
+        # 'Asia/Kolkata',
         # 'Australia/Sydney',
         # 'Africa/Johannesburg',
         # 'Asia/Tokyo',
@@ -48,6 +51,74 @@ def timezones():
     return outputs
 
 
+FONT_SIZE_TITLE = 135
+FONT_SIZE_SESSION_NUMBER = 80
+
+
+def build_twitch_block(pos, duration):
+    clips = []
+    x, y = pos[0], pos[1]
+
+    clips.append(
+        ImageClip("../resources/static_img/twitch-block.png")
+        .with_duration(duration)
+        .with_position(pos)
+    )
+
+    tl = ImageClip("../resources/social_icons/twitch.png")
+    tl_scale = 0.5
+    tl_size = int(tl.size[0] / 2 * tl_scale)
+    clips.append(
+        tl
+        .fx(resize, tl_scale)
+        .with_duration(duration)
+        .with_position((x+20, y+80))
+        .fx(rotate, lambda t: np.cos(t*np.pi)*10, expand=False, center=(tl_size, tl_size))
+    )
+
+    clips.append(
+        ImageSequenceClip("../resources/static_img/stream_anim", fps=60)
+        .fx(loop, duration=duration)
+        .with_position((x+750, y+50))
+    )
+
+    clips.append(
+        TextClip(
+            "Join LIVE every Saturday",
+            # color=twitch_color,
+            font_size=70,
+            font=PIXEL_FONT
+        )
+        .with_position((x+160, y+10))
+        .with_duration(duration)
+    )
+    clips.append(
+        TextClip(
+            "twitch.tv/StudyOfLight",
+            # color=twitch_color,
+            font_size=70,
+            font=PIXEL_FONT
+        )
+        .with_position((x+195, y+125))
+        .with_duration(duration)
+    )
+
+    for i, t in enumerate(timezones()):
+        print(i, t)
+        clips.append(
+            TextClip(
+                f"{t[1]}\n{t[0]}",
+                # color=twitch_color,
+                font_size=60,
+                font=PIXEL_FONT
+            )
+            .with_position(lambda t, i=i: (x+430 + (i-2)*140, y+230 + np.cos(np.pi * t + 0.4*(-i)*np.pi) * 10))
+            .with_duration(duration)
+        )
+
+    return clips
+
+
 def build_outro(
     base_dir: str,
     session_number: int,
@@ -58,48 +129,90 @@ def build_outro(
     fmt = Format.PORTRAIT
     if content_type == pb.ContentType.CONTENT_TYPE_LONGFORM:
         fmt = Format.LANDSCAPE
+    portrait = fmt == Format.PORTRAIT
 
-    title, session_number_clip, _ = build_base(
-        metadata,
-        duration,
-        "unused",
-        portrait=fmt == Format.PORTRAIT
-    )
-    dslr = build_dslr_image(
-        base_dir,
-        session_number,
-        duration,
-        fmt,
-        ('center'
-         if fmt == Format.PORTRAIT else
-         lambda t: (870 + (1-slow_grow_effect(t))*500, 'center')),
-    )
+    clips = []
 
-    clips = [dslr, title, session_number_clip]
-
-    # Date
     clips.append(
-        TextClip(
-            "Join LIVE every SATURDAY\n\n\n\ntwitch.tv/StudyOfLight",
-            color='white',
-            font_size=70,
-            font=PIXEL_FONT
+        build_dslr_image(
+            base_dir,
+            session_number,
+            duration,
+            fmt,
+            lambda t: ('center', 300 + (1-slow_grow_effect(t))*500)
+            if fmt == Format.PORTRAIT else (870 + (1-slow_grow_effect(t))*500, 'center')
         )
-        .with_position((200, 390))
-        .with_duration(duration)
     )
 
-    for i, t in enumerate(timezones()):
-        print(i, t)
-        clips.append(
-            TextClip(
-                f"{t[1]}\n{t[0]}",
-                color='white',
-                font_size=60,
-                font=PIXEL_FONT
-            )
-            .with_position((440 + (i-3)*140, 500))
-            .with_duration(duration)
+    clips.extend(
+        build_title(
+            (540, 85) if portrait else (500, 80),
+            duration,
+            font_size=FONT_SIZE_TITLE if portrait else FONT_SIZE_TITLE - 10
         )
+    )
+
+    clips.extend(
+        build_session_number(
+            metadata,
+            (540, 230) if portrait else (500, 210),
+            duration,
+            font_size=FONT_SIZE_SESSION_NUMBER,
+            center_align=True
+        )
+    )
+
+    clips.extend(
+        build_twitch_block(
+            (60, 1250) if portrait else (10, 390),
+            duration
+        )
+    )
+
+    # SOCIAL ICONS
+    SI_BASEPATH = "../resources/social_icons"
+    SI_PATHS = [f"{SI_BASEPATH}/youtube.png", f"{SI_BASEPATH}/tiktok.png",
+                f"{SI_BASEPATH}/instagram.png", f"{SI_BASEPATH}/twitter.png"]
+
+    for i, p in enumerate(SI_PATHS):
+        clips.append(
+            ImageClip(p)
+            .fx(resize, 0.5)
+            .with_duration(duration)
+            .with_position((100+i*230, 1750) if portrait else (65+i*230, 890))
+        )
+
+    clips.extend(
+        draw_main_text(
+            "Follow for more!",
+            (250, 1630) if portrait else (200, 760),
+            80,
+            duration
+        )
+    )
+
+    clips.extend(
+        draw_main_text(
+            "Thank you for watching!",
+            (100, 280) if portrait else (50, 270),
+            80,
+            duration
+        )
+    )
 
     return CompositeVideoClip(clips, size=get_size_from_format(fmt))
+
+
+def draw_main_text(text, pos, font_size, duration):
+    offset = 3
+    shadow = (
+        TextClip(text, color="black", font=MAIN_FONT, font_size=font_size)
+        .with_duration(duration)
+        .with_position((pos[0]+offset, pos[1]+offset))
+    )
+    main_text = (
+        TextClip(text, color="white", font=MAIN_FONT, font_size=font_size)
+        .with_duration(duration)
+        .with_position(pos)
+    )
+    return [shadow, main_text]
