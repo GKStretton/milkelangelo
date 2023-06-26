@@ -67,7 +67,7 @@ def build_splashtext(splash_text: str, hue: int, pos, duration) -> typing.Tuple[
         x-(w*splashtext_pulse(t)*FONT_RESCALE)/2, y-(h*splashtext_pulse(t)*FONT_RESCALE)/2))
 
     # Apply the pulse effect to shadow
-    xoffset = -4
+    xoffset = 3
     yoffset = 3
     pulsing_shadow = resize(splash_clip_shadow, splashtext_pulse).rotate(angle, resample='bicubic')
     w, h = pulsing_shadow.size

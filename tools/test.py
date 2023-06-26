@@ -7,8 +7,8 @@ from moviepy.video.fx import resize
 
 def intros():
     """Manually generate and preview an intro"""
-    session_number = 60
-    content_type = pb.ContentType.CONTENT_TYPE_CLEANING
+    session_number = 59
+    content_type = pb.ContentType.CONTENT_TYPE_LONGFORM
 
     bd = "/mnt/md0/light-stores"
     metadata = get_session_metadata(bd, session_number)
@@ -22,7 +22,7 @@ def intros():
 def outros():
     """Manually generate and preview an intro"""
     session_number = 60
-    content_type = pb.ContentType.CONTENT_TYPE_SHORTFORM
+    content_type = pb.ContentType.CONTENT_TYPE_LONGFORM
 
     bd = "/mnt/md0/light-stores"
     metadata = get_session_metadata(bd, session_number)

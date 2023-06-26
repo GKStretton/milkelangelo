@@ -25,7 +25,7 @@ if __name__ == "__main__":
     metadata = loaders.get_session_metadata(args.base_dir, args.session_number)
     session_number_text = f"#{metadata['production_id']}" if metadata['production'] else f"dev#{metadata['id']}"
 
-    print(f"Launching publish_helpers for session {args.session_number} in '{args.base_dir}'\n")
+    print(f"Launching content plan generator for session {args.session_number} in '{args.base_dir}'\n")
 
     content_statuses = load_content_statuses(args.base_dir, args.session_number)
     if content_statuses is not None and not args.override:
