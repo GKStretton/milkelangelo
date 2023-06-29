@@ -40,7 +40,7 @@ if __name__ == "__main__":
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_LONGFORM.name] = buildLongform(session_number_text)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_SHORTFORM.name] = buildShortform(session_number_text)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_CLEANING.name] = buildCleaning(session_number_text)
-    content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_DSLR.name] = buildDslr(session_number_text)
+    # content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_DSLR.name] = buildDslr(session_number_text)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_STILL.name] = buildStill(session_number_text)
 
     write_content_statuses(content_statuses, args.base_dir, args.session_number)

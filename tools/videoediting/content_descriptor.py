@@ -32,11 +32,16 @@ class ContentDescriptor:
         property_manager: BasePropertyManager,
         dispense_metadata_wrapper: DispenseMetadataWrapper,
         misc_data: MiscData,
+        content_plan: pb.ContentTypeStatuses,
+        content_type: pb.ContentType
     ):
         self.session_metadata = session_metadata
         self.property_manager = property_manager
         self.dispense_metadata_wrapper = dispense_metadata_wrapper
         self.misc_data = misc_data
+        self.content_plan = content_plan
+        self.content_type = content_type
+        self.caption = self.content_plan.content_statuses[self.content_type.name].caption
 
         # [(timestamp_s, sr), ...]
         self.state_reports: typing.List[typing.Tuple[float, pb.StateReport, VideoState]] = []
@@ -63,8 +68,18 @@ class ContentDescriptor:
 
         self.properties.append((timestamp, properties))
 
-    # without any skips or speed changes, no props pass
-    def _generate_raw_overlay_clip(self) -> VideoClip:
+    def _generate_state_report_overlay_clip(self) -> VideoClip:
+        """
+        This only looks at state reports, and generates a full uncut clip of all
+        state reports as text. No skipping or speed changes take place here.
+
+        This is done to simplify the main generation code which iterates properties.
+        Because state reports can occur when there is no property change, only
+        iterating properties doesn't let you change the state reports in the overlay
+        at the right times. You could loop both state reports and properties and
+        generate an overlay that way, but I couldn't work out how to do that, this
+        way is easier but less efficient.
+        """
         if len(self.properties) == 0 or len(self.state_reports) == 0:
             print("_generate_raw_overlay_clip found no properties / state_reports")
             exit(1)
@@ -99,21 +114,36 @@ class ContentDescriptor:
         sr_full_clip = concatenate_videoclips(sr_clips)
         return sr_full_clip
 
-    # returns (Overlay, Content)
     def generate_content_clip(self, top_footage: FootageWrapper, front_footage: FootageWrapper) -> typing.Tuple[VideoClip, VideoClip]:
+        """
+        self.properties has been generated, so we have the list
+        [
+            (timestamp, Props)
+        ]
+
+        So we need to iterate that list (self.properties) and create a subclip
+        for each property. only max_duration is enforced here (because that's
+        simple truncation), the other functionality like min_duration is handled
+        in the property generation stage.
+
+
+        """
         if len(self.properties) == 0:
             print("generate_content_clip found no properties / state_reports")
             exit(1)
 
-        raw_overlay = self._generate_raw_overlay_clip()
+        # Generate full raw overlay from the properties
+        raw_overlay = self._generate_state_report_overlay_clip()
         start_timestamp = self.properties[0][0]
 
         print(f"gen content for {len(self.properties)} props")
         overlay_clips = []
         content_clips = []
         for i, _ in enumerate(self.properties):
+            print()
             print(i)
             props = self.properties[i][1]
+            print(props)
             if props.skip:
                 print("skipping")
                 continue
@@ -141,8 +171,8 @@ class ContentDescriptor:
             txt: TextClip = TextClip(text_str, font='DejaVu-Sans-Mono', font_size=10, color='white', align='West')
             txt = txt.with_duration(overlay_raw_subclip.duration)
             if props.speed != 1.0:
-                overlay_raw_subclip = overlay_raw_subclip.speedx(props.speed)
-                txt = txt.speedx(props.speed)
+                overlay_raw_subclip = overlay_raw_subclip.multiply_speed(props.speed)
+                txt = txt.multiply_speed(props.speed)
             overlay_subclip = clips_array([[overlay_raw_subclip], [txt]])
 
             # build footage subclips
@@ -155,8 +185,8 @@ class ContentDescriptor:
 
             # apply speed to both
             if props.speed != 1.0:
-                top_subclip = top_subclip.speedx(props.speed)
-                front_subclip = front_subclip.speedx(props.speed)
+                top_subclip = top_subclip.multiply_speed(props.speed)
+                front_subclip = front_subclip.multiply_speed(props.speed)
 
             # clips should all be same length unless it's the last property.
             if i != len(self.properties) - 1 and not floats_are_equal(0.00001, [overlay_subclip.duration, top_subclip.duration, front_subclip.duration]):
@@ -166,8 +196,12 @@ class ContentDescriptor:
                 exit(1)
 
             content_clips.append(compositeContentFromFootageSubclips(top_subclip, top_crop,
-                                 front_subclip, front_crop, props, self.property_manager.get_format(), self.session_metadata))
+                                 front_subclip, front_crop, props, self.property_manager.get_format(), self.session_metadata, self.caption))
             overlay_clips.append(overlay_subclip)
+
+        if len(content_clips) == 0:
+            print("no content clips built, skipped all?")
+            exit(1)
 
         return concatenate_videoclips(overlay_clips), concatenate_videoclips(content_clips)
 
@@ -237,6 +271,24 @@ class ContentDescriptor:
         state_reports: typing.Tuple[float, pb.StateReport],
         end_at: typing.Optional[float]
     ):
+        """
+        This iterates the state reports to build a list of properties.
+        Depending on the state, the video properties (speed, skip toggle) will
+        change. The properties are fetched from the property_manager.
+
+        The non-trivial element here is the handling of "delay" and "min_duration"
+        functionalities. These result in property transitions occuring when
+        there is no state report transition. For example:
+            - delay of 500ms on a new speed means preserve the old speed until
+              500ms after the state change.
+            - min_duration of 5s means that the properties generated for this
+              state must be maintained for at least 5s, even if an upcoming
+              state report suggests changing props before then.
+
+        Min duration is handled with some precise logic around a
+        "generated_until" tracker, which serves as a block on property changes
+        until that time. Delay is handled alongside that mechanism.
+        """
         start_ts = state_reports[0][0]
 
         # no properties may be set until after this time
@@ -249,7 +301,11 @@ class ContentDescriptor:
         for i, (report_ts, report) in enumerate(state_reports):
             # Get section properties
             props, delay, min_duration = self.property_manager.get_section_properties(
-                video_state, report, self.dispense_metadata_wrapper, self.misc_data)
+                video_state,
+                report,
+                self.dispense_metadata_wrapper,
+                self.misc_data
+            )
 
             # Always set state report in descriptor for use in the overlays
             self.set_state_report(report_ts, report, video_state)

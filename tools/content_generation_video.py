@@ -7,7 +7,8 @@ import argparse
 from datetime import datetime
 import os
 
-from moviepy.editor import VideoClip, CompositeVideoClip
+from moviepy.editor import VideoClip, CompositeVideoClip, clips_array, TextClip
+from moviepy.video.fx import resize
 from pycommon.util import dur_fmt
 
 from videoediting import loaders
@@ -45,7 +46,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("-x", "--test", action="store_true",
                         help="If true, run test code instead of main functionality")
     parser.add_argument("-t", "--type", action="store",
-                        help="content type of output e.g. SHORTFORM | LONGFORM", default="LONGFORM")
+                        help="content type of output e.g. CONTENT_TYPE_SHORTFORM | CONTENT_TYPE_LONGFORM", default="CONTENT_TYPE_LONGFORM")
     parser.add_argument("-s", "--start-at", action="store",
                         help="set final clip start to this time (s), useful with preview", default=0)
     parser.add_argument("-y", "--yes", action="store_true",
@@ -123,51 +124,51 @@ def run():
         session_metadata,
         property_manager,
         dispense_metadata_wrapper,
-        misc_data
+        misc_data,
+        content_plan,
+        content_type
     )
 
+    print("\n\n** BUILD PROPERTIES LIST (CONTENT DESCRIPTOR)**\n\n")
     # Iterate the state reports, building all the video properties
     descriptor.build_content_descriptor(state_reports, end_at=args.end_at)
 
+    print("\n\n** LIMIT DURATION **\n\n")
     # if it's over the maximium time, do some speed up
     descriptor.limit_duration()
 
+    print("\n\n** GENERATE CLIPS (BUILD SUBCLIPS) **\n\n")
     # generate moviepy clips from the constructed descriptor
     overlay_clip, content_clip = descriptor.generate_content_clip(
         top_footage, front_footage)
-    print(f"length without stills: {dur_fmt(content_clip.duration)}")
 
-    overlay_clip, content_clip = add_stills(
-        base_dir,
-        session_number,
-        session_metadata,
-        content_type,
-        property_manager,
-        content_plan,
-        overlay_clip,
-        content_clip,
-    )
+    print(f"\nlength without stills: {dur_fmt(content_clip.duration)}")
+
+    # overlay_clip, content_clip = add_stills(
+    #     base_dir,
+    #     session_number,
+    #     session_metadata,
+    #     content_type,
+    #     property_manager,
+    #     content_plan,
+    #     overlay_clip,
+    #     content_clip,
+    # )
 
     print(f"length with stills: {dur_fmt(content_clip.duration)}")
     print(f"total generation time: {str(datetime.now() - gen_start)}")
 
-    # confirm render
-    if not args.yes:
-        confirm = input("Render? [y/N] ")
-        if confirm != "y":
-            print("Exiting")
-            exit(0)
-
     # launch preview application, or render
     if args.preview:
-        combined_clip = CompositeVideoClip(
-            [content_clip, overlay_clip], size=content_clip.size, use_bgclip=True)
-
-        # pylint: disable=E1101
-        combined_clip = combined_clip.resize(1)
-        combined_clip = combined_clip.subclip(float(args.start_at))
-        combined_clip.preview()
+        content_clip.fx(resize, 0.5).preview()
     else:
+        # confirm render
+        if not args.yes:
+            confirm = input("Render? [y/N] ")
+            if confirm != "y":
+                print("Exiting")
+                exit(0)
+
         render(
             base_dir,
             session_number,

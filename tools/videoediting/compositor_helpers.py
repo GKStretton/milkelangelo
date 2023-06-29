@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import typing
+import textwrap
 
 from moviepy.editor import TextClip, ImageSequenceClip, concatenate_videoclips, VideoClip, ImageClip
 from moviepy.video.fx.resize import resize
@@ -70,10 +71,10 @@ def build_session_number(
     return [shadow_clip, text_clip]
 
 
-def build_subtitle(text: str, pos: typing.Tuple[int, int], duration: float, font_size=80) -> TextClip:
+def build_subtitle(text: str, pos: typing.Tuple[int, int], duration: float, font_size=80, pixel_font=False) -> TextClip:
     text_size = (1080, 500)
     text_clip = TextClip(text, size=text_size, font_size=font_size, align='center',
-                         color='white', font=MAIN_FONT)
+                         color='white', font=PIXEL_FONT if pixel_font else MAIN_FONT)
 
     x = pos[0] if isinstance(pos[0], str) else pos[0] - text_size[0] // 2
     y = pos[1] if isinstance(pos[1], str) else pos[1] - text_size[1] // 2
@@ -81,6 +82,19 @@ def build_subtitle(text: str, pos: typing.Tuple[int, int], duration: float, font
     text_clip = text_clip.with_duration(duration)
 
     return text_clip
+
+
+def build_caption(text: str, pos: typing.Tuple[int, int], duration: float, font_size=60) -> TextClip:
+    # chars before adding new line
+    wrap_length = 44
+    lines = textwrap.wrap(text, width=wrap_length)
+    wrapped_text = "\n".join(lines)
+
+    if len(lines) > 3:
+        print("caption lines greater than 3!")
+        exit(1)
+
+    return build_subtitle(wrapped_text, pos, duration, font_size=font_size, pixel_font=True)
 
 
 def closest_rounded_speed(speed: float) -> str:

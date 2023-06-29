@@ -1,5 +1,5 @@
 from machinepb import machine as pb
-from content_plan.loader import get_hashtags, get_random_title_and_description, get_schedule_timestamp, get_common_text, append_title_hashtags
+from content_plan.loader import *
 
 
 def buildShortform(n_str: str) -> pb.ContentTypeStatus:
@@ -9,7 +9,7 @@ def buildShortform(n_str: str) -> pb.ContentTypeStatus:
     s = pb.ContentTypeStatus(
         raw_title=raw_title,
         raw_description=raw_description,
-        caption="define captions!",
+        caption=get_caption(ct),
     )
 
     platform = pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE
