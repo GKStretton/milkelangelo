@@ -160,6 +160,8 @@ def run():
 
     # launch preview application, or render
     if args.preview:
+        if args.start_at:
+            content_clip = content_clip.subclip(float(args.start_at))
         content_clip.fx(resize, 0.5).preview()
     else:
         # confirm render

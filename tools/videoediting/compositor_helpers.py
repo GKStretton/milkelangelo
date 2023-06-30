@@ -99,7 +99,7 @@ def build_caption(text: str, pos: typing.Tuple[int, int], duration: float, font_
 
 def closest_rounded_speed(speed: float) -> str:
     valid_speeds = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 10, 15, 20, 25,
-                    30, 40, 50, 75, 100, 150, 200, 300, 400, 500, 750, 1000]
+                    30, 40, 50, 75, 100, 150, 200, 300, 400, 500, 750]
     # minimum difference between speed and one of valid_speeds
     closest_speed = min(valid_speeds, key=lambda x: abs(x - speed))
 

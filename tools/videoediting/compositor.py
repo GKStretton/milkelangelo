@@ -21,15 +21,15 @@ def composeLandscape(metadata, props: SectionProperties, top_subclip: VideoClip,
     if props.scene == Scene.DUAL:
         clips = [
             front_subclip.resize(0.7).with_position((50, 'center')),
-            top_subclip.resize(1.05).with_position((960, 'center')),
+            top_subclip.with_position((960, 'center')),
 
-            *build_title((490, 110), top_subclip.duration),
-            *build_session_number(metadata, (195, 990), top_subclip.duration),
-            build_speed(props.speed, (1700, 20), top_subclip.duration),
+            *build_title((landscape_dim[0]//2-100, 70), top_subclip.duration, font_size=90),
+            *build_session_number(metadata, (30, 2), top_subclip.duration),
+            build_speed(props.speed, (1750, 20), top_subclip.duration),
         ]
         if caption:
             clips.append(
-                build_caption(caption, ('center', 'center'), top_subclip.duration)
+                build_caption(caption, (550, landscape_dim[1] - 90), top_subclip.duration)
             )
         return CompositeVideoClip(clips, size=landscape_dim)
 
