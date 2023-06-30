@@ -87,6 +87,23 @@ def get_common_text(ct: pb.ContentType, platform: pb.SocialPlatform) -> str:
     return ""
 
 
+def get_caption(ct: pb.ContentType) -> str:
+    # tab separated value file
+    p = os.path.join(SOCIAL_TEXT_PATH, "captions.csv")
+
+    # Load the csv file into a pandas DataFrame
+    df = pd.read_csv(p, sep='\t')
+
+    captions = list(df['ALL'].dropna())
+    if ct == pb.ContentType.CONTENT_TYPE_LONGFORM or ct == pb.ContentType.CONTENT_TYPE_SHORTFORM:
+        captions.extend(list(df['CONTENT_TYPE_SHORTFORM'].dropna()))
+
+    if ct == pb.ContentType.CONTENT_TYPE_LONGFORM or ct == pb.ContentType.CONTENT_TYPE_CLEANING:
+        captions.extend(list(df['CONTENT_TYPE_CLEANING'].dropna()))
+
+    return random.choice(captions)
+
+
 def append_title_hashtags(title: str, ct: pb.ContentType, platform: pb.SocialPlatform) -> str:
     max_length = 1000
     if ct == pb.ContentType.CONTENT_TYPE_SHORTFORM and platform == pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE:
@@ -107,7 +124,7 @@ def get_hashtags(ct: pb.ContentType, platform: pb.SocialPlatform) -> str:
 
 
 def get_hashtags_list(ct: pb.ContentType, platform: pb.SocialPlatform) -> typing.List[str]:
-    # comma separated value file
+    # tab separated value file
     p = os.path.join(SOCIAL_TEXT_PATH, "hashtags.csv")
 
     # Load the csv file into a pandas DataFrame
@@ -132,16 +149,6 @@ def get_hashtags_list(ct: pb.ContentType, platform: pb.SocialPlatform) -> typing
 
     # Return the tags
     return tags
-
-
-def get_caption(ct: pb.ContentType) -> str:
-    # comma separated value file
-    p = os.path.join(SOCIAL_TEXT_PATH, "captions.csv")
-
-    # Load the csv file into a pandas DataFrame
-    df = pd.read_csv(p, sep='\t')
-
-    return random.choice(df["TEXT"].dropna())
 
 
 def get_splashtext() -> str:
