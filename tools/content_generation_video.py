@@ -79,8 +79,7 @@ def render(
     overlay_file = os.path.join(output_dir, f"{content_type.name}-overlay.{i}.mp4")
     content_file = output_file
 
-    # todo: configure thumbnail time
-    content.save_frame(thumbnail_file, t=thumbnail_time)
+    content.save_frame(thumbnail_file, t=thumbnail_time, with_mask=False)
     print(f"wrote thumbnail to {thumbnail_file}")
 
     overlay_render_start = datetime.now()
@@ -144,16 +143,16 @@ def run():
 
     print(f"\nlength without stills: {dur_fmt(content_clip.duration)}")
 
-    # overlay_clip, content_clip = add_stills(
-    #     base_dir,
-    #     session_number,
-    #     session_metadata,
-    #     content_type,
-    #     property_manager,
-    #     content_plan,
-    #     overlay_clip,
-    #     content_clip,
-    # )
+    overlay_clip, content_clip = add_stills(
+        base_dir,
+        session_number,
+        session_metadata,
+        content_type,
+        property_manager,
+        content_plan,
+        overlay_clip,
+        content_clip,
+    )
 
     print(f"length with stills: {dur_fmt(content_clip.duration)}")
     print(f"total generation time: {str(datetime.now() - gen_start)}")

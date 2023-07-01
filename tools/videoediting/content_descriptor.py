@@ -227,6 +227,7 @@ class ContentDescriptor:
 
         max_duration = self.property_manager.get_max_content_duration()
         if max_duration is None:
+            print("max_duration pref is none")
             return
 
         # calculate existing durations

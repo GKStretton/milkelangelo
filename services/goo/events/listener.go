@@ -182,9 +182,11 @@ func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
 
 	if _, ok := meta.DispenseMetadata[key]; ok {
 		meta.DispenseMetadata[key].FailedDispense = true
+		meta.DispenseMetadata[key].DispenseDelayMs = 0
 	} else {
 		meta.DispenseMetadata[key] = &machinepb.DispenseMetadata{
-			FailedDispense: true,
+			FailedDispense:  true,
+			DispenseDelayMs: 0,
 		}
 	}
 

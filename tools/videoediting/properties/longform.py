@@ -10,7 +10,6 @@ class LongFormPropertyManager(BasePropertyManager):
         return False
 
     def get_max_content_duration(self) -> typing.Optional[float]:
-        return None
         return 20*60.0
 
     def get_stills_config(self) -> StillsConfig:
