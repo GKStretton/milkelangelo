@@ -18,7 +18,7 @@ type recorder struct {
 	mutex         *sync.RWMutex
 }
 
-func Run(sm *session.SessionManager) {
+func Start(sm *session.SessionManager) {
 	rec = &recorder{
 		sm:            sm,
 		recording:     false,

@@ -1,5 +1,7 @@
 from typing import Literal
 
+KV_KEY_ALL_VIAL_PROFILES: Literal["vial-profiles"] = "vial-profiles"
+KV_KEY_SYSTEM_VIAL_PROFILES: Literal["system-vial-profiles"] = "system-vial-profiles"
 PAYLOAD_SMART_SWITCH_OFF: Literal["OFF"] = "OFF"
 PAYLOAD_SMART_SWITCH_ON: Literal["ON"] = "ON"
 TOPIC_CLOSE_BLIND: Literal["asol/close_bedroom_blind"] = "asol/close_bedroom_blind"

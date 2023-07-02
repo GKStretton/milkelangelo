@@ -7,6 +7,9 @@ import (
 	"os"
 	"os/exec"
 	"time"
+
+	"github.com/gkstretton/dark/services/goo/util/protoyaml"
+	"google.golang.org/protobuf/proto"
 )
 
 func CreateSymlink(original, new string) error {
@@ -71,6 +74,20 @@ func SetPerms(p string) {
 	if err != nil {
 		fmt.Printf("chown failed: %v, %s\n", err, string(out))
 	}
+}
+
+func WriteProtoYaml(path string, msg proto.Message) error {
+	data, err := protoyaml.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("error marshalling delayed dispenses: %v", err)
+	}
+
+	err = os.WriteFile(path, data, 0644)
+	if err != nil {
+		return fmt.Errorf("error writing delayed dispenses file: %v", err)
+	}
+
+	return nil
 }
 
 // func chownRecursive(path string, uid, gid int) error {

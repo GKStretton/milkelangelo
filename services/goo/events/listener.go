@@ -23,7 +23,7 @@ var latest_state_report *machinepb.StateReport
 var subs = []chan *machinepb.StateReport{}
 var lock sync.Mutex
 
-func Run(sm *session.SessionManager) {
+func Start(sm *session.SessionManager) {
 	mqtt.Subscribe(topics_firmware.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
 		t := time.Now().UnixMicro()
 

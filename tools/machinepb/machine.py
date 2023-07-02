@@ -251,3 +251,68 @@ class Email(betterproto.Message):
 
     subject: str = betterproto.string_field(1)
     body: str = betterproto.string_field(2)
+
+
+@dataclass
+class VialProfile(betterproto.Message):
+    """
+    This contains information about each vial/test tube.These should be
+    maintained over time by the frontend interface and the backendin response
+    to dispenses.The current value is copied into session files when a session
+    starts if it's inthe system.
+    """
+
+    # incremental unique id for each vial in and out the system
+    id: int = betterproto.uint64_field(1)
+    # this should have a complete description of the mixture, including base
+    # fluids and the percentage makeup of each. This may be augmented by
+    # quantised makeup data in future.
+    description: str = betterproto.string_field(2)
+    # the pipette slop, how much extra volume to move on the first dispense
+    slop_ul: float = betterproto.float_field(3)
+    # how much volume to dispense each time
+    dispense_volume_ul: float = betterproto.float_field(4)
+    # how long after dispense to slow down the footage in the videos
+    footage_delay_ms: float = betterproto.float_field(5)
+    # how long to keep the footage slowed down in the videos
+    footage_duration_ms: float = betterproto.float_field(6)
+    # what speed to give the footage in the videos
+    footage_speed_mult: float = betterproto.float_field(7)
+    # Volume when this was first put in vial
+    initial_volume_ul: float = betterproto.float_field(8)
+    # Current volume. Note this will be just volume at start of session in
+    # session files.
+    current_volume_ul: float = betterproto.float_field(9)
+
+
+@dataclass
+class SystemVialConfiguration(betterproto.Message):
+    """
+    contains a map of the current vial positions to vial profile ids vial
+    position -> VialProfile id.
+    """
+
+    vials: Dict[int, int] = betterproto.map_field(
+        1, betterproto.TYPE_UINT64, betterproto.TYPE_UINT64
+    )
+
+
+@dataclass
+class VialProfileCollection(betterproto.Message):
+    """this is for all the VialProfiles, mapped by id."""
+
+    # VialProfile ID -> VialProfile
+    profiles: Dict[int, "VialProfile"] = betterproto.map_field(
+        1, betterproto.TYPE_UINT64, betterproto.TYPE_MESSAGE
+    )
+
+
+@dataclass
+class SystemVialConfigurationSnapshot(betterproto.Message):
+    """
+    contains a static snapshot of the VialProfiles for each system position
+    """
+
+    profiles: Dict[int, "VialProfile"] = betterproto.map_field(
+        1, betterproto.TYPE_UINT64, betterproto.TYPE_MESSAGE
+    )

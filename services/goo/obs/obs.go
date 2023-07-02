@@ -22,7 +22,7 @@ const retryWaitS = 5
 
 var sm *session.SessionManager
 
-func Run(s *session.SessionManager) {
+func Start(s *session.SessionManager) {
 	sm = s
 	fmt.Println("Running OBS controller")
 

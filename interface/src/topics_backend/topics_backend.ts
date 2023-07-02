@@ -1,4 +1,6 @@
 
+export const KV_KEY_ALL_VIAL_PROFILES: string = "vial-profiles";
+export const KV_KEY_SYSTEM_VIAL_PROFILES: string = "system-vial-profiles";
 export const PAYLOAD_SMART_SWITCH_OFF: string = "OFF";
 export const PAYLOAD_SMART_SWITCH_ON: string = "ON";
 export const TOPIC_CLOSE_BLIND: string = "asol/close_bedroom_blind";

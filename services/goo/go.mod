@@ -7,7 +7,7 @@ go 1.19
 require (
 	github.com/andreykaipov/goobs v0.12.0
 	github.com/eclipse/paho.mqtt.golang v1.4.2
-	github.com/gkstretton/asol-protos v0.0.9-0.20230624163112-56e9fd66d197
+	github.com/gkstretton/asol-protos v0.0.9-0.20230702100653-d60e9ce505c6
 	github.com/gorilla/websocket v1.5.0
 	github.com/stretchr/testify v1.8.1
 	google.golang.org/protobuf v1.30.0
