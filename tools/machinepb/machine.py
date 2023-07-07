@@ -278,11 +278,14 @@ class VialProfile(betterproto.Message):
     footage_duration_ms: float = betterproto.float_field(6)
     # what speed to give the footage in the videos
     footage_speed_mult: float = betterproto.float_field(7)
+    # if true, footage of this profile will not be treated differently to other
+    # footage (no slowdown etc.)
+    footage_ignore: bool = betterproto.bool_field(8)
     # Volume when this was first put in vial
-    initial_volume_ul: float = betterproto.float_field(8)
+    initial_volume_ul: float = betterproto.float_field(9)
     # Current volume. Note this will be just volume at start of session in
     # session files.
-    current_volume_ul: float = betterproto.float_field(9)
+    current_volume_ul: float = betterproto.float_field(10)
 
 
 @dataclass

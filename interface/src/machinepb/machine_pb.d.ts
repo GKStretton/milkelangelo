@@ -509,6 +509,9 @@ export class VialProfile extends jspb.Message {
   getFootageSpeedMult(): number;
   setFootageSpeedMult(value: number): void;
 
+  getFootageIgnore(): boolean;
+  setFootageIgnore(value: boolean): void;
+
   getInitialVolumeUl(): number;
   setInitialVolumeUl(value: number): void;
 
@@ -534,6 +537,7 @@ export namespace VialProfile {
     footageDelayMs: number,
     footageDurationMs: number,
     footageSpeedMult: number,
+    footageIgnore: boolean,
     initialVolumeUl: number,
     currentVolumeUl: number,
   }

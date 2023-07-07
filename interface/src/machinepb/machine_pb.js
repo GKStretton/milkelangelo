@@ -3898,8 +3898,9 @@ proto.machine.VialProfile.toObject = function(includeInstance, msg) {
     footageDelayMs: jspb.Message.getFloatingPointFieldWithDefault(msg, 5, 0.0),
     footageDurationMs: jspb.Message.getFloatingPointFieldWithDefault(msg, 6, 0.0),
     footageSpeedMult: jspb.Message.getFloatingPointFieldWithDefault(msg, 7, 0.0),
-    initialVolumeUl: jspb.Message.getFloatingPointFieldWithDefault(msg, 8, 0.0),
-    currentVolumeUl: jspb.Message.getFloatingPointFieldWithDefault(msg, 9, 0.0)
+    footageIgnore: jspb.Message.getBooleanFieldWithDefault(msg, 8, false),
+    initialVolumeUl: jspb.Message.getFloatingPointFieldWithDefault(msg, 9, 0.0),
+    currentVolumeUl: jspb.Message.getFloatingPointFieldWithDefault(msg, 10, 0.0)
   };
 
   if (includeInstance) {
@@ -3965,10 +3966,14 @@ proto.machine.VialProfile.deserializeBinaryFromReader = function(msg, reader) {
       msg.setFootageSpeedMult(value);
       break;
     case 8:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setFootageIgnore(value);
+      break;
+    case 9:
       var value = /** @type {number} */ (reader.readFloat());
       msg.setInitialVolumeUl(value);
       break;
-    case 9:
+    case 10:
       var value = /** @type {number} */ (reader.readFloat());
       msg.setCurrentVolumeUl(value);
       break;
@@ -4050,17 +4055,24 @@ proto.machine.VialProfile.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getFootageIgnore();
+  if (f) {
+    writer.writeBool(
+      8,
+      f
+    );
+  }
   f = message.getInitialVolumeUl();
   if (f !== 0.0) {
     writer.writeFloat(
-      8,
+      9,
       f
     );
   }
   f = message.getCurrentVolumeUl();
   if (f !== 0.0) {
     writer.writeFloat(
-      9,
+      10,
       f
     );
   }
@@ -4194,28 +4206,28 @@ proto.machine.VialProfile.prototype.setFootageSpeedMult = function(value) {
 
 
 /**
- * optional float initial_volume_ul = 8;
+ * optional bool footage_ignore = 8;
+ * @return {boolean}
+ */
+proto.machine.VialProfile.prototype.getFootageIgnore = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 8, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.machine.VialProfile} returns this
+ */
+proto.machine.VialProfile.prototype.setFootageIgnore = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 8, value);
+};
+
+
+/**
+ * optional float initial_volume_ul = 9;
  * @return {number}
  */
 proto.machine.VialProfile.prototype.getInitialVolumeUl = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 8, 0.0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.machine.VialProfile} returns this
- */
-proto.machine.VialProfile.prototype.setInitialVolumeUl = function(value) {
-  return jspb.Message.setProto3FloatField(this, 8, value);
-};
-
-
-/**
- * optional float current_volume_ul = 9;
- * @return {number}
- */
-proto.machine.VialProfile.prototype.getCurrentVolumeUl = function() {
   return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 9, 0.0));
 };
 
@@ -4224,8 +4236,26 @@ proto.machine.VialProfile.prototype.getCurrentVolumeUl = function() {
  * @param {number} value
  * @return {!proto.machine.VialProfile} returns this
  */
-proto.machine.VialProfile.prototype.setCurrentVolumeUl = function(value) {
+proto.machine.VialProfile.prototype.setInitialVolumeUl = function(value) {
   return jspb.Message.setProto3FloatField(this, 9, value);
+};
+
+
+/**
+ * optional float current_volume_ul = 10;
+ * @return {number}
+ */
+proto.machine.VialProfile.prototype.getCurrentVolumeUl = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 10, 0.0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.machine.VialProfile} returns this
+ */
+proto.machine.VialProfile.prototype.setCurrentVolumeUl = function(value) {
+  return jspb.Message.setProto3FloatField(this, 10, value);
 };
 
 
