@@ -33,7 +33,8 @@ class ContentDescriptor:
         dispense_metadata_wrapper: DispenseMetadataWrapper,
         misc_data: MiscData,
         content_plan: pb.ContentTypeStatuses,
-        content_type: pb.ContentType
+        content_type: pb.ContentType,
+        profile_snapshot: pb.SystemVialConfigurationSnapshot
     ):
         self.session_metadata = session_metadata
         self.property_manager = property_manager
@@ -42,6 +43,7 @@ class ContentDescriptor:
         self.content_plan = content_plan
         self.content_type = content_type
         self.caption = self.content_plan.content_statuses[self.content_type.name].caption
+        self.profile_snapshot = profile_snapshot
 
         # [(timestamp_s, sr), ...]
         self.state_reports: typing.List[typing.Tuple[float, pb.StateReport, VideoState]] = []
@@ -305,7 +307,8 @@ class ContentDescriptor:
                 video_state,
                 report,
                 self.dispense_metadata_wrapper,
-                self.misc_data
+                self.misc_data,
+                self.profile_snapshot
             )
 
             # Always set state report in descriptor for use in the overlays

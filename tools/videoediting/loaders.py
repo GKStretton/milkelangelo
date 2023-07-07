@@ -85,3 +85,11 @@ def get_misc_data(base_dir: str, session_number: int) -> MiscData:
     return MiscData(
         selected_dslr_number=get_selected_dslr_image_number(base_dir, session_number)
     )
+
+
+def get_profile_snapshot(base_dir: str, session_number: int) -> pb.SystemVialConfigurationSnapshot:
+    content_path = get_session_content_path(base_dir, session_number)
+    with open(os.path.join(content_path, "vial-profiles.yml"), 'r') as f:
+        raw_profiles = yaml.load(f, yaml.FullLoader)
+
+    return pb.SystemVialConfigurationSnapshot().from_dict(raw_profiles)

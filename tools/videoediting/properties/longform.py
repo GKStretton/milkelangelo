@@ -22,12 +22,13 @@ class LongFormPropertyManager(BasePropertyManager):
         return Format.LANDSCAPE
 
     def _get_specific_section_properties(
-            self,
-            current: typing.Tuple[SectionProperties, float, float],
-            video_state: VideoState,
-            state_report: pb.StateReport,
-            dm_wrapper: DispenseMetadataWrapper,
-            misc_data: MiscData
+        self,
+        current: typing.Tuple[SectionProperties, float, float],
+        video_state: VideoState,
+        state_report: pb.StateReport,
+        dm_wrapper: DispenseMetadataWrapper,
+        misc_data: MiscData,
+        profile_snapshot: pb.SystemVialConfigurationSnapshot
     ) -> typing.Tuple[SectionProperties, float, float]:
         props, delay, min_duration = current
         if props.skip:

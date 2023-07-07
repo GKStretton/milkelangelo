@@ -17,20 +17,26 @@ class CleaningPropertyManager(BasePropertyManager):
         return Format.PORTRAIT
 
     def _get_specific_section_properties(
-            self,
-            current: typing.Tuple[SectionProperties, float, float],
-            video_state: VideoState,
-            state_report: pb.StateReport,
-            dm_wrapper: DispenseMetadataWrapper,
-            misc_data: MiscData
+        self,
+        current: typing.Tuple[SectionProperties, float, float],
+        video_state: VideoState,
+        state_report: pb.StateReport,
+        dm_wrapper: DispenseMetadataWrapper,
+        misc_data: MiscData,
+        profile_snapshot: pb.SystemVialConfigurationSnapshot
     ) -> [SectionProperties, float, float]:
         props, delay, min_duration = current
         if props.skip:
             return props, delay, min_duration
 
-        # skip everything before beginning drain
-        if video_state.canvas_status != CanvasStatus.AFTER:
+        # skip everything before selected dslr image
+        if state_report.latest_dslr_file_number < misc_data.selected_dslr_number:
             props.skip = True
+            return props, delay, min_duration
+
+        # speed up from selected dslr to drain start
+        if video_state.canvas_status == CanvasStatus.DURING:
+            props.speed = 50
             return props, delay, min_duration
 
         if state_report.status == pb.Status.SHUTTING_DOWN:
@@ -55,7 +61,7 @@ class CleaningPropertyManager(BasePropertyManager):
             props.speed = 2
             return props, delay, min_duration
 
-        if state_report.fluid_request.complete:
+        if video_state.canvas_status == CanvasStatus.AFTER and state_report.fluid_request.complete:
             props.skip = True
 
         return props, delay, min_duration

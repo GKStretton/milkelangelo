@@ -29,7 +29,8 @@ class ShortFormPropertyManager(BasePropertyManager):
         video_state: VideoState,
         state_report: pb.StateReport,
         dm_wrapper: DispenseMetadataWrapper,
-        misc_data: MiscData
+        misc_data: MiscData,
+        profile_snapshot: pb.SystemVialConfigurationSnapshot
     ) -> [SectionProperties, float, float]:
         props, delay, min_duration = current
         if props.skip:
@@ -42,29 +43,10 @@ class ShortFormPropertyManager(BasePropertyManager):
             props.skip = True
             return props, delay, min_duration
 
-        # DISPENSE
-        if state_report.status == pb.Status.DISPENSING:
-            dispense_metadata = dm_wrapper.get_dispense_metadata_from_sr(state_report)
-            if dispense_metadata:
-                props.skip = dispense_metadata.failed_dispense
-                delay = dispense_metadata.dispense_delay_ms / 1000.0
-
-            if state_report.pipette_state.vial_held == EMULSIFIER_VIAL:
-                min_duration = 2
-                props.speed = 1
-            else:  # dye
-                min_duration = 2
-                if state_report.pipette_state.dispense_request_number <= 1:
-                    # first dispense
-                    props.speed = 1
-                else:
-                    props.speed = 5
-
-            return props, delay, min_duration
-
         # OTHER
         if state_report.collection_request.request_number < 1:
             props.skip = True
+            return props, delay, min_duration
         elif state_report.status == pb.Status.WAITING_FOR_DISPENSE:
             props.speed = 15
         elif state_report.pipette_state.dispense_request_number < 1:
@@ -76,5 +58,22 @@ class ShortFormPropertyManager(BasePropertyManager):
             props.speed = 100
         else:
             props.speed = 50
+
+        # DISPENSE
+        if state_report.status == pb.Status.DISPENSING:
+            dispense_metadata = dm_wrapper.get_dispense_metadata_from_sr(state_report)
+            if dispense_metadata:
+                props.skip = dispense_metadata.failed_dispense
+                delay = dispense_metadata.dispense_delay_ms / 1000.0
+
+            vial_profile = profile_snapshot.profiles.get(state_report.pipette_state.vial_held)
+            if vial_profile and not vial_profile.footage_ignore:
+                min_duration = vial_profile.footage_duration_ms / 1000.0
+                delay += vial_profile.footage_delay_ms / 1000.0
+                props.speed = vial_profile.footage_speed_mult
+
+            # override speed of first dispense
+            if state_report.pipette_state.dispense_request_number <= 1:
+                props.speed = 1
 
         return props, delay, min_duration

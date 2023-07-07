@@ -84,13 +84,20 @@ class BasePropertyManager(ABC):
             video_state: VideoState,
             state_report: pb.StateReport,
             dm_wrapper: DispenseMetadataWrapper,
-            misc_data: MiscData
+            misc_data: MiscData,
+            profile_snapshot: pb.SystemVialConfigurationSnapshot
     ) -> typing.Tuple[SectionProperties, float, float]:
         self._update_state_pre(video_state, state_report)
 
         props, delay, min_duration = self._common_get_section_properties(video_state, state_report)
         props, delay, min_duration = self._get_specific_section_properties(
-            (props, delay, min_duration), video_state, state_report, dm_wrapper, misc_data)
+            (props, delay, min_duration),
+            video_state,
+            state_report,
+            dm_wrapper,
+            misc_data,
+            profile_snapshot
+        )
 
         self._update_state_post(video_state, state_report)
 
@@ -132,7 +139,8 @@ class BasePropertyManager(ABC):
             video_state: VideoState,
             state_report: pb.StateReport,
             dm_wrapper: DispenseMetadataWrapper,
-            misc_data: MiscData
+            misc_data: MiscData,
+            profile_snapshot: pb.SystemVialConfigurationSnapshot
     ) -> SectionProperties:
         """ content-type specific properties logic """
 

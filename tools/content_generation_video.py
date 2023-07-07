@@ -107,6 +107,7 @@ def run():
     dispense_metadata_wrapper = DispenseMetadataWrapper(base_dir, session_number)
     misc_data = loaders.get_misc_data(base_dir, session_number)
     content_plan = loaders.get_content_plan(base_dir, session_number)
+    profile_snapshot = loaders.get_profile_snapshot(base_dir, session_number)
 
     # load webcam footage
     content_path = loaders.get_session_content_path(base_dir, session_number)
@@ -125,7 +126,8 @@ def run():
         dispense_metadata_wrapper,
         misc_data,
         content_plan,
-        content_type
+        content_type,
+        profile_snapshot
     )
 
     print("\n\n** BUILD PROPERTIES LIST (CONTENT DESCRIPTOR)**\n\n")
