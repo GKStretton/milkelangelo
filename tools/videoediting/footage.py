@@ -6,6 +6,7 @@ import typing
 import pycommon.util as util
 import os
 from pycommon.crop_util import CropConfig
+import logging
 
 # FootagePiece handles loading and storage of a video clip, its crop config, and
 # timestamps. It supports getting subclips by absolute timestamp, wrapping
@@ -16,7 +17,7 @@ class FootagePiece:
     def __init__(self, path, timeOffset: float = 0):
         self.file_name = os.path.basename(path)
         self.timeOffset = timeOffset
-        print("\tLoading FootagePiece:", path)
+        logging.info("\tLoading FootagePiece: %s", path)
 
         # create VideoClip
         self.video = VideoFileClip.VideoFileClip(path)
@@ -30,10 +31,10 @@ class FootagePiece:
             # timestamp unix in seconds with decimal
             self.start_timestamp = float(unixtime) + self.timeOffset
 
-        print("\t\tcc:\t\t x1={}; x2={}; y1={}; y2={}".format(self.crop_config.x1,
-              self.crop_config.x2, self.crop_config.y1, self.crop_config.y2))
-        print("\t\trange:\t\t {:.2f} - {:.2f}".format(self.get_start_timestamp(), self.get_end_timestamp()))
-        print("\t\tduration:\t {:.2f}".format(self.video.duration))
+        logging.info("\t\tcc:\t\t x1={}; x2={}; y1={}; y2={}".format(self.crop_config.x1,
+                                                                     self.crop_config.x2, self.crop_config.y1, self.crop_config.y2))
+        logging.info("\t\trange:\t\t {:.2f} - {:.2f}".format(self.get_start_timestamp(), self.get_end_timestamp()))
+        logging.info("\t\tduration:\t {:.2f}".format(self.video.duration))
 
     def get_clip(self) -> VideoClip.VideoClip:
         return self.video
@@ -75,27 +76,27 @@ class FootagePiece:
         absolute_start_t = max(start_t, self.get_start_timestamp())
         absolute_end_t = min(end_t, self.get_end_timestamp())
 
-        print("\t\tApplicable absolute range considered ({:.2f}, {:.2f}) in {}".format(
+        logging.info("\t\tApplicable absolute range considered ({:.2f}, {:.2f}) in {}".format(
             absolute_start_t, absolute_end_t, self.file_name))
 
         start_relative = absolute_start_t - self.get_start_timestamp()
         end_relative = absolute_end_t - self.get_start_timestamp()
         if start_relative < 0:
-            print("\t\tstart_relative ({}) < 0 in {}, exiting".format(start_relative, self.file_name))
+            logging.info("\t\tstart_relative ({}) < 0 in {}, exiting".format(start_relative, self.file_name))
             exit(1)
         if end_relative > self.video.duration:
             end_relative = self.video.duration
             # should only be very small, floating point inaccuracies
             if end_relative - self.video.duration > 0.01:
-                print("\t\tend_relative {} significantly bigger than video duration {} in {}, exiting".format(
+                logging.info("\t\tend_relative {} significantly bigger than video duration {} in {}, exiting".format(
                     end_relative, self.video.duration, self.file_name))
 
-        print("\t\tApplicable relative range considered ({:.2f}, {:.2f}) in {}".format(
+        logging.info("\t\tApplicable relative range considered ({:.2f}, {:.2f}) in {}".format(
             start_relative, end_relative, self.file_name))
 
         before = time.time()
         subclip = self.video.subclip(start_relative, end_relative)
-        print("\t\tvideo.subclip took {}s".format(time.time() - before))
+        logging.info("\t\tvideo.subclip took {}s".format(time.time() - before))
         return subclip, absolute_start_t, absolute_end_t
 
 
@@ -105,7 +106,7 @@ class FootageWrapper:
     # timeOffset is how many seconds to offset the footage absolute time by
     def __init__(self, footagePath, timeOffset: float = 0):
         self.timeOffset = timeOffset
-        print("Loading footage from directory:", footagePath)
+        logging.info("Loading footage from directory: %s", footagePath)
         self.clips: typing.List[FootagePiece] = []
         for file in sorted(os.listdir(footagePath)):
             # get every .mp4 in the directory
@@ -113,7 +114,7 @@ class FootageWrapper:
                 # create a FootagePiece for each
                 path = os.path.join(footagePath, file)
                 self.clips.append(FootagePiece(path, timeOffset=timeOffset))
-        print()
+        logging.info("")
 
     def get_start_timestamp(self):
         if len(self.clips) == 0:
@@ -123,7 +124,7 @@ class FootageWrapper:
     # get subclip by absolute timestamp range, including padding
     def get_subclip(self, start_t: float, end_t: float) -> typing.Tuple[VideoClip.VideoClip, CropConfig]:
         if len(self.clips) == 0:
-            print("get_subclip found self.clips to be empty")
+            logging.info("get_subclip found self.clips to be empty")
             exit(1)
 
         # clips with absolute timestamp ranges
@@ -136,7 +137,7 @@ class FootageWrapper:
                 # this clip contains footage of the state report
                 subclips.append((clip, start_a, end_a))
                 crop_config = v.get_crop_config()
-                print(f"\tFound footage from {start_a} to {end_a} ({end_a-start_a})")
+                logging.info(f"\tFound footage from {start_a} to {end_a} ({end_a-start_a})")
 
         # padding template
         s = self.clips[0].get_clip().size
@@ -153,7 +154,7 @@ class FootageWrapper:
         # add any pre-video padding
         initial_pad_duration = subclips[0][1] - start_t
         if initial_pad_duration > 0:
-            print(f"\tAdding {initial_pad_duration:.2f} of initial padding")
+            logging.info(f"\tAdding {initial_pad_duration:.2f} of initial padding")
             subclips_with_padding.append(padding.with_duration(initial_pad_duration))
 
         # iterate subclips

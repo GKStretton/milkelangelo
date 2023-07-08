@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import typing
 import os
@@ -15,7 +16,7 @@ def get_session_metadata(base_dir: str, session_number: int):
     yml = None
     with open(path, 'r') as f:
         yml = yaml.load(f, Loader=yaml.FullLoader)
-    print("Loaded session metadata: {}\n".format(yml))
+    logging.info("Loaded session metadata: {}\n".format(yml))
     return yml
 
 
@@ -30,7 +31,7 @@ def get_state_reports(base_dir: str, session_number: int) -> typing.Tuple[float,
         raw_state_reports = yaml.load(f, yaml.FullLoader)
 
     state_report_list = pb.StateReportList().from_dict(raw_state_reports).state_reports
-    print("Loaded {} state report entries\n".format(len(state_report_list)))
+    logging.info("Loaded {} state report entries\n".format(len(state_report_list)))
 
     state_reports: typing.Tuple[float, pb.StateReport] = []
     for _, v in enumerate(state_report_list):

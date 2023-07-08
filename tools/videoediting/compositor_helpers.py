@@ -1,4 +1,5 @@
 import math
+import logging
 import numpy as np
 import typing
 import textwrap
@@ -91,7 +92,7 @@ def build_caption(text: str, pos: typing.Tuple[int, int], duration: float, font_
     wrapped_text = "\n".join(lines)
 
     if len(lines) > 3:
-        print("caption lines greater than 3!")
+        logging.error("caption lines greater than 3!")
         exit(1)
 
     return build_subtitle(wrapped_text, pos, duration, font_size=font_size, pixel_font=True)

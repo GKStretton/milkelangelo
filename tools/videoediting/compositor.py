@@ -1,3 +1,4 @@
+import logging
 from moviepy.editor import VideoClip, CompositeVideoClip
 from moviepy.video.fx import crop
 import pycommon.image as image
@@ -33,7 +34,7 @@ def composeLandscape(metadata, props: SectionProperties, top_subclip: VideoClip,
             )
         return CompositeVideoClip(clips, size=landscape_dim)
 
-    print("scene {} not supported for landscape format".format(props.scene))
+    logging.error("scene {} not supported for landscape format".format(props.scene))
     exit(1)
 
 
@@ -55,7 +56,7 @@ def composePortrait(metadata, props: SectionProperties, top_subclip: VideoClip, 
             )
         return CompositeVideoClip(clips, size=portrait_dim)
 
-    print("scene {} not supported for portrait format".format(props.scene))
+    logging.error("scene {} not supported for portrait format".format(props.scene))
     exit(1)
 
 

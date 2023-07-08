@@ -1,6 +1,7 @@
 import typing
 import dataclasses
 import json
+import logging
 
 from moviepy.editor import VideoClip, TextClip, concatenate_videoclips, clips_array, CompositeVideoClip
 
@@ -52,7 +53,7 @@ class ContentDescriptor:
 
     def set_state_report(self, timestamp: float, state_report: pb.StateReport, video_state: VideoState):
         if len(self.state_reports) > 0 and self.state_reports[-1][0] > timestamp:
-            print(
+            logging.error(
                 f"set_state_report with timestamp {timestamp}, but previously seen state report has timestamp {self.state_reports[-1][0]}")
             exit(1)
 
@@ -60,7 +61,7 @@ class ContentDescriptor:
 
     def set_properties(self, timestamp: float, properties: SectionProperties):
         if len(self.properties) > 0 and self.properties[-1][0] > timestamp:
-            print(
+            logging.error(
                 f"set_properties with timestamp {timestamp}, but previously seen state report has timestamp {self.properties[-1][0]}")
             exit(1)
 
@@ -83,16 +84,15 @@ class ContentDescriptor:
         way is easier but less efficient.
         """
         if len(self.properties) == 0 or len(self.state_reports) == 0:
-            print("_generate_raw_overlay_clip found no properties / state_reports")
+            logging.error("_generate_raw_overlay_clip found no properties / state_reports")
             exit(1)
 
         start_timestamp = self.state_reports[0][0]
 
-        print(f"gen raw state report overlay for {len(self.state_reports)} state reports")
+        logging.info(f"gen raw state report overlay for {len(self.state_reports)} state reports")
         # generate raw state report overlay in normal time
         sr_clips = []
         for i, _ in enumerate(self.state_reports):
-            print(i)
             timestamp, sr, video_state = self.state_reports[i]
 
             # show last one for this long
@@ -131,23 +131,23 @@ class ContentDescriptor:
 
         """
         if len(self.properties) == 0:
-            print("generate_content_clip found no properties / state_reports")
+            logging.error("generate_content_clip found no properties / state_reports")
             exit(1)
 
         # Generate full raw overlay from the properties
         raw_overlay = self._generate_state_report_overlay_clip()
         start_timestamp = self.properties[0][0]
 
-        print(f"gen content for {len(self.properties)} props")
+        logging.info(f"gen content for {len(self.properties)} props")
         overlay_clips = []
         content_clips = []
         for i, _ in enumerate(self.properties):
-            print()
-            print(i)
+            logging.info("")
+            logging.info(i)
             props = self.properties[i][1]
-            print(props)
+            logging.info("PROPS\n%s", props)
             if props.skip:
-                print("skipping")
+                logging.info("skipping")
                 continue
 
             ts1_abs = self.properties[i][0]
@@ -179,10 +179,10 @@ class ContentDescriptor:
             overlay_subclip = CompositeVideoClip([overlay_raw_subclip, txt], size=(400, 800))
 
             # build footage subclips
-            print(
+            logging.info(
                 f"Getting top_footage between {ts1_abs} and {ts2_abs} ({ts_fmt(ts1_rel)} to {ts_fmt(ts2_rel)})")
             top_subclip, top_crop = top_footage.get_subclip(ts1_abs, ts2_abs)
-            print(
+            logging.info(
                 f"Getting front_footage between {ts1_abs} and {ts2_abs} ({ts_fmt(ts1_rel)} to {ts_fmt(ts2_rel)})")
             front_subclip, front_crop = front_footage.get_subclip(ts1_abs, ts2_abs)
 
@@ -194,7 +194,7 @@ class ContentDescriptor:
             # clips should all be same length unless it's the last property.
             if i != len(self.properties) - 1 and not floats_are_equal(0.00001, [overlay_subclip.duration, top_subclip.duration, front_subclip.duration]):
                 # these should be same length if the footage has been padded correctly''
-                print("processed subclips are not same duration: {} {} {}, exiting".format(
+                logging.error("processed subclips are not same duration: {} {} {}, exiting".format(
                     overlay_subclip.duration, top_subclip.duration, front_subclip.duration))
                 exit(1)
 
@@ -203,7 +203,7 @@ class ContentDescriptor:
             overlay_clips.append(overlay_subclip)
 
         if len(content_clips) == 0:
-            print("no content clips built, skipped all?")
+            logging.error("no content clips built, skipped all?")
             exit(1)
 
         return concatenate_videoclips(overlay_clips), concatenate_videoclips(content_clips)
@@ -230,7 +230,7 @@ class ContentDescriptor:
 
         max_duration = self.property_manager.get_max_content_duration()
         if max_duration is None:
-            print("max_duration pref is none")
+            logging.info("max_duration pref is none")
             return
 
         # calculate existing durations
@@ -253,15 +253,15 @@ class ContentDescriptor:
         reduction = full_total - max_duration
         threshold = 0.1
         if reduction <= threshold:
-            print(f"No duration reduction needed: {full_total:.2f}s <= {max_duration + threshold:.2f}s")
+            logging.info(f"No duration reduction needed: {full_total:.2f}s <= {max_duration + threshold:.2f}s")
             return
 
         new_applicable_time = applicable_duration - reduction
         # Find speed factor to achieve the reduction
         speed_factor = applicable_duration / new_applicable_time
 
-        print(f"Target reduction of {reduction:.2f}s, {speed_factor:.2f} factor per applicable property")
-        print(f"Calculated total duration: {full_total:.2f}s, applicable: {applicable_duration:.2f}s.")
+        logging.info(f"Target reduction of {reduction:.2f}s, {speed_factor:.2f} factor per applicable property")
+        logging.info(f"Calculated total duration: {full_total:.2f}s, applicable: {applicable_duration:.2f}s.")
 
         # apply reduction
         for _, v in enumerate(self.properties):

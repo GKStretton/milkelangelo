@@ -1,4 +1,5 @@
 import yaml
+import logging
 from typing import Optional
 import machinepb.machine as pb
 import os
@@ -19,7 +20,7 @@ class DispenseMetadataWrapper:
                 meta: pb.DispenseMetadataMap = pb.DispenseMetadataMap().from_dict(value=yml)
                 return meta
         except FileNotFoundError:
-            print("no dispense metadata found")
+            logging.error("no dispense metadata found")
             return None
 
     def get_dispense_metadata(self, startup_counter: int, dispense_request_number: int) -> Optional[pb.DispenseMetadata]:
