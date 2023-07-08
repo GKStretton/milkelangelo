@@ -204,6 +204,10 @@ class DispenseMetadata(betterproto.Message):
     failed_dispense: bool = betterproto.bool_field(1)
     # how many ms later than expected the dispense happened
     dispense_delay_ms: int = betterproto.uint64_field(2)
+    # if non-zero, override the vial profile's duration with this value.
+    min_duration_override_ms: int = betterproto.uint64_field(3)
+    # if non-zero, override the vial profile's speed with this value.
+    speed_mult_override: int = betterproto.uint64_field(4)
 
 
 @dataclass
@@ -273,9 +277,9 @@ class VialProfile(betterproto.Message):
     # how much volume to dispense each time
     dispense_volume_ul: float = betterproto.float_field(4)
     # how long after dispense to slow down the footage in the videos
-    footage_delay_ms: float = betterproto.float_field(5)
+    footage_delay_ms: int = betterproto.uint64_field(5)
     # how long to keep the footage slowed down in the videos
-    footage_duration_ms: float = betterproto.float_field(6)
+    footage_min_duration_ms: int = betterproto.uint64_field(6)
     # what speed to give the footage in the videos
     footage_speed_mult: float = betterproto.float_field(7)
     # if true, footage of this profile will not be treated differently to other

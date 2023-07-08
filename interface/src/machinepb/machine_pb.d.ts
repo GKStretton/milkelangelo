@@ -331,11 +331,17 @@ export namespace DispenseMetadataMap {
 }
 
 export class DispenseMetadata extends jspb.Message {
-  getFaileddispense(): boolean;
-  setFaileddispense(value: boolean): void;
+  getFailedDispense(): boolean;
+  setFailedDispense(value: boolean): void;
 
-  getDispensedelayms(): number;
-  setDispensedelayms(value: number): void;
+  getDispenseDelayMs(): number;
+  setDispenseDelayMs(value: number): void;
+
+  getMinDurationOverrideMs(): number;
+  setMinDurationOverrideMs(value: number): void;
+
+  getSpeedMultOverride(): number;
+  setSpeedMultOverride(value: number): void;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DispenseMetadata.AsObject;
@@ -349,8 +355,10 @@ export class DispenseMetadata extends jspb.Message {
 
 export namespace DispenseMetadata {
   export type AsObject = {
-    faileddispense: boolean,
-    dispensedelayms: number,
+    failedDispense: boolean,
+    dispenseDelayMs: number,
+    minDurationOverrideMs: number,
+    speedMultOverride: number,
   }
 }
 
@@ -503,8 +511,8 @@ export class VialProfile extends jspb.Message {
   getFootageDelayMs(): number;
   setFootageDelayMs(value: number): void;
 
-  getFootageDurationMs(): number;
-  setFootageDurationMs(value: number): void;
+  getFootageMinDurationMs(): number;
+  setFootageMinDurationMs(value: number): void;
 
   getFootageSpeedMult(): number;
   setFootageSpeedMult(value: number): void;
@@ -535,7 +543,7 @@ export namespace VialProfile {
     slopUl: number,
     dispenseVolumeUl: number,
     footageDelayMs: number,
-    footageDurationMs: number,
+    footageMinDurationMs: number,
     footageSpeedMult: number,
     footageIgnore: boolean,
     initialVolumeUl: number,

@@ -6,6 +6,7 @@ list of profiles and system vial configuration.
 import os
 import argparse
 import yaml
+from betterproto import Casing
 import machinepb.machine as pb
 
 
@@ -30,24 +31,24 @@ dye = pb.VialProfile(
     id=0,
     description="dye",
     footage_delay_ms=0,
-    footage_duration_ms=0,
-    footage_speed_mult=1,
-    footage_ignore=True
+    footage_min_duration_ms=2000,
+    footage_speed_mult=3,
+    footage_ignore=False
 )
 
 emulsifier = pb.VialProfile(
     id=1,
     description="emulsifier",
-    footage_delay_ms=3000,
-    footage_duration_ms=10000,
-    footage_speed_mult=5
+    footage_delay_ms=0,
+    footage_min_duration_ms=10000,
+    footage_speed_mult=4
 )
 
 isopropyl = pb.VialProfile(
     id=2,
     description="isopropyl alcohol",
     footage_delay_ms=0,
-    footage_duration_ms=2000,
+    footage_min_duration_ms=2500,
     footage_speed_mult=1
 )
 
@@ -61,6 +62,6 @@ snapshot.profiles[6] = dye
 OUTPUT = os.path.join(args.base_dir, "session_content", args.session_number, "vial-profiles.yml")
 with open(OUTPUT, 'w') as f:
     yaml.dump(
-        snapshot.to_dict(include_default_values=True),
+        snapshot.to_dict(include_default_values=True, casing=Casing.SNAKE),
         f
     )

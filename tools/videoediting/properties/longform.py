@@ -41,7 +41,15 @@ class LongFormPropertyManager(BasePropertyManager):
                 props.skip = dispense_metadata.failed_dispense
                 delay = dispense_metadata.dispense_delay_ms / 1000.0
 
-            min_duration = 3
+            # we use min_duration to prevent early speedup when system goes idle
+            vial_profile = profile_snapshot.profiles.get(state_report.pipette_state.vial_held)
+            if vial_profile and not vial_profile.footage_ignore:
+                min_duration = vial_profile.footage_min_duration_ms / 1000.0
+
+            # per-dispense min_duration override
+            if dispense_metadata:
+                if dispense_metadata.min_duration_override_ms != 0:
+                    min_duration = dispense_metadata.min_duration_override_ms / 1000.0
 
         if state_report.status == pb.Status.WAITING_FOR_DISPENSE:
             # we shouldn't be waiting for dispense. In future could add a timeout

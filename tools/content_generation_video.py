@@ -50,7 +50,9 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("-s", "--start-at", action="store",
                         help="set final clip start to this time (s), useful with preview", default=0)
     parser.add_argument("-y", "--yes", action="store_true",
-                        help="auto-yes to render confirmation", default=False)
+                        help="auto-yes to render confirmation", default=True)
+    parser.add_argument("-f", "--full-duration", action="store_true",
+                        help="if true, do not limit video duration to max dur")
 
     return parser.parse_args()
 
@@ -134,9 +136,10 @@ def run():
     # Iterate the state reports, building all the video properties
     descriptor.build_content_descriptor(state_reports, end_at=args.end_at)
 
-    print("\n\n** LIMIT DURATION **\n\n")
-    # if it's over the maximium time, do some speed up
-    descriptor.limit_duration()
+    if not args.full_duration:
+        print("\n\n** LIMIT DURATION **\n\n")
+        # if it's over the maximium time, do some speed up
+        descriptor.limit_duration()
 
     print("\n\n** GENERATE CLIPS (BUILD SUBCLIPS) **\n\n")
     # generate moviepy clips from the constructed descriptor
@@ -163,7 +166,7 @@ def run():
     if args.preview:
         if args.start_at:
             content_clip = content_clip.subclip(float(args.start_at))
-        content_clip.fx(resize, 0.5).preview()
+        overlay_clip.fx(resize, 0.5).preview()
     else:
         # confirm render
         if not args.yes:

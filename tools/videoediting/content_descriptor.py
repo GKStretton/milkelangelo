@@ -2,7 +2,7 @@ import typing
 import dataclasses
 import json
 
-from moviepy.editor import VideoClip, TextClip, concatenate_videoclips, clips_array
+from moviepy.editor import VideoClip, TextClip, concatenate_videoclips, clips_array, CompositeVideoClip
 
 from betterproto import Casing
 import machinepb.machine as pb
@@ -175,7 +175,8 @@ class ContentDescriptor:
             if props.speed != 1.0:
                 overlay_raw_subclip = overlay_raw_subclip.multiply_speed(props.speed)
                 txt = txt.multiply_speed(props.speed)
-            overlay_subclip = clips_array([[overlay_raw_subclip], [txt]])
+            txt = txt.with_position((0, 600))
+            overlay_subclip = CompositeVideoClip([overlay_raw_subclip, txt], size=(400, 800))
 
             # build footage subclips
             print(

@@ -3,8 +3,8 @@ module github.com/gkstretton/dark/services/dslrcapture
 go 1.19
 
 require (
-	github.com/gkstretton/asol-protos v0.0.9-0.20230707145941-126c327a13dd
-	github.com/gkstretton/dark/services/goo v0.0.0-20230702104827-fa3982b68f2f
+	github.com/gkstretton/asol-protos v0.0.9-0.20230708095357-d91016e3f669
+	github.com/gkstretton/dark/services/goo v0.0.0-20230707193130-3804eccf6636
 	google.golang.org/protobuf v1.31.0
 )
 

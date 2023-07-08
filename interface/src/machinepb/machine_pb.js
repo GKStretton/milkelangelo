@@ -2787,8 +2787,10 @@ proto.machine.DispenseMetadata.prototype.toObject = function(opt_includeInstance
  */
 proto.machine.DispenseMetadata.toObject = function(includeInstance, msg) {
   var f, obj = {
-    faileddispense: jspb.Message.getBooleanFieldWithDefault(msg, 1, false),
-    dispensedelayms: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    failedDispense: jspb.Message.getBooleanFieldWithDefault(msg, 1, false),
+    dispenseDelayMs: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    minDurationOverrideMs: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    speedMultOverride: jspb.Message.getFieldWithDefault(msg, 4, 0)
   };
 
   if (includeInstance) {
@@ -2827,11 +2829,19 @@ proto.machine.DispenseMetadata.deserializeBinaryFromReader = function(msg, reade
     switch (field) {
     case 1:
       var value = /** @type {boolean} */ (reader.readBool());
-      msg.setFaileddispense(value);
+      msg.setFailedDispense(value);
       break;
     case 2:
       var value = /** @type {number} */ (reader.readUint64());
-      msg.setDispensedelayms(value);
+      msg.setDispenseDelayMs(value);
+      break;
+    case 3:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setMinDurationOverrideMs(value);
+      break;
+    case 4:
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setSpeedMultOverride(value);
       break;
     default:
       reader.skipField();
@@ -2862,17 +2872,31 @@ proto.machine.DispenseMetadata.prototype.serializeBinary = function() {
  */
 proto.machine.DispenseMetadata.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getFaileddispense();
+  f = message.getFailedDispense();
   if (f) {
     writer.writeBool(
       1,
       f
     );
   }
-  f = message.getDispensedelayms();
+  f = message.getDispenseDelayMs();
   if (f !== 0) {
     writer.writeUint64(
       2,
+      f
+    );
+  }
+  f = message.getMinDurationOverrideMs();
+  if (f !== 0) {
+    writer.writeUint64(
+      3,
+      f
+    );
+  }
+  f = message.getSpeedMultOverride();
+  if (f !== 0) {
+    writer.writeUint64(
+      4,
       f
     );
   }
@@ -2880,10 +2904,10 @@ proto.machine.DispenseMetadata.serializeBinaryToWriter = function(message, write
 
 
 /**
- * optional bool failedDispense = 1;
+ * optional bool failed_dispense = 1;
  * @return {boolean}
  */
-proto.machine.DispenseMetadata.prototype.getFaileddispense = function() {
+proto.machine.DispenseMetadata.prototype.getFailedDispense = function() {
   return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 1, false));
 };
 
@@ -2892,16 +2916,16 @@ proto.machine.DispenseMetadata.prototype.getFaileddispense = function() {
  * @param {boolean} value
  * @return {!proto.machine.DispenseMetadata} returns this
  */
-proto.machine.DispenseMetadata.prototype.setFaileddispense = function(value) {
+proto.machine.DispenseMetadata.prototype.setFailedDispense = function(value) {
   return jspb.Message.setProto3BooleanField(this, 1, value);
 };
 
 
 /**
- * optional uint64 dispenseDelayMs = 2;
+ * optional uint64 dispense_delay_ms = 2;
  * @return {number}
  */
-proto.machine.DispenseMetadata.prototype.getDispensedelayms = function() {
+proto.machine.DispenseMetadata.prototype.getDispenseDelayMs = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
@@ -2910,8 +2934,44 @@ proto.machine.DispenseMetadata.prototype.getDispensedelayms = function() {
  * @param {number} value
  * @return {!proto.machine.DispenseMetadata} returns this
  */
-proto.machine.DispenseMetadata.prototype.setDispensedelayms = function(value) {
+proto.machine.DispenseMetadata.prototype.setDispenseDelayMs = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
+};
+
+
+/**
+ * optional uint64 min_duration_override_ms = 3;
+ * @return {number}
+ */
+proto.machine.DispenseMetadata.prototype.getMinDurationOverrideMs = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.machine.DispenseMetadata} returns this
+ */
+proto.machine.DispenseMetadata.prototype.setMinDurationOverrideMs = function(value) {
+  return jspb.Message.setProto3IntField(this, 3, value);
+};
+
+
+/**
+ * optional uint64 speed_mult_override = 4;
+ * @return {number}
+ */
+proto.machine.DispenseMetadata.prototype.getSpeedMultOverride = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.machine.DispenseMetadata} returns this
+ */
+proto.machine.DispenseMetadata.prototype.setSpeedMultOverride = function(value) {
+  return jspb.Message.setProto3IntField(this, 4, value);
 };
 
 
@@ -3895,8 +3955,8 @@ proto.machine.VialProfile.toObject = function(includeInstance, msg) {
     description: jspb.Message.getFieldWithDefault(msg, 2, ""),
     slopUl: jspb.Message.getFloatingPointFieldWithDefault(msg, 3, 0.0),
     dispenseVolumeUl: jspb.Message.getFloatingPointFieldWithDefault(msg, 4, 0.0),
-    footageDelayMs: jspb.Message.getFloatingPointFieldWithDefault(msg, 5, 0.0),
-    footageDurationMs: jspb.Message.getFloatingPointFieldWithDefault(msg, 6, 0.0),
+    footageDelayMs: jspb.Message.getFieldWithDefault(msg, 5, 0),
+    footageMinDurationMs: jspb.Message.getFieldWithDefault(msg, 6, 0),
     footageSpeedMult: jspb.Message.getFloatingPointFieldWithDefault(msg, 7, 0.0),
     footageIgnore: jspb.Message.getBooleanFieldWithDefault(msg, 8, false),
     initialVolumeUl: jspb.Message.getFloatingPointFieldWithDefault(msg, 9, 0.0),
@@ -3954,12 +4014,12 @@ proto.machine.VialProfile.deserializeBinaryFromReader = function(msg, reader) {
       msg.setDispenseVolumeUl(value);
       break;
     case 5:
-      var value = /** @type {number} */ (reader.readFloat());
+      var value = /** @type {number} */ (reader.readUint64());
       msg.setFootageDelayMs(value);
       break;
     case 6:
-      var value = /** @type {number} */ (reader.readFloat());
-      msg.setFootageDurationMs(value);
+      var value = /** @type {number} */ (reader.readUint64());
+      msg.setFootageMinDurationMs(value);
       break;
     case 7:
       var value = /** @type {number} */ (reader.readFloat());
@@ -4035,15 +4095,15 @@ proto.machine.VialProfile.serializeBinaryToWriter = function(message, writer) {
     );
   }
   f = message.getFootageDelayMs();
-  if (f !== 0.0) {
-    writer.writeFloat(
+  if (f !== 0) {
+    writer.writeUint64(
       5,
       f
     );
   }
-  f = message.getFootageDurationMs();
-  if (f !== 0.0) {
-    writer.writeFloat(
+  f = message.getFootageMinDurationMs();
+  if (f !== 0) {
+    writer.writeUint64(
       6,
       f
     );
@@ -4152,11 +4212,11 @@ proto.machine.VialProfile.prototype.setDispenseVolumeUl = function(value) {
 
 
 /**
- * optional float footage_delay_ms = 5;
+ * optional uint64 footage_delay_ms = 5;
  * @return {number}
  */
 proto.machine.VialProfile.prototype.getFootageDelayMs = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 5, 0.0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
 };
 
 
@@ -4165,16 +4225,16 @@ proto.machine.VialProfile.prototype.getFootageDelayMs = function() {
  * @return {!proto.machine.VialProfile} returns this
  */
 proto.machine.VialProfile.prototype.setFootageDelayMs = function(value) {
-  return jspb.Message.setProto3FloatField(this, 5, value);
+  return jspb.Message.setProto3IntField(this, 5, value);
 };
 
 
 /**
- * optional float footage_duration_ms = 6;
+ * optional uint64 footage_min_duration_ms = 6;
  * @return {number}
  */
-proto.machine.VialProfile.prototype.getFootageDurationMs = function() {
-  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 6, 0.0));
+proto.machine.VialProfile.prototype.getFootageMinDurationMs = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
 };
 
 
@@ -4182,8 +4242,8 @@ proto.machine.VialProfile.prototype.getFootageDurationMs = function() {
  * @param {number} value
  * @return {!proto.machine.VialProfile} returns this
  */
-proto.machine.VialProfile.prototype.setFootageDurationMs = function(value) {
-  return jspb.Message.setProto3FloatField(this, 6, value);
+proto.machine.VialProfile.prototype.setFootageMinDurationMs = function(value) {
+  return jspb.Message.setProto3IntField(this, 6, value);
 };
 
 
