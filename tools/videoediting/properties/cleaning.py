@@ -36,7 +36,7 @@ class CleaningPropertyManager(BasePropertyManager):
 
         # speed up from selected dslr to drain start
         if video_state.canvas_status == CanvasStatus.DURING:
-            props.speed = 50
+            props.speed = 150
             return props, delay, min_duration
 
         if state_report.status == pb.Status.SHUTTING_DOWN:
@@ -47,9 +47,9 @@ class CleaningPropertyManager(BasePropertyManager):
                 state_report.fluid_request.fluid_type == pb.FluidType.FLUID_DRAIN and
                 not state_report.fluid_request.complete
         ):
-            delay = 4
-            props.max_duration = 30
-            props.speed = 2
+            delay = 5
+            props.max_duration = 35
+            props.speed = 2.5
             return props, delay, min_duration
 
         if (
@@ -57,8 +57,8 @@ class CleaningPropertyManager(BasePropertyManager):
                 not state_report.fluid_request.complete
         ):
             delay = 3.5
-            props.max_duration = 50
-            props.speed = 2
+            props.max_duration = 60
+            props.speed = 2.5
             return props, delay, min_duration
 
         if video_state.canvas_status == CanvasStatus.AFTER and state_report.fluid_request.complete:

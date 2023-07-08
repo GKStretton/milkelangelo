@@ -31,9 +31,9 @@ dye = pb.VialProfile(
     id=0,
     description="dye",
     footage_delay_ms=0,
-    footage_min_duration_ms=2000,
+    footage_min_duration_ms=0,
     footage_speed_mult=3,
-    footage_ignore=False
+    footage_ignore=True
 )
 
 emulsifier = pb.VialProfile(
@@ -48,7 +48,7 @@ isopropyl = pb.VialProfile(
     id=2,
     description="isopropyl alcohol",
     footage_delay_ms=0,
-    footage_min_duration_ms=2500,
+    footage_min_duration_ms=1750,
     footage_speed_mult=1
 )
 

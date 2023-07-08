@@ -52,7 +52,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("-s", "--start-at", action="store",
                         help="set final clip start to this time (s), useful with preview", default=0)
     parser.add_argument("-y", "--yes", action="store_true",
-                        help="auto-yes to render confirmation", default=True)
+                        help="auto-yes to render confirmation")
     parser.add_argument("-f", "--full-duration", action="store_true",
                         help="if true, do not limit video duration to max dur")
 

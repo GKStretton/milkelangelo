@@ -11,6 +11,8 @@ from videoediting.compositor_helpers import (
     build_session_number,
 )
 
+SHOW_TWITCH_BANNER = False
+
 
 def timezones():
     from datetime import datetime, time
@@ -162,12 +164,13 @@ def build_outro(
         )
     )
 
-    clips.extend(
-        build_twitch_block(
-            (60, 1250) if portrait else (10, 390),
-            duration
+    if SHOW_TWITCH_BANNER:
+        clips.extend(
+            build_twitch_block(
+                (60, 1250) if portrait else (10, 390),
+                duration
+            )
         )
-    )
 
     # SOCIAL ICONS
     SI_BASEPATH = "../resources/social_icons"

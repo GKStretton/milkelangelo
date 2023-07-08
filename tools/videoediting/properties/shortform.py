@@ -7,7 +7,7 @@ class ShortFormPropertyManager(BasePropertyManager):
     def is_applicable(self, props: SectionProperties) -> bool:
         if props.skip:
             return False
-        if props.speed >= 3.0 and props.speed <= 40:
+        if props.speed >= 3.0:
             return True
         return False
 
@@ -51,7 +51,7 @@ class ShortFormPropertyManager(BasePropertyManager):
             props.speed = 15
         elif state_report.pipette_state.dispense_request_number < 1:
             # initial collection and movement is slower
-            props.speed = 5
+            props.speed = 10
         elif state_report.status == pb.Status.NAVIGATING_IK:
             props.speed = 15
         elif state_report.status == pb.Status.IDLE_STATIONARY:
@@ -81,6 +81,7 @@ class ShortFormPropertyManager(BasePropertyManager):
 
             # override speed of first dispense
             if state_report.pipette_state.dispense_request_number <= 1:
-                props.speed = 1
+                props.speed = 3
+                min_duration = 3
 
         return props, delay, min_duration
