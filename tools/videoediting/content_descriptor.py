@@ -255,13 +255,26 @@ class ContentDescriptor:
         if reduction <= threshold:
             logging.info(f"No duration reduction needed: {full_total:.2f}s <= {max_duration + threshold:.2f}s")
             return
+        if reduction >= applicable_duration:
+            logging.error("cannot reduce video by %d: "
+                          "it's more than the applicable amount of time %d",
+                          reduction, applicable_duration)
+            exit(1)
 
         new_applicable_time = applicable_duration - reduction
         # Find speed factor to achieve the reduction
         speed_factor = applicable_duration / new_applicable_time
 
-        logging.info(f"Target reduction of {reduction:.2f}s, {speed_factor:.2f} factor per applicable property")
-        logging.info(f"Calculated total duration: {full_total:.2f}s, applicable: {applicable_duration:.2f}s.")
+        logging.info(f"Target reduction of {reduction:.2f}s, "
+                     "{speed_factor:.2f} factor per applicable property")
+        logging.info(f"Calculated total duration: "
+                     "{full_total:.2f}s, applicable: {applicable_duration:.2f}s.")
+
+        max_sf = 3
+        if speed_factor > max_sf:
+            logging.error(
+                "speed factor %f is greater than max %f, deemed too much speed up. "
+                "please adjust settings", speed_factor, max_sf)
 
         # apply reduction
         for _, v in enumerate(self.properties):

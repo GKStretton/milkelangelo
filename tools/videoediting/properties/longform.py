@@ -1,3 +1,4 @@
+import logging
 from videoediting.constants import *
 from videoediting.properties.content_property_manager import *
 from videoediting.loaders import MiscData
@@ -10,12 +11,13 @@ class LongFormPropertyManager(BasePropertyManager):
         return False
 
     def get_max_content_duration(self) -> typing.Optional[float]:
-        return 20*60.0
+        return None
+        # return 20*60.0
 
     def get_stills_config(self) -> StillsConfig:
         return StillsConfig(
             intro_duration=4.33,
-            outro_duration=10,
+            outro_duration=15,
         )
 
     def get_format(self) -> Format:
@@ -34,12 +36,17 @@ class LongFormPropertyManager(BasePropertyManager):
         if props.skip:
             return props, delay, min_duration
 
+        if state_report.status == pb.Status.WAKING_UP:
+            delay += 1
+
         # DISPENSE
         if state_report.status == pb.Status.DISPENSING:
             dispense_metadata = dm_wrapper.get_dispense_metadata_from_sr(state_report)
             if dispense_metadata:
-                props.skip = dispense_metadata.failed_dispense
                 delay = dispense_metadata.dispense_delay_ms / 1000.0
+                # * I think we should include the failures, the longform should be close
+                # * to reality, I should fix root problems rather than masking them here.
+                # props.skip = dispense_metadata.failed_dispense
 
             # we use min_duration to prevent early speedup when system goes idle
             vial_profile = profile_snapshot.profiles.get(state_report.pipette_state.vial_held)
@@ -51,6 +58,9 @@ class LongFormPropertyManager(BasePropertyManager):
                 if dispense_metadata.min_duration_override_ms != 0:
                     min_duration = dispense_metadata.min_duration_override_ms / 1000.0
 
+            # Basically forces speed 1 for at least 30 seconds after the latest dispense
+            min_duration = min(20, min_duration)
+
         if state_report.status == pb.Status.WAITING_FOR_DISPENSE:
             # we shouldn't be waiting for dispense. In future could add a timeout
             # that forces dispense after being still a certain time. liquid should
@@ -59,7 +69,7 @@ class LongFormPropertyManager(BasePropertyManager):
 
         if (
                 state_report.status == pb.Status.IDLE_STATIONARY and
-                video_state.canvas_status == CanvasStatus.DURING
+                state_report.fluid_request.complete
         ):
             props.speed = 20
 
