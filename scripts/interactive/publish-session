@@ -8,7 +8,7 @@ if [ -z "$1" ]; then
 	exit 1
 fi
 
-google-chrome --profile-directory="Profile 3" --new-window \
+google-chrome --profile-directory="Profile 2" --new-window \
 	https://studio.youtube.com/channel/UCAvwN8vS3f0FFNxWoh3jqyQ/videos/upload?d=ud \
 	https://www.tiktok.com/upload/ \
 	https://www.instagram.com/astudyoflight_/ \
