@@ -2,7 +2,9 @@ import { Button, Grid, Typography } from "@mui/material";
 import "./Profiles.css";
 import { useSystemVialProfiles, useVialProfiles } from "../util/hooks";
 import { SystemVialConfiguration, VialProfile, VialProfileCollection } from "../machinepb/machine";
-import { KV_KEY_ALL_VIAL_PROFILES } from "../topics_backend/topics_backend";
+import { KV_KEY_ALL_VIAL_PROFILES, KV_KEY_SYSTEM_VIAL_PROFILES, TOPIC_KV_GET } from "../topics_backend/topics_backend";
+import { useContext } from "react";
+import MqttContext from "../util/mqttContext";
 
 // I still don't understand the type/value distinction that gives rise to this
 // const VialProfileCollectionMethods = VialProfileCollection;
@@ -16,6 +18,17 @@ export default function Profiles() {
   //   KV_KEY_ALL_VIAL_PROFILES,
   //   VialProfileCollection
   // );
+
+  const { client: c } = useContext(MqttContext);
+
+  const requestProfiles = () => {
+    if (!c || !c.connected) {
+      console.error(`cannot request profiles, client not connected: ${c}`);
+      return;
+    }
+    c?.publish(TOPIC_KV_GET + KV_KEY_ALL_VIAL_PROFILES, "");
+    c?.publish(TOPIC_KV_GET + KV_KEY_SYSTEM_VIAL_PROFILES, "");
+  };
 
   // testing
   const setProfiles = () => {
@@ -48,6 +61,7 @@ export default function Profiles() {
       </Typography>
       <Button onClick={setSystemProfiles}>Test</Button>
       <textarea id="systemProfiles" readOnly value={JSON.stringify(systemVialProfiles, null, 2)}></textarea>
+      <Button onClick={requestProfiles}>Force request profiles</Button>
     </>
   );
 }
