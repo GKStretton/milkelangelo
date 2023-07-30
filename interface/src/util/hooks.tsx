@@ -25,15 +25,13 @@ export function useProtoTopic(topic: string): Buffer | null {
 
   // Subscribe
   useEffect(() => {
+    if (!c || !c.connected) {
+      return;
+    }
     c?.subscribe(topic, (m) => {
       console.log(`subscribed to '${topic}': ${m}`);
     });
   }, [c?.connected]);
-
-  if (!c || !c.connected) {
-    console.error("cannot useProtoTopic, client not connected:", c);
-    return null;
-  }
 
   return messages[topic] ?? null;
 }
@@ -60,27 +58,68 @@ export function useStreamStatus(): StreamStatus | null {
 }
 
 export function useVialProfiles(): [VialProfileCollection | null, (collection: VialProfileCollection) => void] {
-  const msg: Buffer | null = useProtoTopic(TOPIC_KV_GET_RESP + KV_KEY_ALL_VIAL_PROFILES);
-  const obj = msg ? JSON.parse(msg.toString()) : null;
-  const profile = obj ? VialProfileCollection.fromJSON(obj) : null;
-
   const { client: c } = useContext(MqttContext);
 
   // initial get request
   useEffect(() => {
+    if (!c || !c.connected) {
+      console.error(`cannot get vial profiles, client not connected: ${c}`);
+      return;
+    }
     console.log("initial getting vial profiles");
     c?.publish(TOPIC_KV_GET + KV_KEY_ALL_VIAL_PROFILES, "");
-  }, []);
+  }, [c?.connected]);
 
   // publish function to be returned
   const pub = (collection: VialProfileCollection) => {
-    if (!c) {
+    if (!c || !c.connected) {
       console.error("cannot publish vial profile collection because mqtt client is null");
       return;
     }
-    const json = JSON.stringify(VialProfileCollection.toJSON(collection), null, 2);
+    const json = JSON.stringify(collection, null, 2);
     c.publish(TOPIC_KV_SET + KV_KEY_ALL_VIAL_PROFILES, json);
   };
+
+  const msg: Buffer | null = useProtoTopic(TOPIC_KV_GET_RESP + KV_KEY_ALL_VIAL_PROFILES);
+  if (!msg || msg.toString() == "") return [null, pub];
+
+  const obj = JSON.parse(msg.toString());
+  const profile = obj ? VialProfileCollection.fromJSON(obj) : null;
+
+  return [profile, pub];
+}
+
+export function useSystemVialProfiles(): [
+  SystemVialConfiguration | null,
+  (collection: SystemVialConfiguration) => void
+] {
+  const { client: c } = useContext(MqttContext);
+
+  // initial get request
+  useEffect(() => {
+    if (!c || !c.connected) {
+      console.error(`cannot get system profiles, client not connected: ${c}`);
+      return;
+    }
+    console.log("initial getting system vial profiles");
+    c?.publish(TOPIC_KV_GET + KV_KEY_SYSTEM_VIAL_PROFILES, "");
+  }, [c?.connected]);
+
+  // publish function to be returned
+  const pub = (collection: SystemVialConfiguration) => {
+    if (!c || !c.connected) {
+      console.error("cannot publish system vial profile collection because mqtt client is null");
+      return;
+    }
+    const json = JSON.stringify(collection, null, 2);
+    c.publish(TOPIC_KV_SET + KV_KEY_SYSTEM_VIAL_PROFILES, json);
+  };
+
+  const msg: Buffer | null = useProtoTopic(TOPIC_KV_GET_RESP + KV_KEY_SYSTEM_VIAL_PROFILES);
+  if (!msg || msg.toString() == "") return [null, pub];
+
+  const obj = JSON.parse(msg.toString());
+  const profile = obj ? SystemVialConfiguration.fromJSON(obj) : null;
 
   return [profile, pub];
 }
