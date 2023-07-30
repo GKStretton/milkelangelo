@@ -22,15 +22,7 @@ import {
   TOPIC_STREAM_END,
   TOPIC_STREAM_START,
 } from "../topics_backend/topics_backend";
-import {
-  SessionStatus,
-  SolenoidValve,
-  StateReport,
-  Status,
-  StreamStatus,
-  FluidType,
-  Node,
-} from "../machinepb/machine_pb";
+import { SessionStatus, SolenoidValve, StateReport, Status, StreamStatus, FluidType, Node } from "../machinepb/machine";
 import MqttContext from "../util/mqttContext";
 import {
   ButtonGroup,
@@ -47,6 +39,7 @@ import {
 } from "@mui/material";
 import { useSessionStatus, useStateReport, useStreamStatus } from "../util/hooks";
 import CollectDispense from "./CollectDispense";
+import Profiles from "./Profiles";
 
 export default function ControlGroup() {
   const [tabValue, setTabValue] = useState(0);
@@ -80,13 +73,13 @@ export default function ControlGroup() {
   });
 
   const isAwake: boolean =
-    !!stateReport && stateReport?.getStatus() !== Status.SLEEPING && stateReport?.getStatus() !== Status.E_STOP_ACTIVE;
+    !!stateReport && stateReport?.status !== Status.SLEEPING && stateReport?.status !== Status.E_STOP_ACTIVE;
 
   const noVials = 7;
   const vials = new Array(noVials).fill(0).map((_, i) => noVials - i);
 
-  const collecting: boolean = !!stateReport && stateReport?.getCollectionRequest()?.getCompleted() === false;
-  const collectingVial = collecting && stateReport?.getCollectionRequest()?.getVialNumber();
+  const collecting: boolean = !!stateReport && stateReport?.collectionRequest?.completed === false;
+  const collectingVial = collecting && stateReport?.collectionRequest?.vialNumber;
 
   const bulkRequests = [
     { id: 1, name: "Milk", fluid_type: FluidType.FLUID_MILK, open_drain: false },
@@ -132,6 +125,7 @@ export default function ControlGroup() {
       <Tabs value={tabValue} onChange={handleChange}>
         <Tab label="Core" />
         <Tab label="Overrides" />
+        <Tab label="Profiles" />
         <Tab label="Sessions" />
         <Tab label="Socials" />
       </Tabs>
@@ -151,36 +145,30 @@ export default function ControlGroup() {
             </Button>
           </ButtonGroup>
           <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
-            <Button
-              disabled={!streamStatus || streamStatus.getLive()}
-              onClick={() => c?.publish(TOPIC_STREAM_START, "")}
-            >
+            <Button disabled={!streamStatus || streamStatus.live} onClick={() => c?.publish(TOPIC_STREAM_START, "")}>
               Start Stream
             </Button>
-            <Button
-              disabled={!streamStatus || !streamStatus.getLive()}
-              onClick={() => c?.publish(TOPIC_STREAM_END, "")}
-            >
+            <Button disabled={!streamStatus || !streamStatus.live} onClick={() => c?.publish(TOPIC_STREAM_END, "")}>
               End Stream
             </Button>
           </ButtonGroup>
           <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
             <Button
-              disabled={!sessionStatus || !sessionStatus.getComplete() || sessionStatus.getPaused()}
+              disabled={!sessionStatus || !sessionStatus.complete || sessionStatus.paused}
               onClick={() => c?.publish(TOPIC_SESSION_BEGIN, "")}
             >
               {" "}
               Begin Session
             </Button>
             <Button
-              disabled={!sessionStatus || !sessionStatus.getComplete() || sessionStatus.getPaused()}
+              disabled={!sessionStatus || !sessionStatus.complete || sessionStatus.paused}
               variant="contained"
               onClick={() => c?.publish(TOPIC_SESSION_BEGIN, "PRODUCTION")}
             >
               Begin Prod. Session
             </Button>
             <Button
-              disabled={!sessionStatus || !sessionStatus.getPaused()}
+              disabled={!sessionStatus || !sessionStatus.paused}
               onClick={() => c?.publish(TOPIC_SESSION_RESUME, "")}
             >
               Resume Session
@@ -188,13 +176,13 @@ export default function ControlGroup() {
           </ButtonGroup>
           <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
             <Button
-              disabled={!sessionStatus || sessionStatus.getComplete() || sessionStatus.getPaused()}
+              disabled={!sessionStatus || sessionStatus.complete || sessionStatus.paused}
               onClick={() => c?.publish(TOPIC_SESSION_PAUSE, "")}
             >
               Pause Session
             </Button>
             <Button
-              disabled={!sessionStatus || sessionStatus.getComplete()}
+              disabled={!sessionStatus || sessionStatus.complete}
               onClick={() => c?.publish(TOPIC_SESSION_END, "")}
             >
               End Session
@@ -396,19 +384,21 @@ export default function ControlGroup() {
         </>
       )}
 
-      {tabValue === 2 && (
+      {tabValue === 2 && <Profiles />}
+
+      {tabValue === 3 && (
         <>
           <Typography>Not implemented: view all sessions, delete sessions, prune, generate post., etc.</Typography>
         </>
       )}
 
-      {tabValue === 3 && (
+      {tabValue === 4 && (
         <>
           <Typography>Not implemented: post to social media</Typography>
 
           <Button
             onClick={() =>
-              c?.publish("asol/videos-generated", sessionStatus?.getId() === 0 ? "" : String(sessionStatus?.getId()))
+              c?.publish("asol/videos-generated", sessionStatus?.id === 0 ? "" : String(sessionStatus?.id))
             }
           >
             Signal videos generated (do upload)

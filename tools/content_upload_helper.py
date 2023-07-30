@@ -5,7 +5,7 @@ from content_plan.loader import *
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata", required=True)
+	parser.add_argument("-d", "--base-dir", action="store", help="base directory containing session_content and session_metadata", default="/mnt/md0/light-stores")
 	parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5", required=True)
 	parser.add_argument("-i", "--ignore-uploaded", action="store_true", help="if true, skip posts that are marked as uploaded", default=True)
 	args = parser.parse_args()

@@ -63,6 +63,8 @@ github.com/gkstretton/asol-protos v0.0.9-0.20230707145941-126c327a13dd h1:yrvtkf
 github.com/gkstretton/asol-protos v0.0.9-0.20230707145941-126c327a13dd/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/gkstretton/asol-protos v0.0.9-0.20230708095357-d91016e3f669 h1:vgiuH7P+0tMEjk8kzqRLxva06K853GH3ObnPDCnPDR8=
 github.com/gkstretton/asol-protos v0.0.9-0.20230708095357-d91016e3f669/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.9-0.20230730084135-df600ca9d6a4 h1:WEtFFPZlkvQVWo41rWadTG/Ks1ta8JiWAUdvH3GrrbA=
+github.com/gkstretton/asol-protos v0.0.9-0.20230730084135-df600ca9d6a4/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
 github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
 github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da h1:oI5xCqsCo564l8iNU+DwB5epxmsaqB+rhGL0m5jtYqE=

@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { TOPIC_DISPENSE, TOPIC_COLLECT } from "../topics_firmware/topics_firmware";
-import { StateReport, Status } from "../machinepb/machine_pb";
+import { StateReport, Status } from "../machinepb/machine";
 import MqttContext from "../util/mqttContext";
 import { ButtonGroup, Button, Typography, Slider, Box, Tabs, Tab } from "@mui/material";
 import { useSessionStatus, useStateReport, useStreamStatus } from "../util/hooks";
@@ -16,10 +16,10 @@ export default function CollectDispense() {
   const [dropNumber, setDropNumber] = useState(3);
 
   const isAwake: boolean =
-    !!stateReport && stateReport?.getStatus() !== Status.SLEEPING && stateReport?.getStatus() !== Status.E_STOP_ACTIVE;
+    !!stateReport && stateReport?.status !== Status.SLEEPING && stateReport?.status !== Status.E_STOP_ACTIVE;
 
-  const collecting: boolean = !!stateReport && stateReport?.getCollectionRequest()?.getCompleted() === false;
-  const collectingVial = collecting && stateReport?.getCollectionRequest()?.getVialNumber();
+  const collecting: boolean = !!stateReport && stateReport?.collectionRequest?.completed === false;
+  const collectingVial = collecting && stateReport?.collectionRequest?.vialNumber;
 
   // DROP VOLUMES
   // water = 20ul
@@ -28,7 +28,7 @@ export default function CollectDispense() {
   const dropVolumeFromVial = (vial: number | undefined) => (vial === 4 ? 10.0 : 13.0);
 
   const getAutoDispenseVolume = () => {
-    return dropVolumeFromVial(stateReport?.getPipetteState()?.getVialHeld());
+    return dropVolumeFromVial(stateReport?.pipetteState?.vialHeld);
   };
 
   const requestCollection = (vial: number): void => {
@@ -53,7 +53,7 @@ export default function CollectDispense() {
   };
 
   const getDispensesRemaining = () => {
-    return (stateReport?.getPipetteState()?.getVolumeTargetUl() ?? 0) / getAutoDispenseVolume();
+    return (stateReport?.pipetteState?.volumeTargetUl ?? 0) / getAutoDispenseVolume();
   };
 
   useEffect(() => {
@@ -65,13 +65,13 @@ export default function CollectDispense() {
 
   const [latestFailedDispense, setLatestFailedDispense] = useState(-1);
   const markFailedDispense = () => {
-    setLatestFailedDispense(stateReport?.getPipetteState()?.getDispenseRequestNumber() ?? -1);
+    setLatestFailedDispense(stateReport?.pipetteState?.dispenseRequestNumber ?? -1);
     setLatestDelayedDispense(-1);
     c?.publish(TOPIC_MARK_FAILED_DISPENSE, "");
   };
   const [latestDelayedDispense, setLatestDelayedDispense] = useState(-1);
   const markDelayedDispense = () => {
-    setLatestDelayedDispense(stateReport?.getPipetteState()?.getDispenseRequestNumber() ?? -1);
+    setLatestDelayedDispense(stateReport?.pipetteState?.dispenseRequestNumber ?? -1);
     setLatestFailedDispense(-1);
     c?.publish(TOPIC_MARK_DELAYED_DISPENSE, "");
   };
@@ -106,7 +106,7 @@ export default function CollectDispense() {
       <Typography variant="body1">Dispenses remaining: {getDispensesRemaining()}</Typography>
       <Typography variant="body1">Auto-Dispense Volume: {getAutoDispenseVolume()}µl</Typography>
       <Button
-        disabled={!isAwake || collecting || stateReport?.getPipetteState()?.getSpent()}
+        disabled={!isAwake || collecting || stateReport?.pipetteState?.spent}
         onClick={() => c?.publish(TOPIC_DISPENSE, getAutoDispenseVolume().toString())}
         sx={{ margin: 1 }}
       >
@@ -116,8 +116,8 @@ export default function CollectDispense() {
         color="error"
         disabled={
           !isAwake ||
-          stateReport?.getPipetteState()?.getDispenseRequestNumber() == latestFailedDispense ||
-          stateReport?.getPipetteState()?.getDispenseRequestNumber() === 0
+          stateReport?.pipetteState?.dispenseRequestNumber === latestFailedDispense ||
+          stateReport?.pipetteState?.dispenseRequestNumber === 0
         }
         onClick={markFailedDispense}
       >
@@ -127,8 +127,8 @@ export default function CollectDispense() {
         color="error"
         disabled={
           !isAwake ||
-          stateReport?.getPipetteState()?.getDispenseRequestNumber() == latestDelayedDispense ||
-          stateReport?.getPipetteState()?.getDispenseRequestNumber() === 0
+          stateReport?.pipetteState?.dispenseRequestNumber === latestDelayedDispense ||
+          stateReport?.pipetteState?.dispenseRequestNumber === 0
         }
         onClick={markDelayedDispense}
       >

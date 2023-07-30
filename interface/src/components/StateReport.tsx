@@ -12,37 +12,20 @@ import {
 import { TOPIC_STATE_REPORT_RAW, TOPIC_STATE_REPORT_REQUEST } from "../topics_firmware/topics_firmware";
 import MqttContext from "../util/mqttContext";
 import { Grid, Button, Tabs, Tab } from "@mui/material";
+import { useProtoTopic } from "../util/hooks";
 
 export default function StateReport() {
-  const { client: c, messages } = useContext(MqttContext);
-  const stateReport = messages[TOPIC_STATE_REPORT_JSON];
-  const sessionStatus = messages[TOPIC_SESSION_STATUS_RESP_JSON];
-  const streamStatus = messages[TOPIC_STREAM_STATUS_RESP_JSON];
+  const { client: c } = useContext(MqttContext);
   const connected = c?.connected;
+
+  const stateReport = useProtoTopic(TOPIC_STATE_REPORT_JSON);
+  const sessionStatus = useProtoTopic(TOPIC_SESSION_STATUS_RESP_JSON);
+  const streamStatus = useProtoTopic(TOPIC_STREAM_STATUS_RESP_JSON);
 
   useEffect(() => {
     if (!c || !c.connected) {
       return;
     }
-    // todo: sub to the raw for when parsing individual fields
-    c.subscribe(TOPIC_STATE_REPORT_JSON, (m) => {
-      console.log("subscribed to state report", m);
-    });
-    c.subscribe(TOPIC_STATE_REPORT_RAW, (m) => {
-      console.log("subscribed to state report", m);
-    });
-    c.subscribe(TOPIC_SESSION_STATUS_RESP_JSON, (m) => {
-      console.log("subscribed to session status", m);
-    });
-    c.subscribe(TOPIC_SESSION_STATUS_RESP_RAW, (m) => {
-      console.log("subscribed to session status", m);
-    });
-    c.subscribe(TOPIC_STREAM_STATUS_RESP_JSON, (m) => {
-      console.log("subscribed to stream status", m);
-    });
-    c.subscribe(TOPIC_STREAM_STATUS_RESP_RAW, (m) => {
-      console.log("subscribed to stream status", m);
-    });
     c.publish(TOPIC_STATE_REPORT_REQUEST, "");
     c.publish(TOPIC_SESSION_STATUS_GET, "");
     c.publish(TOPIC_STREAM_STATUS_GET, "");
