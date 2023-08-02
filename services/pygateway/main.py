@@ -17,6 +17,8 @@ debug = False
 # If true, just print, don't handle serial
 justPrint = False
 
+mqtt_connected = False
+
 
 def debugf(msg, *args):
     if debug:
@@ -28,6 +30,7 @@ def debugf(msg, *args):
 
 
 def on_connect(client, userdata, flags, rc):
+    mqtt_connected = True
     client.subscribe([
         ("mega/req/#", 1),
         ("mega/flash", 1),
@@ -42,6 +45,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_disconnect(client, userdata, rc):
+    mqtt_connected = False
     print("MQTT disconnected")
     serialConn.close()
     print("closed serial")
@@ -156,7 +160,7 @@ if __name__ == "__main__":
 
     while not exiting:
         # Reconnect serial if down
-        if client.connected and not serialConn.isOpen():
+        if mqtt_connected and not serialConn.isOpen():
             serialConn.open()
             time.sleep(0.5)
 
@@ -175,13 +179,13 @@ if __name__ == "__main__":
                     debugf("received start symbol, discarding the following:", miscOutput)
                     # now it's the topic
                     topic = serialConn.read_until(TOPIC_END)[:-1]
-                    debugf("received topic end for '{}'".format(topic))
+                    debugf(f"received topic end for '{topic}'")
                     payloadType = serialConn.read()
-                    debugf("received payload type '{}'".format(payloadType))
+                    debugf(f"received payload type '{payloadType}'")
 
                     if payloadType == PLAINTEXT_IDENTIFIER:
                         payload = serialConn.read_until(PAYLOAD_END)[:-1]
-                        debugf("received plaintext payload '{}'".format(payload))
+                        debugf(f"received plaintext payload '{payload}'")
                     elif payloadType == PROTOBUF_IDENTIFIER:
                         # todo: support longer lengths than 255
                         payloadSizeRaw = serialConn.read(1)
