@@ -62,6 +62,10 @@ export default function CollectDispense() {
 
   const requestCollection = (vial: number): void => {
     const volume = dropNumber * dispenseVolumeFromVial(vial);
+    if (volume === 0) {
+      error("could not get volume");
+      return;
+    }
     c?.publish(TOPIC_COLLECT, `${vial.toString()},${volume}`);
   };
 
