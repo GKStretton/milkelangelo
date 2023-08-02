@@ -43,6 +43,9 @@ export function useStateReport(): StateReport | null {
   return StateReport.fromJSON(JSON.parse(msg.toString()));
 }
 
+// Could add an alternate useXRef that returns a ref wrapper so the latest
+// value can be accessed from within closures like the key listeners.
+
 export function useSessionStatus(): SessionStatus | null {
   const msg: Buffer | null = useProtoTopic(TOPIC_SESSION_STATUS_RESP_RAW);
   if (!msg) return null;

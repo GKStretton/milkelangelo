@@ -3,8 +3,15 @@ import { TOPIC_DISPENSE, TOPIC_COLLECT } from "../topics_firmware/topics_firmwar
 import { StateReport, Status } from "../machinepb/machine";
 import MqttContext from "../util/mqttContext";
 import { ButtonGroup, Button, Typography, Slider, Box, Tabs, Tab } from "@mui/material";
-import { useSessionStatus, useStateReport, useStreamStatus } from "../util/hooks";
+import {
+  useSessionStatus,
+  useStateReport,
+  useStreamStatus,
+  useSystemVialProfiles,
+  useVialProfiles,
+} from "../util/hooks";
 import { TOPIC_MARK_DELAYED_DISPENSE, TOPIC_MARK_FAILED_DISPENSE } from "../topics_backend/topics_backend";
+import { vialDisabled } from "./helpers";
 
 export default function CollectDispense() {
   const noVials = 7;
@@ -12,6 +19,8 @@ export default function CollectDispense() {
 
   const { client: c, messages } = useContext(MqttContext);
   const stateReport: StateReport | null = useStateReport();
+  const [vialProfiles, setVialProfiles] = useVialProfiles();
+  const [systemVialProfiles, setSystemVialProfiles] = useSystemVialProfiles();
 
   const [dropNumber, setDropNumber] = useState(3);
 
@@ -25,18 +34,38 @@ export default function CollectDispense() {
   // water = 20ul
   // temporary emulsifier = 12ul
   // dye (green) = 14ul
-  const dropVolumeFromVial = (vial: number | undefined) => (vial === 4 ? 10.0 : 13.0);
+  const dispenseVolumeFromVial = (vial: number | undefined): number => {
+    if (!vial) {
+      console.error(`cannot get drop volume for ${vial}`);
+      return 0;
+    }
+
+    const vialProfileId = systemVialProfiles?.vials[vial];
+    if (vialProfileId === undefined) {
+      console.error(`cannot find system profile for vial ${vial}: ${systemVialProfiles}`);
+      return 0;
+    }
+
+    const vialProfile = vialProfiles?.profiles[vialProfileId];
+    if (vialProfile === undefined) {
+      console.error(`cannot find profile for profileId ${vialProfileId}: ${vialProfiles}`);
+      return 0;
+    }
+
+    return vialProfile.dispenseVolumeUl;
+  };
 
   const getAutoDispenseVolume = () => {
-    return dropVolumeFromVial(stateReport?.pipetteState?.vialHeld);
+    return dispenseVolumeFromVial(stateReport?.pipetteState?.vialHeld);
   };
 
   const requestCollection = (vial: number): void => {
-    const volume = dropNumber * dropVolumeFromVial(vial);
+    const volume = dropNumber * dispenseVolumeFromVial(vial);
     c?.publish(TOPIC_COLLECT, `${vial.toString()},${volume}`);
   };
 
   const keyDownHandler = (event: KeyboardEvent) => {
+    console.log(`key handler, ${dropNumber}, ${event}`);
     const key = event.key;
 
     const num = parseInt(key, 10);
@@ -61,8 +90,10 @@ export default function CollectDispense() {
     return () => {
       window.removeEventListener("keydown", keyDownHandler);
     };
-  }, [c, stateReport, dropNumber]);
+  }, [c, stateReport, dropNumber, vialProfiles, systemVialProfiles]);
 
+  // Keeps track of dispense status so the failed / delayed buttons can be greyed
+  // out according to what's already been pressed.
   const [latestFailedDispense, setLatestFailedDispense] = useState(-1);
   const markFailedDispense = () => {
     setLatestFailedDispense(stateReport?.pipetteState?.dispenseRequestNumber ?? -1);
@@ -95,7 +126,7 @@ export default function CollectDispense() {
         {vials.map((vial) => (
           <Button
             key={vial}
-            disabled={!isAwake || collecting}
+            disabled={!isAwake || collecting || vialDisabled(vial)}
             variant={collectingVial === vial ? "contained" : "outlined"}
             onClick={() => requestCollection(vial)}
           >
