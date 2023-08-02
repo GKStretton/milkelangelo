@@ -4,7 +4,7 @@
 CAMERA=$1
 CONFIG_FILE="/config/crop_${CAMERA}"
 HOST="localhost"
-SCRIPT_PATH="/scripts/getcrop.sh"
+SCRIPT_PATH="/scripts/getcrop"
 
 echo $CONFIG_FILE
 
