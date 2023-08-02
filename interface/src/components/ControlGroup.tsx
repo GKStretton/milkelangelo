@@ -40,8 +40,10 @@ import {
 import { useSessionStatus, useStateReport, useStreamStatus } from "../util/hooks";
 import CollectDispense from "./CollectDispense";
 import Profiles from "./Profiles";
+import { useError } from "./ErrorManager";
 
 export default function ControlGroup() {
+  const error = useError();
   const [tabValue, setTabValue] = useState(0);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -380,6 +382,17 @@ export default function ControlGroup() {
             sx={{ margin: 2 }}
           >
             Close Cover
+          </Button>
+
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => {
+              error("test");
+            }}
+            sx={{ margin: 2 }}
+          >
+            Test Error
           </Button>
         </>
       )}

@@ -12,11 +12,13 @@ import {
 } from "../util/hooks";
 import { TOPIC_MARK_DELAYED_DISPENSE, TOPIC_MARK_FAILED_DISPENSE } from "../topics_backend/topics_backend";
 import { vialDisabled } from "./helpers";
+import { useError } from "./ErrorManager";
 
 export default function CollectDispense() {
   const noVials = 7;
   const vials = new Array(noVials).fill(0).map((_, i) => noVials - i);
 
+  const error = useError();
   const { client: c, messages } = useContext(MqttContext);
   const stateReport: StateReport | null = useStateReport();
   const [vialProfiles, setVialProfiles] = useVialProfiles();
@@ -36,19 +38,18 @@ export default function CollectDispense() {
   // dye (green) = 14ul
   const dispenseVolumeFromVial = (vial: number | undefined): number => {
     if (!vial) {
-      console.error(`cannot get drop volume for ${vial}`);
-      return 0;
+      return NaN;
     }
 
     const vialProfileId = systemVialProfiles?.vials[vial];
     if (vialProfileId === undefined) {
-      console.error(`cannot find system profile for vial ${vial}: ${systemVialProfiles}`);
+      error(`cannot find system profile for vial ${vial}: ${systemVialProfiles}`);
       return 0;
     }
 
     const vialProfile = vialProfiles?.profiles[vialProfileId];
     if (vialProfile === undefined) {
-      console.error(`cannot find profile for profileId ${vialProfileId}: ${vialProfiles}`);
+      error(`cannot find profile for profileId ${vialProfileId}: ${vialProfiles}`);
       return 0;
     }
 

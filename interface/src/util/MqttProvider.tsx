@@ -2,6 +2,7 @@
 import React, { useState, useEffect, ReactNode } from "react";
 import mqtt, { MqttClient } from "precompiled-mqtt";
 import MqttContext, { MqttContextValue } from "./mqttContext";
+import { useError } from "../components/ErrorManager";
 
 interface MqttProviderProps {
   url: string;
@@ -19,6 +20,8 @@ const MqttProvider: React.FC<MqttProviderProps> = ({ url, children }) => {
   const [credentials, setCredentials] = useState<Credentials>({ username: "", password: "" });
 
   const do_auth: boolean = process.env.REACT_APP_MQTT_AUTHENTICATE === "true";
+
+  const error = useError();
 
   useEffect(() => {
     if (!do_auth || (credentials.username && credentials.password)) return;
@@ -51,6 +54,10 @@ const MqttProvider: React.FC<MqttProviderProps> = ({ url, children }) => {
         ...prevMessages,
         [topic]: message,
       }));
+    });
+
+    mqttClient.on("error", (e) => {
+      error(`mqtt error: ${e}`);
     });
 
     return () => {
