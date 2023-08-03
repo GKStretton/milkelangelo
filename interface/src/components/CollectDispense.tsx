@@ -61,6 +61,7 @@ export default function CollectDispense() {
   };
 
   const requestCollection = (vial: number): void => {
+    console.log(`request collection vial ${vial}`);
     const volume = dropNumber * dispenseVolumeFromVial(vial);
     if (volume === 0) {
       error("could not get volume");
@@ -87,7 +88,10 @@ export default function CollectDispense() {
   };
 
   const getDispensesRemaining = () => {
-    return (stateReport?.pipetteState?.volumeTargetUl ?? 0) / getAutoDispenseVolume();
+    const dispenseVolume = getAutoDispenseVolume();
+    if (dispenseVolume === 0) return 0;
+
+    return (stateReport?.pipetteState?.volumeTargetUl ?? 0) / dispenseVolume;
   };
 
   useEffect(() => {

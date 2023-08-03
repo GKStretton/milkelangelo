@@ -857,9 +857,9 @@ export const PipetteState = {
   fromJSON(object: any): PipetteState {
     return {
       spent: isSet(object.spent) ? Boolean(object.spent) : false,
-      vialHeld: isSet(object.vialHeld) ? Number(object.vialHeld) : 0,
-      volumeTargetUl: isSet(object.volumeTargetUl) ? Number(object.volumeTargetUl) : 0,
-      dispenseRequestNumber: isSet(object.dispenseRequestNumber) ? Number(object.dispenseRequestNumber) : 0,
+      vialHeld: isSet(object.vial_held) ? Number(object.vial_held) : 0,
+      volumeTargetUl: isSet(object.volume_target_ul) ? Number(object.volume_target_ul) : 0,
+      dispenseRequestNumber: isSet(object.dispense_request_number) ? Number(object.dispense_request_number) : 0,
     };
   },
 
@@ -869,13 +869,13 @@ export const PipetteState = {
       obj.spent = message.spent;
     }
     if (message.vialHeld !== 0) {
-      obj.vialHeld = Math.round(message.vialHeld);
+      obj.vial_held = Math.round(message.vialHeld);
     }
     if (message.volumeTargetUl !== 0) {
-      obj.volumeTargetUl = message.volumeTargetUl;
+      obj.volume_target_ul = message.volumeTargetUl;
     }
     if (message.dispenseRequestNumber !== 0) {
-      obj.dispenseRequestNumber = Math.round(message.dispenseRequestNumber);
+      obj.dispense_request_number = Math.round(message.dispenseRequestNumber);
     }
     return obj;
   },
@@ -961,9 +961,9 @@ export const CollectionRequest = {
   fromJSON(object: any): CollectionRequest {
     return {
       completed: isSet(object.completed) ? Boolean(object.completed) : false,
-      requestNumber: isSet(object.requestNumber) ? Number(object.requestNumber) : 0,
-      vialNumber: isSet(object.vialNumber) ? Number(object.vialNumber) : 0,
-      volumeUl: isSet(object.volumeUl) ? Number(object.volumeUl) : 0,
+      requestNumber: isSet(object.request_number) ? Number(object.request_number) : 0,
+      vialNumber: isSet(object.vial_number) ? Number(object.vial_number) : 0,
+      volumeUl: isSet(object.volume_ul) ? Number(object.volume_ul) : 0,
     };
   },
 
@@ -973,13 +973,13 @@ export const CollectionRequest = {
       obj.completed = message.completed;
     }
     if (message.requestNumber !== 0) {
-      obj.requestNumber = Math.round(message.requestNumber);
+      obj.request_number = Math.round(message.requestNumber);
     }
     if (message.vialNumber !== 0) {
-      obj.vialNumber = Math.round(message.vialNumber);
+      obj.vial_number = Math.round(message.vialNumber);
     }
     if (message.volumeUl !== 0) {
-      obj.volumeUl = message.volumeUl;
+      obj.volume_ul = message.volumeUl;
     }
     return obj;
   },
@@ -1074,30 +1074,30 @@ export const MovementDetails = {
 
   fromJSON(object: any): MovementDetails {
     return {
-      targetXUnit: isSet(object.targetXUnit) ? Number(object.targetXUnit) : 0,
-      targetYUnit: isSet(object.targetYUnit) ? Number(object.targetYUnit) : 0,
-      targetZIk: isSet(object.targetZIk) ? Number(object.targetZIk) : 0,
-      targetRingDeg: isSet(object.targetRingDeg) ? Number(object.targetRingDeg) : 0,
-      targetYawDeg: isSet(object.targetYawDeg) ? Number(object.targetYawDeg) : 0,
+      targetXUnit: isSet(object.target_x_unit) ? Number(object.target_x_unit) : 0,
+      targetYUnit: isSet(object.target_y_unit) ? Number(object.target_y_unit) : 0,
+      targetZIk: isSet(object.target_z_ik) ? Number(object.target_z_ik) : 0,
+      targetRingDeg: isSet(object.target_ring_deg) ? Number(object.target_ring_deg) : 0,
+      targetYawDeg: isSet(object.target_yaw_deg) ? Number(object.target_yaw_deg) : 0,
     };
   },
 
   toJSON(message: MovementDetails): unknown {
     const obj: any = {};
     if (message.targetXUnit !== 0) {
-      obj.targetXUnit = message.targetXUnit;
+      obj.target_x_unit = message.targetXUnit;
     }
     if (message.targetYUnit !== 0) {
-      obj.targetYUnit = message.targetYUnit;
+      obj.target_y_unit = message.targetYUnit;
     }
     if (message.targetZIk !== 0) {
-      obj.targetZIk = message.targetZIk;
+      obj.target_z_ik = message.targetZIk;
     }
     if (message.targetRingDeg !== 0) {
-      obj.targetRingDeg = message.targetRingDeg;
+      obj.target_ring_deg = message.targetRingDeg;
     }
     if (message.targetYawDeg !== 0) {
-      obj.targetYawDeg = message.targetYawDeg;
+      obj.target_yaw_deg = message.targetYawDeg;
     }
     return obj;
   },
@@ -1184,9 +1184,9 @@ export const FluidRequest = {
   fromJSON(object: any): FluidRequest {
     return {
       fluidType: isSet(object.fluidType) ? fluidTypeFromJSON(object.fluidType) : 0,
-      volumeMl: isSet(object.volumeMl) ? Number(object.volumeMl) : 0,
+      volumeMl: isSet(object.volume_ml) ? Number(object.volume_ml) : 0,
       complete: isSet(object.complete) ? Boolean(object.complete) : false,
-      openDrain: isSet(object.openDrain) ? Boolean(object.openDrain) : false,
+      openDrain: isSet(object.open_drain) ? Boolean(object.open_drain) : false,
     };
   },
 
@@ -1196,13 +1196,13 @@ export const FluidRequest = {
       obj.fluidType = fluidTypeToJSON(message.fluidType);
     }
     if (message.volumeMl !== 0) {
-      obj.volumeMl = message.volumeMl;
+      obj.volume_ml = message.volumeMl;
     }
     if (message.complete === true) {
       obj.complete = message.complete;
     }
     if (message.openDrain === true) {
-      obj.openDrain = message.openDrain;
+      obj.open_drain = message.openDrain;
     }
     return obj;
   },
@@ -1256,13 +1256,13 @@ export const FluidDetails = {
   },
 
   fromJSON(object: any): FluidDetails {
-    return { bowlFluidLevelMl: isSet(object.bowlFluidLevelMl) ? Number(object.bowlFluidLevelMl) : 0 };
+    return { bowlFluidLevelMl: isSet(object.bowl_fluid_level_ml) ? Number(object.bowl_fluid_level_ml) : 0 };
   },
 
   toJSON(message: FluidDetails): unknown {
     const obj: any = {};
     if (message.bowlFluidLevelMl !== 0) {
-      obj.bowlFluidLevelMl = message.bowlFluidLevelMl;
+      obj.bowl_fluid_level_ml = message.bowlFluidLevelMl;
     }
     return obj;
   },
@@ -1448,31 +1448,31 @@ export const StateReport = {
 
   fromJSON(object: any): StateReport {
     return {
-      timestampUnixMicros: isSet(object.timestampUnixMicros) ? Number(object.timestampUnixMicros) : 0,
-      startupCounter: isSet(object.startupCounter) ? Number(object.startupCounter) : 0,
+      timestampUnixMicros: isSet(object.timestamp_unix_micros) ? Number(object.timestamp_unix_micros) : 0,
+      startupCounter: isSet(object.startup_counter) ? Number(object.startup_counter) : 0,
       mode: isSet(object.mode) ? modeFromJSON(object.mode) : 0,
       status: isSet(object.status) ? statusFromJSON(object.status) : 0,
-      lightsOn: isSet(object.lightsOn) ? Boolean(object.lightsOn) : false,
-      pipetteState: isSet(object.pipetteState) ? PipetteState.fromJSON(object.pipetteState) : undefined,
-      collectionRequest: isSet(object.collectionRequest)
-        ? CollectionRequest.fromJSON(object.collectionRequest)
+      lightsOn: isSet(object.lights_on) ? Boolean(object.lights_on) : false,
+      pipetteState: isSet(object.pipette_state) ? PipetteState.fromJSON(object.pipette_state) : undefined,
+      collectionRequest: isSet(object.collection_request)
+        ? CollectionRequest.fromJSON(object.collection_request)
         : undefined,
-      movementDetails: isSet(object.movementDetails) ? MovementDetails.fromJSON(object.movementDetails) : undefined,
-      fluidRequest: isSet(object.fluidRequest) ? FluidRequest.fromJSON(object.fluidRequest) : undefined,
-      fluidDetails: isSet(object.fluidDetails) ? FluidDetails.fromJSON(object.fluidDetails) : undefined,
+      movementDetails: isSet(object.movement_details) ? MovementDetails.fromJSON(object.movement_details) : undefined,
+      fluidRequest: isSet(object.fluid_request) ? FluidRequest.fromJSON(object.fluid_request) : undefined,
+      fluidDetails: isSet(object.fluid_details) ? FluidDetails.fromJSON(object.fluid_details) : undefined,
       paused: isSet(object.paused) ? Boolean(object.paused) : false,
-      timestampReadable: isSet(object.timestampReadable) ? String(object.timestampReadable) : "",
-      latestDslrFileNumber: isSet(object.latestDslrFileNumber) ? Number(object.latestDslrFileNumber) : 0,
+      timestampReadable: isSet(object.timestamp_readable) ? String(object.timestamp_readable) : "",
+      latestDslrFileNumber: isSet(object.latest_dslr_file_number) ? Number(object.latest_dslr_file_number) : 0,
     };
   },
 
   toJSON(message: StateReport): unknown {
     const obj: any = {};
     if (message.timestampUnixMicros !== 0) {
-      obj.timestampUnixMicros = Math.round(message.timestampUnixMicros);
+      obj.timestamp_unix_micros = Math.round(message.timestampUnixMicros);
     }
     if (message.startupCounter !== 0) {
-      obj.startupCounter = Math.round(message.startupCounter);
+      obj.startup_counter = Math.round(message.startupCounter);
     }
     if (message.mode !== 0) {
       obj.mode = modeToJSON(message.mode);
@@ -1481,31 +1481,31 @@ export const StateReport = {
       obj.status = statusToJSON(message.status);
     }
     if (message.lightsOn === true) {
-      obj.lightsOn = message.lightsOn;
+      obj.lights_on = message.lightsOn;
     }
     if (message.pipetteState !== undefined) {
-      obj.pipetteState = PipetteState.toJSON(message.pipetteState);
+      obj.pipette_state = PipetteState.toJSON(message.pipetteState);
     }
     if (message.collectionRequest !== undefined) {
-      obj.collectionRequest = CollectionRequest.toJSON(message.collectionRequest);
+      obj.collection_request = CollectionRequest.toJSON(message.collectionRequest);
     }
     if (message.movementDetails !== undefined) {
-      obj.movementDetails = MovementDetails.toJSON(message.movementDetails);
+      obj.movement_details = MovementDetails.toJSON(message.movementDetails);
     }
     if (message.fluidRequest !== undefined) {
-      obj.fluidRequest = FluidRequest.toJSON(message.fluidRequest);
+      obj.fluid_request = FluidRequest.toJSON(message.fluidRequest);
     }
     if (message.fluidDetails !== undefined) {
-      obj.fluidDetails = FluidDetails.toJSON(message.fluidDetails);
+      obj.fluid_details = FluidDetails.toJSON(message.fluidDetails);
     }
     if (message.paused === true) {
       obj.paused = message.paused;
     }
     if (message.timestampReadable !== "") {
-      obj.timestampReadable = message.timestampReadable;
+      obj.timestamp_readable = message.timestampReadable;
     }
     if (message.latestDslrFileNumber !== 0) {
-      obj.latestDslrFileNumber = Math.round(message.latestDslrFileNumber);
+      obj.latest_dslr_file_number = Math.round(message.latestDslrFileNumber);
     }
     return obj;
   },
@@ -1684,7 +1684,7 @@ export const SessionStatus = {
       paused: isSet(object.paused) ? Boolean(object.paused) : false,
       complete: isSet(object.complete) ? Boolean(object.complete) : false,
       production: isSet(object.production) ? Boolean(object.production) : false,
-      productionId: isSet(object.productionId) ? Number(object.productionId) : 0,
+      productionId: isSet(object.production_id) ? Number(object.production_id) : 0,
     };
   },
 
@@ -1703,7 +1703,7 @@ export const SessionStatus = {
       obj.production = message.production;
     }
     if (message.productionId !== 0) {
-      obj.productionId = Math.round(message.productionId);
+      obj.production_id = Math.round(message.productionId);
     }
     return obj;
   },
@@ -1819,8 +1819,8 @@ export const DispenseMetadataMap = {
 
   fromJSON(object: any): DispenseMetadataMap {
     return {
-      dispenseMetadata: isObject(object.dispenseMetadata)
-        ? Object.entries(object.dispenseMetadata).reduce<{ [key: string]: DispenseMetadata }>((acc, [key, value]) => {
+      dispenseMetadata: isObject(object.dispense_metadata)
+        ? Object.entries(object.dispense_metadata).reduce<{ [key: string]: DispenseMetadata }>((acc, [key, value]) => {
           acc[key] = DispenseMetadata.fromJSON(value);
           return acc;
         }, {})
@@ -1833,9 +1833,9 @@ export const DispenseMetadataMap = {
     if (message.dispenseMetadata) {
       const entries = Object.entries(message.dispenseMetadata);
       if (entries.length > 0) {
-        obj.dispenseMetadata = {};
+        obj.dispense_metadata = {};
         entries.forEach(([k, v]) => {
-          obj.dispenseMetadata[k] = DispenseMetadata.toJSON(v);
+          obj.dispense_metadata[k] = DispenseMetadata.toJSON(v);
         });
       }
     }
@@ -2006,26 +2006,26 @@ export const DispenseMetadata = {
 
   fromJSON(object: any): DispenseMetadata {
     return {
-      failedDispense: isSet(object.failedDispense) ? Boolean(object.failedDispense) : false,
-      dispenseDelayMs: isSet(object.dispenseDelayMs) ? Number(object.dispenseDelayMs) : 0,
-      minDurationOverrideMs: isSet(object.minDurationOverrideMs) ? Number(object.minDurationOverrideMs) : 0,
-      speedMultOverride: isSet(object.speedMultOverride) ? Number(object.speedMultOverride) : 0,
+      failedDispense: isSet(object.failed_dispense) ? Boolean(object.failed_dispense) : false,
+      dispenseDelayMs: isSet(object.dispense_delay_ms) ? Number(object.dispense_delay_ms) : 0,
+      minDurationOverrideMs: isSet(object.min_duration_override_ms) ? Number(object.min_duration_override_ms) : 0,
+      speedMultOverride: isSet(object.speed_mult_override) ? Number(object.speed_mult_override) : 0,
     };
   },
 
   toJSON(message: DispenseMetadata): unknown {
     const obj: any = {};
     if (message.failedDispense === true) {
-      obj.failedDispense = message.failedDispense;
+      obj.failed_dispense = message.failedDispense;
     }
     if (message.dispenseDelayMs !== 0) {
-      obj.dispenseDelayMs = Math.round(message.dispenseDelayMs);
+      obj.dispense_delay_ms = Math.round(message.dispenseDelayMs);
     }
     if (message.minDurationOverrideMs !== 0) {
-      obj.minDurationOverrideMs = Math.round(message.minDurationOverrideMs);
+      obj.min_duration_override_ms = Math.round(message.minDurationOverrideMs);
     }
     if (message.speedMultOverride !== 0) {
-      obj.speedMultOverride = Math.round(message.speedMultOverride);
+      obj.speed_mult_override = Math.round(message.speedMultOverride);
     }
     return obj;
   },
@@ -2103,14 +2103,14 @@ export const ContentTypeStatuses = {
 
   fromJSON(object: any): ContentTypeStatuses {
     return {
-      contentStatuses: isObject(object.contentStatuses)
-        ? Object.entries(object.contentStatuses).reduce<{ [key: string]: ContentTypeStatus }>((acc, [key, value]) => {
+      contentStatuses: isObject(object.content_statuses)
+        ? Object.entries(object.content_statuses).reduce<{ [key: string]: ContentTypeStatus }>((acc, [key, value]) => {
           acc[key] = ContentTypeStatus.fromJSON(value);
           return acc;
         }, {})
         : {},
       splashtext: isSet(object.splashtext) ? String(object.splashtext) : "",
-      splashtextHue: isSet(object.splashtextHue) ? Number(object.splashtextHue) : 0,
+      splashtextHue: isSet(object.splashtext_hue) ? Number(object.splashtext_hue) : 0,
     };
   },
 
@@ -2119,9 +2119,9 @@ export const ContentTypeStatuses = {
     if (message.contentStatuses) {
       const entries = Object.entries(message.contentStatuses);
       if (entries.length > 0) {
-        obj.contentStatuses = {};
+        obj.content_statuses = {};
         entries.forEach(([k, v]) => {
-          obj.contentStatuses[k] = ContentTypeStatus.toJSON(v);
+          obj.content_statuses[k] = ContentTypeStatus.toJSON(v);
         });
       }
     }
@@ -2129,7 +2129,7 @@ export const ContentTypeStatuses = {
       obj.splashtext = message.splashtext;
     }
     if (message.splashtextHue !== 0) {
-      obj.splashtextHue = Math.round(message.splashtextHue);
+      obj.splashtext_hue = Math.round(message.splashtextHue);
     }
     return obj;
   },
@@ -2301,8 +2301,8 @@ export const ContentTypeStatus = {
 
   fromJSON(object: any): ContentTypeStatus {
     return {
-      rawTitle: isSet(object.rawTitle) ? String(object.rawTitle) : "",
-      rawDescription: isSet(object.rawDescription) ? String(object.rawDescription) : "",
+      rawTitle: isSet(object.raw_title) ? String(object.raw_title) : "",
+      rawDescription: isSet(object.raw_description) ? String(object.raw_description) : "",
       caption: isSet(object.caption) ? String(object.caption) : "",
       posts: Array.isArray(object?.posts) ? object.posts.map((e: any) => Post.fromJSON(e)) : [],
     };
@@ -2311,10 +2311,10 @@ export const ContentTypeStatus = {
   toJSON(message: ContentTypeStatus): unknown {
     const obj: any = {};
     if (message.rawTitle !== "") {
-      obj.rawTitle = message.rawTitle;
+      obj.raw_title = message.rawTitle;
     }
     if (message.rawDescription !== "") {
-      obj.rawDescription = message.rawDescription;
+      obj.raw_description = message.rawDescription;
     }
     if (message.caption !== "") {
       obj.caption = message.caption;
@@ -2455,13 +2455,13 @@ export const Post = {
   fromJSON(object: any): Post {
     return {
       platform: isSet(object.platform) ? socialPlatformFromJSON(object.platform) : 0,
-      subPlatform: isSet(object.subPlatform) ? String(object.subPlatform) : "",
+      subPlatform: isSet(object.sub_platform) ? String(object.sub_platform) : "",
       title: isSet(object.title) ? String(object.title) : "",
       description: isSet(object.description) ? String(object.description) : "",
       uploaded: isSet(object.uploaded) ? Boolean(object.uploaded) : false,
       url: isSet(object.url) ? String(object.url) : "",
       crosspost: isSet(object.crosspost) ? Boolean(object.crosspost) : false,
-      scheduledUnixTimetamp: isSet(object.scheduledUnixTimetamp) ? Number(object.scheduledUnixTimetamp) : 0,
+      scheduledUnixTimetamp: isSet(object.scheduled_unix_timetamp) ? Number(object.scheduled_unix_timetamp) : 0,
     };
   },
 
@@ -2471,7 +2471,7 @@ export const Post = {
       obj.platform = socialPlatformToJSON(message.platform);
     }
     if (message.subPlatform !== "") {
-      obj.subPlatform = message.subPlatform;
+      obj.sub_platform = message.subPlatform;
     }
     if (message.title !== "") {
       obj.title = message.title;
@@ -2489,7 +2489,7 @@ export const Post = {
       obj.crosspost = message.crosspost;
     }
     if (message.scheduledUnixTimetamp !== 0) {
-      obj.scheduledUnixTimetamp = Math.round(message.scheduledUnixTimetamp);
+      obj.scheduled_unix_timetamp = Math.round(message.scheduledUnixTimetamp);
     }
     return obj;
   },
@@ -2725,14 +2725,14 @@ export const VialProfile = {
     return {
       id: isSet(object.id) ? Number(object.id) : 0,
       description: isSet(object.description) ? String(object.description) : "",
-      slopUl: isSet(object.slopUl) ? Number(object.slopUl) : 0,
-      dispenseVolumeUl: isSet(object.dispenseVolumeUl) ? Number(object.dispenseVolumeUl) : 0,
-      footageDelayMs: isSet(object.footageDelayMs) ? Number(object.footageDelayMs) : 0,
-      footageMinDurationMs: isSet(object.footageMinDurationMs) ? Number(object.footageMinDurationMs) : 0,
-      footageSpeedMult: isSet(object.footageSpeedMult) ? Number(object.footageSpeedMult) : 0,
-      footageIgnore: isSet(object.footageIgnore) ? Boolean(object.footageIgnore) : false,
-      initialVolumeUl: isSet(object.initialVolumeUl) ? Number(object.initialVolumeUl) : 0,
-      currentVolumeUl: isSet(object.currentVolumeUl) ? Number(object.currentVolumeUl) : 0,
+      slopUl: isSet(object.slop_ul) ? Number(object.slop_ul) : 0,
+      dispenseVolumeUl: isSet(object.dispense_volume_ul) ? Number(object.dispense_volume_ul) : 0,
+      footageDelayMs: isSet(object.footage_delay_ms) ? Number(object.footage_delay_ms) : 0,
+      footageMinDurationMs: isSet(object.footage_min_duration_ms) ? Number(object.footage_min_duration_ms) : 0,
+      footageSpeedMult: isSet(object.footage_speed_mult) ? Number(object.footage_speed_mult) : 0,
+      footageIgnore: isSet(object.footage_ignore) ? Boolean(object.footage_ignore) : false,
+      initialVolumeUl: isSet(object.initial_volume_ul) ? Number(object.initial_volume_ul) : 0,
+      currentVolumeUl: isSet(object.current_volume_ul) ? Number(object.current_volume_ul) : 0,
     };
   },
 
@@ -2745,28 +2745,28 @@ export const VialProfile = {
       obj.description = message.description;
     }
     if (message.slopUl !== 0) {
-      obj.slopUl = message.slopUl;
+      obj.slop_ul = message.slopUl;
     }
     if (message.dispenseVolumeUl !== 0) {
-      obj.dispenseVolumeUl = message.dispenseVolumeUl;
+      obj.dispense_volume_ul = message.dispenseVolumeUl;
     }
     if (message.footageDelayMs !== 0) {
-      obj.footageDelayMs = Math.round(message.footageDelayMs);
+      obj.footage_delay_ms = Math.round(message.footageDelayMs);
     }
     if (message.footageMinDurationMs !== 0) {
-      obj.footageMinDurationMs = Math.round(message.footageMinDurationMs);
+      obj.footage_min_duration_ms = Math.round(message.footageMinDurationMs);
     }
     if (message.footageSpeedMult !== 0) {
-      obj.footageSpeedMult = message.footageSpeedMult;
+      obj.footage_speed_mult = message.footageSpeedMult;
     }
     if (message.footageIgnore === true) {
-      obj.footageIgnore = message.footageIgnore;
+      obj.footage_ignore = message.footageIgnore;
     }
     if (message.initialVolumeUl !== 0) {
-      obj.initialVolumeUl = message.initialVolumeUl;
+      obj.initial_volume_ul = message.initialVolumeUl;
     }
     if (message.currentVolumeUl !== 0) {
-      obj.currentVolumeUl = message.currentVolumeUl;
+      obj.current_volume_ul = message.currentVolumeUl;
     }
     return obj;
   },
