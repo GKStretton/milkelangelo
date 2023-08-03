@@ -24,7 +24,7 @@ var lock = &sync.Mutex{}
 
 var subs = subscriptions{}
 
-const timeout = time.Second * time.Duration(2)
+const timeout = time.Millisecond * time.Duration(250)
 
 func Start() {
 	_ = paho.CRITICAL
@@ -35,7 +35,7 @@ func Start() {
 		SetConnectionLostHandler(on_disconnect),
 	)
 	token := client.Connect()
-	if !token.WaitTimeout(time.Second * time.Duration(5)) {
+	if !token.WaitTimeout(time.Second * time.Duration(2)) {
 		panic("mqtt client connect timed out")
 	}
 	if token.Error() != nil {
