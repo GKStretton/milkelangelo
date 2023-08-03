@@ -77,7 +77,7 @@ export default function ControlGroup() {
   const isAwake: boolean =
     !!stateReport && stateReport?.status !== Status.SLEEPING && stateReport?.status !== Status.E_STOP_ACTIVE;
 
-  const noVials = 7;
+  const noVials = 6;
   const vials = new Array(noVials).fill(0).map((_, i) => noVials - i);
 
   const collecting: boolean = !!stateReport && stateReport?.collectionRequest?.completed === false;

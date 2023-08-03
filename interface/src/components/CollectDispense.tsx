@@ -15,8 +15,8 @@ import { vialDisabled } from "./helpers";
 import { useError } from "./ErrorManager";
 
 export default function CollectDispense() {
-  const noVials = 7;
-  const vials = new Array(noVials).fill(0).map((_, i) => noVials - i);
+  const noVials = 6;
+  const vials = new Array(noVials - 1).fill(0).map((_, i) => noVials - i);
 
   const error = useError();
   const { client: c, messages } = useContext(MqttContext);
@@ -74,7 +74,7 @@ export default function CollectDispense() {
     const key = event.key;
 
     const num = parseInt(key, 10);
-    if (num >= 1 && num <= 7) {
+    if (num >= 1 && num <= noVials) {
       requestCollection(num);
       return;
     }

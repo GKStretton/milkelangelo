@@ -1,4 +1,4 @@
 
 export const vialDisabled = (vial: number): boolean => {
-return vial <= 1 || vial >= 7;
+return vial <= 1 || vial >= 6;
 };
