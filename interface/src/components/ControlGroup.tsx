@@ -61,7 +61,7 @@ export default function ControlGroup() {
 
   useEffect(() => {
     c?.publish(TOPIC_SET_IK_Z, zLevel.toString());
-  });
+  }, [zLevel]);
 
   // Create an array of marks with a 5µl interval
   const marks = Array.from({ length: 21 }, (_, i) => {
