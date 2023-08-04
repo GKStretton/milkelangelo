@@ -13,6 +13,7 @@ import {
   TOPIC_TOGGLE_MANUAL,
   TOPIC_SET_COVER_OPEN,
   TOPIC_SET_COVER_CLOSE,
+  TOPIC_RINSE,
 } from "../topics_firmware/topics_firmware";
 import {
   TOPIC_SESSION_BEGIN,
@@ -393,6 +394,16 @@ export default function ControlGroup() {
             sx={{ margin: 2 }}
           >
             Test Error
+          </Button>
+
+          <Button
+            disabled={!isAwake}
+            variant="contained"
+            color="error"
+            onClick={() => c?.publish(TOPIC_RINSE, "")}
+            sx={{ margin: 2 }}
+          >
+            Rinse
           </Button>
         </>
       )}
