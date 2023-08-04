@@ -309,7 +309,7 @@ export default function ControlGroup() {
           />
 
           <Button
-            disabled={!isAwake || collecting}
+            disabled={!isAwake || stateReport?.pipetteState?.spent}
             onClick={() => c?.publish(TOPIC_DISPENSE, dispenseVolume.toString())}
             sx={{ margin: 2 }}
           >

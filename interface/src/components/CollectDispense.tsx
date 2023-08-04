@@ -146,7 +146,7 @@ export default function CollectDispense() {
       <Typography variant="body1">Dispenses remaining: {getDispensesRemaining()}</Typography>
       <Typography variant="body1">Auto-Dispense Volume: {getAutoDispenseVolume()}µl</Typography>
       <Button
-        disabled={!isAwake || collecting || stateReport?.pipetteState?.spent}
+        disabled={!isAwake || stateReport?.pipetteState?.spent}
         onClick={() => c?.publish(TOPIC_DISPENSE, getAutoDispenseVolume().toString())}
         sx={{ margin: 1 }}
       >
