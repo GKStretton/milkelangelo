@@ -77,6 +77,13 @@ class Status(betterproto.Enum):
     NAVIGATING_OUTER = 75
 
 
+class RinseStatus(betterproto.Enum):
+    RINSE_UNDEFINED = 0
+    RINSE_COMPLETE = 1
+    RINSE_REQUESTED = 2
+    RINSE_EXPELLING = 3
+
+
 class FluidType(betterproto.Enum):
     FLUID_UNDEFINED = 0
     FLUID_DRAIN = 1
@@ -165,6 +172,7 @@ class StateReport(betterproto.Message):
     movement_details: "MovementDetails" = betterproto.message_field(12)
     fluid_request: "FluidRequest" = betterproto.message_field(13)
     fluid_details: "FluidDetails" = betterproto.message_field(14)
+    rinse_status: "RinseStatus" = betterproto.enum_field(15)
     # the following are populated by the backend, useful in post-processing
     paused: bool = betterproto.bool_field(50)
     timestamp_readable: str = betterproto.string_field(51)

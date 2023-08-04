@@ -402,6 +402,51 @@ export function statusToJSON(object: Status): string {
   }
 }
 
+export enum RinseStatus {
+  RINSE_UNDEFINED = 0,
+  RINSE_COMPLETE = 1,
+  RINSE_REQUESTED = 2,
+  RINSE_EXPELLING = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function rinseStatusFromJSON(object: any): RinseStatus {
+  switch (object) {
+    case 0:
+    case "RINSE_UNDEFINED":
+      return RinseStatus.RINSE_UNDEFINED;
+    case 1:
+    case "RINSE_COMPLETE":
+      return RinseStatus.RINSE_COMPLETE;
+    case 2:
+    case "RINSE_REQUESTED":
+      return RinseStatus.RINSE_REQUESTED;
+    case 3:
+    case "RINSE_EXPELLING":
+      return RinseStatus.RINSE_EXPELLING;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return RinseStatus.UNRECOGNIZED;
+  }
+}
+
+export function rinseStatusToJSON(object: RinseStatus): string {
+  switch (object) {
+    case RinseStatus.RINSE_UNDEFINED:
+      return "RINSE_UNDEFINED";
+    case RinseStatus.RINSE_COMPLETE:
+      return "RINSE_COMPLETE";
+    case RinseStatus.RINSE_REQUESTED:
+      return "RINSE_REQUESTED";
+    case RinseStatus.RINSE_EXPELLING:
+      return "RINSE_EXPELLING";
+    case RinseStatus.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export enum FluidType {
   FLUID_UNDEFINED = 0,
   FLUID_DRAIN = 1,
@@ -626,9 +671,8 @@ export interface StateReport {
   collectionRequest: CollectionRequest | undefined;
   movementDetails: MovementDetails | undefined;
   fluidRequest: FluidRequest | undefined;
-  fluidDetails:
-    | FluidDetails
-    | undefined;
+  fluidDetails: FluidDetails | undefined;
+  rinseStatus: RinseStatus;
   /** the following are populated by the backend, useful in post-processing */
   paused: boolean;
   timestampReadable: string;
@@ -1289,6 +1333,7 @@ function createBaseStateReport(): StateReport {
     movementDetails: undefined,
     fluidRequest: undefined,
     fluidDetails: undefined,
+    rinseStatus: 0,
     paused: false,
     timestampReadable: "",
     latestDslrFileNumber: 0,
@@ -1326,6 +1371,9 @@ export const StateReport = {
     }
     if (message.fluidDetails !== undefined) {
       FluidDetails.encode(message.fluidDetails, writer.uint32(114).fork()).ldelim();
+    }
+    if (message.rinseStatus !== 0) {
+      writer.uint32(120).int32(message.rinseStatus);
     }
     if (message.paused === true) {
       writer.uint32(400).bool(message.paused);
@@ -1416,6 +1464,13 @@ export const StateReport = {
 
           message.fluidDetails = FluidDetails.decode(reader, reader.uint32());
           continue;
+        case 15:
+          if (tag !== 120) {
+            break;
+          }
+
+          message.rinseStatus = reader.int32() as any;
+          continue;
         case 50:
           if (tag !== 400) {
             break;
@@ -1460,6 +1515,7 @@ export const StateReport = {
       movementDetails: isSet(object.movement_details) ? MovementDetails.fromJSON(object.movement_details) : undefined,
       fluidRequest: isSet(object.fluid_request) ? FluidRequest.fromJSON(object.fluid_request) : undefined,
       fluidDetails: isSet(object.fluid_details) ? FluidDetails.fromJSON(object.fluid_details) : undefined,
+      rinseStatus: isSet(object.rinse_status) ? rinseStatusFromJSON(object.rinse_status) : 0,
       paused: isSet(object.paused) ? Boolean(object.paused) : false,
       timestampReadable: isSet(object.timestamp_readable) ? String(object.timestamp_readable) : "",
       latestDslrFileNumber: isSet(object.latest_dslr_file_number) ? Number(object.latest_dslr_file_number) : 0,
@@ -1498,6 +1554,9 @@ export const StateReport = {
     if (message.fluidDetails !== undefined) {
       obj.fluid_details = FluidDetails.toJSON(message.fluidDetails);
     }
+    if (message.rinseStatus !== 0) {
+      obj.rinse_status = rinseStatusToJSON(message.rinseStatus);
+    }
     if (message.paused === true) {
       obj.paused = message.paused;
     }
@@ -1535,6 +1594,7 @@ export const StateReport = {
     message.fluidDetails = (object.fluidDetails !== undefined && object.fluidDetails !== null)
       ? FluidDetails.fromPartial(object.fluidDetails)
       : undefined;
+    message.rinseStatus = object.rinseStatus ?? 0;
     message.paused = object.paused ?? false;
     message.timestampReadable = object.timestampReadable ?? "";
     message.latestDslrFileNumber = object.latestDslrFileNumber ?? 0;

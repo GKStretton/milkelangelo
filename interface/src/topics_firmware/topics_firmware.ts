@@ -13,6 +13,7 @@ export const TOPIC_LOGS_WARN: string = "mega/l/warn";
 export const TOPIC_MARK_SAFE_TO_CALIBRATE: string = "mega/req/safe-to-calibrate";
 export const TOPIC_PIN_OFF: string = "mega/req/pin-off";
 export const TOPIC_PIN_ON: string = "mega/req/pin-on";
+export const TOPIC_RINSE: string = "mega/req/rinse";
 export const TOPIC_SET_COVER_CLOSE: string = "mega/req/cover-close";
 export const TOPIC_SET_COVER_OPEN: string = "mega/req/cover-open";
 export const TOPIC_SET_COVER_SERVO_US: string = "mega/req/cover-servo-us";
