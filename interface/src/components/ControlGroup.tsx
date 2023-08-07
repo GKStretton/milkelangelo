@@ -14,6 +14,7 @@ import {
   TOPIC_SET_COVER_OPEN,
   TOPIC_SET_COVER_CLOSE,
   TOPIC_RINSE,
+  TOPIC_MAINTENANCE,
 } from "../topics_firmware/topics_firmware";
 import {
   TOPIC_SESSION_BEGIN,
@@ -317,6 +318,14 @@ export default function ControlGroup() {
           </Button>
 
           <Typography variant="h6">Other</Typography>
+          <Button
+            disabled={!isAwake}
+            variant="contained"
+            onClick={() => c?.publish(TOPIC_MAINTENANCE, "")}
+            sx={{ margin: 2 }}
+          >
+            Goto Maintenance Position
+          </Button>
           <Button
             disabled={!isAwake}
             variant="contained"

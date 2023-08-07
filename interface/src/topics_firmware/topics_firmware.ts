@@ -10,6 +10,7 @@ export const TOPIC_LOGS_DEBUG: string = "mega/l/debug";
 export const TOPIC_LOGS_ERROR: string = "mega/l/error";
 export const TOPIC_LOGS_INFO: string = "mega/l/info";
 export const TOPIC_LOGS_WARN: string = "mega/l/warn";
+export const TOPIC_MAINTENANCE: string = "mega/req/maintenance";
 export const TOPIC_MARK_SAFE_TO_CALIBRATE: string = "mega/req/safe-to-calibrate";
 export const TOPIC_PIN_OFF: string = "mega/req/pin-off";
 export const TOPIC_PIN_ON: string = "mega/req/pin-on";

@@ -3,8 +3,8 @@ module github.com/gkstretton/dark/services/dslrcapture
 go 1.19
 
 require (
-	github.com/gkstretton/asol-protos v0.0.9-0.20230804144538-bf3933f9ad99
-	github.com/gkstretton/dark/services/goo v0.0.0-20230803132643-0b7abd4a539a
+	github.com/gkstretton/asol-protos v0.0.9-0.20230807192124-7711ca1debf8
+	github.com/gkstretton/dark/services/goo v0.0.0-20230804194852-dc9d03011d45
 	google.golang.org/protobuf v1.31.0
 )
 
@@ -16,7 +16,7 @@ require (
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
-	golang.org/x/net v0.13.0 // indirect
+	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
