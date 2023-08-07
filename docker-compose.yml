@@ -57,18 +57,6 @@ services:
       - ./tools:/src/tools
       - ./resources:/src/resources
       - ./services/goo:/goo
-  restreamer:
-    image: "datarhei/restreamer:latest"
-    restart: unless-stopped
-    volumes:
-      - /opt/restreamer/config:/core/config
-      - /opt/restreamer/data:/core/data
-    ports:
-      - 8080:8080
-      - 8181:8181
-      - 1935:1935
-      - 1936:1936
-      - 6000:6000/udp
   interface:
     build:
       context: ./interface
