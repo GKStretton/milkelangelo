@@ -54,8 +54,8 @@ services:
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev
-      - ./tools:/src/tools
-      - ./resources:/src/resources
+      - ./tools:/tools
+      - ./resources:/resources
       - ./services/goo:/goo
   interface:
     build:

@@ -63,7 +63,7 @@ func captureSessionImage(sessionId uint64) {
 
 func captureImage(p string) error {
 	if util.EnvBool("MOCK_DSLR") {
-		copyCmd := exec.Command("cp", "./resources/static_img/dslr_fallback.jpg", p)
+		copyCmd := exec.Command("cp", "/resources/static_img/dslr_fallback.jpg", p)
 		err := copyCmd.Run()
 		if err != nil {
 			return fmt.Errorf("error copying fallback dslr image: %v", err)
@@ -85,12 +85,12 @@ func captureImage(p string) error {
 }
 
 func processImage(imgPath, outDir string) error {
-	postCmd := exec.Command("python3", "./tools/content_generation_dslr_edit.py",
+	postCmd := exec.Command("python3", "/tools/content_generation_dslr_edit.py",
 		"-i", imgPath, "-o", outDir,
 	)
 	postCmd.Stderr = os.Stdout
 	// postCmd.Stdout = os.Stdout
-	err := postCmd.Start()
+	err := postCmd.Run()
 	if err != nil {
 		return fmt.Errorf("failed to start imagePost cmd: %v", err)
 	}
