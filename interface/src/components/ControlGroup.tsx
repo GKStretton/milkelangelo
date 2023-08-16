@@ -59,7 +59,7 @@ export default function ControlGroup() {
   const [dispenseVolume, setDispenseVolume] = useState(10.0);
   const [collectionVolume, setCollectionVolume] = useState(30.0);
   const [bulkFluidRequestVolume, setBulkFluidRequestVolume] = useState(200.0);
-  const [zLevel, setZLevel] = useState(43);
+  const [zLevel, setZLevel] = useState(44);
 
   useEffect(() => {
     c?.publish(TOPIC_SET_IK_Z, zLevel.toString());
