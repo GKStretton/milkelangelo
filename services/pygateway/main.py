@@ -201,7 +201,8 @@ if __name__ == "__main__":
                         print("error, payloadType", payloadType, "is invalid")
                         print("Closing serial connection")
                         serialConn.close()
-                        continue
+                        print("Exiting")
+                        exit(1)
 
                     print("topic:", topic, "; payload:", payload)
                     client.publish(topic.decode("utf-8"), payload)
