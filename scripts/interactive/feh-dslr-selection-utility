@@ -11,6 +11,8 @@ fi
 DIR=$(pwd)
 DSLR_DIR=/mnt/md0/light-stores/session_content/$1/dslr/post
 cd $DSLR_DIR
-feh --action1 "; $DIR/tools/util/select-dslr-image %F" --scale-down --draw-filename .
+echo "key '1' to select the image. 'q' to quit."
+feh --action1 "; $DIR/scripts/util/select-dslr-image %F" --scale-down --draw-filename .
 
+echo "done, press enter to quit"
 read

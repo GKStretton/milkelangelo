@@ -3,4 +3,4 @@
 CONTENT_DIR=/mnt/md0/light-stores/session_content/
 cd tools
 source .venv/bin/activate
-python3 tools/content_generation_dslr_edit.py --input ${CONTENT_DIR}$1/dslr/raw/$2 --output ${CONTENT_DIR}/$1/dslr/post
+python3 content_generation_dslr_edit.py --input ${CONTENT_DIR}$1/dslr/raw/$2 --output ${CONTENT_DIR}/$1/dslr/post

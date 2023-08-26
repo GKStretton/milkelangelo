@@ -11,7 +11,7 @@ from videoediting.compositor_helpers import (
     build_session_number,
 )
 
-SHOW_TWITCH_BANNER = False
+SHOW_TWITCH_BANNER = True
 
 
 def timezones():

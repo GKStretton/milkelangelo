@@ -24,7 +24,7 @@ power_line_frequency=1
 # value as it already is. Seems to just stay at a silent 0 even though the value
 # changes
 v4l2-ctl --device $path --set-ctrl \
-focus_absolute=29,\
+focus_absolute=25,\
 white_balance_temperature=5000
 
 v4l2-ctl --device $path --set-ctrl \
@@ -34,7 +34,7 @@ exposure_absolute=70
 
 # wait so focus set happens while camera is up (streamcam bug?)
 sleep 1.5
-v4l2-ctl --device $path --set-ctrl focus_absolute=30
+v4l2-ctl --device $path --set-ctrl focus_absolute=26
 
 # Fix for red camera effect
 sleep 0.05
