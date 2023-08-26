@@ -20,8 +20,8 @@ class DispenseMetadataWrapper:
                 meta: pb.DispenseMetadataMap = pb.DispenseMetadataMap().from_dict(value=yml)
                 return meta
         except FileNotFoundError:
-            logging.error("no dispense metadata found")
-            return None
+            logging.warning("no dispense metadata found")
+            return pb.DispenseMetadataMap()
 
     def get_dispense_metadata(self, startup_counter: int, dispense_request_number: int) -> Optional[pb.DispenseMetadata]:
         if self.metadata is None:
