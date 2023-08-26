@@ -1,4 +1,4 @@
-moviepy==1.0.3
+moviepy @ git+https://github.com/Zulko/moviepy@b5bb086
 betterproto==2.0.0b5
 opencv-python
 Pillow
