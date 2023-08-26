@@ -1,4 +1,6 @@
+#!/bin/bash
 # setup handles setup of python environment
+set -e
 
 cd tools
 python3 -m venv .venv

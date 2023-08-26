@@ -52,9 +52,10 @@ if __name__ == "__main__":
 
     duration = 1
 
-    dslr_img = get_selected_dslr_realpath(base_dir, session_number)
-    date_time = get_file_date_time(dslr_img)
-    dslr_clip = ImageClip(dslr_img).with_duration(duration)
+    dslr_path = get_selected_dslr_realpath(base_dir, session_number)
+    # creationtime is on the raw not post file
+    date_time = get_file_date_time(dslr_path.replace("/post/", "/raw/"))
+    dslr_clip = ImageClip(dslr_path).with_duration(duration)
     w, h = dslr_clip.size
 
     align_x, align_y = -1080, -350

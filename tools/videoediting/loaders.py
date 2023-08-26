@@ -61,7 +61,7 @@ def get_selected_dslr_image(base_dir: str, session_number: int, image_choice: st
 # look up creationtime of selected.jpg dslr/post image
 
 
-def get_selected_dslr_realpath(base_dir: str, session_number: int) -> float:
+def get_selected_dslr_realpath(base_dir: str, session_number: int) -> str:
     linkname = f"selected.jpg"
     path = os.path.join(base_dir, "session_content", str(session_number), "dslr/post", linkname)
 
