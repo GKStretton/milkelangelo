@@ -46,13 +46,13 @@ def composePortrait(metadata, props: SectionProperties, top_subclip: VideoClip, 
             front_subclip.resize(0.7).with_position(('center', 1180)),
             top_subclip.with_position(('center', 0)),
 
-            *build_title((portrait_dim[0]//2, portrait_dim[1]//2+15), top_subclip.duration, font_size=70),
+            *build_title((portrait_dim[0]//2, portrait_dim[1]//2+35), top_subclip.duration, font_size=70),
             *build_session_number(metadata, (10, 0), top_subclip.duration, font_size=80),
             build_speed(props.speed, (900, 10), top_subclip.duration),
         ]
         if caption:
             clips.append(
-                build_caption(caption, ('center', 1090), top_subclip.duration)
+                build_caption(caption, ('center', 1105), top_subclip.duration)
             )
         return CompositeVideoClip(clips, size=portrait_dim)
 

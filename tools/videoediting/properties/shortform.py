@@ -66,7 +66,7 @@ class ShortFormPropertyManager(BasePropertyManager):
                 props.skip = dispense_metadata.failed_dispense
                 delay = dispense_metadata.dispense_delay_ms / 1000.0
 
-            vial_profile = profile_snapshot.profiles.get(state_report.pipette_state.vial_held)
+            vial_profile = profile_snapshot.profiles.get(str(state_report.pipette_state.vial_held))
             if vial_profile and not vial_profile.footage_ignore:
                 min_duration = vial_profile.footage_min_duration_ms / 1000.0
                 delay += vial_profile.footage_delay_ms / 1000.0

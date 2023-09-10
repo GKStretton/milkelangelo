@@ -104,27 +104,28 @@ def build_main_intro(
         clips.append(splash_shadow)
         clips.append(splash)
 
-    def arm_pos(t):
-        if portrait:
-            return 820, 1520 + np.cos(t*np.pi)*5
-        else:
-            return 1715, 870 + np.cos(t*np.pi)*5
+    if metadata['production'] and metadata['production_id'] % 10 == 0:
+        def arm_pos(t):
+            if portrait:
+                return 820, 1520 + np.cos(t*np.pi)*5
+            else:
+                return 1715, 870 + np.cos(t*np.pi)*5
 
-    arm_scale = 0.5 if portrait else 0.4
-    clips.append(
-        ImageClip(ROBOT_FOREARM_PATH)
-        .fx(resize, arm_scale)
-        .with_duration(duration)
-        .with_position(arm_pos)
-        .fx(rotate, lambda t: np.cos((t+0.5)*np.pi)*16+3, center=(88*arm_scale, 431*arm_scale), expand=False)
-    )
+        arm_scale = 0.5 if portrait else 0.4
+        clips.append(
+            ImageClip(ROBOT_FOREARM_PATH)
+            .fx(resize, arm_scale)
+            .with_duration(duration)
+            .with_position(arm_pos)
+            .fx(rotate, lambda t: np.cos((t+0.5)*np.pi)*16+3, center=(88*arm_scale, 431*arm_scale), expand=False)
+        )
 
-    clips.append(
-        ImageClip(ROBOT_UPPERARM_PATH)
-        .fx(resize, arm_scale)
-        .with_duration(duration)
-        .with_position(arm_pos)
-    )
+        clips.append(
+            ImageClip(ROBOT_UPPERARM_PATH)
+            .fx(resize, arm_scale)
+            .with_duration(duration)
+            .with_position(arm_pos)
+        )
 
     return CompositeVideoClip(clips, size=get_size_from_format(fmt))
 

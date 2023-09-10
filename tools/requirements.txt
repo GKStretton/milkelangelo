@@ -1,7 +1,7 @@
 moviepy @ git+https://github.com/Zulko/moviepy@b5bb086
 betterproto==2.0.0b5
 opencv-python
-Pillow
+Pillow==9.0.0
 paho-mqtt
 protobuf
 PyYAML
@@ -9,3 +9,4 @@ scikit-image
 matplotlib
 pandas
 pytz
+pygame

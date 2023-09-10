@@ -266,9 +266,9 @@ class ContentDescriptor:
         speed_factor = applicable_duration / new_applicable_time
 
         logging.info(f"Target reduction of {reduction:.2f}s, "
-                     "{speed_factor:.2f} factor per applicable property")
+                     f"{speed_factor:.2f} factor per applicable property")
         logging.info(f"Calculated total duration: "
-                     "{full_total:.2f}s, applicable: {applicable_duration:.2f}s.")
+                     f"{full_total:.2f}s, applicable: {applicable_duration:.2f}s.")
 
         max_sf = 3
         if speed_factor > max_sf:

@@ -49,7 +49,7 @@ class LongFormPropertyManager(BasePropertyManager):
                 # props.skip = dispense_metadata.failed_dispense
 
             # we use min_duration to prevent early speedup when system goes idle
-            vial_profile = profile_snapshot.profiles.get(state_report.pipette_state.vial_held)
+            vial_profile = profile_snapshot.profiles.get(str(state_report.pipette_state.vial_held))
             if vial_profile and not vial_profile.footage_ignore:
                 min_duration = vial_profile.footage_min_duration_ms / 1000.0
 
