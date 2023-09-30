@@ -87,9 +87,9 @@ export default function ControlGroup() {
 
   const bulkRequests = [
     { id: 1, name: "Milk", fluid_type: FluidType.FLUID_MILK, open_drain: false },
-    { id: 2, name: "Water", fluid_type: FluidType.FLUID_WATER, open_drain: false },
-    { id: 3, name: "Rinse", fluid_type: FluidType.FLUID_WATER, open_drain: true },
     { id: 4, name: "Drain", fluid_type: FluidType.FLUID_DRAIN, open_drain: false },
+    { id: 3, name: "Rinse", fluid_type: FluidType.FLUID_WATER, open_drain: true },
+    { id: 2, name: "Water", fluid_type: FluidType.FLUID_WATER, open_drain: false },
   ];
 
   const valves = [
@@ -138,44 +138,35 @@ export default function ControlGroup() {
         <>
           <Typography variant="h6">Basic</Typography>
           <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
-            <Button variant="contained" disabled={isAwake} onClick={() => c?.publish(TOPIC_WAKE, "")}>
-              Wake
-            </Button>
-            <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_SHUTDOWN, "")}>
-              Shutdown
-            </Button>
-            <Button disabled={!isAwake} variant="contained" color="error" onClick={() => c?.publish(TOPIC_SLEEP, "")}>
-              Kill
-            </Button>
-          </ButtonGroup>
-          <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
             <Button disabled={!streamStatus || streamStatus.live} onClick={() => c?.publish(TOPIC_STREAM_START, "")}>
               Start Stream
             </Button>
-            <Button disabled={!streamStatus || !streamStatus.live} onClick={() => c?.publish(TOPIC_STREAM_END, "")}>
-              End Stream
-            </Button>
           </ButtonGroup>
           <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
             <Button
               disabled={!sessionStatus || !sessionStatus.complete || sessionStatus.paused}
+              color="warning"
               onClick={() => c?.publish(TOPIC_SESSION_BEGIN, "")}
             >
               {" "}
-              Begin Session
+              Begin dev Session
             </Button>
             <Button
               disabled={!sessionStatus || !sessionStatus.complete || sessionStatus.paused}
-              variant="contained"
               onClick={() => c?.publish(TOPIC_SESSION_BEGIN, "PRODUCTION")}
             >
               Begin Prod. Session
             </Button>
+            <Button disabled={isAwake} onClick={() => c?.publish(TOPIC_WAKE, "")}>
+              Wake
+            </Button>
             <Button
-              disabled={!sessionStatus || !sessionStatus.paused}
-              onClick={() => c?.publish(TOPIC_SESSION_RESUME, "")}
+              disabled={!isAwake}
+              onClick={() =>
+                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_MILK},${bulkFluidRequestVolume},${false}`)
+              }
             >
-              Resume Session
+              Milk
             </Button>
           </ButtonGroup>
           <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
@@ -186,10 +177,43 @@ export default function ControlGroup() {
               Pause Session
             </Button>
             <Button
+              disabled={!sessionStatus || !sessionStatus.paused}
+              onClick={() => c?.publish(TOPIC_SESSION_RESUME, "")}
+            >
+              Resume Session
+            </Button>
+          </ButtonGroup>
+          <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
+            <Button
+              disabled={!isAwake}
+              onClick={() =>
+                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_DRAIN},${bulkFluidRequestVolume},${false}`)
+              }
+            >
+              Drain
+            </Button>
+            <Button
+              disabled={!isAwake}
+              onClick={() =>
+                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_WATER},${bulkFluidRequestVolume},${true}`)
+              }
+            >
+              Rinse
+            </Button>
+            <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_SHUTDOWN, "")}>
+              Shutdown
+            </Button>
+            <Button disabled={!isAwake} variant="contained" color="error" onClick={() => c?.publish(TOPIC_SLEEP, "")}>
+              Kill
+            </Button>
+            <Button
               disabled={!sessionStatus || sessionStatus.complete}
               onClick={() => c?.publish(TOPIC_SESSION_END, "")}
             >
               End Session
+            </Button>
+            <Button disabled={!streamStatus || !streamStatus.live} onClick={() => c?.publish(TOPIC_STREAM_END, "")}>
+              End Stream
             </Button>
           </ButtonGroup>
 

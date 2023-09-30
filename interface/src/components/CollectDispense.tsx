@@ -1,6 +1,6 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import { TOPIC_DISPENSE, TOPIC_COLLECT } from "../topics_firmware/topics_firmware";
-import { StateReport, Status } from "../machinepb/machine";
+import { StateReport, Status, VialProfile } from "../machinepb/machine";
 import MqttContext from "../util/mqttContext";
 import { ButtonGroup, Button, Typography, Slider, Box, Tabs, Tab } from "@mui/material";
 import {
@@ -13,6 +13,7 @@ import {
 import { TOPIC_MARK_DELAYED_DISPENSE, TOPIC_MARK_FAILED_DISPENSE } from "../topics_backend/topics_backend";
 import { vialDisabled } from "./helpers";
 import { useError } from "./ErrorManager";
+import { prettyFormat } from "@testing-library/react";
 
 export default function CollectDispense() {
   const noVials = 6;
@@ -32,37 +33,33 @@ export default function CollectDispense() {
   const collecting: boolean = !!stateReport && stateReport?.collectionRequest?.completed === false;
   const collectingVial = collecting && stateReport?.collectionRequest?.vialNumber;
 
-  // DROP VOLUMES
-  // water = 20ul
-  // temporary emulsifier = 12ul
-  // dye (green) = 14ul
-  const dispenseVolumeFromVial = (vial: number | undefined): number => {
+  const profileFromVial = useCallback((vial: number | undefined): VialProfile|undefined => {
     if (!vial) {
-      return NaN;
+      return undefined;
     }
 
     const vialProfileId = systemVialProfiles?.vials[vial];
     if (vialProfileId === undefined) {
       error(`cannot find system profile for vial ${vial}: ${systemVialProfiles}`);
-      return 0;
+      return undefined;
     }
 
     const vialProfile = vialProfiles?.profiles[vialProfileId];
     if (vialProfile === undefined) {
       error(`cannot find profile for profileId ${vialProfileId}: ${vialProfiles}`);
-      return 0;
+      return undefined;
     }
 
-    return vialProfile.dispenseVolumeUl;
-  };
+    return vialProfile;
+  }, [error, systemVialProfiles, vialProfiles]);
 
   const getAutoDispenseVolume = () => {
-    return dispenseVolumeFromVial(stateReport?.pipetteState?.vialHeld);
+    return profileFromVial(stateReport?.pipetteState?.vialHeld)?.dispenseVolumeUl ?? 0;
   };
 
   const requestCollection = (vial: number): void => {
     console.log(`request collection vial ${vial}`);
-    const volume = dropNumber * dispenseVolumeFromVial(vial);
+    const volume = dropNumber * (profileFromVial(vial)?.dispenseVolumeUl ?? 0);
     if (volume === 0) {
       error("could not get volume");
       return;
@@ -139,7 +136,7 @@ export default function CollectDispense() {
             variant={collectingVial === vial ? "contained" : "outlined"}
             onClick={() => requestCollection(vial)}
           >
-            {vial}
+            {profileFromVial(vial)?.description}
           </Button>
         ))}
       </ButtonGroup>
