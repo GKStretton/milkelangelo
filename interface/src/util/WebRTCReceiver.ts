@@ -23,8 +23,8 @@ export class WebRTCReceiver {
 
     this.ws = new WebSocket(fullUrl);
 
-    this.ws.onerror = () => {
-      console.log('ws error');
+    this.ws.onerror = (e: Event) => {
+      console.log('ws error', e);
       if (this.ws === null) {
         return;
       }
