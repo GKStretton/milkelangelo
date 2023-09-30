@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/email"
@@ -12,6 +11,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/livecapture"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/obs"
+	"github.com/gkstretton/dark/services/goo/scheduler"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
@@ -24,7 +24,7 @@ func main() {
 	flag.Parse()
 
 	if *test {
-		Test()
+		scheduler.TestEntry()
 		return
 	}
 
@@ -40,17 +40,10 @@ func main() {
 	livecapture.Start(sm)
 	obs.Start(sm)
 	vialprofiles.Start(sm)
+	scheduler.Start()
 
 	// Block to prevent early quit
 	for {
 		time.Sleep(time.Millisecond * time.Duration(100))
 	}
-}
-
-func Test() {
-	micros := uint64(1677327218577344)
-	t := time.UnixMicro(int64(micros))
-	str := t.Format("2006-03-02 15:04:05.000000")
-	fmt.Println(micros)
-	fmt.Println(str)
 }
