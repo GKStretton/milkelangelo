@@ -25,15 +25,17 @@ func Start(sm *session.SessionManager) {
 		saveSnapshot(uint64(id))
 	})
 
-	c := sm.SubscribeToEvents()
+	go func() {
+		c := sm.SubscribeToEvents()
 
-	for {
-		e := <-c
-		if e.Type == session.SESSION_STARTED {
-			// save system vial configuration snapshot for this session
-			saveSnapshot(uint64(e.SessionID))
+		for {
+			e := <-c
+			if e.Type == session.SESSION_STARTED {
+				// save system vial configuration snapshot for this session
+				saveSnapshot(uint64(e.SessionID))
+			}
 		}
-	}
+	}()
 }
 
 func saveSnapshot(sessionId uint64) {

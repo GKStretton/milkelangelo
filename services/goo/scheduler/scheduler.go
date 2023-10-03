@@ -71,5 +71,6 @@ func scheduleWatcher(s *Schedule) {
 }
 
 func Start(sm *session.SessionManager) {
+	fmt.Printf("Starting scheduler\n")
 	defineSchedule(sm)
 }

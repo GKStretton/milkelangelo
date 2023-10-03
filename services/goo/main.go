@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/email"
@@ -42,6 +43,7 @@ func main() {
 	scheduler.Start(sm)
 
 	// Block to prevent early quit
+	fmt.Println("finished init, main loop sleeping.")
 	for {
 		time.Sleep(time.Millisecond * time.Duration(100))
 	}
