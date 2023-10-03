@@ -8,6 +8,11 @@ if [ -z "$1" ]; then
 	exit 1
 fi
 
+cd ~/asol/software/asol-backend/tools
+source .venv/bin/activate
+
+alacritty -e bash -ic "python3 ./content_upload_helper.py -n $1 -d /mnt/md0/light-stores" &
+
 google-chrome --new-window \
 	https://studio.youtube.com/channel/UCAvwN8vS3f0FFNxWoh3jqyQ/videos/upload?d=ud \
 	https://www.tiktok.com/upload/ \
@@ -15,7 +20,3 @@ google-chrome --new-window \
 	#https://twitter.com/compose/tweet \
 	#https://business.facebook.com/latest/posts/published_posts?asset_id=116836424739888&nav_ref=bm_home_redirect \
 
-cd ~/asol/software/asol-backend/tools
-source .venv/bin/activate
-
-alacritty -e bash -ic "python3 ./content_upload_helper.py -n $1 -d /mnt/md0/light-stores"

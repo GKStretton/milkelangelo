@@ -445,7 +445,21 @@ export default function ControlGroup() {
 
       {tabValue === 3 && (
         <>
-          <Typography>Not implemented: view all sessions, delete sessions, prune, generate post., etc.</Typography>
+          <Typography variant="h4"> after session </Typography>
+          <code>cd ~/asol/software/asol-backend</code>
+          <ol>
+            <li>choose image</li>
+            <code>./scripts/interactive/feh-dslr-selection-utility $session</code>
+            <li>generate content plan</li>
+            <code>./scripts/generation/generate-content-plan $session</code>
+            <li>generate content</li>
+            <code>./scripts/generation/generate-content $session</code>
+            <li>publish</li>
+            <code>./scripts/interactive/publish-session $session</code>
+          </ol>
+          <Typography variant="h4"> video generation modifications </Typography>
+          <Typography> If changes to the pipeline required: </Typography>
+
         </>
       )}
 

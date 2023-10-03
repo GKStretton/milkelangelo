@@ -24,7 +24,6 @@ func main() {
 	flag.Parse()
 
 	if *test {
-		scheduler.TestEntry()
 		return
 	}
 
@@ -40,7 +39,7 @@ func main() {
 	livecapture.Start(sm)
 	obs.Start(sm)
 	vialprofiles.Start(sm)
-	scheduler.Start()
+	scheduler.Start(sm)
 
 	// Block to prevent early quit
 	for {
