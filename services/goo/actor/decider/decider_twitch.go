@@ -16,5 +16,18 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 }
 
 func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) executor.Executor {
-	return nil
+	e := executor.NewDispenseExecutor(0, 0)
+
+	type voteStruct struct {
+		x float32
+		y float32
+	}
+	voteChan := make(chan voteStruct)
+	for vote := range voteChan {
+		e.X = vote.x
+		e.Y = vote.y
+		e.Preempt()
+	}
+
+	return e
 }

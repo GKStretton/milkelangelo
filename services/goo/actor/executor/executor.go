@@ -1,6 +1,8 @@
 package executor
 
 import (
+	"fmt"
+
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/events"
 )
@@ -12,6 +14,8 @@ type Executor interface {
 	PredictOutcome(state *machinepb.StateReport) *machinepb.StateReport
 	// Called during a voting round to issue some preemptive action, e.g. move throughout the vote.
 	Preempt()
+	// For debug
+	String() string
 }
 
 func conditionWaiter(c chan *machinepb.StateReport, cond func(*machinepb.StateReport) bool) chan *machinepb.StateReport {
@@ -36,7 +40,9 @@ func RunExecutorNonBlocking(c chan *machinepb.StateReport, e Executor) (completi
 
 	completionCh = make(chan struct{})
 	go func() {
+		fmt.Printf("beginning execution: %s\n", e)
 		e.Execute(c)
+		fmt.Printf("completed execution: %s\n", e)
 
 		completionCh <- struct{}{}
 		close(completionCh)

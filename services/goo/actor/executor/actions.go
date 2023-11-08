@@ -13,8 +13,8 @@ import (
 // goTo commands.
 var goToLock sync.Mutex
 
-func collect(vialNo int, volUl float32) {
-	mqtt.Publish(topics_firmware.TOPIC_COLLECT, fmt.Sprintf("%d,%.0f", vialNo, volUl))
+func collect(vialNo int, volUl int) {
+	mqtt.Publish(topics_firmware.TOPIC_COLLECT, fmt.Sprintf("%d,%d", vialNo, volUl))
 }
 
 func goTo(x, y float32) {

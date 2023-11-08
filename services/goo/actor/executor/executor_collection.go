@@ -1,6 +1,8 @@
 package executor
 
 import (
+	"fmt"
+
 	"github.com/gkstretton/asol-protos/go/machinepb"
 )
 
@@ -32,8 +34,12 @@ func (e *collectionExecutor) PredictOutcome(state *machinepb.StateReport) *machi
 }
 
 func (e *collectionExecutor) Execute(c chan *machinepb.StateReport) {
-	collect(e.vialNo, float32(e.volUl))
+	collect(e.vialNo, e.volUl)
 	<-conditionWaiter(c, func(sr *machinepb.StateReport) bool {
 		return sr.CollectionRequest.Completed
 	})
+}
+
+func (e *collectionExecutor) String() string {
+	return fmt.Sprintf("collectionExecutor (vialNo: %d, volUl: %d)", e.vialNo, e.volUl)
 }

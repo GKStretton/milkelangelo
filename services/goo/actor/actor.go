@@ -1,6 +1,7 @@
 package actor
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
@@ -8,6 +9,8 @@ import (
 	"github.com/gkstretton/dark/services/goo/actor/executor"
 	"github.com/gkstretton/dark/services/goo/events"
 )
+
+var waitForUser = flag.Bool("waitForUser", false, "if true, do blocking waits at certain debug points")
 
 // LaunchActor is launched to control a session after the canvas is prepared.
 // It should effect art.
@@ -41,7 +44,13 @@ func LaunchActor() {
 func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan executor.Executor {
 	c := make(chan executor.Executor)
 	go func() {
-		c <- decideNextAction(decider, predictedState)
+		fmt.Printf("making next decision...\n")
+		decision := decideNextAction(decider, predictedState)
+		if *waitForUser {
+			fmt.Scanln()
+		}
+		fmt.Printf("made   next decision: %s\n", decision)
+		c <- decision
 		close(c)
 	}()
 	return c
@@ -49,7 +58,9 @@ func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan
 
 func decideNextAction(decider decider.Decider, predictedState *machinepb.StateReport) executor.Executor {
 	if predictedState.PipetteState.Spent {
+		fmt.Println("decided COLLECTION")
 		return decider.DecideCollection(predictedState)
 	}
+	fmt.Println("decided DISPENSE")
 	return decider.DecideDispense(predictedState)
 }

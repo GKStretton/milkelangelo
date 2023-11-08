@@ -1,8 +1,6 @@
 package decider
 
 import (
-	"time"
-
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
 )
@@ -22,18 +20,16 @@ func (d *mockDecider) DecideCollection(predictedState *machinepb.StateReport) ex
 	}
 	tempCollectionTracker++
 
+	vialNo := 2
 	return executor.NewCollectionExecutor(
-		2, //empty
-		15*3,
+		vialNo, //empty
+		int(getVialVolume(vialNo)*3),
 	)
 }
 
 var tempLocationTracker bool
 
 func (d *mockDecider) DecideDispense(predictedState *machinepb.StateReport) executor.Executor {
-	// simulate decision delay
-	time.Sleep(time.Second * time.Duration(3))
-
 	tempLocationTracker = !tempLocationTracker
 	multiplier := float32(1)
 	if tempLocationTracker {
