@@ -39,7 +39,7 @@ export enum Node {
   OUTER_HANDOVER = 90,
   INNER_HANDOVER = 110,
   INVERSE_KINEMATICS_POSITION = 150,
-  IDLE_LOCATION = 8,
+  IDLE_LOCATION = 80,
   UNRECOGNIZED = -1,
 }
 
@@ -126,7 +126,7 @@ export function nodeFromJSON(object: any): Node {
     case 150:
     case "INVERSE_KINEMATICS_POSITION":
       return Node.INVERSE_KINEMATICS_POSITION;
-    case 8:
+    case 80:
     case "IDLE_LOCATION":
       return Node.IDLE_LOCATION;
     case -1:
@@ -900,10 +900,12 @@ export const PipetteState = {
 
   fromJSON(object: any): PipetteState {
     return {
-      spent: isSet(object.spent) ? Boolean(object.spent) : false,
-      vialHeld: isSet(object.vial_held) ? Number(object.vial_held) : 0,
-      volumeTargetUl: isSet(object.volume_target_ul) ? Number(object.volume_target_ul) : 0,
-      dispenseRequestNumber: isSet(object.dispense_request_number) ? Number(object.dispense_request_number) : 0,
+      spent: isSet(object.spent) ? globalThis.Boolean(object.spent) : false,
+      vialHeld: isSet(object.vial_held) ? globalThis.Number(object.vial_held) : 0,
+      volumeTargetUl: isSet(object.volume_target_ul) ? globalThis.Number(object.volume_target_ul) : 0,
+      dispenseRequestNumber: isSet(object.dispense_request_number)
+        ? globalThis.Number(object.dispense_request_number)
+        : 0,
     };
   },
 
@@ -1004,10 +1006,10 @@ export const CollectionRequest = {
 
   fromJSON(object: any): CollectionRequest {
     return {
-      completed: isSet(object.completed) ? Boolean(object.completed) : false,
-      requestNumber: isSet(object.request_number) ? Number(object.request_number) : 0,
-      vialNumber: isSet(object.vial_number) ? Number(object.vial_number) : 0,
-      volumeUl: isSet(object.volume_ul) ? Number(object.volume_ul) : 0,
+      completed: isSet(object.completed) ? globalThis.Boolean(object.completed) : false,
+      requestNumber: isSet(object.request_number) ? globalThis.Number(object.request_number) : 0,
+      vialNumber: isSet(object.vial_number) ? globalThis.Number(object.vial_number) : 0,
+      volumeUl: isSet(object.volume_ul) ? globalThis.Number(object.volume_ul) : 0,
     };
   },
 
@@ -1118,11 +1120,11 @@ export const MovementDetails = {
 
   fromJSON(object: any): MovementDetails {
     return {
-      targetXUnit: isSet(object.target_x_unit) ? Number(object.target_x_unit) : 0,
-      targetYUnit: isSet(object.target_y_unit) ? Number(object.target_y_unit) : 0,
-      targetZIk: isSet(object.target_z_ik) ? Number(object.target_z_ik) : 0,
-      targetRingDeg: isSet(object.target_ring_deg) ? Number(object.target_ring_deg) : 0,
-      targetYawDeg: isSet(object.target_yaw_deg) ? Number(object.target_yaw_deg) : 0,
+      targetXUnit: isSet(object.target_x_unit) ? globalThis.Number(object.target_x_unit) : 0,
+      targetYUnit: isSet(object.target_y_unit) ? globalThis.Number(object.target_y_unit) : 0,
+      targetZIk: isSet(object.target_z_ik) ? globalThis.Number(object.target_z_ik) : 0,
+      targetRingDeg: isSet(object.target_ring_deg) ? globalThis.Number(object.target_ring_deg) : 0,
+      targetYawDeg: isSet(object.target_yaw_deg) ? globalThis.Number(object.target_yaw_deg) : 0,
     };
   },
 
@@ -1228,9 +1230,9 @@ export const FluidRequest = {
   fromJSON(object: any): FluidRequest {
     return {
       fluidType: isSet(object.fluidType) ? fluidTypeFromJSON(object.fluidType) : 0,
-      volumeMl: isSet(object.volume_ml) ? Number(object.volume_ml) : 0,
-      complete: isSet(object.complete) ? Boolean(object.complete) : false,
-      openDrain: isSet(object.open_drain) ? Boolean(object.open_drain) : false,
+      volumeMl: isSet(object.volume_ml) ? globalThis.Number(object.volume_ml) : 0,
+      complete: isSet(object.complete) ? globalThis.Boolean(object.complete) : false,
+      openDrain: isSet(object.open_drain) ? globalThis.Boolean(object.open_drain) : false,
     };
   },
 
@@ -1300,7 +1302,7 @@ export const FluidDetails = {
   },
 
   fromJSON(object: any): FluidDetails {
-    return { bowlFluidLevelMl: isSet(object.bowl_fluid_level_ml) ? Number(object.bowl_fluid_level_ml) : 0 };
+    return { bowlFluidLevelMl: isSet(object.bowl_fluid_level_ml) ? globalThis.Number(object.bowl_fluid_level_ml) : 0 };
   },
 
   toJSON(message: FluidDetails): unknown {
@@ -1503,11 +1505,11 @@ export const StateReport = {
 
   fromJSON(object: any): StateReport {
     return {
-      timestampUnixMicros: isSet(object.timestamp_unix_micros) ? Number(object.timestamp_unix_micros) : 0,
-      startupCounter: isSet(object.startup_counter) ? Number(object.startup_counter) : 0,
+      timestampUnixMicros: isSet(object.timestamp_unix_micros) ? globalThis.Number(object.timestamp_unix_micros) : 0,
+      startupCounter: isSet(object.startup_counter) ? globalThis.Number(object.startup_counter) : 0,
       mode: isSet(object.mode) ? modeFromJSON(object.mode) : 0,
       status: isSet(object.status) ? statusFromJSON(object.status) : 0,
-      lightsOn: isSet(object.lights_on) ? Boolean(object.lights_on) : false,
+      lightsOn: isSet(object.lights_on) ? globalThis.Boolean(object.lights_on) : false,
       pipetteState: isSet(object.pipette_state) ? PipetteState.fromJSON(object.pipette_state) : undefined,
       collectionRequest: isSet(object.collection_request)
         ? CollectionRequest.fromJSON(object.collection_request)
@@ -1516,9 +1518,11 @@ export const StateReport = {
       fluidRequest: isSet(object.fluid_request) ? FluidRequest.fromJSON(object.fluid_request) : undefined,
       fluidDetails: isSet(object.fluid_details) ? FluidDetails.fromJSON(object.fluid_details) : undefined,
       rinseStatus: isSet(object.rinse_status) ? rinseStatusFromJSON(object.rinse_status) : 0,
-      paused: isSet(object.paused) ? Boolean(object.paused) : false,
-      timestampReadable: isSet(object.timestamp_readable) ? String(object.timestamp_readable) : "",
-      latestDslrFileNumber: isSet(object.latest_dslr_file_number) ? Number(object.latest_dslr_file_number) : 0,
+      paused: isSet(object.paused) ? globalThis.Boolean(object.paused) : false,
+      timestampReadable: isSet(object.timestamp_readable) ? globalThis.String(object.timestamp_readable) : "",
+      latestDslrFileNumber: isSet(object.latest_dslr_file_number)
+        ? globalThis.Number(object.latest_dslr_file_number)
+        : 0,
     };
   },
 
@@ -1639,7 +1643,7 @@ export const StateReportList = {
 
   fromJSON(object: any): StateReportList {
     return {
-      StateReports: Array.isArray(object?.StateReports)
+      StateReports: globalThis.Array.isArray(object?.StateReports)
         ? object.StateReports.map((e: any) => StateReport.fromJSON(e))
         : [],
     };
@@ -1740,11 +1744,11 @@ export const SessionStatus = {
 
   fromJSON(object: any): SessionStatus {
     return {
-      id: isSet(object.id) ? Number(object.id) : 0,
-      paused: isSet(object.paused) ? Boolean(object.paused) : false,
-      complete: isSet(object.complete) ? Boolean(object.complete) : false,
-      production: isSet(object.production) ? Boolean(object.production) : false,
-      productionId: isSet(object.production_id) ? Number(object.production_id) : 0,
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      paused: isSet(object.paused) ? globalThis.Boolean(object.paused) : false,
+      complete: isSet(object.complete) ? globalThis.Boolean(object.complete) : false,
+      production: isSet(object.production) ? globalThis.Boolean(object.production) : false,
+      productionId: isSet(object.production_id) ? globalThis.Number(object.production_id) : 0,
     };
   },
 
@@ -1818,7 +1822,7 @@ export const StreamStatus = {
   },
 
   fromJSON(object: any): StreamStatus {
-    return { live: isSet(object.live) ? Boolean(object.live) : false };
+    return { live: isSet(object.live) ? globalThis.Boolean(object.live) : false };
   },
 
   toJSON(message: StreamStatus): unknown {
@@ -1966,7 +1970,7 @@ export const DispenseMetadataMap_DispenseMetadataEntry = {
 
   fromJSON(object: any): DispenseMetadataMap_DispenseMetadataEntry {
     return {
-      key: isSet(object.key) ? String(object.key) : "",
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
       value: isSet(object.value) ? DispenseMetadata.fromJSON(object.value) : undefined,
     };
   },
@@ -2066,10 +2070,12 @@ export const DispenseMetadata = {
 
   fromJSON(object: any): DispenseMetadata {
     return {
-      failedDispense: isSet(object.failed_dispense) ? Boolean(object.failed_dispense) : false,
-      dispenseDelayMs: isSet(object.dispense_delay_ms) ? Number(object.dispense_delay_ms) : 0,
-      minDurationOverrideMs: isSet(object.min_duration_override_ms) ? Number(object.min_duration_override_ms) : 0,
-      speedMultOverride: isSet(object.speed_mult_override) ? Number(object.speed_mult_override) : 0,
+      failedDispense: isSet(object.failed_dispense) ? globalThis.Boolean(object.failed_dispense) : false,
+      dispenseDelayMs: isSet(object.dispense_delay_ms) ? globalThis.Number(object.dispense_delay_ms) : 0,
+      minDurationOverrideMs: isSet(object.min_duration_override_ms)
+        ? globalThis.Number(object.min_duration_override_ms)
+        : 0,
+      speedMultOverride: isSet(object.speed_mult_override) ? globalThis.Number(object.speed_mult_override) : 0,
     };
   },
 
@@ -2169,8 +2175,8 @@ export const ContentTypeStatuses = {
           return acc;
         }, {})
         : {},
-      splashtext: isSet(object.splashtext) ? String(object.splashtext) : "",
-      splashtextHue: isSet(object.splashtext_hue) ? Number(object.splashtext_hue) : 0,
+      splashtext: isSet(object.splashtext) ? globalThis.String(object.splashtext) : "",
+      splashtextHue: isSet(object.splashtext_hue) ? globalThis.Number(object.splashtext_hue) : 0,
     };
   },
 
@@ -2261,7 +2267,7 @@ export const ContentTypeStatuses_ContentStatusesEntry = {
 
   fromJSON(object: any): ContentTypeStatuses_ContentStatusesEntry {
     return {
-      key: isSet(object.key) ? String(object.key) : "",
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
       value: isSet(object.value) ? ContentTypeStatus.fromJSON(object.value) : undefined,
     };
   },
@@ -2361,10 +2367,10 @@ export const ContentTypeStatus = {
 
   fromJSON(object: any): ContentTypeStatus {
     return {
-      rawTitle: isSet(object.raw_title) ? String(object.raw_title) : "",
-      rawDescription: isSet(object.raw_description) ? String(object.raw_description) : "",
-      caption: isSet(object.caption) ? String(object.caption) : "",
-      posts: Array.isArray(object?.posts) ? object.posts.map((e: any) => Post.fromJSON(e)) : [],
+      rawTitle: isSet(object.raw_title) ? globalThis.String(object.raw_title) : "",
+      rawDescription: isSet(object.raw_description) ? globalThis.String(object.raw_description) : "",
+      caption: isSet(object.caption) ? globalThis.String(object.caption) : "",
+      posts: globalThis.Array.isArray(object?.posts) ? object.posts.map((e: any) => Post.fromJSON(e)) : [],
     };
   },
 
@@ -2515,13 +2521,15 @@ export const Post = {
   fromJSON(object: any): Post {
     return {
       platform: isSet(object.platform) ? socialPlatformFromJSON(object.platform) : 0,
-      subPlatform: isSet(object.sub_platform) ? String(object.sub_platform) : "",
-      title: isSet(object.title) ? String(object.title) : "",
-      description: isSet(object.description) ? String(object.description) : "",
-      uploaded: isSet(object.uploaded) ? Boolean(object.uploaded) : false,
-      url: isSet(object.url) ? String(object.url) : "",
-      crosspost: isSet(object.crosspost) ? Boolean(object.crosspost) : false,
-      scheduledUnixTimetamp: isSet(object.scheduled_unix_timetamp) ? Number(object.scheduled_unix_timetamp) : 0,
+      subPlatform: isSet(object.sub_platform) ? globalThis.String(object.sub_platform) : "",
+      title: isSet(object.title) ? globalThis.String(object.title) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
+      uploaded: isSet(object.uploaded) ? globalThis.Boolean(object.uploaded) : false,
+      url: isSet(object.url) ? globalThis.String(object.url) : "",
+      crosspost: isSet(object.crosspost) ? globalThis.Boolean(object.crosspost) : false,
+      scheduledUnixTimetamp: isSet(object.scheduled_unix_timetamp)
+        ? globalThis.Number(object.scheduled_unix_timetamp)
+        : 0,
     };
   },
 
@@ -2618,8 +2626,8 @@ export const Email = {
 
   fromJSON(object: any): Email {
     return {
-      subject: isSet(object.subject) ? String(object.subject) : "",
-      body: isSet(object.body) ? String(object.body) : "",
+      subject: isSet(object.subject) ? globalThis.String(object.subject) : "",
+      body: isSet(object.body) ? globalThis.String(object.body) : "",
     };
   },
 
@@ -2783,16 +2791,18 @@ export const VialProfile = {
 
   fromJSON(object: any): VialProfile {
     return {
-      id: isSet(object.id) ? Number(object.id) : 0,
-      description: isSet(object.description) ? String(object.description) : "",
-      slopUl: isSet(object.slop_ul) ? Number(object.slop_ul) : 0,
-      dispenseVolumeUl: isSet(object.dispense_volume_ul) ? Number(object.dispense_volume_ul) : 0,
-      footageDelayMs: isSet(object.footage_delay_ms) ? Number(object.footage_delay_ms) : 0,
-      footageMinDurationMs: isSet(object.footage_min_duration_ms) ? Number(object.footage_min_duration_ms) : 0,
-      footageSpeedMult: isSet(object.footage_speed_mult) ? Number(object.footage_speed_mult) : 0,
-      footageIgnore: isSet(object.footage_ignore) ? Boolean(object.footage_ignore) : false,
-      initialVolumeUl: isSet(object.initial_volume_ul) ? Number(object.initial_volume_ul) : 0,
-      currentVolumeUl: isSet(object.current_volume_ul) ? Number(object.current_volume_ul) : 0,
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
+      slopUl: isSet(object.slop_ul) ? globalThis.Number(object.slop_ul) : 0,
+      dispenseVolumeUl: isSet(object.dispense_volume_ul) ? globalThis.Number(object.dispense_volume_ul) : 0,
+      footageDelayMs: isSet(object.footage_delay_ms) ? globalThis.Number(object.footage_delay_ms) : 0,
+      footageMinDurationMs: isSet(object.footage_min_duration_ms)
+        ? globalThis.Number(object.footage_min_duration_ms)
+        : 0,
+      footageSpeedMult: isSet(object.footage_speed_mult) ? globalThis.Number(object.footage_speed_mult) : 0,
+      footageIgnore: isSet(object.footage_ignore) ? globalThis.Boolean(object.footage_ignore) : false,
+      initialVolumeUl: isSet(object.initial_volume_ul) ? globalThis.Number(object.initial_volume_ul) : 0,
+      currentVolumeUl: isSet(object.current_volume_ul) ? globalThis.Number(object.current_volume_ul) : 0,
     };
   },
 
@@ -2892,7 +2902,7 @@ export const SystemVialConfiguration = {
     return {
       vials: isObject(object.vials)
         ? Object.entries(object.vials).reduce<{ [key: number]: number }>((acc, [key, value]) => {
-          acc[Number(key)] = Number(value);
+          acc[globalThis.Number(key)] = Number(value);
           return acc;
         }, {})
         : {},
@@ -2920,7 +2930,7 @@ export const SystemVialConfiguration = {
     const message = createBaseSystemVialConfiguration();
     message.vials = Object.entries(object.vials ?? {}).reduce<{ [key: number]: number }>((acc, [key, value]) => {
       if (value !== undefined) {
-        acc[Number(key)] = Number(value);
+        acc[globalThis.Number(key)] = globalThis.Number(value);
       }
       return acc;
     }, {});
@@ -2974,7 +2984,10 @@ export const SystemVialConfiguration_VialsEntry = {
   },
 
   fromJSON(object: any): SystemVialConfiguration_VialsEntry {
-    return { key: isSet(object.key) ? Number(object.key) : 0, value: isSet(object.value) ? Number(object.value) : 0 };
+    return {
+      key: isSet(object.key) ? globalThis.Number(object.key) : 0,
+      value: isSet(object.value) ? globalThis.Number(object.value) : 0,
+    };
   },
 
   toJSON(message: SystemVialConfiguration_VialsEntry): unknown {
@@ -3045,7 +3058,7 @@ export const VialProfileCollection = {
     return {
       profiles: isObject(object.profiles)
         ? Object.entries(object.profiles).reduce<{ [key: number]: VialProfile }>((acc, [key, value]) => {
-          acc[Number(key)] = VialProfile.fromJSON(value);
+          acc[globalThis.Number(key)] = VialProfile.fromJSON(value);
           return acc;
         }, {})
         : {},
@@ -3074,7 +3087,7 @@ export const VialProfileCollection = {
     message.profiles = Object.entries(object.profiles ?? {}).reduce<{ [key: number]: VialProfile }>(
       (acc, [key, value]) => {
         if (value !== undefined) {
-          acc[Number(key)] = VialProfile.fromPartial(value);
+          acc[globalThis.Number(key)] = VialProfile.fromPartial(value);
         }
         return acc;
       },
@@ -3131,7 +3144,7 @@ export const VialProfileCollection_ProfilesEntry = {
 
   fromJSON(object: any): VialProfileCollection_ProfilesEntry {
     return {
-      key: isSet(object.key) ? Number(object.key) : 0,
+      key: isSet(object.key) ? globalThis.Number(object.key) : 0,
       value: isSet(object.value) ? VialProfile.fromJSON(object.value) : undefined,
     };
   },
@@ -3207,7 +3220,7 @@ export const SystemVialConfigurationSnapshot = {
     return {
       profiles: isObject(object.profiles)
         ? Object.entries(object.profiles).reduce<{ [key: number]: VialProfile }>((acc, [key, value]) => {
-          acc[Number(key)] = VialProfile.fromJSON(value);
+          acc[globalThis.Number(key)] = VialProfile.fromJSON(value);
           return acc;
         }, {})
         : {},
@@ -3238,7 +3251,7 @@ export const SystemVialConfigurationSnapshot = {
     message.profiles = Object.entries(object.profiles ?? {}).reduce<{ [key: number]: VialProfile }>(
       (acc, [key, value]) => {
         if (value !== undefined) {
-          acc[Number(key)] = VialProfile.fromPartial(value);
+          acc[globalThis.Number(key)] = VialProfile.fromPartial(value);
         }
         return acc;
       },
@@ -3295,7 +3308,7 @@ export const SystemVialConfigurationSnapshot_ProfilesEntry = {
 
   fromJSON(object: any): SystemVialConfigurationSnapshot_ProfilesEntry {
     return {
-      key: isSet(object.key) ? Number(object.key) : 0,
+      key: isSet(object.key) ? globalThis.Number(object.key) : 0,
       value: isSet(object.value) ? VialProfile.fromJSON(object.value) : undefined,
     };
   },
@@ -3328,29 +3341,11 @@ export const SystemVialConfigurationSnapshot_ProfilesEntry = {
   },
 };
 
-declare const self: any | undefined;
-declare const window: any | undefined;
-declare const global: any | undefined;
-const tsProtoGlobalThis: any = (() => {
-  if (typeof globalThis !== "undefined") {
-    return globalThis;
-  }
-  if (typeof self !== "undefined") {
-    return self;
-  }
-  if (typeof window !== "undefined") {
-    return window;
-  }
-  if (typeof global !== "undefined") {
-    return global;
-  }
-  throw "Unable to locate global object";
-})();
-
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
-  : T extends Array<infer U> ? Array<DeepPartial<U>> : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
   : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
@@ -3359,8 +3354,8 @@ export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
 
 function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new tsProtoGlobalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  if (long.gt(globalThis.Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
   }
   return long.toNumber();
 }

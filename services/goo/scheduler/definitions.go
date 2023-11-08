@@ -7,6 +7,7 @@ import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
+	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
 )
@@ -32,6 +33,17 @@ var mainSessionEndTime = RecurringTime{
 // defineSchedule works by launching go routines watching for the specified
 // time, to trigger the stated action.
 func defineSchedule(sm *session.SessionManager) {
+	go scheduleWatcher(&Schedule{
+		name:    "FRIDGE_ON",
+		enabled: true,
+		function: func() {
+			mqtt.Publish(topics_backend.TOPIC_FRIDGE_SWITCH, topics_backend.PAYLOAD_SMART_SWITCH_ON)
+		},
+		recurringTime: mainSessionStartTime,
+		hourOffset:    -7,
+		minuteOffset:  -30,
+	})
+
 	// ***********
 	// SESSION START
 	// ***********
@@ -93,16 +105,11 @@ func defineSchedule(sm *session.SessionManager) {
 		name:    "LAUNCH_ACTOR",
 		enabled: true,
 		function: func() {
-			fmt.Printf(
-				"ACTOR NOT IMPLEMENTED\n" +
-					"\tplan: auto-actor with mqtt livechat integration\n",
-			)
-			// idea: pass an "active duration", like 20 mins. After which no
-			// idea: more action can be taken
+			actor.LaunchActor()
 		},
 		recurringTime: mainSessionStartTime,
-		minuteOffset:  1,
-		secondOffset:  0,
+		minuteOffset:  0,
+		secondOffset:  25,
 	})
 
 	// ***********
@@ -174,5 +181,15 @@ func defineSchedule(sm *session.SessionManager) {
 		},
 		recurringTime: mainSessionEndTime,
 		secondOffset:  30,
+	})
+
+	go scheduleWatcher(&Schedule{
+		name:    "FRIDGE_OFF",
+		enabled: true,
+		function: func() {
+			mqtt.Publish(topics_backend.TOPIC_FRIDGE_SWITCH, topics_backend.PAYLOAD_SMART_SWITCH_OFF)
+		},
+		recurringTime: mainSessionEndTime,
+		minuteOffset:  1,
 	})
 }

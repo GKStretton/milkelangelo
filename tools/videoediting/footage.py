@@ -145,7 +145,7 @@ class FootageWrapper:
         padding = VideoClip.ColorClip(s, color=(0, 0, 0), duration=dur)
 
         # generate black video with correct duration if there's no footage
-        if len(subclips) == 0:
+        if len(subclips) == 0 or end_t - start_t < 0.00001:  # prevent concatenation of miniclips
             return padding, crop_config
 
         # if there is footage...

@@ -87,6 +87,7 @@ func Start(sm *session.SessionManager) {
 			)
 		}
 	})
+	RequestStateReport()
 }
 
 func Subscribe() chan *machinepb.StateReport {
@@ -95,6 +96,18 @@ func Subscribe() chan *machinepb.StateReport {
 	c := make(chan *machinepb.StateReport, 10)
 	subs = append(subs, c)
 	return c
+}
+
+func Unsubscribe(c chan *machinepb.StateReport) {
+	lock.Lock()
+	defer lock.Unlock()
+	for i, sub := range subs {
+		if sub == c {
+			subs = append(subs[:i], subs[i+1:]...)
+			close(c)
+			break
+		}
+	}
 }
 
 // publish to internal channels and to broker
@@ -253,4 +266,15 @@ func appendDelayedDispense(sessionId, startupCounter, dispenseNumber, delayMs ui
 	}
 
 	fmt.Printf("wrote delayed dispense to file (session %d, startup %d, dispense %d)\n", sessionId, startupCounter, dispenseNumber)
+}
+
+func GetLatestStateReportCopy() *machinepb.StateReport {
+	return proto.Clone(latest_state_report).(*machinepb.StateReport)
+}
+
+func RequestStateReport() {
+	err := mqtt.Publish(topics_firmware.TOPIC_STATE_REPORT_REQUEST, "")
+	if err != nil {
+		fmt.Printf("failed to request state report from firmware: %v\n", err)
+	}
 }

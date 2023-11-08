@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/filesystem"
@@ -25,6 +26,11 @@ func main() {
 	flag.Parse()
 
 	if *test {
+		mqtt.Start()
+		sm := session.NewSessionManager(false)
+		events.Start(sm)
+		time.Sleep(time.Second)
+		actor.LaunchActor()
 		return
 	}
 

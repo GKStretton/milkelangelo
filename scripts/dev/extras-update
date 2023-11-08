@@ -7,15 +7,21 @@ CURRENT_DIR=$(pwd)
 cd $PROTOS_REPO_DIR
 docker-compose up
 
+echo 'Copying python files'
+
 # PYTHON
 cd $CURRENT_DIR
 cp -r $PROTOS_REPO_DIR/python/* ./tools/
 touch ./tools/topics_backend/__init__.py
 touch ./tools/topics_firmware/__init__.py
 
+echo 'Copying typescript files'
+
 # TYPESCRIPT
 cd $CURRENT_DIR
 cp -r $PROTOS_REPO_DIR/typescript/* ./interface/src/
+
+echo 'Updating Go'
 
 # GO
 cd $CURRENT_DIR/services/goo
@@ -25,3 +31,4 @@ cd $CURRENT_DIR/services/dslrcapture
 go get -u github.com/gkstretton/asol-protos@main
 go get -u github.com/gkstretton/dark/services/goo@main
 
+echo 'Done'

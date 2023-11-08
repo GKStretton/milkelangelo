@@ -88,3 +88,11 @@ func getSystemProfileConfiguration() *machinepb.SystemVialConfiguration {
 
 	return systemConf
 }
+
+// for a given robot vial position, get the vial profile
+// does a lookup against the system configuration
+// returns nil if can't find
+func GetSystemVialProfile(vialPosition int) *machinepb.VialProfile {
+	snapshot := getSystemVialConfigurationSnapshot()
+	return snapshot.Profiles[uint64(vialPosition)]
+}

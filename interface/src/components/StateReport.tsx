@@ -3,15 +3,13 @@ import "./StateReport.css";
 import {
   TOPIC_SESSION_STATUS_GET,
   TOPIC_SESSION_STATUS_RESP_JSON,
-  TOPIC_SESSION_STATUS_RESP_RAW,
   TOPIC_STATE_REPORT_JSON,
   TOPIC_STREAM_STATUS_GET,
   TOPIC_STREAM_STATUS_RESP_JSON,
-  TOPIC_STREAM_STATUS_RESP_RAW,
 } from "../topics_backend/topics_backend";
-import { TOPIC_STATE_REPORT_RAW, TOPIC_STATE_REPORT_REQUEST } from "../topics_firmware/topics_firmware";
+import { TOPIC_STATE_REPORT_REQUEST } from "../topics_firmware/topics_firmware";
 import MqttContext from "../util/mqttContext";
-import { Grid, Button, Tabs, Tab } from "@mui/material";
+import { Button, Tabs, Tab } from "@mui/material";
 import { useProtoTopic } from "../util/hooks";
 
 export default function StateReport() {

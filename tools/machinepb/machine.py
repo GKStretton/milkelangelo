@@ -40,7 +40,7 @@ class Node(betterproto.Enum):
     OUTER_HANDOVER = 90
     INNER_HANDOVER = 110
     INVERSE_KINEMATICS_POSITION = 150
-    IDLE_LOCATION = 8
+    IDLE_LOCATION = 80
 
 
 class SolenoidValve(betterproto.Enum):

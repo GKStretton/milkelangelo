@@ -20,6 +20,7 @@ type Schedule struct {
 	function      func()
 	recurringTime RecurringTime
 	// this long before or after the recurring time
+	hourOffset   int
 	minuteOffset int
 	secondOffset int
 }
@@ -40,6 +41,7 @@ func (s *Schedule) nextRunTime() time.Time {
 		now.Location(),
 	)
 	// offset the time
+	nextRunTime = nextRunTime.Add(time.Hour * time.Duration(s.hourOffset))
 	nextRunTime = nextRunTime.Add(time.Minute * time.Duration(s.minuteOffset))
 	nextRunTime = nextRunTime.Add(time.Second * time.Duration(s.secondOffset))
 
