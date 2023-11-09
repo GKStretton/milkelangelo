@@ -21,6 +21,7 @@ require (
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gempir/go-twitch-irc/v4 v4.0.0 // indirect
+	github.com/golang-jwt/jwt v3.2.1+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -29,7 +30,8 @@ require (
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/nicklaw5/helix/v2 v2.25.1 // indirect
+	github.com/nicklaw5/helix v1.25.0 // indirect
+	github.com/nicklaw5/helix/v2 v2.25.2 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	go.opencensus.io v0.24.0 // indirect

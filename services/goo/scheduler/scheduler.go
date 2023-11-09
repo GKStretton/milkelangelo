@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gkstretton/dark/services/goo/livechat"
 	"github.com/gkstretton/dark/services/goo/session"
 )
 
@@ -72,7 +73,7 @@ func scheduleWatcher(s *Schedule) {
 	}
 }
 
-func Start(sm *session.SessionManager) {
+func Start(sm *session.SessionManager, twitchApi *livechat.TwitchApi) {
 	fmt.Printf("Starting scheduler\n")
-	defineSchedule(sm)
+	defineSchedule(sm, twitchApi)
 }

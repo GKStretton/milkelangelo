@@ -77,6 +77,8 @@ github.com/gkstretton/asol-protos v0.0.9-0.20231022083940-7efad0bd3794 h1:fMc2OD
 github.com/gkstretton/asol-protos v0.0.9-0.20231022083940-7efad0bd3794/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/gkstretton/asol-protos v0.0.9-0.20231022084157-bc08a2b5a5db h1:Rq+8w2P4PL4HN+Ms7qL6vl56PpCF02MYGNaOKypAEfc=
 github.com/gkstretton/asol-protos v0.0.9-0.20231022084157-bc08a2b5a5db/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/golang-jwt/jwt v3.2.1+incompatible h1:73Z+4BJcrTC+KczS6WvTPvRGOp1WmfEP4Q1lOd9Z/+c=
+github.com/golang-jwt/jwt v3.2.1+incompatible/go.mod h1:8pz2t5EyA70fFQQSrl6XZXzqecmYZeUEB8OUGHkxJ+I=
 github.com/golang-jwt/jwt/v4 v4.5.0 h1:7cYmW1XlMY7h7ii7UhUyChSgS5wUJEnm9uZVTGqOWzg=
 github.com/golang-jwt/jwt/v4 v4.5.0/go.mod h1:m21LjoU+eqJr34lmDMbreY2eSTRJ1cv77w39/MY0Ch0=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
@@ -123,8 +125,12 @@ github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORN
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
+github.com/nicklaw5/helix v1.25.0 h1:Mrz537izZVsGdM3I46uGAAlslj61frgkhS/9xQqyT/M=
+github.com/nicklaw5/helix v1.25.0/go.mod h1:yvXZFapT6afIoxnAvlWiJiUMsYnoHl7tNs+t0bloAMw=
 github.com/nicklaw5/helix/v2 v2.25.1 h1:hccFfWf1kdPKeC/Zp8jNbOvqV0f6ya12hdeNHuQa5wg=
 github.com/nicklaw5/helix/v2 v2.25.1/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
+github.com/nicklaw5/helix/v2 v2.25.2 h1:diGnmRnUpNk8vYVM1vOjUo5PGZnr8atbkUYT78T6evc=
+github.com/nicklaw5/helix/v2 v2.25.2/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
 github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d h1:VhgPp6v9qf9Agr/56bj7Y/xa04UccTW04VP0Qed4vnQ=
 github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d/go.mod h1:YUTz3bUH2ZwIWBy3CJBeOBEugqcmXREj14T+iG/4k4U=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

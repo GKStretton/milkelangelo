@@ -27,14 +27,12 @@ func main() {
 	flag.Parse()
 
 	if *test {
-		livechat.Start()
-		return
-
 		mqtt.Start()
 		sm := session.NewSessionManager(false)
+		twitchApi := livechat.Start()
 		events.Start(sm)
 		time.Sleep(time.Second)
-		actor.LaunchActor()
+		actor.LaunchActor(twitchApi)
 		return
 	}
 
@@ -45,12 +43,13 @@ func main() {
 	email.Start()
 
 	sm := session.NewSessionManager(false)
+	twitchApi := livechat.Start()
 
 	events.Start(sm)
 	livecapture.Start(sm)
 	obs.Start(sm)
 	vialprofiles.Start(sm)
-	scheduler.Start(sm)
+	scheduler.Start(sm, twitchApi)
 
 	// Block to prevent early quit
 	fmt.Println("finished init, main loop sleeping.")

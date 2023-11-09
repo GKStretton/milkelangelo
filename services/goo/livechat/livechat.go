@@ -2,72 +2,97 @@ package livechat
 
 import (
 	"fmt"
+	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gempir/go-twitch-irc/v4"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
+	"github.com/nicklaw5/helix/v2"
 )
 
+const refreshTokenKey = "TWITCH_REFRESH_TOKEN"
 const channelName = "studyoflight"
+const channelId = "807784320"
 
-func Start() {
+type TwitchApi struct {
+	helixClient *helix.Client
+	ircClient   *twitch.Client
+
+	subs []chan *Message
+	lock sync.Mutex
+}
+
+func Start() *TwitchApi {
+	// auth
 	clientID := string(keyvalue.Get("TWITCH_CLIENT_ID"))
 	clientSecret := string(keyvalue.Get("TWITCH_CLIENT_SECRET"))
 
-	// Obtain a new access token using the refresh token
-	tokenResponse, err := RefreshAccessToken(clientID, clientSecret, getRefreshToken())
+	// Helix api
+	helixClient, err := helix.NewClient(&helix.Options{
+		ClientID:        clientID,
+		ClientSecret:    clientSecret,
+		RefreshToken:    getRefreshToken(),
+		UserAccessToken: "x", // will auto refresh
+		HTTPClient: &http.Client{
+			Transport: &http.Transport{
+				MaxIdleConns:    10,
+				IdleConnTimeout: 30 * time.Second,
+			},
+			Timeout: 10 * time.Second,
+		},
+	})
+
+	// IRC api
+	ircClient := twitch.NewClient(channelName, "oauth:x") // will be refreshed by helix client
+
+	helixClient.OnUserAccessTokenRefreshed(func(newAccessToken, newRefreshToken string) {
+		// Update the client's token
+		ircClient.SetIRCToken("oauth:" + newAccessToken)
+		// Update the stored refresh token with the new one
+		setRefreshToken(newRefreshToken)
+		fmt.Println("twitch helix client refreshed access token")
+	})
+
+	// will trigger auth refresh
+	_, err = helixClient.SendChatAnnouncement(&helix.SendChatAnnouncementParams{
+		BroadcasterID: channelId,
+		ModeratorID:   channelId,
+		Message:       "A Study of Light backend is now running",
+		// value must be one of "", "primary", "purple", "blue", "green", "orange"
+		Color: "primary",
+	})
 	if err != nil {
-		fmt.Println(err)
-		return
+		panic(fmt.Sprintf("failed to send initial helix broadcast: %v\n", err))
 	}
-	setRefreshToken(tokenResponse.RefreshToken)
+	fmt.Println("sent twitch startup announcement.")
 
-	client := twitch.NewClient(channelName, "oauth:"+tokenResponse.AccessToken)
-
-	go refreshTokenPeriodically(client, clientID, clientSecret)
+	api := &TwitchApi{
+		helixClient: helixClient,
+		ircClient:   ircClient,
+		subs:        []chan *Message{},
+	}
 
 	// Set up your client, handlers, etc. here
-	setup(client)
+	api.setupHandlers()
 
-	client.Join(channelName)
-
-	err = client.Connect()
-	if err != nil {
-		panic(err)
-	}
-}
-
-func refreshTokenPeriodically(client *twitch.Client, clientID, clientSecret string) {
-	interval := 3*time.Hour + 30*time.Minute
-	next := time.After(interval) // Set the interval to 3.5 hours
-	for {
-		<-next
-
-		// Call the function to refresh the token here
-		tokenResponse, err := RefreshAccessToken(clientID, clientSecret, getRefreshToken())
-		if err != nil {
-			fmt.Printf("Could not refresh the twitch access token: %v", err)
-			next = time.After(time.Minute * time.Duration(5))
-			continue
-		}
-		next = time.After(interval)
-
-		// Update the client's token
-		client.SetIRCToken("oauth:" + tokenResponse.AccessToken)
-		// Update the stored refresh token with the new one
-		setRefreshToken(tokenResponse.RefreshToken)
-	}
-}
-
-func setup(client *twitch.Client) {
-	client.OnPrivateMessage(func(message twitch.PrivateMessage) {
-		for _, e := range message.Emotes {
-			fmt.Printf("emote %s: https://static-cdn.jtvnw.net/emoticons/v1/%s/3.0\n", e.Name, e.ID)
-		}
-		fmt.Println("got message")
-	})
+	// listen to irc
 	go func() {
-		time.Sleep(time.Second * 5)
-		client.Say(channelName, "goo/livechat is running")
+		ircClient.Join(channelName)
+		fmt.Println("connecting to twitch irc")
+		err = ircClient.Connect()
+		if err != nil {
+			panic(err)
+		}
 	}()
+
+	return api
+}
+
+func getRefreshToken() string {
+	return string(keyvalue.Get(refreshTokenKey))
+}
+
+func setRefreshToken(token string) {
+	keyvalue.Set(refreshTokenKey, []byte(token))
 }

@@ -13,7 +13,7 @@ related features. Hopefully doesn't become too gooey.
 Set up the twitch cli and do
 
 ```bash
-twitch token -u -s 'chat:read chat:edit'
+twitch token -u -s 'chat:read chat:edit moderator:manage:announcements'
 ```
 
 Save the refresh token in `kv/TWITCH_REFRESH_TOKEN`
