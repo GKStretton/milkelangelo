@@ -1,6 +1,7 @@
 package keyvalue
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -47,5 +48,5 @@ func getKeyValue(key string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read value to key %s at %s: %v", key, p, err)
 	}
-	return value, nil
+	return bytes.TrimSuffix(value, []byte("\n")), nil
 }

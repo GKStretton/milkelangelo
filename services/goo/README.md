@@ -7,3 +7,13 @@ related features. Hopefully doesn't become too gooey.
 - [ ] Store / make available the Events.
 - [ ] Connect with the cloud system over gRPC, facilitating communication.
 - Perhaps, eventually replace pygateway and have controller<>goo be proto-based.
+
+## Twitch auth
+
+Set up the twitch cli and do
+
+```bash
+twitch token -u -s 'chat:read chat:edit'
+```
+
+Save the refresh token in `kv/TWITCH_REFRESH_TOKEN`

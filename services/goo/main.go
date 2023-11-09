@@ -11,6 +11,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/livecapture"
+	"github.com/gkstretton/dark/services/goo/livechat"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/obs"
 	"github.com/gkstretton/dark/services/goo/scheduler"
@@ -26,6 +27,9 @@ func main() {
 	flag.Parse()
 
 	if *test {
+		livechat.Start()
+		return
+
 		mqtt.Start()
 		sm := session.NewSessionManager(false)
 		events.Start(sm)
