@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/livechat"
@@ -74,6 +75,10 @@ func scheduleWatcher(s *Schedule) {
 }
 
 func Start(sm *session.SessionManager, twitchApi *livechat.TwitchApi) {
-	fmt.Printf("Starting scheduler\n")
-	defineSchedule(sm, twitchApi)
+	if os.Getenv("ENABLE_SCHEDULER") == "true" {
+		fmt.Printf("Starting scheduler\n")
+		defineSchedule(sm, twitchApi)
+	} else {
+		fmt.Println("ignoringscheduler, ENABLE_SCHEDULER not set")
+	}
 }

@@ -34,6 +34,7 @@ services:
     environment:
       OBS_LANDSCAPE_URL: ${OBS_LANDSCAPE_URL}
       EMAIL_RECIPIENT: ${EMAIL_RECIPIENT}
+      ENABLE_SCHEDULER: ${ENABLE_SCHEDULER}
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev
