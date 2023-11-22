@@ -1,0 +1,335 @@
+// A Study of Light machine messages
+
+syntax = "proto3";
+
+package machine;
+option go_package = "github.com/gkstretton/asol-protos/go/machinepb";
+
+enum Node {
+	option allow_alias = true;
+	UNDEFINED = 0;
+	HOME = 4;
+	HOME_TOP = 8;
+
+	// Above and inside test tube positions
+	// Note; INSIDE positions are valid for a range of z values, determined outside Navigation.
+	VIAL_1_ABOVE = 10;
+	MIN_VIAL_ABOVE = 10;
+	VIAL_1_INSIDE = 15;
+	MIN_VIAL_INSIDE = 15;
+
+	VIAL_2_ABOVE = 20;
+	VIAL_2_INSIDE = 25;
+
+	VIAL_3_ABOVE = 30;
+	VIAL_3_INSIDE = 35;
+
+	VIAL_4_ABOVE = 40;
+	VIAL_4_INSIDE = 45;
+
+	VIAL_5_ABOVE = 50;
+	VIAL_5_INSIDE = 55;
+
+	VIAL_6_ABOVE = 60;
+	VIAL_6_INSIDE = 65;
+
+	VIAL_7_ABOVE = 70;
+	MAX_VIAL_ABOVE = 70;
+	VIAL_7_INSIDE = 75;
+	MAX_VIAL_INSIDE = 75;
+
+	// The node to enter the lower (vial) regions at
+	LOW_ENTRY_POINT = 30;
+
+	// High z but otherwise aligned for rinse container
+	RINSE_CONTAINER_ENTRY = 80;
+	// Low z and aligned for rinse container (in water)
+	RINSE_CONTAINER_LOW = 85;
+
+	OUTER_HANDOVER = 90;
+	INNER_HANDOVER = 110;
+	INVERSE_KINEMATICS_POSITION = 150;
+
+	IDLE_LOCATION = 80;
+};
+
+// used in requests
+enum SolenoidValve {
+	VALVE_UNDEFINED = 0;
+	VALVE_DRAIN = 1;
+	VALVE_WATER = 2;
+	VALVE_MILK = 3;
+	VALVE_AIR = 4;
+}
+
+enum Mode {
+	UNDEFINED_MODE = 0;
+	MANUAL = 1;
+	AUTONOMOUS = 2;
+}
+
+enum Status {
+	UNDEFINED_STATUS = 0;
+	ERROR = 1;
+	E_STOP_ACTIVE = 5;
+	SLEEPING = 6;
+	SHUTTING_DOWN = 9;
+	WAKING_UP = 10;
+	CALIBRATING = 20;
+	IDLE_STATIONARY = 30;
+	IDLE_MOVING = 31;
+	RINSING_PIPETTE = 40;
+	DISPENSING = 50;
+	WAITING_FOR_DISPENSE = 55;
+	COLLECTING = 60;
+	NAVIGATING_IK = 70;
+	NAVIGATING_OUTER = 75;
+}
+
+enum RinseStatus {
+	RINSE_UNDEFINED = 0;
+	RINSE_COMPLETE = 1;
+	RINSE_REQUESTED = 2;
+	RINSE_EXPELLING = 3;
+}
+
+message PipetteState {
+	bool spent = 1;
+	uint32 vial_held = 2;
+	float volume_target_ul = 3;
+	// incremented every time a dispense is requested
+	uint32 dispense_request_number = 4;
+}
+
+message CollectionRequest {
+	bool completed = 1;
+	uint64 request_number = 2;
+	uint64 vial_number = 3;
+	float volume_ul = 4;
+}
+
+message MovementDetails {
+	// ik target from -1 to 1
+	float target_x_unit = 1;
+	// ik target from -1 to 1
+	float target_y_unit = 2;
+	// ik z target in mm
+	float target_z_ik = 5;
+	// fk target in degrees
+	float target_ring_deg = 10;
+	// fk target in degrees
+	float target_yaw_deg = 11;
+	// @exclude not adding current positions here, because
+	// these reports are sent when something changes, not
+	// regularly. Regular info can come through a controls
+	// / realtime report.
+}
+
+enum FluidType {
+	FLUID_UNDEFINED = 0;
+	FLUID_DRAIN = 1;
+	FLUID_WATER = 2;
+	FLUID_MILK = 3;
+}
+message FluidRequest {
+	FluidType fluidType = 1;
+	float volume_ml = 2;
+	bool complete = 3;
+	// if true, open drain while request is taking place
+	// (e.g. for rinsing with water)
+	bool open_drain = 4;
+}
+
+message FluidDetails {
+	float bowl_fluid_level_ml = 1;
+}
+
+message StateReport {
+	// Microseconds since cpu started. Note rollover.
+	// uint32 timestamp_cpu_us = 1;
+	reserved 1;
+	// timestamp in microseconds since unix epoch, UTC. Added
+	// by gateway since firmware doesn't know real time.
+	uint64 timestamp_unix_micros = 2;
+	// incremented on startup, currently 1 byte
+	uint64 startup_counter = 3;
+	Mode mode = 4;
+	Status status = 5;
+	// Useful for synchronisation with footage
+	bool lights_on = 6;
+	PipetteState pipette_state = 10;
+	CollectionRequest collection_request = 11;
+	MovementDetails movement_details = 12;
+	FluidRequest fluid_request = 13;
+	FluidDetails fluid_details = 14;
+	RinseStatus rinse_status = 15;
+	// the following are populated by the backend, useful in post-processing
+	bool paused = 50;
+	string timestamp_readable = 51;
+	// e.g. 1 for 0001.jpg
+	uint64 latest_dslr_file_number = 52;
+}
+
+message StateReportList {
+	repeated StateReport StateReports = 1;
+}
+
+/////////////////////////////////////////////
+// BACKEND STUFF
+// MAYBE MAKE SEPARATE PROTO IN FUTURE
+/////////////////////////////////////////////
+
+message SessionStatus {
+	uint64 id = 1;
+	bool paused = 2;
+	bool complete = 3;
+	bool production = 4;
+	uint64 production_id = 5;
+}
+
+message StreamStatus {
+	bool live = 1;
+}
+
+message DispenseMetadataMap {
+	// [startupCounter]_[dispenseRequestNumber]
+	map<string, DispenseMetadata> dispense_metadata = 1;
+}
+
+message DispenseMetadata {
+	bool failed_dispense = 1;
+	// how many ms later than expected the dispense happened
+	uint64 dispense_delay_ms = 2;
+	// if non-zero, override the vial profile's duration with this value.
+	uint64 min_duration_override_ms = 3;
+	// if non-zero, override the vial profile's speed with this value.
+	uint64 speed_mult_override = 4;
+}
+
+enum ContentType {
+	CONTENT_TYPE_UNDEFINED = 0;
+	CONTENT_TYPE_LONGFORM = 1;
+	CONTENT_TYPE_SHORTFORM = 2;
+	CONTENT_TYPE_CLEANING = 3;
+	CONTENT_TYPE_DSLR = 4;
+	CONTENT_TYPE_STILL = 5;
+}
+
+// statuses for all the content types for a specific session
+message ContentTypeStatuses {
+	// str(ContentType) -> ContentTypeStatus
+	map<string, ContentTypeStatus> content_statuses = 1;
+	// splashtext for this session
+	string splashtext = 2;
+	uint64 splashtext_hue = 3;
+}
+
+message ContentTypeStatus {
+	string raw_title = 1;
+	string raw_description = 2;
+	string caption = 3;
+	repeated Post posts = 5;
+}
+
+enum SocialPlatform {
+	SOCIAL_PLATFORM_UNDEFINED = 0;
+	SOCIAL_PLATFORM_YOUTUBE = 1;
+	SOCIAL_PLATFORM_TIKTOK = 2;
+	SOCIAL_PLATFORM_INSTAGRAM = 3;
+	SOCIAL_PLATFORM_FACEBOOK = 4;
+	SOCIAL_PLATFORM_TWITTER = 5;
+	SOCIAL_PLATFORM_REDDIT = 6;
+}
+
+message Post {
+	SocialPlatform platform = 1;
+	// e.g. subreddit
+	string sub_platform = 2;
+	string title = 3;
+	string description = 4;
+	bool uploaded = 5;
+	string url = 6;
+	// if true and relevant, crosspost rather than reuploading, e.g. for reddit
+	bool crosspost = 7;
+	// seconds ts of when to publish. If 0, publish immediately, because 0 is in the past.
+	uint64 scheduled_unix_timetamp = 8;
+}
+
+// emails used for administration, not intended for audience distribution
+message Email {
+	string subject = 1;
+	string body = 2;
+}
+
+/*
+This contains information about each vial/test tube.
+
+These should be maintained over time by the frontend interface and the backend
+in response to dispenses.
+
+The current value is copied into session files when a session starts if it's in
+the system.
+*/
+message VialProfile {
+	// incremental unique id for each vial in and out the system
+	uint64 id = 1;
+	// this should have a complete description of the mixture, including base
+	// fluids and the percentage makeup of each. This may be augmented by
+	// quantised makeup data in future.
+	string description = 2;
+	// the pipette slop, how much extra volume to move on the first dispense
+	float slop_ul = 3;
+	// how much volume to dispense each time
+	float dispense_volume_ul = 4;
+
+	//* The following may be derived from detailed mixture properties in future
+
+	// how long after dispense to slow down the footage in the videos
+	uint64 footage_delay_ms = 5;
+	// how long to keep the footage slowed down in the videos
+	uint64 footage_min_duration_ms = 6;
+	// what speed to give the footage in the videos
+	float footage_speed_mult = 7;
+	// if true, footage of this profile will not be treated differently
+	// to other footage (no slowdown etc.)
+	bool footage_ignore = 8;
+
+	// Volume when this was first put in vial
+	float initial_volume_ul = 9;
+	// Current volume. Note this will be just volume at start of session in
+	// session files.
+	float current_volume_ul = 10;
+
+	// friendly name for use in interfaces
+	string name = 11;
+
+	enum VialFluid {
+		VIAL_FLUID_UNDEFINED = 0;
+		VIAL_FLUID_DYE_WATER_BASED = 1;
+		VIAL_FLUID_EMULSIFIER = 2;
+	}
+	VialFluid vial_fluid = 12;
+
+	// colour to represent this in interfaces, of the form '#aa22ff'
+	string colour = 13;
+
+	// alternate names that can be used in voting
+	repeated string aliases = 14;
+}
+
+// contains a map of the current vial positions to vial profile ids
+// vial position -> VialProfile id.
+message SystemVialConfiguration {
+	map<uint64, uint64> vials = 1;
+}
+
+// this is for all the VialProfiles, mapped by id.
+message VialProfileCollection {
+	// VialProfile ID -> VialProfile
+	map<uint64, VialProfile> profiles = 1;
+}
+
+// contains a static snapshot of the VialProfiles for each system position
+message SystemVialConfigurationSnapshot {
+	map<uint64, VialProfile> profiles = 1;
+}

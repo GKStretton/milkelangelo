@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  codegen:
+    build: .
+    command: bash ./build.sh
+    volumes:
+      - .:/src
+  xlangconstants:
+    image: gkstretton/x-lang-constants
+    volumes:
+      - ./constants:/input
+      - .:/output

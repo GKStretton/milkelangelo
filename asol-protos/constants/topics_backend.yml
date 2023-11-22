@@ -1,0 +1,58 @@
+constants:
+  # add payload PRODUCTION to make prod
+  TOPIC_SESSION_BEGIN: "asol/session/begin"
+  TOPIC_SESSION_BEGAN: "asol/session/began"
+  TOPIC_SESSION_END: "asol/session/end"
+  TOPIC_SESSION_ENDED: "asol/session/ended"
+  TOPIC_SESSION_PAUSE: "asol/session/pause"
+  TOPIC_SESSION_PAUSED: "asol/session/paused"
+  TOPIC_SESSION_RESUME: "asol/session/resume"
+  TOPIC_SESSION_RESUMED: "asol/session/resumed"
+  TOPIC_STREAM_START: "asol/stream/begin"
+  TOPIC_STREAM_END: "asol/stream/end"
+
+  TOPIC_STREAM_STATUS_GET: "asol/stream/status-get"
+  TOPIC_STREAM_STATUS_RESP_JSON: "asol/stream/status-resp-json"
+  TOPIC_STREAM_STATUS_RESP_RAW: "asol/stream/status-resp-raw"
+  TOPIC_SESSION_STATUS_GET: "asol/session/status-get"
+  TOPIC_SESSION_STATUS_RESP_JSON: "asol/session/status-resp-json"
+  TOPIC_SESSION_STATUS_RESP_RAW: "asol/session/status-resp-raw"
+
+  TOPIC_STATE_REPORT_JSON: "asol/state-report-json"
+
+  TOPIC_KV_GET: "asol/kv/get/"
+  TOPIC_KV_GET_RESP: "asol/kv/get-resp/"
+  TOPIC_KV_SET: "asol/kv/set/"
+  TOPIC_KV_SET_RESP: "asol/kv/set-resp/"
+
+  TOPIC_TRIGGER_DSLR: "asol/dslr-crop-capture"
+  TOPIC_TRIGGER_DSLR_RESP: "asol/dslr-crop-capture-resp"
+
+  TOPIC_MONITOR_ON: "asol/monitor_on"
+  TOPIC_MONITOR_OFF: "asol/monitor_off"
+
+  TOPIC_CLOSE_BLIND: "asol/close_bedroom_blind"
+  TOPIC_OPEN_BLIND: "asol/open_bedroom_blind"
+
+  TOPIC_SMART_SWITCH: "cmnd/tasmota_sw1/Power1"
+  TOPIC_FRIDGE_SWITCH: "cmnd/tasmota_sw_fridge/Power1"
+  PAYLOAD_SMART_SWITCH_ON: "ON"
+  PAYLOAD_SMART_SWITCH_OFF: "OFF"
+
+  # deprecated
+  TOPIC_STILLS_GENERATED: "asol/stills-generated"
+
+  TOPIC_PIECE_SELECTED: "asol/piece-selected"
+  TOPIC_VIDEOS_GENERATED: "asol/videos-generated"
+
+  TOPIC_MARK_FAILED_DISPENSE: "asol/mark-failed-dispense"
+  TOPIC_MARK_DELAYED_DISPENSE: "asol/mark-delayed-dispense"
+
+  TOPIC_EMAIL_SEND: "asol/send-email"
+
+  TRIGGER_UPLOAD_FROM_LATEST_CONTENT_PLAN: "asol/upload-from-latest-content-plan"
+
+  # (VialProfileCollection)
+  KV_KEY_ALL_VIAL_PROFILES: "vial-profiles"
+  # (SystemVialConfiguration)
+  KV_KEY_SYSTEM_VIAL_PROFILES: "system-vial-profiles"

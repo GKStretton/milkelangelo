@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   rtsp:
-    build: services/rtsp
+    build: rtsp
     restart: unless-stopped
     network_mode: host
     ports:
@@ -10,14 +10,14 @@ services:
       - 8888:8888
       - 8889:8889
     volumes:
-      - ./services/rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
-      - ./services/rtsp/scripts:/scripts
+      - ./rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
+      - ./rtsp/scripts:/scripts
       - ${LIGHT_STORES_DIR}/kv:/config
     devices:
       - $TOP_CAM:/dev/top-cam
       - $FRONT_CAM:/dev/front-cam
   pygateway:
-    build: services/pygateway
+    build: pygateway
     devices:
       - /dev/ttyACM0
     tty: true
@@ -27,7 +27,7 @@ services:
       BROKER_HOST: ${BROKER_HOST:-localhost}
       DEBUG_PYGATEWAY: ${DEBUG_PYGATEWAY:-false}
   goo:
-    build: services/goo
+    build: goo
     command: -basePath ${LIGHT_STORES_DIR}
     restart: unless-stopped
     network_mode: host
@@ -43,7 +43,7 @@ services:
     user: "1000:1000"
   dslrcapture:
     build:
-      context: ./services
+      context: .
       dockerfile: dslrcapture/Dockerfile
     command: -basePath ${LIGHT_STORES_DIR}
     restart: unless-stopped
@@ -57,7 +57,6 @@ services:
       - /dev:/dev
       - ./tools:/tools
       - ./resources:/resources
-      - ./services/goo:/goo
   interface:
     build:
       context: ./interface
