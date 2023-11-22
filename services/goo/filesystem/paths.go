@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -15,6 +16,7 @@ var (
 	metadataPath                = flag.String("metadataPath", "session_metadata", "path for session metadata")
 	rawVideoPath                = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
 	stateReportFileName         = flag.String("stateReportFileName", "state-reports.yml", "filename for list of state reports")
+	contentPlanFileName         = flag.String("contentPlanFileName", "content_plan.yml", "filename for content plan")
 	dispenseMetadataFileName    = flag.String("dispenseMetadataFileName", "dispense-metadata.yml", "filename for dispense metadata")
 	vialProfileSnapshotFileName = flag.String("vialProfileSnapshotFileName", "vial-profiles.yml", "filename for vial profiles")
 )
@@ -64,6 +66,20 @@ func GetStateReportPath(sessionId uint64) string {
 	}
 	SetPerms(p)
 	return filepath.Join(p, *stateReportFileName)
+}
+
+func GetContentPlanPath(sessionId uint64) string {
+	p := filepath.Join(
+		*basePath,
+		*contentPath,
+		strconv.Itoa(int(sessionId)),
+	)
+	err := os.MkdirAll(p, 0777)
+	if err != nil {
+		panic(fmt.Errorf("failed to create state report path: %v", err))
+	}
+	SetPerms(p)
+	return filepath.Join(p, *contentPlanFileName)
 }
 
 func GetDispenseMetadataPath(sessionId uint64) string {
@@ -153,6 +169,40 @@ func GetPostDslrDir(sessionId uint64) string {
 	SetPerms(p)
 	SetPerms(p2)
 	return p2
+}
+
+// get dir with post processed videos in
+func GetPostVideosDir(sessionId uint64) string {
+	return filepath.Join(
+		*basePath,
+		*contentPath,
+		strconv.Itoa(int(sessionId)),
+		"video",
+		"post",
+	)
+}
+
+// GetPostStillFile returns the filename of the first .jpg file in the specified directory
+func GetPostStillFile(sessionId uint64) (string, error) {
+	searchDir := filepath.Join(
+		*basePath,
+		*contentPath,
+		strconv.Itoa(int(sessionId)),
+		"dslr",
+	)
+
+	files, err := os.ReadDir(searchDir)
+	if err != nil {
+		return "", err
+	}
+
+	for _, file := range files {
+		if strings.HasSuffix(file.Name(), ".jpg") {
+			return filepath.Join(searchDir, file.Name()), nil
+		}
+	}
+
+	return "", fmt.Errorf("no .jpg files found in directory %s", searchDir)
 }
 
 // GetIncrementalFile considers 'outDir' and returns the **full path to** the

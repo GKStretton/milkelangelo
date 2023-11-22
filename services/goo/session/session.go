@@ -216,6 +216,18 @@ func (sm *SessionManager) GetLatestSession() (*Session, error) {
 	return latest, nil
 }
 
+// GetLatestProductionSession returns nil, nil if there are no sessions yet
+func (sm *SessionManager) GetLatestProdutionSession() (*Session, error) {
+	sm.lock.Lock()
+	defer sm.lock.Unlock()
+
+	latest, err := sm.s.getLatestProduction()
+	if err != nil {
+		return nil, err
+	}
+	return latest, nil
+}
+
 func (sm *SessionManager) clearLatestCache() {
 	sm.lock.Lock()
 	defer sm.lock.Unlock()

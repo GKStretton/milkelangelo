@@ -20,6 +20,10 @@ github.com/gempir/go-twitch-irc/v4 v4.0.0 h1:sHVIvbWOv9nHXGEErilclxASv0AaQEr/r/f
 github.com/gempir/go-twitch-irc/v4 v4.0.0/go.mod h1:QsOMMAk470uxQ7EYD9GJBGAVqM/jDrXBNbuePfTauzg=
 github.com/gkstretton/asol-protos v0.0.9-0.20231022084157-bc08a2b5a5db h1:Rq+8w2P4PL4HN+Ms7qL6vl56PpCF02MYGNaOKypAEfc=
 github.com/gkstretton/asol-protos v0.0.9-0.20231022084157-bc08a2b5a5db/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.9-0.20231115134409-7736e874bcb8 h1:c/cvalBOozb+Y88USeLRJz3Tfh7zr4IMaKFZj3QDb2Q=
+github.com/gkstretton/asol-protos v0.0.9-0.20231115134409-7736e874bcb8/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
+github.com/gkstretton/asol-protos v0.0.9-0.20231121080309-bd93879457b6 h1:ioDUMmaiajNgrq5hKDbhmRkQvRsPH4x3lpewYponcZU=
+github.com/gkstretton/asol-protos v0.0.9-0.20231121080309-bd93879457b6/go.mod h1:zJPBi+kKaLCu/+qpuZmxEC8E7DqyACjktPXCx2cNufE=
 github.com/gobwas/httphead v0.1.0 h1:exrUm0f4YX0L7EBwZHuCF4GDp8aJfVeBrlLQrs6NqWU=
 github.com/gobwas/httphead v0.1.0/go.mod h1:O/RXo79gxV8G+RqlR/otEwx4Q36zl9rqC5u12GKvMCM=
 github.com/gobwas/pool v0.2.1 h1:xfeeEhW7pwmX8nuLVlqbzVc7udMDrwetjEv+TZIz1og=

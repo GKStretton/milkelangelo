@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/actor"
+	"github.com/gkstretton/dark/services/goo/contentscheduler"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/filesystem"
@@ -29,6 +30,9 @@ func main() {
 	if *test {
 		mqtt.Start()
 		sm := session.NewSessionManager(false)
+		// contentscheduler.Test(sm)
+		// return
+
 		twitchApi := livechat.Start()
 		events.Start(sm)
 		time.Sleep(time.Second)
@@ -50,6 +54,7 @@ func main() {
 	obs.Start(sm)
 	vialprofiles.Start(sm)
 	scheduler.Start(sm, twitchApi)
+	contentscheduler.Start(sm)
 
 	// Block to prevent early quit
 	fmt.Println("finished init, main loop sleeping.")

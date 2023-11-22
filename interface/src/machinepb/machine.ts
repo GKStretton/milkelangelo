@@ -797,6 +797,50 @@ export interface VialProfile {
    * session files.
    */
   currentVolumeUl: number;
+  /** friendly name for use in interfaces */
+  name: string;
+  vialFluid: VialProfile_VialFluid;
+  /** colour to represent this with in interfaces, of the form '#aa22ff' */
+  colour: string;
+}
+
+export enum VialProfile_VialFluid {
+  VIAL_FLUID_UNDEFINED = 0,
+  VIAL_FLUID_DYE_WATER_BASED = 1,
+  VIAL_FLUID_EMULSIFIER = 2,
+  UNRECOGNIZED = -1,
+}
+
+export function vialProfile_VialFluidFromJSON(object: any): VialProfile_VialFluid {
+  switch (object) {
+    case 0:
+    case "VIAL_FLUID_UNDEFINED":
+      return VialProfile_VialFluid.VIAL_FLUID_UNDEFINED;
+    case 1:
+    case "VIAL_FLUID_DYE_WATER_BASED":
+      return VialProfile_VialFluid.VIAL_FLUID_DYE_WATER_BASED;
+    case 2:
+    case "VIAL_FLUID_EMULSIFIER":
+      return VialProfile_VialFluid.VIAL_FLUID_EMULSIFIER;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return VialProfile_VialFluid.UNRECOGNIZED;
+  }
+}
+
+export function vialProfile_VialFluidToJSON(object: VialProfile_VialFluid): string {
+  switch (object) {
+    case VialProfile_VialFluid.VIAL_FLUID_UNDEFINED:
+      return "VIAL_FLUID_UNDEFINED";
+    case VialProfile_VialFluid.VIAL_FLUID_DYE_WATER_BASED:
+      return "VIAL_FLUID_DYE_WATER_BASED";
+    case VialProfile_VialFluid.VIAL_FLUID_EMULSIFIER:
+      return "VIAL_FLUID_EMULSIFIER";
+    case VialProfile_VialFluid.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 /**
@@ -2665,6 +2709,9 @@ function createBaseVialProfile(): VialProfile {
     footageIgnore: false,
     initialVolumeUl: 0,
     currentVolumeUl: 0,
+    name: "",
+    vialFluid: 0,
+    colour: "",
   };
 }
 
@@ -2699,6 +2746,15 @@ export const VialProfile = {
     }
     if (message.currentVolumeUl !== 0) {
       writer.uint32(85).float(message.currentVolumeUl);
+    }
+    if (message.name !== "") {
+      writer.uint32(90).string(message.name);
+    }
+    if (message.vialFluid !== 0) {
+      writer.uint32(96).int32(message.vialFluid);
+    }
+    if (message.colour !== "") {
+      writer.uint32(106).string(message.colour);
     }
     return writer;
   },
@@ -2780,6 +2836,27 @@ export const VialProfile = {
 
           message.currentVolumeUl = reader.float();
           continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        case 12:
+          if (tag !== 96) {
+            break;
+          }
+
+          message.vialFluid = reader.int32() as any;
+          continue;
+        case 13:
+          if (tag !== 106) {
+            break;
+          }
+
+          message.colour = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2803,6 +2880,9 @@ export const VialProfile = {
       footageIgnore: isSet(object.footage_ignore) ? globalThis.Boolean(object.footage_ignore) : false,
       initialVolumeUl: isSet(object.initial_volume_ul) ? globalThis.Number(object.initial_volume_ul) : 0,
       currentVolumeUl: isSet(object.current_volume_ul) ? globalThis.Number(object.current_volume_ul) : 0,
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      vialFluid: isSet(object.vial_fluid) ? vialProfile_VialFluidFromJSON(object.vial_fluid) : 0,
+      colour: isSet(object.colour) ? globalThis.String(object.colour) : "",
     };
   },
 
@@ -2838,6 +2918,15 @@ export const VialProfile = {
     if (message.currentVolumeUl !== 0) {
       obj.current_volume_ul = message.currentVolumeUl;
     }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.vialFluid !== 0) {
+      obj.vial_fluid = vialProfile_VialFluidToJSON(message.vialFluid);
+    }
+    if (message.colour !== "") {
+      obj.colour = message.colour;
+    }
     return obj;
   },
 
@@ -2856,6 +2945,9 @@ export const VialProfile = {
     message.footageIgnore = object.footageIgnore ?? false;
     message.initialVolumeUl = object.initialVolumeUl ?? 0;
     message.currentVolumeUl = object.currentVolumeUl ?? 0;
+    message.name = object.name ?? "";
+    message.vialFluid = object.vialFluid ?? 0;
+    message.colour = object.colour ?? "";
     return message;
   },
 };

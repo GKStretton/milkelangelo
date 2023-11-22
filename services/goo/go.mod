@@ -9,7 +9,7 @@ require (
 	github.com/andreykaipov/goobs v0.12.0
 	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/gempir/go-twitch-irc/v4 v4.0.0
-	github.com/gkstretton/asol-protos v0.0.9-0.20231022084157-bc08a2b5a5db
+	github.com/gkstretton/asol-protos v0.0.9-0.20231121080309-bd93879457b6
 	github.com/gorilla/websocket v1.5.0
 	github.com/nicklaw5/helix/v2 v2.25.2
 	github.com/stretchr/testify v1.8.1

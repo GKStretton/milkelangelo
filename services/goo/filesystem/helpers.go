@@ -79,12 +79,12 @@ func SetPerms(p string) {
 func WriteProtoYaml(path string, msg proto.Message) error {
 	data, err := protoyaml.Marshal(msg)
 	if err != nil {
-		return fmt.Errorf("error marshalling delayed dispenses: %v", err)
+		return fmt.Errorf("error marshalling proto yaml: %v", err)
 	}
 
 	err = os.WriteFile(path, data, 0644)
 	if err != nil {
-		return fmt.Errorf("error writing delayed dispenses file: %v", err)
+		return fmt.Errorf("error writing proto yaml: %v", err)
 	}
 
 	return nil

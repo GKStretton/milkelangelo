@@ -59,9 +59,9 @@ func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan
 
 func decideNextAction(decider decider.Decider, predictedState *machinepb.StateReport) executor.Executor {
 	if predictedState.PipetteState.Spent {
-		fmt.Println("decided COLLECTION")
+		fmt.Println("collection is next, deciding...")
 		return decider.DecideCollection(predictedState)
 	}
-	fmt.Println("decided DISPENSE")
+	fmt.Println("dispense is next, deciding...")
 	return decider.DecideDispense(predictedState)
 }

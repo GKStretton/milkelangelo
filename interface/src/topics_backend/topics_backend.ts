@@ -38,3 +38,4 @@ export const TOPIC_STREAM_STATUS_RESP_RAW: string = "asol/stream/status-resp-raw
 export const TOPIC_TRIGGER_DSLR: string = "asol/dslr-crop-capture";
 export const TOPIC_TRIGGER_DSLR_RESP: string = "asol/dslr-crop-capture-resp";
 export const TOPIC_VIDEOS_GENERATED: string = "asol/videos-generated";
+export const TRIGGER_UPLOAD_FROM_LATEST_CONTENT_PLAN: string = "asol/upload-from-latest-content-plan";

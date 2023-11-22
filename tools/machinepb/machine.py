@@ -110,6 +110,12 @@ class SocialPlatform(betterproto.Enum):
     SOCIAL_PLATFORM_REDDIT = 6
 
 
+class VialProfileVialFluid(betterproto.Enum):
+    VIAL_FLUID_UNDEFINED = 0
+    VIAL_FLUID_DYE_WATER_BASED = 1
+    VIAL_FLUID_EMULSIFIER = 2
+
+
 @dataclass
 class PipetteState(betterproto.Message):
     spent: bool = betterproto.bool_field(1)
@@ -298,6 +304,11 @@ class VialProfile(betterproto.Message):
     # Current volume. Note this will be just volume at start of session in
     # session files.
     current_volume_ul: float = betterproto.float_field(10)
+    # friendly name for use in interfaces
+    name: str = betterproto.string_field(11)
+    vial_fluid: "VialProfileVialFluid" = betterproto.enum_field(12)
+    # colour to represent this with in interfaces, of the form '#aa22ff'
+    colour: str = betterproto.string_field(13)
 
 
 @dataclass

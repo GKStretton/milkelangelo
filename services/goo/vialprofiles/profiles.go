@@ -39,7 +39,7 @@ func Start(sm *session.SessionManager) {
 }
 
 func saveSnapshot(sessionId uint64) {
-	snapshot := getSystemVialConfigurationSnapshot()
+	snapshot := GetSystemVialConfigurationSnapshot()
 
 	path := filesystem.GetVialProfileSnapshotPath(sessionId)
 	err := filesystem.WriteProtoYaml(path, snapshot)
@@ -50,7 +50,7 @@ func saveSnapshot(sessionId uint64) {
 
 // returns the map of vial position -> profile
 // probably for saving at the start of a session
-func getSystemVialConfigurationSnapshot() *machinepb.SystemVialConfigurationSnapshot {
+func GetSystemVialConfigurationSnapshot() *machinepb.SystemVialConfigurationSnapshot {
 	all := getAllProfiles()
 	positionConfig := getSystemProfileConfiguration()
 
@@ -93,6 +93,6 @@ func getSystemProfileConfiguration() *machinepb.SystemVialConfiguration {
 // does a lookup against the system configuration
 // returns nil if can't find
 func GetSystemVialProfile(vialPosition int) *machinepb.VialProfile {
-	snapshot := getSystemVialConfigurationSnapshot()
+	snapshot := GetSystemVialConfigurationSnapshot()
 	return snapshot.Profiles[uint64(vialPosition)]
 }

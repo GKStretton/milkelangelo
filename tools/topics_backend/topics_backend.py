@@ -39,3 +39,4 @@ TOPIC_STREAM_STATUS_RESP_RAW: Literal["asol/stream/status-resp-raw"] = "asol/str
 TOPIC_TRIGGER_DSLR: Literal["asol/dslr-crop-capture"] = "asol/dslr-crop-capture"
 TOPIC_TRIGGER_DSLR_RESP: Literal["asol/dslr-crop-capture-resp"] = "asol/dslr-crop-capture-resp"
 TOPIC_VIDEOS_GENERATED: Literal["asol/videos-generated"] = "asol/videos-generated"
+TRIGGER_UPLOAD_FROM_LATEST_CONTENT_PLAN: Literal["asol/upload-from-latest-content-plan"] = "asol/upload-from-latest-content-plan"
