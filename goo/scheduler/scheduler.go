@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/gkstretton/dark/services/goo/livechat"
 	"github.com/gkstretton/dark/services/goo/session"
+	"github.com/gkstretton/dark/services/goo/twitch"
 )
 
 type RecurringTime struct {
@@ -74,7 +74,7 @@ func scheduleWatcher(s *Schedule) {
 	}
 }
 
-func Start(sm *session.SessionManager, twitchApi *livechat.TwitchApi) {
+func Start(sm *session.SessionManager, twitchApi *twitch.TwitchApi) {
 	if os.Getenv("ENABLE_SCHEDULER") == "true" {
 		fmt.Printf("Starting scheduler\n")
 		defineSchedule(sm, twitchApi)

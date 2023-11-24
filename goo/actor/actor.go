@@ -8,14 +8,14 @@ import (
 	"github.com/gkstretton/dark/services/goo/actor/decider"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
 	"github.com/gkstretton/dark/services/goo/events"
-	"github.com/gkstretton/dark/services/goo/livechat"
+	"github.com/gkstretton/dark/services/goo/twitch"
 )
 
 var waitForUser = flag.Bool("waitForUser", false, "if true, do blocking waits at certain debug points")
 
 // LaunchActor is launched to control a session after the canvas is prepared.
 // It should effect art.
-func LaunchActor(twitchApi *livechat.TwitchApi) {
+func LaunchActor(twitchApi *twitch.TwitchApi) {
 	fmt.Printf("Launching actor\n")
 
 	// access state reports

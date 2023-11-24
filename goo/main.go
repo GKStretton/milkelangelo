@@ -12,11 +12,11 @@ import (
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/livecapture"
-	"github.com/gkstretton/dark/services/goo/livechat"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/obs"
 	"github.com/gkstretton/dark/services/goo/scheduler"
 	"github.com/gkstretton/dark/services/goo/session"
+	"github.com/gkstretton/dark/services/goo/twitch"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
@@ -33,7 +33,7 @@ func main() {
 		// contentscheduler.Test(sm)
 		// return
 
-		twitchApi := livechat.Start()
+		twitchApi := twitch.Start()
 		events.Start(sm)
 		time.Sleep(time.Second)
 		actor.LaunchActor(twitchApi)
@@ -47,7 +47,7 @@ func main() {
 	email.Start()
 
 	sm := session.NewSessionManager(false)
-	twitchApi := livechat.Start()
+	twitchApi := twitch.Start()
 
 	events.Start(sm)
 	livecapture.Start(sm)
