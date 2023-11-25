@@ -11,6 +11,9 @@ function App() {
       console.log("got auth: ", auth);
       setAuth(auth);
     })
+    ext.listen("broadcast", (target, contentType, message) => {
+      console.log("got broadcast: ", target, contentType, message);
+    })
   }, [ext])
   const { height, width } = useWindowDimensions();
   const [{x, y}, setCoords] = useState({x: 0, y: 0})
