@@ -47,6 +47,11 @@ func main() {
 
 		fmt.Fprintf(w, "<h1>test</h1>\n<p>%f, %f</p><p>%s</p>", locationVote.X, locationVote.Y, claims.OpaqueUserID)
 	})
+	http.HandleFunc("/listen", func(w http.ResponseWriter, r *http.Request) {
+		//todo: verify depth/goo auth token
+		//todo: open sse stream
+		//todo: send every vote to listener. (this is stateless)
+	})
 
 	fmt.Println("listening...")
 	log.Fatal(http.ListenAndServe("localhost:8080", nil))

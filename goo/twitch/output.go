@@ -2,7 +2,6 @@ package twitch
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/nicklaw5/helix/v2"
 )
@@ -35,27 +34,4 @@ func (c *TwitchApi) Say(msg string) {
 
 func (c *TwitchApi) Reply(msgId string, msg string) {
 	c.ircClient.Reply(channelName, msgId, msg)
-}
-
-func (c *TwitchApi) SendExtensionMessage(payload string) {
-	r, err := c.helixClient.SendExtensionPubSubMessage(&helix.ExtensionSendPubSubMessageParams{
-		BroadcasterID: channelId,
-		Message:       payload,
-		Target:        []helix.ExtensionPubSubPublishType{helix.ExtensionPubSubBroadcastPublish},
-	})
-	if err != nil {
-		fmt.Printf("failed to send pubsub message: %v\n", err)
-		return
-	}
-	if r.Error != "" {
-		fmt.Printf("failed to send pubsub message: %v\n", r)
-		return
-	}
-
-}
-
-func init() {
-	api := Start()
-	api.SendExtensionMessage("test msg")
-	os.Exit(0)
 }
