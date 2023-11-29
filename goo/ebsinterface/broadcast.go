@@ -10,21 +10,16 @@ import (
 )
 
 // consists of latest state report and current vote status
-type BroadcastData struct{}
+type BroadcastData = string
 
-func (e *extensionSession) BroadcastData(data *BroadcastData) error {
-	messageData, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-
+func (e *extensionSession) BroadcastData(data BroadcastData) error {
 	type payload struct {
 		message        string
 		broadcaster_id string
 		target         []string
 	}
 	pl := &payload{
-		message:        string(messageData),
+		message:        data,
 		broadcaster_id: channelId,
 		target:         []string{"broadcast"},
 	}

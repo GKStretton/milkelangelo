@@ -71,6 +71,8 @@ func (e *extensionSession) launch() error {
 	return errors.New("launch not implemented for hosted ebs")
 }
 
+// CleanUp will be automatically called after duration specified on creation.
+// If exiting early, call manually.
 func (e *extensionSession) CleanUp() {
 	e.lock.Lock()
 	defer e.lock.Unlock()

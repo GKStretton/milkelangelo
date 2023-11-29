@@ -11,7 +11,7 @@ import (
 const ebsListenUrl = "http://localhost:8080/listen"
 
 // json string
-type VoteData string
+type VoteData = string
 
 var subs = []chan VoteData{}
 var subsLock = sync.Mutex{}
@@ -38,7 +38,7 @@ func (e *extensionSession) UnsubscribeVotes(c <-chan VoteData) {
 }
 
 func (e *extensionSession) distributeVote(data VoteData) {
-	l.Printf("got vote: %s\n", string(data))
+	l.Printf("got vote: %s\n", data)
 	subsLock.Lock()
 	defer subsLock.Unlock()
 
