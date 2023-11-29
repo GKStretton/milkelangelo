@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-var viewerRequestLogging = flag.Bool("requestLogging", false, "if enabled, log viewer requests")
+var viewerRequestLogging = flag.Bool("requestLogging", true, "if enabled, log viewer requests")
 
 func voteHandler(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
@@ -17,31 +17,37 @@ func voteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	claims, err := verifyUserRequest(r)
 	if err != nil {
-		fmt.Printf("error verifying user request: %v\n", err)
-		w.WriteHeader(http.StatusForbidden)
+		httpErr(&w, http.StatusForbidden, "error verifying user request: %v", err)
 		return
 	}
 
 	data, err := io.ReadAll(r.Body)
 	r.Body.Close()
 	if err != nil {
-		fmt.Printf("failed to read body: %v\n", err)
-		w.WriteHeader(http.StatusBadRequest)
+		httpErr(&w, http.StatusBadRequest, "failed to read body: %v", err)
 		return
 	}
 	if *viewerRequestLogging {
-		fmt.Printf("got vote data from %s\n", r.RemoteAddr)
+		fmt.Printf("got vote data from %s: %s\n", r.RemoteAddr, string(data))
 	}
-	err = sendVote(&vote{
-		data:          data,
-		opaqueUserID:  claims.OpaqueUserID,
-		isBroadcaster: claims.Role != "broadcaster",
+	err = sendVote(&Vote{
+		Data:          string(data),
+		OpaqueUserID:  claims.OpaqueUserID,
+		IsBroadcaster: claims.Role != "broadcaster",
 	})
 	if err != nil {
-		fmt.Fprintf(w, "failed to vote: %s", err)
-		w.WriteHeader(http.StatusInternalServerError)
+		httpErr(&w, http.StatusInternalServerError, "failed to vote: %s", err)
 		return
 	}
 
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func httpErr(w *http.ResponseWriter, code int, s string, args ...interface{}) {
+	msg := fmt.Errorf(s, args...)
+	(*w).WriteHeader(code)
+	fmt.Fprintln(*w, msg)
+	if *viewerRequestLogging {
+		fmt.Println(fmt.Sprintf("%d: %s", code, msg))
+	}
 }

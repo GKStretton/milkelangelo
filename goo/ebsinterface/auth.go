@@ -1,4 +1,4 @@
-package twitchextension
+package ebsinterface
 
 import (
 	"encoding/base64"

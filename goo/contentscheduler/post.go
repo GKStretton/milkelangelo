@@ -16,6 +16,10 @@ func (m *manager) handlePost(ct machinepb.ContentType, post *machinepb.Post, ses
 		return "", fmt.Errorf("could not get post content paths: %v", err)
 	}
 
+	if !filesystem.Exists(contentPath + ".completed") {
+		return "", fmt.Errorf("content .completed file not found for %s", contentPath)
+	}
+
 	req := &socialmedia.UploadRequest{
 		Platform:          post.Platform,
 		Type:              socialmedia.VideoPost,

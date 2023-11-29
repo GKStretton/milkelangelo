@@ -3,6 +3,7 @@
 import argparse
 from datetime import datetime
 import os
+from pathlib import Path
 
 from moviepy.editor import ImageClip, CompositeVideoClip, TextClip
 from videoediting.loaders import get_selected_dslr_realpath
@@ -39,7 +40,8 @@ def get_file_date_time(path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--base-dir", action="store",
-                        help=("base directory containing session_content and session_metadata"),
+                        help=(
+                            "base directory containing session_content and session_metadata"),
                         default="/mnt/md0/light-stores")
     parser.add_argument("-n", "--session-number", action="store",
                         help="session number e.g. 5", required=True)
@@ -100,5 +102,8 @@ if __name__ == "__main__":
     # clip.resize((1000, 1000)).show(interactive=True)
 
     filename = f"{metadata['production_id']}" if metadata['production'] else f"dev{metadata['id']}"
-    still_path = os.path.join(base_dir, "session_content", str(session_number), "dslr", f"{filename}.jpg")
+    still_path = os.path.join(base_dir, "session_content", str(
+        session_number), "dslr", f"{filename}.jpg")
     clip.save_frame(still_path, t=0.5)
+
+    Path(f"{still_path}.completed").touch()

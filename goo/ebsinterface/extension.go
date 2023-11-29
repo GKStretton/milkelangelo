@@ -1,12 +1,15 @@
-package twitchextension
+package ebsinterface
 
 import (
 	"errors"
 	"flag"
-	"fmt"
+	"log"
+	"os"
 	"sync"
 	"time"
 )
+
+var l = log.New(os.Stdout, "[EBS Interface] ", log.Flags())
 
 const channelId = "807784320"
 
@@ -19,6 +22,9 @@ type extensionSession struct {
 	ebsListeningToken string
 	cleanUpDone       bool
 	lock              sync.Mutex
+
+	// used to disconnect from ebs
+	exitCh chan struct{}
 }
 
 func NewExtensionSession(dur time.Duration) (*extensionSession, error) {
@@ -34,6 +40,7 @@ func NewExtensionSession(dur time.Duration) (*extensionSession, error) {
 	es := &extensionSession{
 		broadcastToken:    bt,
 		ebsListeningToken: elt,
+		exitCh:            make(chan struct{}),
 	}
 
 	err = es.launch()
@@ -44,6 +51,14 @@ func NewExtensionSession(dur time.Duration) (*extensionSession, error) {
 		time.Sleep(dur)
 		es.CleanUp()
 	}()
+
+	l.Println("connecting to ebs...")
+	err = es.connect()
+	if err != nil {
+		return nil, err
+	}
+	l.Println("connected to ebs.")
+
 	return es, nil
 }
 
@@ -64,9 +79,11 @@ func (e *extensionSession) CleanUp() {
 	}
 	defer func() { e.cleanUpDone = true }()
 
+	close(e.exitCh)
+
 	if *useLocalEBS {
 		return
 	}
 	// todo: implement
-	fmt.Println("error, cleanup not implemented for hosted ebs")
+	l.Println("error, cleanup not implemented for hosted ebs")
 }

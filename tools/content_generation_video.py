@@ -8,6 +8,7 @@ import typing
 from datetime import datetime
 import os
 import logging
+from pathlib import Path
 
 from moviepy.editor import VideoClip, CompositeVideoClip, clips_array, TextClip
 from moviepy.video.fx import resize
@@ -37,7 +38,8 @@ def get_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--base-dir", action="store",
-                        help=("base directory containing session_content and session_metadata"),
+                        help=(
+                            "base directory containing session_content and session_metadata"),
                         default="/mnt/md0/light-stores")
     parser.add_argument("-n", "--session-number", action="store",
                         help="session number e.g. 5", required=True)
@@ -72,14 +74,16 @@ def setup_logging(base_dir: str, session_number: int, content_type: pb.ContentTy
                             logging.StreamHandler(),
                             logging.FileHandler(log_file)
                         ])
-    logging.info("logging initialised for %d, %s", session_number, content_type.name)
+    logging.info("logging initialised for %d, %s",
+                 session_number, content_type.name)
 
 
 def get_output_file(base_dir: str, session_number: int, content_type: pb.ContentType) -> typing.Tuple[str, int]:
     """
     Returns main content file and increment number for this content type
     """
-    output_dir = os.path.join(loaders.get_session_content_path(base_dir, session_number), "video/post/")
+    output_dir = os.path.join(loaders.get_session_content_path(
+        base_dir, session_number), "video/post/")
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
 
@@ -101,29 +105,37 @@ def render(
     thumbnail_time: int
 ):
     """ Render overlay, then content, outputting to files """
-    output_dir = os.path.join(loaders.get_session_content_path(base_dir, session_number), "video/post/")
+    output_dir = os.path.join(loaders.get_session_content_path(
+        base_dir, session_number), "video/post/")
 
     content_file, i = get_output_file(base_dir, session_number, content_type)
-    thumbnail_file = os.path.join(output_dir, f"{content_type.name}-thumbnail.{i}.jpg")
-    overlay_file = os.path.join(output_dir, f"{content_type.name}-overlay.{i}.mp4")
+    thumbnail_file = os.path.join(
+        output_dir, f"{content_type.name}-thumbnail.{i}.jpg")
+    overlay_file = os.path.join(
+        output_dir, f"{content_type.name}-overlay.{i}.mp4")
 
     content.save_frame(thumbnail_file, t=thumbnail_time, with_mask=False)
     logging.info(f"wrote thumbnail to {thumbnail_file}")
 
     overlay_render_start = datetime.now()
     overlay.write_videofile(overlay_file, codec='libx264', fps=FPS)
-    logging.info(f"overlay generation time: {str(datetime.now() - overlay_render_start)}")
+    logging.info(
+        f"overlay generation time: {str(datetime.now() - overlay_render_start)}")
 
     content_render_start = datetime.now()
     content.write_videofile(content_file, codec='libx264', fps=FPS)
-    logging.info(f"content generation time: {str(datetime.now() - content_render_start)}")
+    logging.info(
+        f"content generation time: {str(datetime.now() - content_render_start)}")
+
+    Path(f"{content_file}.completed").touch()
 
 
 def run():
     gen_start = datetime.now()
     args = get_args()
     base_dir, session_number = args.base_dir, int(args.session_number)
-    print(f"Launching auto_video_post for session {session_number} in '{base_dir}'\n")
+    print(
+        f"Launching auto_video_post for session {session_number} in '{base_dir}'\n")
 
     # the type we're generating for
     content_type = pb.ContentType.from_string(args.type)
@@ -134,7 +146,8 @@ def run():
     # load data
     session_metadata = loaders.get_session_metadata(base_dir, session_number)
     state_reports = loaders.get_state_reports(base_dir, session_number)
-    dispense_metadata_wrapper = DispenseMetadataWrapper(base_dir, session_number)
+    dispense_metadata_wrapper = DispenseMetadataWrapper(
+        base_dir, session_number)
     misc_data = loaders.get_misc_data(base_dir, session_number)
     content_plan = loaders.get_content_plan(base_dir, session_number)
     profile_snapshot = loaders.get_profile_snapshot(base_dir, session_number)

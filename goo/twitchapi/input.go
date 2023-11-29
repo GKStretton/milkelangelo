@@ -1,4 +1,4 @@
-package twitch
+package twitchapi
 
 import (
 	"github.com/gempir/go-twitch-irc/v4"

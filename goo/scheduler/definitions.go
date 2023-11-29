@@ -10,7 +10,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
-	"github.com/gkstretton/dark/services/goo/twitch"
+	"github.com/gkstretton/dark/services/goo/twitchapi"
 )
 
 const bulkVolume = 200 //ml of milk
@@ -33,7 +33,7 @@ var mainSessionEndTime = RecurringTime{
 
 // defineSchedule works by launching go routines watching for the specified
 // time, to trigger the stated action.
-func defineSchedule(sm *session.SessionManager, twitchApi *twitch.TwitchApi) {
+func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
 	go scheduleWatcher(&Schedule{
 		name:    "FRIDGE_ON",
 		enabled: true,

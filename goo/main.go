@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/contentscheduler"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/filesystem"
@@ -16,7 +16,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/obs"
 	"github.com/gkstretton/dark/services/goo/scheduler"
 	"github.com/gkstretton/dark/services/goo/session"
-	"github.com/gkstretton/dark/services/goo/twitch"
+	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
@@ -28,15 +28,13 @@ func main() {
 	flag.Parse()
 
 	if *test {
-		mqtt.Start()
-		sm := session.NewSessionManager(false)
-		// contentscheduler.Test(sm)
-		// return
-
-		twitchApi := twitch.Start()
-		events.Start(sm)
-		time.Sleep(time.Second)
-		actor.LaunchActor(twitchApi)
+		es, err := ebsinterface.NewExtensionSession(time.Hour * 2)
+		if err != nil {
+			panic(err)
+		}
+		es.SubscribeVotes()
+		_ = es
+		time.Sleep(time.Minute * 5)
 		return
 	}
 
@@ -47,7 +45,7 @@ func main() {
 	email.Start()
 
 	sm := session.NewSessionManager(false)
-	twitchApi := twitch.Start()
+	twitchApi := twitchapi.Start()
 
 	events.Start(sm)
 	livecapture.Start(sm)

@@ -26,16 +26,18 @@ func (m *manager) processContentPlan(path string, sessionNumber uint64) error {
 
 	for contentType, contentTypeStatus := range plan.ContentStatuses {
 		for _, post := range contentTypeStatus.Posts {
-			ct := machinepb.ContentType(machinepb.ContentType_value[contentType])
-			if !post.Uploaded && postIsDue(post) {
-				url, err := m.handlePost(ct, post, sessionNumber)
-				if err != nil {
-					fmt.Printf("failed to upload %s to %s: %v\n", contentType, post.Platform, err)
-					continue
-				}
-				post.Url = url
-				post.Uploaded = true
+			if post.Uploaded || !postIsDue(post) {
+				continue
 			}
+
+			ct := machinepb.ContentType(machinepb.ContentType_value[contentType])
+			url, err := m.handlePost(ct, post, sessionNumber)
+			if err != nil {
+				fmt.Printf("failed to upload %s to %s: %v\n", contentType, post.Platform, err)
+				continue
+			}
+			post.Url = url
+			post.Uploaded = true
 		}
 	}
 

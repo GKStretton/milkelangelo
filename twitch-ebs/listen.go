@@ -10,23 +10,23 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-type vote struct {
-	data          []byte
-	opaqueUserID  string
-	isBroadcaster bool
+type Vote struct {
+	Data          string
+	OpaqueUserID  string
+	IsBroadcaster bool
 }
 
-var subs = []chan *vote{}
+var subs = []chan *Vote{}
 var subsLock = sync.Mutex{}
 
-func registerListener(c chan *vote) {
+func registerVoteListener(c chan *Vote) {
 	subsLock.Lock()
 	defer subsLock.Unlock()
 
 	subs = append(subs, c)
 }
 
-func removeListener(c chan *vote) {
+func removeVoteListener(c chan *Vote) {
 	subsLock.Lock()
 	defer subsLock.Unlock()
 
@@ -39,7 +39,7 @@ func removeListener(c chan *vote) {
 	}
 }
 
-func sendVote(v *vote) error {
+func sendVote(v *Vote) error {
 	subsLock.Lock()
 	defer subsLock.Unlock()
 
@@ -69,30 +69,35 @@ func listenHandler(w http.ResponseWriter, r *http.Request) {
 
 	claims, err := verifyInternalRequest(r)
 	if err != nil {
-		fmt.Printf("failed to verify internal (goo) request: %v\n", err)
-		w.WriteHeader(http.StatusUnauthorized)
+		httpErr(&w, http.StatusUnauthorized, "failed to verify internal (goo) request: %v", err)
 		return
 	}
 	PrintRequesterInfo(r, claims)
 
-	// 1 buffer
-	c := make(chan *vote, 1)
-	registerListener(c)
-	defer removeListener(c)
-	for {
-		vote, ok := <-c
-		if !ok {
-			return
-		}
+	w.WriteHeader(http.StatusOK)
+	w.(http.Flusher).Flush()
 
-		data, err := json.Marshal(vote)
-		if err != nil {
-			fmt.Printf("failed to marshal vote: %v\n", err)
-			continue
+	// 1 buffer
+	c := make(chan *Vote, 1)
+	// c subscribes to vote stream from viewers
+	registerVoteListener(c)
+	defer removeVoteListener(c)
+
+	// do the listening and returning
+	for {
+		select {
+		case <-r.Context().Done():
+			return // exit handler, remove listener
+		case vote := <-c:
+			data, err := json.Marshal(vote)
+			if err != nil {
+				fmt.Printf("failed to marshal vote: %v\n", err)
+				continue
+			}
+			fmt.Fprintf(w, "event: vote\n")
+			fmt.Fprintf(w, "data: %s\n\n", data)
+			w.(http.Flusher).Flush()
 		}
-		fmt.Fprintf(w, "event: vote\n")
-		fmt.Fprintf(w, "data: %s\n\n", data)
-		w.(http.Flusher).Flush()
 	}
 }
 
@@ -106,5 +111,5 @@ func PrintRequesterInfo(r *http.Request, claims *jwt.StandardClaims) {
 			fmt.Printf("\t%v: %v\n", name, h)
 		}
 	}
-	fmt.Printf("claims: %+v\n", claims)
+	fmt.Printf("claims: %+v\n\n\n", claims)
 }

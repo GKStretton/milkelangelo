@@ -10,17 +10,17 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
-	"github.com/gkstretton/dark/services/goo/twitch"
+	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
 type twitchDecider struct {
-	api *twitch.TwitchApi
+	api *twitchapi.TwitchApi
 	// if there are no votes, fallback to this one
 	fallback Decider
 }
 
-func NewTwitchDecider(twitchApi *twitch.TwitchApi) Decider {
+func NewTwitchDecider(twitchApi *twitchapi.TwitchApi) Decider {
 	return &twitchDecider{
 		api: twitchApi,
 		// todo: change to a more comprehensive auto decider
@@ -29,7 +29,7 @@ func NewTwitchDecider(twitchApi *twitch.TwitchApi) Decider {
 }
 
 // if early exit is returned true after a vote, the vote will finish before the timeout
-func conductVote(msgCh chan *twitch.Message, timeout time.Duration, handler func(*twitch.Message) (earlyExit bool)) {
+func conductVote(msgCh chan *twitchapi.Message, timeout time.Duration, handler func(*twitchapi.Message) (earlyExit bool)) {
 	timeoutCh := time.After(timeout)
 	for {
 		select {
@@ -55,7 +55,7 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 		idToName[profile.Id] = profile.Name
 		options = append(options, strings.ToLower(profile.Name))
 	}
-	d.api.Announce("Taking votes on next collection. Options: "+strings.Join(options, ", "), twitch.COLOUR_GREEN)
+	d.api.Announce("Taking votes on next collection. Options: "+strings.Join(options, ", "), twitchapi.COLOUR_GREEN)
 
 	// vialNo -> number of votes
 	votes := map[uint64]uint64{}
@@ -63,7 +63,7 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 	conductVote(
 		msgCh,
 		time.Duration(30)*time.Second,
-		func(msg *twitch.Message) bool {
+		func(msg *twitchapi.Message) bool {
 			lowerCase := strings.ToLower(msg.Message)
 			for _, profile := range vialConfig.GetProfiles() {
 
@@ -121,7 +121,7 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 	conductVote(
 		msgCh,
 		time.Duration(30)*time.Second,
-		func(msg *twitch.Message) bool {
+		func(msg *twitchapi.Message) bool {
 			vote, err := parseCoordinates(msg.Message)
 			if err != nil {
 				d.api.Reply(msg.ID, err.Error())
