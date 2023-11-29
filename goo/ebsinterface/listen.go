@@ -16,7 +16,7 @@ type VoteData = string
 var subs = []chan VoteData{}
 var subsLock = sync.Mutex{}
 
-func (e *extensionSession) SubscribeVotes() <-chan VoteData {
+func (e *ExtensionSession) SubscribeVotes() <-chan VoteData {
 	subsLock.Lock()
 	defer subsLock.Unlock()
 
@@ -25,7 +25,7 @@ func (e *extensionSession) SubscribeVotes() <-chan VoteData {
 	return c
 }
 
-func (e *extensionSession) UnsubscribeVotes(c <-chan VoteData) {
+func (e *ExtensionSession) UnsubscribeVotes(c <-chan VoteData) {
 	subsLock.Lock()
 	defer subsLock.Unlock()
 
@@ -37,7 +37,7 @@ func (e *extensionSession) UnsubscribeVotes(c <-chan VoteData) {
 	}
 }
 
-func (e *extensionSession) distributeVote(data VoteData) {
+func (e *ExtensionSession) distributeVote(data VoteData) {
 	l.Printf("got vote: %s\n", data)
 	subsLock.Lock()
 	defer subsLock.Unlock()
@@ -51,7 +51,7 @@ func (e *extensionSession) distributeVote(data VoteData) {
 }
 
 // connect listens to the ebs vote stream
-func (e *extensionSession) connect() error {
+func (e *ExtensionSession) connect() error {
 	client := sse.NewClient(ebsListenUrl)
 	client.Headers["Authorization"] = "Bearer " + e.ebsListeningToken
 	// client.ReconnectStrategy = &backoff.StopBackOff{}

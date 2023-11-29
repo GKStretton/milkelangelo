@@ -17,7 +17,7 @@ var (
 	useLocalEBS = flag.Bool("useLocalEBS", true, "if true, use local ebs rather than hosted one")
 )
 
-type extensionSession struct {
+type ExtensionSession struct {
 	broadcastToken    string
 	ebsListeningToken string
 	cleanUpDone       bool
@@ -27,7 +27,7 @@ type extensionSession struct {
 	exitCh chan struct{}
 }
 
-func NewExtensionSession(dur time.Duration) (*extensionSession, error) {
+func NewExtensionSession(dur time.Duration) (*ExtensionSession, error) {
 	bt, err := getBroadcastToken(dur)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func NewExtensionSession(dur time.Duration) (*extensionSession, error) {
 		return nil, err
 	}
 
-	es := &extensionSession{
+	es := &ExtensionSession{
 		broadcastToken:    bt,
 		ebsListeningToken: elt,
 		exitCh:            make(chan struct{}),
@@ -63,7 +63,7 @@ func NewExtensionSession(dur time.Duration) (*extensionSession, error) {
 }
 
 // trigger running of the EBS on fly.io
-func (e *extensionSession) launch() error {
+func (e *ExtensionSession) launch() error {
 	if *useLocalEBS {
 		return nil
 	}
@@ -73,7 +73,7 @@ func (e *extensionSession) launch() error {
 
 // CleanUp will be automatically called after duration specified on creation.
 // If exiting early, call manually.
-func (e *extensionSession) CleanUp() {
+func (e *ExtensionSession) CleanUp() {
 	e.lock.Lock()
 	defer e.lock.Unlock()
 	if e.cleanUpDone {

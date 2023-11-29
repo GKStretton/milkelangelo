@@ -3,6 +3,7 @@ package ebsinterface
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
@@ -12,7 +13,12 @@ import (
 // consists of latest state report and current vote status
 type BroadcastData = string
 
-func (e *extensionSession) BroadcastData(data BroadcastData) error {
+func (e *ExtensionSession) SetBroadcastData(data BroadcastData) error {
+	// todo: cache this and broadcast it regularly, every second or so
+	return errors.New("not impl")
+}
+
+func (e *ExtensionSession) broadcastData(data BroadcastData) error {
 	type payload struct {
 		message        string
 		broadcaster_id string

@@ -10,18 +10,26 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
 type twitchDecider struct {
+	ebs *ebsinterface.ExtensionSession
 	api *twitchapi.TwitchApi
 	// if there are no votes, fallback to this one
 	fallback Decider
 }
 
 func NewTwitchDecider(twitchApi *twitchapi.TwitchApi) Decider {
+	ebs, err := ebsinterface.NewExtensionSession(time.Hour * 2)
+	if err != nil {
+		fmt.Printf("failed to create ebs interface in NewTwitchDecider: %v\n", err)
+	}
+
 	return &twitchDecider{
+		ebs: ebs,
 		api: twitchApi,
 		// todo: change to a more comprehensive auto decider
 		fallback: NewMockDecider(),
@@ -36,7 +44,8 @@ func conductVote(msgCh chan *twitchapi.Message, timeout time.Duration, handler f
 		case <-timeoutCh:
 			return
 		case msg := <-msgCh:
-			if handler(msg) {
+			earlyExit := handler(msg)
+			if earlyExit {
 				return
 			}
 		}
