@@ -1,31 +1,30 @@
 package ebsinterface
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
 
+	"github.com/gkstretton/dark/services/goo/types"
 	"github.com/r3labs/sse"
 )
 
 const ebsListenUrl = "http://localhost:8080/listen"
 
-// json string
-type VoteData = string
-
-var subs = []chan VoteData{}
+var subs = []chan *types.Vote{}
 var subsLock = sync.Mutex{}
 
-func (e *ExtensionSession) SubscribeVotes() <-chan VoteData {
+func (e *ExtensionSession) SubscribeVotes() <-chan *types.Vote {
 	subsLock.Lock()
 	defer subsLock.Unlock()
 
-	c := make(chan VoteData)
+	c := make(chan *types.Vote)
 	subs = append(subs, c)
 	return c
 }
 
-func (e *ExtensionSession) UnsubscribeVotes(c <-chan VoteData) {
+func (e *ExtensionSession) UnsubscribeVotes(c <-chan *types.Vote) {
 	subsLock.Lock()
 	defer subsLock.Unlock()
 
@@ -37,8 +36,7 @@ func (e *ExtensionSession) UnsubscribeVotes(c <-chan VoteData) {
 	}
 }
 
-func (e *ExtensionSession) distributeVote(data VoteData) {
-	l.Printf("got vote: %s\n", data)
+func (e *ExtensionSession) distributeVote(data *types.Vote) {
 	subsLock.Lock()
 	defer subsLock.Unlock()
 
@@ -48,6 +46,13 @@ func (e *ExtensionSession) distributeVote(data VoteData) {
 		default:
 		}
 	}
+}
+
+// rawVote is received over sse channel
+type rawVote struct {
+	Data          []byte
+	OpaqueUserID  string
+	IsBroadcaster bool
 }
 
 // connect listens to the ebs vote stream
@@ -75,7 +80,25 @@ func (e *ExtensionSession) connect() error {
 				return
 			}
 			//todo: rate limit to prevent ddos, here or in ebs?
-			e.distributeVote(VoteData(event.Data))
+			vote := &rawVote{}
+			err := json.Unmarshal(event.Data, vote)
+			if err != nil {
+				l.Printf("failed to unmarshal rawVote: %v\n", err)
+				continue
+			}
+
+			voteDetails := &types.VoteDetails{}
+			err = json.Unmarshal(vote.Data, voteDetails)
+			if err != nil {
+				l.Printf("failed to unmarshal voteDetails: %v\n", err)
+				continue
+			}
+
+			e.distributeVote(&types.Vote{
+				Data:          *voteDetails,
+				OpaqueUserID:  vote.OpaqueUserID,
+				IsBroadcaster: vote.IsBroadcaster,
+			})
 		}
 	}()
 

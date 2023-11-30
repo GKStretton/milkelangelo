@@ -3,10 +3,12 @@ package actor
 import (
 	"flag"
 	"fmt"
+	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor/decider"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 )
@@ -22,8 +24,13 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi) {
 	c := events.Subscribe()
 	defer events.Unsubscribe(c)
 
+	ebs, err := ebsinterface.NewExtensionSession(time.Hour * 2)
+	if err != nil {
+		fmt.Printf("failed to create ebs interface in LaunchActor: %v\n", err)
+	}
+
 	// decider := decider.NewMockDecider()
-	decider := decider.NewTwitchDecider(twitchApi)
+	decider := decider.NewTwitchDecider(ebs, twitchApi)
 
 	awaitDecision := decide(decider, events.GetLatestStateReportCopy())
 	decision := <-awaitDecision

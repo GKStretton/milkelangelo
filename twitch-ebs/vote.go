@@ -31,7 +31,7 @@ func voteHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("got vote data from %s: %s\n", r.RemoteAddr, string(data))
 	}
 	err = sendVote(&Vote{
-		Data:          string(data),
+		Data:          data,
 		OpaqueUserID:  claims.OpaqueUserID,
 		IsBroadcaster: claims.Role != "broadcaster",
 	})

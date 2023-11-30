@@ -24,7 +24,9 @@ type ExtensionSession struct {
 	lock              sync.Mutex
 
 	// used to disconnect from ebs
-	exitCh chan struct{}
+	exitCh             chan struct{}
+	triggerBroadcast   chan struct{}
+	broadcastDataCache *broadcastData
 }
 
 func NewExtensionSession(dur time.Duration) (*ExtensionSession, error) {
@@ -38,9 +40,10 @@ func NewExtensionSession(dur time.Duration) (*ExtensionSession, error) {
 	}
 
 	es := &ExtensionSession{
-		broadcastToken:    bt,
-		ebsListeningToken: elt,
-		exitCh:            make(chan struct{}),
+		broadcastToken:     bt,
+		ebsListeningToken:  elt,
+		exitCh:             make(chan struct{}),
+		broadcastDataCache: &broadcastData{},
 	}
 
 	err = es.launch()
@@ -55,9 +58,13 @@ func NewExtensionSession(dur time.Duration) (*ExtensionSession, error) {
 	l.Println("connecting to ebs...")
 	err = es.connect()
 	if err != nil {
+		es.CleanUp()
 		return nil, err
 	}
 	l.Println("connected to ebs.")
+
+	go es.regularRobotStatusUpdate()
+	go es.regularBroadcast()
 
 	return es, nil
 }

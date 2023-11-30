@@ -22,12 +22,7 @@ type twitchDecider struct {
 	fallback Decider
 }
 
-func NewTwitchDecider(twitchApi *twitchapi.TwitchApi) Decider {
-	ebs, err := ebsinterface.NewExtensionSession(time.Hour * 2)
-	if err != nil {
-		fmt.Printf("failed to create ebs interface in NewTwitchDecider: %v\n", err)
-	}
-
+func NewTwitchDecider(ebs *ebsinterface.ExtensionSession, twitchApi *twitchapi.TwitchApi) Decider {
 	return &twitchDecider{
 		ebs: ebs,
 		api: twitchApi,

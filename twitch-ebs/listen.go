@@ -11,7 +11,7 @@ import (
 )
 
 type Vote struct {
-	Data          string
+	Data          []byte
 	OpaqueUserID  string
 	IsBroadcaster bool
 }
