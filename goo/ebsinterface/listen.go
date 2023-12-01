@@ -104,6 +104,7 @@ func (e *ExtensionSession) connect() error {
 
 	go func() {
 		<-e.exitCh
+		client.Unsubscribe(ch)
 		close(ch)
 	}()
 

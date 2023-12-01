@@ -11,14 +11,15 @@ def buildStill(n_str: str) -> pb.ContentTypeStatus:
         # caption=get_caption(ct),
     )
 
-    platform = pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE
-    s.posts.append(pb.Post(
-        platform=platform,
-        title=f"{s.raw_title}\n\n{get_common_text(ct, platform)}\n\n{get_hashtags(ct, platform)}",
-        description="N/A",
-        crosspost=False,
-        scheduled_unix_timetamp=get_schedule_timestamp(ct),
-    ))
+    # disabling because I can't get the youtube channel comments insert api endpoint working
+    # platform = pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE
+    # s.posts.append(pb.Post(
+    #     platform=platform,
+    #     title=f"{s.raw_title}\n\n{get_common_text(ct, platform)}\n\n{get_hashtags(ct, platform)}",
+    #     description="N/A",
+    #     crosspost=False,
+    #     scheduled_unix_timetamp=get_schedule_timestamp(ct),
+    # ))
 
     platform = pb.SocialPlatform.SOCIAL_PLATFORM_INSTAGRAM
     s.posts.append(pb.Post(

@@ -21,14 +21,14 @@ def buildCleaning(n_str: str) -> pb.ContentTypeStatus:
         scheduled_unix_timetamp=get_schedule_timestamp(ct),
     ))
 
-    platform = pb.SocialPlatform.SOCIAL_PLATFORM_TIKTOK
-    s.posts.append(pb.Post(
-        platform=platform,
-        title=append_title_hashtags(f"{s.raw_title} - {n_str}", ct, platform) + "\n\n" + get_common_text(ct, platform),
-        description="N/A",
-        crosspost=False,
-        scheduled_unix_timetamp=get_schedule_timestamp(ct),
-    ))
+    # platform = pb.SocialPlatform.SOCIAL_PLATFORM_TIKTOK
+    # s.posts.append(pb.Post(
+    #     platform=platform,
+    #     title=append_title_hashtags(f"{s.raw_title} - {n_str}", ct, platform) + "\n\n" + get_common_text(ct, platform),
+    #     description="N/A",
+    #     crosspost=False,
+    #     scheduled_unix_timetamp=get_schedule_timestamp(ct),
+    # ))
 
     platform = pb.SocialPlatform.SOCIAL_PLATFORM_INSTAGRAM
     s.posts.append(pb.Post(
