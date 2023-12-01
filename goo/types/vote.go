@@ -1,5 +1,7 @@
 package types
 
+import "fmt"
+
 type VoteType string
 
 const (
@@ -26,4 +28,16 @@ type Vote struct {
 	Data          VoteDetails
 	OpaqueUserID  string
 	IsBroadcaster bool
+}
+
+func (v *Vote) String() string {
+	d := v.Data
+	switch d.VoteType {
+	case VoteTypeCollection:
+		return fmt.Sprintf("%s (%+v)", d.VoteType, d.CollectionVote)
+	case VoteTypeLocation:
+		return fmt.Sprintf("%s (%+v)", d.VoteType, d.LocationVote)
+	default:
+		return fmt.Sprintf("unrecognised type %s", d.VoteType)
+	}
 }

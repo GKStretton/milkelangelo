@@ -3,6 +3,9 @@ package ebsinterface
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -97,14 +100,14 @@ func (e *ExtensionSession) regularBroadcast() {
 // So we stick to 1 per second, 60 per minute.
 func (e *ExtensionSession) broadcastData(jsonData []byte) error {
 	type payload struct {
-		message        string
-		broadcaster_id string
-		target         []string
+		Message       string   `json:"message"`
+		BroadcasterID string   `json:"broadcaster_id"`
+		Target        []string `json:"target"`
 	}
 	pl := &payload{
-		message:        string(jsonData),
-		broadcaster_id: channelId,
-		target:         []string{"broadcast"},
+		Message:       string(jsonData),
+		BroadcasterID: channelId,
+		Target:        []string{"broadcast"},
 	}
 
 	jsonPl, err := json.Marshal(pl)
@@ -130,6 +133,13 @@ func (e *ExtensionSession) broadcastData(jsonData []byte) error {
 		return err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusNoContent {
+		b, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("error reading error response: %v", err)
+		}
+		return errors.New(string(b))
+	}
 
 	return nil
 }
