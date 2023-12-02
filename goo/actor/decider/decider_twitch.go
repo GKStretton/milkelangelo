@@ -10,6 +10,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/types"
+	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
 type twitchDecider struct {
@@ -28,14 +29,14 @@ func NewTwitchDecider(ebs *ebsinterface.ExtensionSession, twitchApi *twitchapi.T
 }
 
 func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) executor.Executor {
-	options, vialPosToName := getVialOptionsAndMap()
+	options, vialPosToName := vialprofiles.GetVialOptionsAndMap()
 
 	// votes from twitch ebs
 	ebsCh := d.ebs.SubscribeVotes()
 	defer d.ebs.UnsubscribeVotes(ebsCh)
 
 	// votes from twitch chat
-	chatVoteCh, unSub := d.subscribeChatVotes(types.VoteTypeCollection, vialPosToName)
+	chatVoteCh, unSub := d.api.SubscribeChatVotes(types.VoteTypeCollection)
 	defer unSub()
 
 	d.api.Announce("Taking votes on next collection. Options: "+strings.Join(options, ", "), twitchapi.COLOUR_GREEN)
@@ -78,7 +79,7 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 	defer d.ebs.UnsubscribeVotes(ebsCh)
 
 	// votes from twitch chat
-	chatVoteCh, unSub := d.subscribeChatVotes(types.VoteTypeCollection, nil)
+	chatVoteCh, unSub := d.api.SubscribeChatVotes(types.VoteTypeCollection)
 	defer unSub()
 
 	d.api.Announce("Taking votes on next dispense. Chat format 'x, y'", twitchapi.COLOUR_GREEN)

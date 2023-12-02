@@ -114,6 +114,8 @@ class VialProfileVialFluid(betterproto.Enum):
     VIAL_FLUID_UNDEFINED = 0
     VIAL_FLUID_DYE_WATER_BASED = 1
     VIAL_FLUID_EMULSIFIER = 2
+    VIAL_FLUID_AIR = 3
+    VIAL_FLUID_SOLVENT = 4
 
 
 @dataclass

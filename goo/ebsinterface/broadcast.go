@@ -74,7 +74,6 @@ func (e *ExtensionSession) regularBroadcast() {
 			l.Printf("failed to send broadcast data: %v\n", err)
 			return
 		}
-		l.Println("sent broadcast")
 	}
 
 	next := time.After(0)

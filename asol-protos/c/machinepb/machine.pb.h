@@ -115,7 +115,11 @@ typedef enum _machine_SocialPlatform {
 typedef enum _machine_VialProfile_VialFluid { 
     machine_VialProfile_VialFluid_VIAL_FLUID_UNDEFINED = 0, 
     machine_VialProfile_VialFluid_VIAL_FLUID_DYE_WATER_BASED = 1, 
-    machine_VialProfile_VialFluid_VIAL_FLUID_EMULSIFIER = 2 
+    machine_VialProfile_VialFluid_VIAL_FLUID_EMULSIFIER = 2, 
+    /* Above and inside test tube positions
+ Note; INSIDE positions are valid for a range of z values, determined outside Navigation. */
+    machine_VialProfile_VialFluid_VIAL_FLUID_AIR = 3, 
+    machine_VialProfile_VialFluid_VIAL_FLUID_SOLVENT = 4 
 } machine_VialProfile_VialFluid;
 
 /* Struct definitions */
@@ -370,8 +374,8 @@ typedef struct _machine_VialProfileCollection_ProfilesEntry {
 #define _machine_SocialPlatform_ARRAYSIZE ((machine_SocialPlatform)(machine_SocialPlatform_SOCIAL_PLATFORM_REDDIT+1))
 
 #define _machine_VialProfile_VialFluid_MIN machine_VialProfile_VialFluid_VIAL_FLUID_UNDEFINED
-#define _machine_VialProfile_VialFluid_MAX machine_VialProfile_VialFluid_VIAL_FLUID_EMULSIFIER
-#define _machine_VialProfile_VialFluid_ARRAYSIZE ((machine_VialProfile_VialFluid)(machine_VialProfile_VialFluid_VIAL_FLUID_EMULSIFIER+1))
+#define _machine_VialProfile_VialFluid_MAX machine_VialProfile_VialFluid_VIAL_FLUID_SOLVENT
+#define _machine_VialProfile_VialFluid_ARRAYSIZE ((machine_VialProfile_VialFluid)(machine_VialProfile_VialFluid_VIAL_FLUID_SOLVENT+1))
 
 
 #ifdef __cplusplus

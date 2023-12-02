@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { createLocationVote } from './ebs/helpers';
+import { createCollectionVote, createLocationVote } from './ebs/helpers';
 import useWindowDimensions from './hooks/WindowSize';
+import _ from 'lodash';
 
 function App() {
   const ext = window?.Twitch?.ext
@@ -24,7 +25,7 @@ function App() {
   const { height, width } = useWindowDimensions();
   const [{x, y}, setCoords] = useState({x: 0, y: 0})
 
-  const clickHandler = (e: React.MouseEvent<HTMLElement>) => {
+  const locationVoteHandler = (e: React.MouseEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
     const bounds = target.getBoundingClientRect();
     const x = e.clientX - bounds.left;
@@ -32,6 +33,7 @@ function App() {
     setCoords({x: x, y: y});
 
     if (!auth) return;
+    console.log("voting location ", x, y);
     fetch(`http://localhost:8080/vote`, {
       method: 'POST',
       body: JSON.stringify(createLocationVote(x, y)),
@@ -41,6 +43,20 @@ function App() {
       },
     }).catch(e => console.error(e))
   }
+
+  const collectionVoteHandler = (i: number) => () => {
+    if (!auth) return;
+    console.log("voting collection for ", 6-i);
+    fetch(`http://localhost:8080/vote`, {
+      method: 'POST',
+      body: JSON.stringify(createCollectionVote(6-i)),
+      headers: {
+        "Authorization": "Bearer " + auth.token,
+        "X-Twitch-Extension-Client-Id": auth.clientId,
+      },
+    }).catch(e => console.error(e))
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -48,10 +64,9 @@ function App() {
         <>
           <div className="debug-text">{`${width}, ${height}. chat: ${ext.features.isChatEnabled}`}</div>
           <div id="color-vote-area">
-            {/* <div className="color-option" /> */}
-            {/* <div className="color-option" /> */}
+            {_.times(5, (i) => <div className="color-option" onClick={collectionVoteHandler(i)}/>)}
           </div>
-          <div className='canvas' onClick={clickHandler}>
+          <div className='canvas' onClick={locationVoteHandler}>
             <div className='cursor' style={{left: x, top: y}}/>
           </div>
         </>

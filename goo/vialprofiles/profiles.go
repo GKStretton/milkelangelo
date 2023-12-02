@@ -5,6 +5,7 @@ package vialprofiles
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
@@ -95,4 +96,16 @@ func getSystemProfileConfiguration() *machinepb.SystemVialConfiguration {
 func GetSystemVialProfile(vialPosition int) *machinepb.VialProfile {
 	snapshot := GetSystemVialConfigurationSnapshot()
 	return snapshot.Profiles[uint64(vialPosition)]
+}
+
+func GetVialOptionsAndMap() ([]string, map[uint64]string) {
+	vialConfig := GetSystemVialConfigurationSnapshot()
+
+	options := []string{}
+	vialPosToName := map[uint64]string{}
+	for posNo, profile := range vialConfig.GetProfiles() {
+		vialPosToName[posNo] = profile.Name
+		options = append(options, strings.ToLower(profile.Name))
+	}
+	return options, vialPosToName
 }

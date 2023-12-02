@@ -810,6 +810,8 @@ export enum VialProfile_VialFluid {
   VIAL_FLUID_UNDEFINED = 0,
   VIAL_FLUID_DYE_WATER_BASED = 1,
   VIAL_FLUID_EMULSIFIER = 2,
+  VIAL_FLUID_AIR = 3,
+  VIAL_FLUID_SOLVENT = 4,
   UNRECOGNIZED = -1,
 }
 
@@ -824,6 +826,12 @@ export function vialProfile_VialFluidFromJSON(object: any): VialProfile_VialFlui
     case 2:
     case "VIAL_FLUID_EMULSIFIER":
       return VialProfile_VialFluid.VIAL_FLUID_EMULSIFIER;
+    case 3:
+    case "VIAL_FLUID_AIR":
+      return VialProfile_VialFluid.VIAL_FLUID_AIR;
+    case 4:
+    case "VIAL_FLUID_SOLVENT":
+      return VialProfile_VialFluid.VIAL_FLUID_SOLVENT;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -839,6 +847,10 @@ export function vialProfile_VialFluidToJSON(object: VialProfile_VialFluid): stri
       return "VIAL_FLUID_DYE_WATER_BASED";
     case VialProfile_VialFluid.VIAL_FLUID_EMULSIFIER:
       return "VIAL_FLUID_EMULSIFIER";
+    case VialProfile_VialFluid.VIAL_FLUID_AIR:
+      return "VIAL_FLUID_AIR";
+    case VialProfile_VialFluid.VIAL_FLUID_SOLVENT:
+      return "VIAL_FLUID_SOLVENT";
     case VialProfile_VialFluid.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";

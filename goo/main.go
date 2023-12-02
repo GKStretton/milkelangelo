@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/contentscheduler"
-	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/filesystem"
@@ -17,7 +16,6 @@ import (
 	"github.com/gkstretton/dark/services/goo/scheduler"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
-	"github.com/gkstretton/dark/services/goo/types"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
@@ -25,32 +23,11 @@ var (
 	test = flag.Bool("test", false, "if true, just run test code")
 )
 
-func testEBS() {
-	es, err := ebsinterface.NewExtensionSession(time.Hour * 2)
-	if err != nil {
-		panic(err)
-	}
-	es.UpdateCurrentVoteStatus(&types.VoteStatus{
-		VoteType: types.VoteTypeCollection,
-		CollectionVoteStatus: &types.CollectionVoteStatus{
-			TotalVotes: 5,
-			VoteCounts: map[int]int{5: 25},
-		},
-	})
-	v := es.SubscribeVotes()
-	defer es.UnsubscribeVotes(v)
-
-	for {
-		vote := <-v
-		fmt.Printf("got vote:\n%+v\n", vote)
-	}
-}
-
 func main() {
 	flag.Parse()
 
 	if *test {
-		testEBS()
+		runAdHocTests()
 		return
 	}
 

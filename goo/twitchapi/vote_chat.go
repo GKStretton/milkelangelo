@@ -1,4 +1,4 @@
-package types
+package twitchapi
 
 import (
 	"fmt"
@@ -6,13 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gkstretton/dark/services/goo/twitchapi"
+	"github.com/gkstretton/dark/services/goo/types"
 )
 
-func TwitchMessageToVote(voteType VoteType, msg *twitchapi.Message, vialPosToName map[uint64]string) (*Vote, error) {
-	var voteDetails VoteDetails
+func TwitchMessageToVote(voteType types.VoteType, msg *Message, vialPosToName map[uint64]string) (*types.Vote, error) {
+	var voteDetails types.VoteDetails
 	switch voteType {
-	case VoteTypeLocation:
+	case types.VoteTypeLocation:
 		data, err := parseCoordinates(msg.Message)
 		if err != nil {
 			return nil, err
@@ -20,11 +20,11 @@ func TwitchMessageToVote(voteType VoteType, msg *twitchapi.Message, vialPosToNam
 		if data == nil {
 			return nil, nil
 		}
-		voteDetails = VoteDetails{
+		voteDetails = types.VoteDetails{
 			VoteType:     voteType,
 			LocationVote: data,
 		}
-	case VoteTypeCollection:
+	case types.VoteTypeCollection:
 		data, err := parseCollection(msg.Message, vialPosToName)
 		if err != nil {
 			return nil, err
@@ -32,25 +32,28 @@ func TwitchMessageToVote(voteType VoteType, msg *twitchapi.Message, vialPosToNam
 		if data == nil {
 			return nil, nil
 		}
-		voteDetails = VoteDetails{
+		voteDetails = types.VoteDetails{
 			VoteType:       voteType,
 			CollectionVote: data,
 		}
 	}
-	return &Vote{
+	return &types.Vote{
 		Data:          voteDetails,
 		OpaqueUserID:  msg.User.ID,
 		IsBroadcaster: msg.IsSelf(),
 	}, nil
 }
 
-func parseCollection(input string, vialPosToName map[uint64]string) (*CollectionVote, error) {
+func parseCollection(input string, vialPosToName map[uint64]string) (*types.CollectionVote, error) {
 	lowerCase := strings.ToLower(input)
 	for pos, name := range vialPosToName {
+		if name == "" {
+			continue
+		}
 
-		if strings.Contains(lowerCase, name) {
+		if strings.Contains(lowerCase, strings.ToLower(name)) {
 			fmt.Printf("'%s' parsed as a vote for '%s' (pos %d)\n", input, name, pos)
-			return &CollectionVote{
+			return &types.CollectionVote{
 				VialNo: pos,
 			}, nil
 		}
@@ -64,8 +67,8 @@ func parseCollection(input string, vialPosToName map[uint64]string) (*Collection
 // The function extracts all decimal numbers from the input and checks if at least two are present.
 // It parses the first two numbers as x and y coordinates, ensuring they are within the range [-1, 1].
 // If the numbers are out of this range, or if there's a parsing error, an error is returned.
-func parseCoordinates(input string) (*LocationVote, error) {
-	re := regexp.MustCompile(`-?\d+\.\d+`)
+func parseCoordinates(input string) (*types.LocationVote, error) {
+	re := regexp.MustCompile(`-?\d+(\.\d+)?`)
 	matches := re.FindAllString(input, -1)
 	n := len(matches)
 
@@ -93,7 +96,7 @@ func parseCoordinates(input string) (*LocationVote, error) {
 		return nil, fmt.Errorf("y should be between -1 and 1, %f is not", y)
 	}
 
-	return &LocationVote{
+	return &types.LocationVote{
 		N: uint64(n),
 		X: float32(x),
 		Y: float32(y),

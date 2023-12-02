@@ -46,11 +46,11 @@
 }
 
 .color-option {
-  width: 60vh;
-  height: 60vh;
+  width: 6vh;
+  height: 6vh;
   border-radius: 100%;
   background-color: #ff00ff85;
-  margin: 0 7vw;
+  margin: 0 1vw;
 
   &:hover {
     background-color: aqua;
