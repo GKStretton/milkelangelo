@@ -2,6 +2,7 @@ package decider
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -84,4 +85,23 @@ func getVialOptionsAndMap() ([]string, map[uint64]string) {
 		options = append(options, strings.ToLower(profile.Name))
 	}
 	return options, vialPosToName
+}
+
+type collectionVoteResult struct {
+	pos   uint64
+	name  string
+	count uint64
+}
+
+func calculateCollectionVoteResults(votes map[uint64]uint64, vialPosToName map[uint64]string) []collectionVoteResult {
+	sortedResults := []collectionVoteResult{}
+	for pos, count := range votes {
+		sortedResults = append(sortedResults, collectionVoteResult{
+			pos:   pos,
+			name:  vialPosToName[pos],
+			count: count,
+		})
+	}
+	slices.SortFunc(sortedResults, func(a, b collectionVoteResult) int { return int(a.count) - int(b.count) })
+	return sortedResults
 }

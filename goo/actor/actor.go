@@ -29,8 +29,9 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi) {
 		fmt.Printf("failed to create ebs interface in LaunchActor: %v\n", err)
 	}
 
+	// todo: change to a more comprehensive auto decider
 	// decider := decider.NewMockDecider()
-	decider := decider.NewTwitchDecider(ebs, twitchApi)
+	decider := decider.NewTwitchDecider(ebs, twitchApi, decider.NewMockDecider())
 
 	awaitDecision := decide(decider, events.GetLatestStateReportCopy())
 	decision := <-awaitDecision

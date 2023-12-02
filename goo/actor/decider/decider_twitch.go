@@ -2,7 +2,6 @@ package decider
 
 import (
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -20,12 +19,11 @@ type twitchDecider struct {
 	fallback Decider
 }
 
-func NewTwitchDecider(ebs *ebsinterface.ExtensionSession, twitchApi *twitchapi.TwitchApi) Decider {
+func NewTwitchDecider(ebs *ebsinterface.ExtensionSession, twitchApi *twitchapi.TwitchApi, fallback Decider) Decider {
 	return &twitchDecider{
-		ebs: ebs,
-		api: twitchApi,
-		// todo: change to a more comprehensive auto decider
-		fallback: NewMockDecider(),
+		ebs:      ebs,
+		api:      twitchApi,
+		fallback: fallback,
 	}
 }
 
@@ -57,20 +55,7 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 	)
 
 	// build sorted results
-	type voteResult struct {
-		pos   uint64
-		name  string
-		count uint64
-	}
-	sortedResults := []voteResult{}
-	for pos, count := range votes {
-		sortedResults = append(sortedResults, voteResult{
-			pos:   pos,
-			name:  vialPosToName[pos],
-			count: count,
-		})
-	}
-	slices.SortFunc(sortedResults, func(a, b voteResult) int { return int(a.count) - int(b.count) })
+	sortedResults := calculateCollectionVoteResults(votes, vialPosToName)
 
 	if len(sortedResults) == 0 {
 		d.api.Say("No votes! Choosing at random...")
@@ -95,6 +80,8 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 	// votes from twitch chat
 	chatVoteCh, unSub := d.subscribeChatVotes(types.VoteTypeCollection, nil)
 	defer unSub()
+
+	d.api.Announce("Taking votes on next dispense. Chat format 'x, y'", twitchapi.COLOUR_GREEN)
 
 	e := executor.NewDispenseExecutor(0, 0)
 	x := RunningAverage{}
