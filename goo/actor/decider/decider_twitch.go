@@ -43,6 +43,18 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 
 	// vialPos -> number of votes
 	votes := map[uint64]uint64{}
+	// total number of votes
+	var n int
+
+	d.ebs.UpdateCurrentVoteStatus(&types.VoteStatus{
+		VoteType: types.VoteTypeCollection,
+		CollectionVoteStatus: &types.CollectionVoteStatus{
+			TotalVotes:    n,
+			VoteCounts:    votes,
+			VialPosToName: vialPosToName,
+		},
+	})
+	d.ebs.ManualTriggerBroadcast()
 
 	conductVotingRound(
 		ebsCh,
@@ -50,7 +62,18 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 		time.Duration(30)*time.Second,
 		func(vote *types.Vote) bool {
 			data := vote.Data.CollectionVote
+			n++
 			votes[data.VialNo]++
+
+			d.ebs.UpdateCurrentVoteStatus(&types.VoteStatus{
+				VoteType: types.VoteTypeCollection,
+				CollectionVoteStatus: &types.CollectionVoteStatus{
+					TotalVotes:    n,
+					VoteCounts:    votes,
+					VialPosToName: vialPosToName,
+				},
+			})
+
 			return false
 		},
 	)
@@ -70,6 +93,17 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 
 	winnerId := sortedResults[0].pos
 
+	d.ebs.UpdateCurrentVoteStatus(nil)
+	d.ebs.UpdatePreviousVoteResult(&types.VoteStatus{
+		VoteType: types.VoteTypeCollection,
+		CollectionVoteStatus: &types.CollectionVoteStatus{
+			TotalVotes:    n,
+			VoteCounts:    votes,
+			VialPosToName: vialPosToName,
+		},
+	})
+	d.ebs.ManualTriggerBroadcast()
+
 	return executor.NewCollectionExecutor(int(winnerId), int(getVialVolume(int(winnerId))))
 }
 
@@ -88,6 +122,16 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 	x := RunningAverage{}
 	y := RunningAverage{}
 
+	d.ebs.UpdateCurrentVoteStatus(&types.VoteStatus{
+		VoteType: types.VoteTypeLocation,
+		LocationVoteStatus: &types.LocationVoteStatus{
+			TotalVotes: x.Count,
+			XAvg:       x.Average,
+			YAvg:       y.Average,
+		},
+	})
+	d.ebs.ManualTriggerBroadcast()
+
 	conductVotingRound(
 		ebsCh,
 		chatVoteCh,
@@ -99,6 +143,16 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 			e.X = x.Average
 			e.Y = y.Average
 			e.Preempt()
+
+			d.ebs.UpdateCurrentVoteStatus(&types.VoteStatus{
+				VoteType: types.VoteTypeLocation,
+				LocationVoteStatus: &types.LocationVoteStatus{
+					TotalVotes: x.Count,
+					XAvg:       x.Average,
+					YAvg:       y.Average,
+				},
+			})
+
 			return false
 		},
 	)
@@ -109,6 +163,17 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 	}
 
 	d.api.Say("Vote settled on average: %.2f, %.2f!")
+
+	d.ebs.UpdateCurrentVoteStatus(nil)
+	d.ebs.UpdatePreviousVoteResult(&types.VoteStatus{
+		VoteType: types.VoteTypeLocation,
+		LocationVoteStatus: &types.LocationVoteStatus{
+			TotalVotes: x.Count,
+			XAvg:       x.Average,
+			YAvg:       y.Average,
+		},
+	})
+	d.ebs.ManualTriggerBroadcast()
 
 	return e
 }

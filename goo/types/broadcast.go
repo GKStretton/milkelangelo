@@ -7,8 +7,9 @@ type VoteStatus struct {
 }
 
 type CollectionVoteStatus struct {
-	TotalVotes int
-	VoteCounts map[int]int
+	TotalVotes    int
+	VoteCounts    map[uint64]uint64
+	VialPosToName map[uint64]string
 }
 
 type LocationVoteStatus struct {

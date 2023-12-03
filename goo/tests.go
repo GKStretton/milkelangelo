@@ -28,7 +28,7 @@ func testEBSAndChatVoting() {
 		VoteType: types.VoteTypeCollection,
 		CollectionVoteStatus: &types.CollectionVoteStatus{
 			TotalVotes: 5,
-			VoteCounts: map[int]int{5: 25},
+			VoteCounts: map[uint64]uint64{5: 25},
 		},
 	})
 	ebsCh := ebs.SubscribeVotes()

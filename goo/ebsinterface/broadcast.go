@@ -86,7 +86,7 @@ func (e *ExtensionSession) regularBroadcast() {
 			next = time.After(time.Second * 2)
 			send()
 		case <-next:
-			next = time.After(time.Second)
+			next = time.After(time.Millisecond * 1100)
 			send()
 		}
 	}
