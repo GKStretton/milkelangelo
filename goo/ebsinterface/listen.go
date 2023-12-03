@@ -94,6 +94,11 @@ func (e *ExtensionSession) connect() error {
 				continue
 			}
 
+			if err := validateVote(voteDetails); err != nil {
+				l.Printf("invalid vote: %v\n", err)
+				continue
+			}
+
 			e.distributeVote(&types.Vote{
 				Data:          *voteDetails,
 				OpaqueUserID:  vote.OpaqueUserID,
@@ -108,5 +113,31 @@ func (e *ExtensionSession) connect() error {
 		close(ch)
 	}()
 
+	return nil
+}
+
+func validateVote(d *types.VoteDetails) error {
+	if d == nil {
+		return fmt.Errorf("nil vote")
+	}
+	if d.VoteType == types.VoteTypeCollection && d.CollectionVote == nil {
+		return fmt.Errorf("nil collection vote")
+	}
+	if d.VoteType == types.VoteTypeLocation && d.LocationVote == nil {
+		return fmt.Errorf("nil location vote")
+	}
+
+	if d.VoteType == types.VoteTypeLocation {
+		v := d.LocationVote
+		if v.N > 11 {
+			return fmt.Errorf("brain too big")
+		}
+		if v.X < -1 || v.X > 1 {
+			return fmt.Errorf("x out of range -1 - 1")
+		}
+		if v.Y < -1 || v.Y > 1 {
+			return fmt.Errorf("y out of range -1 - 1")
+		}
+	}
 	return nil
 }

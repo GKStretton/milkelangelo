@@ -1,11 +1,14 @@
 package executor
 
 import (
-	"fmt"
+	"log"
+	"os"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/events"
 )
+
+var l = log.New(os.Stdout, "[executor] ", log.Flags())
 
 type Executor interface {
 	// Final execution
@@ -40,9 +43,9 @@ func RunExecutorNonBlocking(c chan *machinepb.StateReport, e Executor) (completi
 
 	completionCh = make(chan struct{})
 	go func() {
-		fmt.Printf("beginning execution: %s\n", e)
+		l.Printf("beginning execution: %s\n", e)
 		e.Execute(c)
-		fmt.Printf("completed execution: %s\n", e)
+		l.Printf("completed execution: %s\n", e)
 
 		completionCh <- struct{}{}
 		close(completionCh)

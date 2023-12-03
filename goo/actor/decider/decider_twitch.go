@@ -17,14 +17,16 @@ type twitchDecider struct {
 	ebs *ebsinterface.ExtensionSession
 	api *twitchapi.TwitchApi
 	// if there are no votes, fallback to this one
-	fallback Decider
+	fallback      Decider
+	votingTimeout time.Duration
 }
 
-func NewTwitchDecider(ebs *ebsinterface.ExtensionSession, twitchApi *twitchapi.TwitchApi, fallback Decider) Decider {
+func NewTwitchDecider(ebs *ebsinterface.ExtensionSession, twitchApi *twitchapi.TwitchApi, votingTimeout time.Duration, fallback Decider) Decider {
 	return &twitchDecider{
-		ebs:      ebs,
-		api:      twitchApi,
-		fallback: fallback,
+		ebs:           ebs,
+		api:           twitchApi,
+		fallback:      fallback,
+		votingTimeout: votingTimeout,
 	}
 }
 
@@ -57,11 +59,17 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 	d.ebs.ManualTriggerBroadcast()
 
 	conductVotingRound(
+		types.VoteTypeCollection,
 		ebsCh,
 		chatVoteCh,
-		time.Duration(30)*time.Second,
+		d.votingTimeout,
 		func(vote *types.Vote) bool {
 			data := vote.Data.CollectionVote
+			// ensure vial is valid
+			if _, ok := vialPosToName[data.VialNo]; !ok {
+				return false
+			}
+
 			n++
 			votes[data.VialNo]++
 
@@ -78,21 +86,6 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 		},
 	)
 
-	// build sorted results
-	sortedResults := calculateCollectionVoteResults(votes, vialPosToName)
-
-	if len(sortedResults) == 0 {
-		d.api.Say("No votes! Choosing at random...")
-		return d.fallback.DecideCollection(predictedState)
-	}
-
-	d.api.Say(fmt.Sprintf("Vote settled on %s! Results:\n", sortedResults[0].name))
-	for _, res := range sortedResults {
-		d.api.Say(fmt.Sprintf("    %s: %d", res.name, res.count))
-	}
-
-	winnerId := sortedResults[0].pos
-
 	d.ebs.UpdateCurrentVoteStatus(nil)
 	d.ebs.UpdatePreviousVoteResult(&types.VoteStatus{
 		VoteType: types.VoteTypeCollection,
@@ -104,6 +97,24 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 	})
 	d.ebs.ManualTriggerBroadcast()
 
+	// build sorted results
+	sortedResults := calculateCollectionVoteResults(votes, vialPosToName)
+
+	if len(sortedResults) == 0 {
+		d.api.Say("No votes! Choosing at random...")
+		l.Println("fallback decider for collection...")
+		return d.fallback.DecideCollection(predictedState)
+	}
+
+	msg := fmt.Sprintf("Vote settled on %s! (%d votes)", sortedResults[0].name, sortedResults[0].count)
+	d.api.Say(msg)
+	l.Println(msg)
+	for _, res := range sortedResults {
+		l.Printf("    %s: %d\n", res.name, res.count)
+	}
+
+	winnerId := sortedResults[0].pos
+
 	return executor.NewCollectionExecutor(int(winnerId), int(getVialVolume(int(winnerId))))
 }
 
@@ -113,7 +124,7 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 	defer d.ebs.UnsubscribeVotes(ebsCh)
 
 	// votes from twitch chat
-	chatVoteCh, unSub := d.api.SubscribeChatVotes(types.VoteTypeCollection)
+	chatVoteCh, unSub := d.api.SubscribeChatVotes(types.VoteTypeLocation)
 	defer unSub()
 
 	d.api.Announce("Taking votes on next dispense. Chat format 'x, y'", twitchapi.COLOUR_GREEN)
@@ -133,9 +144,10 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 	d.ebs.ManualTriggerBroadcast()
 
 	conductVotingRound(
+		types.VoteTypeLocation,
 		ebsCh,
 		chatVoteCh,
-		time.Duration(30)*time.Second,
+		d.votingTimeout,
 		func(vote *types.Vote) bool {
 			data := vote.Data.LocationVote
 			x.AddNumber(data.X)
@@ -157,13 +169,6 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 		},
 	)
 
-	if x.Count == 0 {
-		d.api.Say("No votes! Choosing at random...")
-		return d.fallback.DecideDispense(predictedState)
-	}
-
-	d.api.Say("Vote settled on average: %.2f, %.2f!")
-
 	d.ebs.UpdateCurrentVoteStatus(nil)
 	d.ebs.UpdatePreviousVoteResult(&types.VoteStatus{
 		VoteType: types.VoteTypeLocation,
@@ -174,6 +179,16 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 		},
 	})
 	d.ebs.ManualTriggerBroadcast()
+
+	if x.Count == 0 {
+		d.api.Say("No votes! Choosing at random...")
+		l.Println("fallback decider for location...")
+		return d.fallback.DecideDispense(predictedState)
+	}
+
+	msg := fmt.Sprintf("Vote settled on average: %.2f, %.2f!", x.Average, y.Average)
+	d.api.Say(msg)
+	l.Println(msg)
 
 	return e
 }

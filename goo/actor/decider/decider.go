@@ -1,12 +1,15 @@
 package decider
 
 import (
-	"fmt"
+	"log"
+	"os"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
+
+var l = log.New(os.Stdout, "[decider] ", log.Flags())
 
 type Decider interface {
 	DecideCollection(predictedState *machinepb.StateReport) executor.Executor
@@ -18,7 +21,7 @@ func getVialVolume(vialNo int) float32 {
 	profile := vialprofiles.GetSystemVialProfile(vialNo)
 
 	if profile == nil {
-		fmt.Printf("error getting vial volume, using fallback %.1f\n", fallbackVolume)
+		l.Printf("error getting vial volume, using fallback %.1f\n", fallbackVolume)
 		return fallbackVolume
 	}
 

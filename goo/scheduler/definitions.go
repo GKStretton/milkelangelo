@@ -106,7 +106,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 		name:    "LAUNCH_ACTOR",
 		enabled: true,
 		function: func() {
-			actor.LaunchActor(twitchApi)
+			actor.LaunchActor(twitchApi, 5*time.Second)
 		},
 		recurringTime: mainSessionStartTime,
 		minuteOffset:  0,

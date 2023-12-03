@@ -8,18 +8,27 @@ import (
 )
 
 // if early exit is returned true after a vote, the vote will finish before the timeout
-func conductVotingRound(ebsCh, chatCh <-chan *types.Vote, timeout time.Duration, handler func(*types.Vote) (earlyExit bool)) {
+func conductVotingRound(t types.VoteType, ebsCh, chatCh <-chan *types.Vote, timeout time.Duration, handler func(*types.Vote) (earlyExit bool)) {
 	timeoutCh := time.After(timeout)
 	for {
 		select {
 		case <-timeoutCh:
+			l.Println("vote timed out")
 			return
 		case vote := <-ebsCh:
+			if vote.Data.VoteType != t {
+				continue
+			}
+			l.Println("got ebs vote")
 			earlyExit := handler(vote)
 			if earlyExit {
 				return
 			}
 		case vote := <-chatCh:
+			if vote.Data.VoteType != t {
+				continue
+			}
+			l.Println("got chat vote")
 			earlyExit := handler(vote)
 			if earlyExit {
 				return
@@ -53,6 +62,6 @@ func calculateCollectionVoteResults(votes map[uint64]uint64, vialPosToName map[u
 			count: count,
 		})
 	}
-	slices.SortFunc(sortedResults, func(a, b collectionVoteResult) int { return int(a.count) - int(b.count) })
+	slices.SortFunc(sortedResults, func(a, b collectionVoteResult) int { return int(b.count) - int(a.count) })
 	return sortedResults
 }

@@ -2,6 +2,7 @@ package executor
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 )
@@ -20,7 +21,7 @@ func NewDispenseExecutor(x, y float32) *dispenseExecutor {
 
 func (e *dispenseExecutor) Preempt() {
 	if !goToLock.TryLock() {
-		fmt.Println("preemptive goTo blocked")
+		l.Println("preemptive goTo blocked")
 		return
 	}
 	defer goToLock.Unlock()
@@ -45,11 +46,11 @@ func (e *dispenseExecutor) Execute(c chan *machinepb.StateReport) {
 	goToLock.Lock()
 	defer goToLock.Unlock()
 
-	fmt.Printf("Going to %f, %f\n", e.X, e.Y)
+	l.Printf("Going to %f, %f\n", e.X, e.Y)
 	goTo(e.X, e.Y)
-	fmt.Println("dispensing...")
+	l.Println("dispensing...")
 	dispenseBlocking(c)
-	fmt.Println("done...")
+	l.Println("done...")
 }
 
 func (e *dispenseExecutor) String() string {
@@ -61,10 +62,12 @@ func dispenseBlocking(c chan *machinepb.StateReport) {
 	a1 := conditionWaiter(c, func(sr *machinepb.StateReport) bool {
 		return sr.Status == machinepb.Status_DISPENSING
 	})
+	time.Sleep(time.Millisecond * 250)
 	dispense()
-	fmt.Println("waiting for 'DISPENSING'")
+	//! this is buggy. Maybe change to watch for the dispense number incrementing?
+	l.Println("waiting for DISPENSING")
 	<-a1
-	fmt.Println("waiting for '!DISPENSING'")
+	l.Println("waiting for NOT DISPENSING")
 	<-conditionWaiter(c, func(sr *machinepb.StateReport) bool {
 		return sr.Status != machinepb.Status_DISPENSING
 	})

@@ -26,7 +26,6 @@ func (e *ExtensionSession) ManualTriggerBroadcast() {
 	if e.cleanUpDone {
 		return
 	}
-	l.Println("manually triggering broadcast...")
 	e.triggerBroadcast <- struct{}{}
 }
 

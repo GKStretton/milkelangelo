@@ -43,6 +43,7 @@ func NewExtensionSession(dur time.Duration) (*ExtensionSession, error) {
 		broadcastToken:     bt,
 		ebsListeningToken:  elt,
 		exitCh:             make(chan struct{}),
+		triggerBroadcast:   make(chan struct{}),
 		broadcastDataCache: &broadcastData{},
 	}
 

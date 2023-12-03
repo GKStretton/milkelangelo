@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
+	"github.com/gkstretton/dark/services/goo/events"
+	"github.com/gkstretton/dark/services/goo/mqtt"
+	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/types"
 )
@@ -12,14 +16,24 @@ import (
 // tests for human verification during development
 func runAdHocTests() {
 	testActor()
+	// testEBSAndChatVoting()
 }
 
 func testActor() {
-	fmt.Println("todo")
+	mqtt.Start()
+	sm := session.NewSessionManager(false)
+	events.Start(sm)
+	twitchApi := twitchapi.Start()
+
+	actor.LaunchActor(twitchApi, 30*time.Second)
 }
 
 // subscribes to ebs and twitch chat votes and prints the received votes
 func testEBSAndChatVoting() {
+	mqtt.Start()
+	sm := session.NewSessionManager(false)
+	events.Start(sm)
+
 	ebs, err := ebsinterface.NewExtensionSession(time.Hour * 2)
 	if err != nil {
 		panic(err)

@@ -3,6 +3,8 @@ package actor
 import (
 	"flag"
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
@@ -13,11 +15,12 @@ import (
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 )
 
+var l = log.New(os.Stdout, "[actor] ", log.Flags())
 var waitForUser = flag.Bool("waitForUser", false, "if true, do blocking waits at certain debug points")
 
 // LaunchActor is launched to control a session after the canvas is prepared.
 // It should effect art.
-func LaunchActor(twitchApi *twitchapi.TwitchApi) {
+func LaunchActor(twitchApi *twitchapi.TwitchApi, votingTimeout time.Duration) {
 	fmt.Printf("Launching actor\n")
 
 	// access state reports
@@ -31,13 +34,14 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi) {
 
 	// todo: change to a more comprehensive auto decider
 	// decider := decider.NewMockDecider()
-	decider := decider.NewTwitchDecider(ebs, twitchApi, decider.NewMockDecider())
+	decider := decider.NewTwitchDecider(ebs, twitchApi, votingTimeout, decider.NewMockDecider())
 
 	awaitDecision := decide(decider, events.GetLatestStateReportCopy())
 	decision := <-awaitDecision
 
 	for {
 		if decision == nil {
+			l.Println("saw nil decision, exiting actor")
 			break
 		}
 		awaitCompletion, predictedCompletionState := executor.RunExecutorNonBlocking(c, decision)
@@ -53,12 +57,12 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi) {
 func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan executor.Executor {
 	c := make(chan executor.Executor)
 	go func() {
-		fmt.Printf("making next decision...\n")
+		l.Printf("making next decision...\n")
 		decision := decideNextAction(decider, predictedState)
 		if *waitForUser {
 			fmt.Scanln()
 		}
-		fmt.Printf("made   next decision: %s\n", decision)
+		l.Printf("made next decision: %v\n", decision)
 		c <- decision
 		close(c)
 	}()
@@ -66,10 +70,14 @@ func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan
 }
 
 func decideNextAction(decider decider.Decider, predictedState *machinepb.StateReport) executor.Executor {
+	if predictedState.Status == machinepb.Status_SLEEPING {
+		l.Println("invalid state for actor, decided nil.")
+		return nil
+	}
 	if predictedState.PipetteState.Spent {
-		fmt.Println("collection is next, deciding...")
+		l.Println("collection is next, launching decider...")
 		return decider.DecideCollection(predictedState)
 	}
-	fmt.Println("dispense is next, deciding...")
+	l.Println("dispense is next, launching decider...")
 	return decider.DecideDispense(predictedState)
 }
