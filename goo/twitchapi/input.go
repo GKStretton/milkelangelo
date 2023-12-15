@@ -2,7 +2,6 @@ package twitchapi
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/gempir/go-twitch-irc/v4"
 	"github.com/gkstretton/dark/services/goo/types"
@@ -64,7 +63,7 @@ func (api *TwitchApi) SubscribeChatVotes(voteType types.VoteType) (voteCh chan *
 				close(voteCh)
 				return
 			}
-			vote, err := TwitchMessageToVote(voteType, msg, vialPosToName)
+			vote, err := api.twitchMessageToVote(voteType, msg, vialPosToName)
 			if err != nil {
 				fmt.Printf("failed to parse vote from %s: %s\n", msg.Message, err)
 				api.Reply(msg.ID, err.Error())
@@ -72,10 +71,6 @@ func (api *TwitchApi) SubscribeChatVotes(voteType types.VoteType) (voteCh chan *
 			}
 			if vote == nil {
 				continue
-			}
-			if vote.Data.LocationVote != nil && vote.Data.LocationVote.N > 2 {
-				n := vote.Data.LocationVote.N
-				api.Reply(msg.ID, fmt.Sprintf("%dD%s", n, strings.Repeat("!?", int(n-2))))
 			}
 			voteCh <- vote
 		}

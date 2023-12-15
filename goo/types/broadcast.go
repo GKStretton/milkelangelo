@@ -10,10 +10,11 @@ type CollectionVoteStatus struct {
 	TotalVotes    int
 	VoteCounts    map[uint64]uint64
 	VialPosToName map[uint64]string
+	ComputerVote  int
 }
 
 type LocationVoteStatus struct {
-	TotalVotes int
-	XAvg       float32
-	YAvg       float32
+	TotalVotes   int
+	AverageVote  LocationVote
+	ComputerVote LocationVote
 }

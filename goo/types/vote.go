@@ -18,7 +18,6 @@ type CollectionVote struct {
 type LocationVote struct {
 	X float32
 	Y float32
-	N uint64 // how many numbers were provided if voted through chat.
 }
 
 type VoteDetails struct {

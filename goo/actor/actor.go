@@ -58,12 +58,12 @@ func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan
 	c := make(chan executor.Executor)
 	go func() {
 		l.Printf("making next decision...\n")
-		decision := decideNextAction(decider, predictedState)
+		e := decideNextAction(decider, predictedState)
 		if *waitForUser {
 			fmt.Scanln()
 		}
-		l.Printf("made next decision: %v\n", decision)
-		c <- decision
+		l.Printf("made next decision: %v\n", e)
+		c <- e
 		close(c)
 	}()
 	return c
@@ -76,8 +76,10 @@ func decideNextAction(decider decider.Decider, predictedState *machinepb.StateRe
 	}
 	if predictedState.PipetteState.Spent {
 		l.Println("collection is next, launching decider...")
-		return decider.DecideCollection(predictedState)
+		d := decider.DecideCollection(predictedState)
+		return executor.NewCollectionExecutor(d)
 	}
 	l.Println("dispense is next, launching decider...")
-	return decider.DecideDispense(predictedState)
+	d := decider.DecideDispense(predictedState)
+	return executor.NewDispenseExecutor(d)
 }

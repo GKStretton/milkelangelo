@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
-	"github.com/gkstretton/dark/services/goo/actor/executor"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/types"
@@ -30,7 +29,7 @@ func NewTwitchDecider(ebs *ebsinterface.ExtensionSession, twitchApi *twitchapi.T
 	}
 }
 
-func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) executor.Executor {
+func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) *CollectionDecision {
 	options, vialPosToName := vialprofiles.GetVialOptionsAndMap()
 
 	// votes from twitch ebs
@@ -115,10 +114,10 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 
 	winnerId := sortedResults[0].pos
 
-	return executor.NewCollectionExecutor(int(winnerId), int(getVialVolume(int(winnerId))))
+	// return executor.NewCollectionExecutor(int(winnerId), int(getVialVolume(int(winnerId))))
 }
 
-func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) executor.Executor {
+func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) *DispenseDecision {
 	// votes from twitch ebs
 	ebsCh := d.ebs.SubscribeVotes()
 	defer d.ebs.UnsubscribeVotes(ebsCh)
@@ -129,7 +128,9 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) ex
 
 	d.api.Announce("Taking votes on next dispense. Chat format 'x, y'", twitchapi.COLOUR_GREEN)
 
-	e := executor.NewDispenseExecutor(0, 0)
+	computerVote := d.fallback.DecideDispense(predictedState)
+
+	// e := executor.NewDispenseExecutor(0, 0)
 	x := RunningAverage{}
 	y := RunningAverage{}
 

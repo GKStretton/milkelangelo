@@ -129,9 +129,6 @@ func validateVote(d *types.VoteDetails) error {
 
 	if d.VoteType == types.VoteTypeLocation {
 		v := d.LocationVote
-		if v.N > 11 {
-			return fmt.Errorf("brain too big")
-		}
 		if v.X < -1 || v.X > 1 {
 			return fmt.Errorf("x out of range -1 - 1")
 		}

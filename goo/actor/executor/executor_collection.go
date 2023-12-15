@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/actor/decider"
 )
 
 type collectionExecutor struct {
@@ -11,10 +12,14 @@ type collectionExecutor struct {
 	volUl  int
 }
 
-func NewCollectionExecutor(vialNo, volUl int) *collectionExecutor {
+func NewCollectionExecutor(d *decider.CollectionDecision) *collectionExecutor {
+	if d == nil {
+		return nil
+	}
+	vol := d.DropsNo * getVialDropVolume(d.VialNo)
 	return &collectionExecutor{
-		vialNo,
-		volUl,
+		vialNo: d.VialNo,
+		volUl:  vol,
 	}
 }
 

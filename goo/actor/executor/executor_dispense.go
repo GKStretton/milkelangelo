@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/actor/decider"
 )
 
 type dispenseExecutor struct {
@@ -12,10 +13,13 @@ type dispenseExecutor struct {
 	Y float32
 }
 
-func NewDispenseExecutor(x, y float32) *dispenseExecutor {
+func NewDispenseExecutor(d *decider.DispenseDecision) *dispenseExecutor {
+	if d == nil {
+		return nil
+	}
 	return &dispenseExecutor{
-		X: x,
-		Y: y,
+		X: d.X,
+		Y: d.Y,
 	}
 }
 

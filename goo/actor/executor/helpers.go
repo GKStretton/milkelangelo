@@ -8,11 +8,15 @@ import (
 func getDispenseVolume() float32 {
 	sr := events.GetLatestStateReportCopy()
 
+	return getVialDropVolume(int(sr.PipetteState.VialHeld))
+}
+
+func getVialDropVolume(vialNo int) float32 {
 	const fallbackVolume float32 = 15
-	profile := vialprofiles.GetSystemVialProfile(int(sr.PipetteState.VialHeld))
+	profile := vialprofiles.GetSystemVialProfile(vialNo)
 
 	if profile == nil {
-		l.Printf("error getting dispense volume, using fallback %.1f\n", fallbackVolume)
+		l.Printf("error getting vial volume, using fallback %.1f\n", fallbackVolume)
 		return fallbackVolume
 	}
 

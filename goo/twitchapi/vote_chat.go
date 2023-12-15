@@ -9,16 +9,19 @@ import (
 	"github.com/gkstretton/dark/services/goo/types"
 )
 
-func TwitchMessageToVote(voteType types.VoteType, msg *Message, vialPosToName map[uint64]string) (*types.Vote, error) {
+func (api *TwitchApi) twitchMessageToVote(voteType types.VoteType, msg *Message, vialPosToName map[uint64]string) (*types.Vote, error) {
 	var voteDetails types.VoteDetails
 	switch voteType {
 	case types.VoteTypeLocation:
-		data, err := parseCoordinates(msg.Message)
+		data, n, err := parseCoordinates(msg.Message)
 		if err != nil {
 			return nil, err
 		}
 		if data == nil {
 			return nil, nil
+		}
+		if n > 2 {
+			api.Reply(msg.ID, fmt.Sprintf("%dD%s", n, strings.Repeat("!?", int(n-2))))
 		}
 		voteDetails = types.VoteDetails{
 			VoteType:     voteType,
@@ -67,38 +70,37 @@ func parseCollection(input string, vialPosToName map[uint64]string) (*types.Coll
 // The function extracts all decimal numbers from the input and checks if at least two are present.
 // It parses the first two numbers as x and y coordinates, ensuring they are within the range [-1, 1].
 // If the numbers are out of this range, or if there's a parsing error, an error is returned.
-func parseCoordinates(input string) (*types.LocationVote, error) {
+func parseCoordinates(input string) (*types.LocationVote, int, error) {
 	re := regexp.MustCompile(`-?\d+(\.\d+)?`)
 	matches := re.FindAllString(input, -1)
 	n := len(matches)
 
 	if n < 2 {
-		return nil, nil
+		return nil, 0, nil
 	}
 
 	x, err := strconv.ParseFloat(matches[0], 64)
 	if err != nil {
 		fmt.Println("error parsing x coordinate", err)
-		return nil, fmt.Errorf("error parsing x coordinate '%s'", matches[0])
+		return nil, 0, fmt.Errorf("error parsing x coordinate '%s'", matches[0])
 	}
 
 	if x < -1 || x > 1 {
-		return nil, fmt.Errorf("x should be between -1 and 1, %f is not", x)
+		return nil, 0, fmt.Errorf("x should be between -1 and 1, %f is not", x)
 	}
 
 	y, err := strconv.ParseFloat(matches[1], 64)
 	if err != nil {
 		fmt.Println("error parsing y coordinate", err)
-		return nil, fmt.Errorf("error parsing y coordinate '%s'", matches[1])
+		return nil, 0, fmt.Errorf("error parsing y coordinate '%s'", matches[1])
 	}
 
 	if y < -1 || y > 1 {
-		return nil, fmt.Errorf("y should be between -1 and 1, %f is not", y)
+		return nil, 0, fmt.Errorf("y should be between -1 and 1, %f is not", y)
 	}
 
 	return &types.LocationVote{
-		N: uint64(n),
 		X: float32(x),
 		Y: float32(y),
-	}, nil
+	}, n, nil
 }
