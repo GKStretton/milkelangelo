@@ -2,6 +2,7 @@ package decider
 
 import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/types"
 )
 
 type mockDecider struct{}
@@ -12,7 +13,7 @@ func NewMockDecider() Decider {
 
 var tempCollectionTracker int
 
-func (d *mockDecider) DecideCollection(predictedState *machinepb.StateReport) *CollectionDecision {
+func (d *mockDecider) DecideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
 	// Request 2 collections only
 	if tempCollectionTracker >= 2 {
 		return nil
@@ -21,7 +22,7 @@ func (d *mockDecider) DecideCollection(predictedState *machinepb.StateReport) *C
 
 	//empty
 	vialNo := 2
-	return &CollectionDecision{
+	return &types.CollectionDecision{
 		VialNo:  vialNo,
 		DropsNo: 3,
 	}
@@ -29,14 +30,14 @@ func (d *mockDecider) DecideCollection(predictedState *machinepb.StateReport) *C
 
 var tempLocationTracker bool
 
-func (d *mockDecider) DecideDispense(predictedState *machinepb.StateReport) *DispenseDecision {
+func (d *mockDecider) DecideDispense(predictedState *machinepb.StateReport) *types.DispenseDecision {
 	tempLocationTracker = !tempLocationTracker
 	multiplier := float32(1)
 	if tempLocationTracker {
 		multiplier = -1
 	}
 
-	return &DispenseDecision{
+	return &types.DispenseDecision{
 		X: 0.5 * multiplier,
 		Y: 0.5 * multiplier,
 	}

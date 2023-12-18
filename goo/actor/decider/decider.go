@@ -5,21 +5,12 @@ import (
 	"os"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/types"
 )
 
 var l = log.New(os.Stdout, "[decider] ", log.Flags())
 
 type Decider interface {
-	DecideCollection(predictedState *machinepb.StateReport) *CollectionDecision
-	DecideDispense(predictedState *machinepb.StateReport) *DispenseDecision
-}
-
-type CollectionDecision struct {
-	VialNo  int
-	DropsNo int
-}
-
-type DispenseDecision struct {
-	X float32
-	Y float32
+	DecideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision
+	DecideDispense(predictedState *machinepb.StateReport) *types.DispenseDecision
 }
