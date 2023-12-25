@@ -94,7 +94,7 @@ func getInstagramUrlFromMediaId(mediaID string) (string, error) {
 }
 
 // only needed to generate initial config
-func login() {
+func instaLogin() {
 	insta := goinsta.New("astudyoflight_", "[password]")
 
 	// Only call Login the first time you login. Next time import your config

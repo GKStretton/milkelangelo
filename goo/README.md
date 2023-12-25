@@ -17,3 +17,5 @@ twitch token -u -s 'chat:read chat:edit moderator:manage:announcements'
 ```
 
 Save the refresh token in `kv/TWITCH_REFRESH_TOKEN`
+
+## Youtube auth

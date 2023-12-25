@@ -5,18 +5,50 @@ import (
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/actor"
+	"github.com/gkstretton/dark/services/goo/actor/decider"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
+	"github.com/gkstretton/dark/services/goo/socialmedia"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/types"
+	"github.com/gkstretton/dark/services/goo/util"
+	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
 // tests for human verification during development
 func runAdHocTests() {
-	testActor()
+	// testActor()
 	// testEBSAndChatVoting()
+	// testSampleUnitCircle()
+	// testRandomVialPos()
+	// printProfiles()
+	socialmedia.TestYoutubeClient()
+}
+
+func printProfiles() {
+	for i, v := range vialprofiles.GetSystemVialConfigurationSnapshot().Profiles {
+		fmt.Println(i)
+		fmt.Println(v)
+	}
+}
+
+func testRandomVialPos() {
+	i := 0
+	for {
+		if i > 100 {
+			break
+		}
+		i++
+
+		fmt.Print(decider.GetRandomVialPos())
+		fmt.Print(", ")
+	}
+}
+
+func testSampleUnitCircle() {
+	fmt.Println(util.SampleRandomUnitCircleCoordinate())
 }
 
 func testActor() {

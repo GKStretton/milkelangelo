@@ -1,11 +1,15 @@
 package decider
 
 import (
+	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
 	"github.com/gkstretton/dark/services/goo/types"
+	"github.com/gkstretton/dark/services/goo/util"
+	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
 type autoDecider struct {
@@ -19,20 +23,39 @@ func NewAutoDecider(timeout time.Duration) Decider {
 	}
 }
 
-func (d *autoDecider) decideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
-	// return &types.CollectionDecision{
-	// 	VialNo: 1,
-	// 	DropsNo: 1,
-	// }
-	return nil
+// GetRandomVialPos returns a vial position that meets criteria
+func GetRandomVialPos() uint64 {
+	options := []uint64{}
+	snapshot := vialprofiles.GetSystemVialConfigurationSnapshot()
+	for i, p := range snapshot.Profiles {
+		if p.VialFluid == machinepb.VialProfile_VIAL_FLUID_DYE_WATER_BASED ||
+			p.VialFluid == machinepb.VialProfile_VIAL_FLUID_EMULSIFIER {
+			options = append(options, i)
+		}
+	}
+
+	if len(options) == 0 {
+		fmt.Println("ERROR: no system vial profiles")
+		return 0
+	}
+	choiceIndex := rand.Intn(len(options))
+	return options[choiceIndex]
 }
 
+func (d *autoDecider) decideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
+	return &types.CollectionDecision{
+		VialNo:  int(GetRandomVialPos()),
+		DropsNo: 3,
+	}
+}
+
+// decideDispense decides a random location from the unit circle
 func (d *autoDecider) decideDispense(predictedState *machinepb.StateReport) *types.DispenseDecision {
-	// return &types.DispenseDecision{
-	// 	X: 0,
-	// 	Y: 0,
-	// }
-	return nil
+	x, y := util.SampleRandomUnitCircleCoordinate()
+	return &types.DispenseDecision{
+		X: float32(x),
+		Y: float32(y),
+	}
 }
 
 func (d *autoDecider) DecideNextAction(predictedState *machinepb.StateReport) executor.Executor {

@@ -36,6 +36,7 @@ func NewSocialManager() *SocialManager {
 	return &SocialManager{
 		platformManagers: map[machinepb.SocialPlatform]platformManager{
 			machinepb.SocialPlatform_SOCIAL_PLATFORM_INSTAGRAM: newInstagramManager(),
+			machinepb.SocialPlatform_SOCIAL_PLATFORM_YOUTUBE:   newYoutubeManager(),
 		},
 	}
 }
