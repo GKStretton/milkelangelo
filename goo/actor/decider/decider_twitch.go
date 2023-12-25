@@ -30,7 +30,11 @@ func NewTwitchDecider(ebs *ebsinterface.ExtensionSession, twitchApi *twitchapi.T
 	}
 }
 
-func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
+func (d *twitchDecider) DecideNextAction(predictedState *machinepb.StateReport) executor.Executor {
+	return nil
+}
+
+func (d *twitchDecider) decideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
 	options, vialPosToName := vialprofiles.GetVialOptionsAndMap()
 
 	// votes from twitch ebs
@@ -43,7 +47,10 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 
 	d.api.Announce("Taking votes on next collection. Options: "+strings.Join(options, ", "), twitchapi.COLOUR_GREEN)
 
-	computerVote := d.fallback.DecideCollection(predictedState)
+	computerVote := d.fallback.decideCollection(predictedState)
+	if computerVote == nil {
+		return nil
+	}
 
 	// vialPos -> number of votes
 	votes := map[uint64]uint64{}
@@ -114,7 +121,7 @@ func (d *twitchDecider) DecideCollection(predictedState *machinepb.StateReport) 
 	}
 }
 
-func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) *types.DispenseDecision {
+func (d *twitchDecider) decideDispense(predictedState *machinepb.StateReport) *types.DispenseDecision {
 	// votes from twitch ebs
 	ebsCh := d.ebs.SubscribeVotes()
 	defer d.ebs.UnsubscribeVotes(ebsCh)
@@ -125,7 +132,10 @@ func (d *twitchDecider) DecideDispense(predictedState *machinepb.StateReport) *t
 
 	d.api.Announce("Taking votes on next dispense. Chat format 'x, y'", twitchapi.COLOUR_GREEN)
 
-	computerVote := d.fallback.DecideDispense(predictedState)
+	computerVote := d.fallback.decideDispense(predictedState)
+	if computerVote == nil {
+		return nil
+	}
 
 	e := executor.NewDispenseExecutor(computerVote)
 	e.Preempt()

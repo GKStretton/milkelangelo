@@ -20,7 +20,7 @@ var waitForUser = flag.Bool("waitForUser", false, "if true, do blocking waits at
 
 // LaunchActor is launched to control a session after the canvas is prepared.
 // It should effect art.
-func LaunchActor(twitchApi *twitchapi.TwitchApi, votingTimeout time.Duration) {
+func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) {
 	fmt.Printf("Launching actor\n")
 
 	// access state reports
@@ -32,54 +32,42 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, votingTimeout time.Duration) {
 		fmt.Printf("failed to create ebs interface in LaunchActor: %v\n", err)
 	}
 
-	// todo: change to a more comprehensive auto decider
-	// decider := decider.NewMockDecider()
-	decider := decider.NewTwitchDecider(ebs, twitchApi, votingTimeout, decider.NewMockDecider())
+	// d := decider.NewTwitchDecider(ebs, twitchApi, time.Second*5, decider.NewMockDecider())
+	d := decider.NewAutoDecider(actorTimeout)
 
-	awaitDecision := decide(decider, events.GetLatestStateReportCopy())
-	decision := <-awaitDecision
+	awaitDecision := decide(d, events.GetLatestStateReportCopy(), ebs)
+	e := <-awaitDecision
 
 	for {
-		if decision == nil {
+		if e == nil {
 			l.Println("saw nil decision, exiting actor")
 			break
 		}
-		awaitCompletion, predictedCompletionState := executor.RunExecutorNonBlocking(c, decision)
+		awaitCompletion, predictedCompletionState := executor.RunExecutorNonBlocking(c, e)
+		// ebs.UpdateCurrentAction(e)
+		// ebs.UpdateUpcomingAction(nil)
 
 		// get next action while the action is being performed
-		awaitDecision = decide(decider, predictedCompletionState)
+		awaitDecision = decide(d, predictedCompletionState, ebs)
 
 		<-awaitCompletion // ensure last action finished
-		decision = <-awaitDecision
+		// ebs.UpdateCurrentAction(nil)
+		e = <-awaitDecision
 	}
 }
 
-func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan executor.Executor {
+func decide(decider decider.Decider, predictedState *machinepb.StateReport, ebs *ebsinterface.ExtensionSession) chan executor.Executor {
 	c := make(chan executor.Executor)
 	go func() {
 		l.Printf("making next decision...\n")
-		e := decideNextAction(decider, predictedState)
+		e := decider.DecideNextAction(predictedState)
 		if *waitForUser {
 			fmt.Scanln()
 		}
 		l.Printf("made next decision: %v\n", e)
+		// ebs.UpdateUpcomingAction(e)
 		c <- e
 		close(c)
 	}()
 	return c
-}
-
-func decideNextAction(decider decider.Decider, predictedState *machinepb.StateReport) executor.Executor {
-	if predictedState.Status == machinepb.Status_SLEEPING {
-		l.Println("invalid state for actor, decided nil.")
-		return nil
-	}
-	if predictedState.PipetteState.Spent {
-		l.Println("collection is next, launching decider...")
-		d := decider.DecideCollection(predictedState)
-		return executor.NewCollectionExecutor(d)
-	}
-	l.Println("dispense is next, launching decider...")
-	d := decider.DecideDispense(predictedState)
-	return executor.NewDispenseExecutor(d)
 }

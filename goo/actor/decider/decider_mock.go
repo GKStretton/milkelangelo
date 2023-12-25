@@ -2,6 +2,7 @@ package decider
 
 import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/actor/executor"
 	"github.com/gkstretton/dark/services/goo/types"
 )
 
@@ -11,9 +12,13 @@ func NewMockDecider() Decider {
 	return &mockDecider{}
 }
 
+func (d *mockDecider) DecideNextAction(predictedState *machinepb.StateReport) executor.Executor {
+	return nil
+}
+
 var tempCollectionTracker int
 
-func (d *mockDecider) DecideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
+func (d *mockDecider) decideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
 	// Request 2 collections only
 	if tempCollectionTracker >= 2 {
 		return nil
@@ -30,7 +35,7 @@ func (d *mockDecider) DecideCollection(predictedState *machinepb.StateReport) *t
 
 var tempLocationTracker bool
 
-func (d *mockDecider) DecideDispense(predictedState *machinepb.StateReport) *types.DispenseDecision {
+func (d *mockDecider) decideDispense(predictedState *machinepb.StateReport) *types.DispenseDecision {
 	tempLocationTracker = !tempLocationTracker
 	multiplier := float32(1)
 	if tempLocationTracker {
