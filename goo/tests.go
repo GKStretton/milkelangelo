@@ -10,7 +10,6 @@ import (
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
-	"github.com/gkstretton/dark/services/goo/socialmedia"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/types"
 	"github.com/gkstretton/dark/services/goo/util"
@@ -19,12 +18,12 @@ import (
 
 // tests for human verification during development
 func runAdHocTests() {
-	// testActor()
+	testActor()
 	// testEBSAndChatVoting()
 	// testSampleUnitCircle()
 	// testRandomVialPos()
 	// printProfiles()
-	socialmedia.TestYoutubeClient()
+	// socialmedia.TestYoutubeClient()
 }
 
 func printProfiles() {
@@ -57,7 +56,7 @@ func testActor() {
 	events.Start(sm)
 	twitchApi := twitchapi.Start()
 
-	actor.LaunchActor(twitchApi, 30*time.Second)
+	actor.LaunchActor(twitchApi, 3*time.Minute)
 }
 
 // subscribes to ebs and twitch chat votes and prints the received votes

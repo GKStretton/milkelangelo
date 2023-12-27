@@ -27,15 +27,15 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) {
 	c := events.Subscribe()
 	defer events.Unsubscribe(c)
 
-	ebs, err := ebsinterface.NewExtensionSession(time.Hour * 2)
-	if err != nil {
-		fmt.Printf("failed to create ebs interface in LaunchActor: %v\n", err)
-	}
+	// ebs, err := ebsinterface.NewExtensionSession(time.Hour * 2)
+	// if err != nil {
+	// 	fmt.Printf("failed to create ebs interface in LaunchActor: %v\n", err)
+	// }
 
 	// d := decider.NewTwitchDecider(ebs, twitchApi, time.Second*5, decider.NewMockDecider())
 	d := decider.NewAutoDecider(actorTimeout)
 
-	awaitDecision := decide(d, events.GetLatestStateReportCopy(), ebs)
+	awaitDecision := decide(d, events.GetLatestStateReportCopy(), nil)
 	e := <-awaitDecision
 
 	for {
@@ -48,7 +48,7 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) {
 		// ebs.UpdateUpcomingAction(nil)
 
 		// get next action while the action is being performed
-		awaitDecision = decide(d, predictedCompletionState, ebs)
+		awaitDecision = decide(d, predictedCompletionState, nil)
 
 		<-awaitCompletion // ensure last action finished
 		// ebs.UpdateCurrentAction(nil)

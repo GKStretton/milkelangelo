@@ -59,15 +59,17 @@ func (d *autoDecider) decideDispense(predictedState *machinepb.StateReport) *typ
 }
 
 func (d *autoDecider) DecideNextAction(predictedState *machinepb.StateReport) executor.Executor {
-	if time.Now().After(d.endTime) {
-		l.Println("endTime reached on auto decider, deciding nil.")
-		return nil
-	}
 	if predictedState.Status == machinepb.Status_SLEEPING {
 		l.Println("invalid state for actor, decided nil.")
 		return nil
 	}
 	if predictedState.PipetteState.Spent {
+		// only end after the dispense is done
+		if time.Now().After(d.endTime) {
+			l.Println("endTime reached on auto decider, deciding nil.")
+			return nil
+		}
+
 		l.Println("collection is next, launching decider...")
 		decision := d.decideCollection(predictedState)
 		return executor.NewCollectionExecutor(decision)
