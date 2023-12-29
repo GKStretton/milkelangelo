@@ -28,14 +28,7 @@ func requestFridgeMilk() {
 
 const cleaningBody = `Please perform the cleaning routine:
 
-- Fill altar with cleaning solution
-- Run the cleaning cycle @ http://192.168.0.37:5000 "Cleaning" tab. (Must be on home wifi)
-- Change the rinse glass water
-- Ensure vials are topped up with correct fluids
-- Wipe the bowl clean if necessary, once the cycle is done
-- Issue a shutdown
-- Empty bucket and clean it if necessary
-- Replace bucket, ! with tube in it !
+http://192.168.0.37:5000/cleaning (Must be on home wifi)
 `
 
 func requestCleaning() {

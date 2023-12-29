@@ -34,7 +34,7 @@ export default function CollectDispense() {
   const collectingVial = collecting && stateReport?.collectionRequest?.vialNumber;
 
   const profileFromVial = useCallback((vial: number | undefined): VialProfile|undefined => {
-    if (!vial) {
+    if (!vial || !systemVialProfiles) {
       return undefined;
     }
 
