@@ -44,6 +44,8 @@ require (
 	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/mailjet/mailjet-apiv3-go/v3 v3.2.0 // indirect
+	github.com/mailjet/mailjet-apiv3-go/v4 v4.0.1 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/pkg/errors v0.9.1 // indirect

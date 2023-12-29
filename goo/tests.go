@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/actor/decider"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
+	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
@@ -18,12 +20,17 @@ import (
 
 // tests for human verification during development
 func runAdHocTests() {
-	testActor()
-	// testEBSAndChatVoting()
-	// testSampleUnitCircle()
-	// testRandomVialPos()
-	// printProfiles()
-	// socialmedia.TestYoutubeClient()
+	// testActor()
+	// testEmail()
+}
+
+func testEmail() {
+	email.Start()
+	email.SendEmail(&machinepb.Email{
+		Subject:   "maintain me",
+		Body:      "somehting broked",
+		Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_MAINTENANCE,
+	})
 }
 
 func printProfiles() {

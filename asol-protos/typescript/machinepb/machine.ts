@@ -612,6 +612,51 @@ export function socialPlatformToJSON(object: SocialPlatform): string {
   }
 }
 
+export enum EmailRecipient {
+  EMAIL_RECIPIENT_UNDEFINED = 0,
+  EMAIL_RECIPIENT_MAINTENANCE = 1,
+  EMAIL_RECIPIENT_ROUTINE_OPERATIONS = 2,
+  EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function emailRecipientFromJSON(object: any): EmailRecipient {
+  switch (object) {
+    case 0:
+    case "EMAIL_RECIPIENT_UNDEFINED":
+      return EmailRecipient.EMAIL_RECIPIENT_UNDEFINED;
+    case 1:
+    case "EMAIL_RECIPIENT_MAINTENANCE":
+      return EmailRecipient.EMAIL_RECIPIENT_MAINTENANCE;
+    case 2:
+    case "EMAIL_RECIPIENT_ROUTINE_OPERATIONS":
+      return EmailRecipient.EMAIL_RECIPIENT_ROUTINE_OPERATIONS;
+    case 3:
+    case "EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS":
+      return EmailRecipient.EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return EmailRecipient.UNRECOGNIZED;
+  }
+}
+
+export function emailRecipientToJSON(object: EmailRecipient): string {
+  switch (object) {
+    case EmailRecipient.EMAIL_RECIPIENT_UNDEFINED:
+      return "EMAIL_RECIPIENT_UNDEFINED";
+    case EmailRecipient.EMAIL_RECIPIENT_MAINTENANCE:
+      return "EMAIL_RECIPIENT_MAINTENANCE";
+    case EmailRecipient.EMAIL_RECIPIENT_ROUTINE_OPERATIONS:
+      return "EMAIL_RECIPIENT_ROUTINE_OPERATIONS";
+    case EmailRecipient.EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS:
+      return "EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS";
+    case EmailRecipient.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface PipetteState {
   spent: boolean;
   vialHeld: number;
@@ -755,6 +800,7 @@ export interface Post {
 export interface Email {
   subject: string;
   body: string;
+  recipient: EmailRecipient;
 }
 
 /**
@@ -2638,7 +2684,7 @@ export const Post = {
 };
 
 function createBaseEmail(): Email {
-  return { subject: "", body: "" };
+  return { subject: "", body: "", recipient: 0 };
 }
 
 export const Email = {
@@ -2648,6 +2694,9 @@ export const Email = {
     }
     if (message.body !== "") {
       writer.uint32(18).string(message.body);
+    }
+    if (message.recipient !== 0) {
+      writer.uint32(24).int32(message.recipient);
     }
     return writer;
   },
@@ -2673,6 +2722,13 @@ export const Email = {
 
           message.body = reader.string();
           continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.recipient = reader.int32() as any;
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2686,6 +2742,7 @@ export const Email = {
     return {
       subject: isSet(object.subject) ? globalThis.String(object.subject) : "",
       body: isSet(object.body) ? globalThis.String(object.body) : "",
+      recipient: isSet(object.recipient) ? emailRecipientFromJSON(object.recipient) : 0,
     };
   },
 
@@ -2697,6 +2754,9 @@ export const Email = {
     if (message.body !== "") {
       obj.body = message.body;
     }
+    if (message.recipient !== 0) {
+      obj.recipient = emailRecipientToJSON(message.recipient);
+    }
     return obj;
   },
 
@@ -2707,6 +2767,7 @@ export const Email = {
     const message = createBaseEmail();
     message.subject = object.subject ?? "";
     message.body = object.body ?? "";
+    message.recipient = object.recipient ?? 0;
     return message;
   },
 };

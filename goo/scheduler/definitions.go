@@ -39,10 +39,12 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 		enabled: true,
 		function: func() {
 			mqtt.Publish(topics_backend.TOPIC_FRIDGE_SWITCH, topics_backend.PAYLOAD_SMART_SWITCH_ON)
+			// notify routine operator to fill with milk
+			requestFridgeMilk()
 		},
 		recurringTime: mainSessionStartTime,
-		hourOffset:    -7,
-		minuteOffset:  -30,
+		hourOffset:    -10,
+		minuteOffset:  0,
 	})
 
 	// ***********
@@ -179,6 +181,8 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 		enabled: true,
 		function: func() {
 			mqtt.Publish(topics_backend.TOPIC_STREAM_END, "")
+			requestCleaning()
+			requestPieceSelection()
 		},
 		recurringTime: mainSessionEndTime,
 		secondOffset:  30,

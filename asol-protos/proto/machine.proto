@@ -255,10 +255,18 @@ message Post {
 	uint64 scheduled_unix_timetamp = 8;
 }
 
+enum EmailRecipient {
+	EMAIL_RECIPIENT_UNDEFINED = 0;
+	EMAIL_RECIPIENT_MAINTENANCE = 1;
+	EMAIL_RECIPIENT_ROUTINE_OPERATIONS = 2;
+	EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS = 3;
+}
+
 // emails used for administration, not intended for audience distribution
 message Email {
 	string subject = 1;
 	string body = 2;
+	EmailRecipient recipient = 3;
 }
 
 /*

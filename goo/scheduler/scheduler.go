@@ -16,6 +16,22 @@ type RecurringTime struct {
 	second int
 }
 
+// fmtLocal gets just the hh:mm in local time
+func (r RecurringTime) fmtLocal() string {
+	now := time.Now()
+	d := time.Date(
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		mainSessionStartTime.hour,
+		mainSessionStartTime.minute,
+		mainSessionStartTime.second,
+		0,
+		now.Location(),
+	)
+	return fmt.Sprintf("%d:%d", d.Hour(), d.Minute())
+}
+
 type Schedule struct {
 	name          string
 	enabled       bool
