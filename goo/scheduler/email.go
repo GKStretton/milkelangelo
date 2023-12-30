@@ -2,7 +2,6 @@ package scheduler
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/email"
@@ -56,10 +55,4 @@ func requestPieceSelection() {
 	if err != nil {
 		fmt.Println(err)
 	}
-}
-
-func init() {
-	email.Start()
-	requestCleaning()
-	os.Exit(0)
 }

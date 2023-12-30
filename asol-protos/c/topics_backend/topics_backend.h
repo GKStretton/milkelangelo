@@ -8,6 +8,7 @@
 #define TOPIC_CLOSE_BLIND "asol/close_bedroom_blind"
 #define TOPIC_EMAIL_SEND "asol/send-email"
 #define TOPIC_FRIDGE_SWITCH "cmnd/tasmota_sw_fridge/Power1"
+#define TOPIC_GENERATE_CONTENT "asol/generate-content"
 #define TOPIC_KV_GET "asol/kv/get/"
 #define TOPIC_KV_GET_RESP "asol/kv/get-resp/"
 #define TOPIC_KV_SET "asol/kv/set/"

@@ -14,6 +14,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/obs"
 	"github.com/gkstretton/dark/services/goo/scheduler"
+	"github.com/gkstretton/dark/services/goo/server"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
@@ -36,6 +37,7 @@ func main() {
 	mqtt.Start()
 	keyvalue.Start()
 	email.Start()
+	server.Start()
 
 	sm := session.NewSessionManager(false)
 	twitchApi := twitchapi.Start()

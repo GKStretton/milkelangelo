@@ -71,6 +71,7 @@ export class WebRTCReceiver {
     this.pc.ontrack = (evt) => {
       console.log('new track ' + evt.track.kind);
       const video = document.getElementById(this.name) as HTMLVideoElement;
+      if (!video) return;
       video.srcObject = evt.streams[0];
 
       video.addEventListener('loadedmetadata', () => {

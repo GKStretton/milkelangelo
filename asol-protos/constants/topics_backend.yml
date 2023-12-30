@@ -45,6 +45,9 @@ constants:
   TOPIC_PIECE_SELECTED: "asol/piece-selected"
   TOPIC_VIDEOS_GENERATED: "asol/videos-generated"
 
+  # takes raw session id as payload
+  TOPIC_GENERATE_CONTENT: "asol/generate-content"
+
   TOPIC_MARK_FAILED_DISPENSE: "asol/mark-failed-dispense"
   TOPIC_MARK_DELAYED_DISPENSE: "asol/mark-delayed-dispense"
 

@@ -612,6 +612,51 @@ export function socialPlatformToJSON(object: SocialPlatform): string {
   }
 }
 
+export enum EmailRecipient {
+  EMAIL_RECIPIENT_UNDEFINED = 0,
+  EMAIL_RECIPIENT_MAINTENANCE = 1,
+  EMAIL_RECIPIENT_ROUTINE_OPERATIONS = 2,
+  EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function emailRecipientFromJSON(object: any): EmailRecipient {
+  switch (object) {
+    case 0:
+    case "EMAIL_RECIPIENT_UNDEFINED":
+      return EmailRecipient.EMAIL_RECIPIENT_UNDEFINED;
+    case 1:
+    case "EMAIL_RECIPIENT_MAINTENANCE":
+      return EmailRecipient.EMAIL_RECIPIENT_MAINTENANCE;
+    case 2:
+    case "EMAIL_RECIPIENT_ROUTINE_OPERATIONS":
+      return EmailRecipient.EMAIL_RECIPIENT_ROUTINE_OPERATIONS;
+    case 3:
+    case "EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS":
+      return EmailRecipient.EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return EmailRecipient.UNRECOGNIZED;
+  }
+}
+
+export function emailRecipientToJSON(object: EmailRecipient): string {
+  switch (object) {
+    case EmailRecipient.EMAIL_RECIPIENT_UNDEFINED:
+      return "EMAIL_RECIPIENT_UNDEFINED";
+    case EmailRecipient.EMAIL_RECIPIENT_MAINTENANCE:
+      return "EMAIL_RECIPIENT_MAINTENANCE";
+    case EmailRecipient.EMAIL_RECIPIENT_ROUTINE_OPERATIONS:
+      return "EMAIL_RECIPIENT_ROUTINE_OPERATIONS";
+    case EmailRecipient.EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS:
+      return "EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS";
+    case EmailRecipient.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface PipetteState {
   spent: boolean;
   vialHeld: number;
@@ -755,6 +800,7 @@ export interface Post {
 export interface Email {
   subject: string;
   body: string;
+  recipient: EmailRecipient;
 }
 
 /**
@@ -800,14 +846,18 @@ export interface VialProfile {
   /** friendly name for use in interfaces */
   name: string;
   vialFluid: VialProfile_VialFluid;
-  /** colour to represent this with in interfaces, of the form '#aa22ff' */
+  /** colour to represent this in interfaces, of the form '#aa22ff' */
   colour: string;
+  /** alternate names that can be used in voting */
+  aliases: string[];
 }
 
 export enum VialProfile_VialFluid {
   VIAL_FLUID_UNDEFINED = 0,
   VIAL_FLUID_DYE_WATER_BASED = 1,
   VIAL_FLUID_EMULSIFIER = 2,
+  VIAL_FLUID_AIR = 3,
+  VIAL_FLUID_SOLVENT = 4,
   UNRECOGNIZED = -1,
 }
 
@@ -822,6 +872,12 @@ export function vialProfile_VialFluidFromJSON(object: any): VialProfile_VialFlui
     case 2:
     case "VIAL_FLUID_EMULSIFIER":
       return VialProfile_VialFluid.VIAL_FLUID_EMULSIFIER;
+    case 3:
+    case "VIAL_FLUID_AIR":
+      return VialProfile_VialFluid.VIAL_FLUID_AIR;
+    case 4:
+    case "VIAL_FLUID_SOLVENT":
+      return VialProfile_VialFluid.VIAL_FLUID_SOLVENT;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -837,6 +893,10 @@ export function vialProfile_VialFluidToJSON(object: VialProfile_VialFluid): stri
       return "VIAL_FLUID_DYE_WATER_BASED";
     case VialProfile_VialFluid.VIAL_FLUID_EMULSIFIER:
       return "VIAL_FLUID_EMULSIFIER";
+    case VialProfile_VialFluid.VIAL_FLUID_AIR:
+      return "VIAL_FLUID_AIR";
+    case VialProfile_VialFluid.VIAL_FLUID_SOLVENT:
+      return "VIAL_FLUID_SOLVENT";
     case VialProfile_VialFluid.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -2624,7 +2684,7 @@ export const Post = {
 };
 
 function createBaseEmail(): Email {
-  return { subject: "", body: "" };
+  return { subject: "", body: "", recipient: 0 };
 }
 
 export const Email = {
@@ -2634,6 +2694,9 @@ export const Email = {
     }
     if (message.body !== "") {
       writer.uint32(18).string(message.body);
+    }
+    if (message.recipient !== 0) {
+      writer.uint32(24).int32(message.recipient);
     }
     return writer;
   },
@@ -2659,6 +2722,13 @@ export const Email = {
 
           message.body = reader.string();
           continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.recipient = reader.int32() as any;
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2672,6 +2742,7 @@ export const Email = {
     return {
       subject: isSet(object.subject) ? globalThis.String(object.subject) : "",
       body: isSet(object.body) ? globalThis.String(object.body) : "",
+      recipient: isSet(object.recipient) ? emailRecipientFromJSON(object.recipient) : 0,
     };
   },
 
@@ -2683,6 +2754,9 @@ export const Email = {
     if (message.body !== "") {
       obj.body = message.body;
     }
+    if (message.recipient !== 0) {
+      obj.recipient = emailRecipientToJSON(message.recipient);
+    }
     return obj;
   },
 
@@ -2693,6 +2767,7 @@ export const Email = {
     const message = createBaseEmail();
     message.subject = object.subject ?? "";
     message.body = object.body ?? "";
+    message.recipient = object.recipient ?? 0;
     return message;
   },
 };
@@ -2712,6 +2787,7 @@ function createBaseVialProfile(): VialProfile {
     name: "",
     vialFluid: 0,
     colour: "",
+    aliases: [],
   };
 }
 
@@ -2755,6 +2831,9 @@ export const VialProfile = {
     }
     if (message.colour !== "") {
       writer.uint32(106).string(message.colour);
+    }
+    for (const v of message.aliases) {
+      writer.uint32(114).string(v!);
     }
     return writer;
   },
@@ -2857,6 +2936,13 @@ export const VialProfile = {
 
           message.colour = reader.string();
           continue;
+        case 14:
+          if (tag !== 114) {
+            break;
+          }
+
+          message.aliases.push(reader.string());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2883,6 +2969,7 @@ export const VialProfile = {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       vialFluid: isSet(object.vial_fluid) ? vialProfile_VialFluidFromJSON(object.vial_fluid) : 0,
       colour: isSet(object.colour) ? globalThis.String(object.colour) : "",
+      aliases: globalThis.Array.isArray(object?.aliases) ? object.aliases.map((e: any) => globalThis.String(e)) : [],
     };
   },
 
@@ -2927,6 +3014,9 @@ export const VialProfile = {
     if (message.colour !== "") {
       obj.colour = message.colour;
     }
+    if (message.aliases?.length) {
+      obj.aliases = message.aliases;
+    }
     return obj;
   },
 
@@ -2948,6 +3038,7 @@ export const VialProfile = {
     message.name = object.name ?? "";
     message.vialFluid = object.vialFluid ?? 0;
     message.colour = object.colour ?? "";
+    message.aliases = object.aliases?.map((e) => e) || [];
     return message;
   },
 };

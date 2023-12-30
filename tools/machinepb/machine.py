@@ -110,10 +110,19 @@ class SocialPlatform(betterproto.Enum):
     SOCIAL_PLATFORM_REDDIT = 6
 
 
+class EmailRecipient(betterproto.Enum):
+    EMAIL_RECIPIENT_UNDEFINED = 0
+    EMAIL_RECIPIENT_MAINTENANCE = 1
+    EMAIL_RECIPIENT_ROUTINE_OPERATIONS = 2
+    EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS = 3
+
+
 class VialProfileVialFluid(betterproto.Enum):
     VIAL_FLUID_UNDEFINED = 0
     VIAL_FLUID_DYE_WATER_BASED = 1
     VIAL_FLUID_EMULSIFIER = 2
+    VIAL_FLUID_AIR = 3
+    VIAL_FLUID_SOLVENT = 4
 
 
 @dataclass
@@ -269,6 +278,7 @@ class Email(betterproto.Message):
 
     subject: str = betterproto.string_field(1)
     body: str = betterproto.string_field(2)
+    recipient: "EmailRecipient" = betterproto.enum_field(3)
 
 
 @dataclass
@@ -307,8 +317,10 @@ class VialProfile(betterproto.Message):
     # friendly name for use in interfaces
     name: str = betterproto.string_field(11)
     vial_fluid: "VialProfileVialFluid" = betterproto.enum_field(12)
-    # colour to represent this with in interfaces, of the form '#aa22ff'
+    # colour to represent this in interfaces, of the form '#aa22ff'
     colour: str = betterproto.string_field(13)
+    # alternate names that can be used in voting
+    aliases: List[str] = betterproto.string_field(14)
 
 
 @dataclass
