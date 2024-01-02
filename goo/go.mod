@@ -1,6 +1,6 @@
 module github.com/gkstretton/dark/services/goo
 
-go 1.19
+go 1.21
 
 replace github.com/gkstretton/asol-protos => ../asol-protos
 

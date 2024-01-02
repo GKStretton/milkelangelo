@@ -55,8 +55,6 @@ services:
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev
-      - ./tools:/tools
-      - ./resources:/resources
   interface:
     build:
       context: ./interface

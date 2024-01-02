@@ -28,6 +28,11 @@ func Start() *TwitchApi {
 	clientID := string(keyvalue.Get("TWITCH_CLIENT_ID"))
 	clientSecret := string(keyvalue.Get("TWITCH_CLIENT_SECRET"))
 
+	if clientID == "" || clientSecret == "" {
+		fmt.Println("error: twitch client id or secret not set")
+		return nil
+	}
+
 	// Helix api
 	helixClient, err := helix.NewClient(&helix.Options{
 		ClientID:        clientID,
