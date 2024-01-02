@@ -1,22 +1,19 @@
-FROM golang:1.19
+FROM golang:1.21
 
 RUN apt update && apt install -y \
     ffmpeg \
-    gphoto2 \
-    python3 \
-    python3-pip
-
-RUN python3 -m pip install opencv-python scikit-image matplotlib pyyaml pandas
+    gphoto2
 
 WORKDIR /src
 
-COPY ./go.mod ./go.mod
-COPY ./go.sum ./go.sum
+COPY ./goo/go.mod ./go.mod
+COPY ./goo/go.sum ./go.sum
 COPY ./asol-protos ../asol-protos
+COPY ./resources ../resources
 
 RUN go mod download
 
-COPY . .
+COPY ./goo .
 
 RUN go build -race
 

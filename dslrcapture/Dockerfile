@@ -1,7 +1,6 @@
 FROM golang:1.19
 
 RUN apt update
-RUN apt install -y ffmpeg
 RUN apt install -y gphoto2
 RUN apt install -y python3 python3-pip
 

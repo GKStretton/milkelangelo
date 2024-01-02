@@ -27,7 +27,9 @@ services:
       BROKER_HOST: ${BROKER_HOST:-localhost}
       DEBUG_PYGATEWAY: ${DEBUG_PYGATEWAY:-false}
   goo:
-    build: goo
+    build:
+      context: .
+      dockerfile: goo/Dockerfile
     command: -basePath ${LIGHT_STORES_DIR}
     restart: unless-stopped
     network_mode: host
@@ -38,8 +40,6 @@ services:
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev
-      - ./tools:/tools
-      - ./resources:/resources
     user: "1000:1000"
   dslrcapture:
     build:
