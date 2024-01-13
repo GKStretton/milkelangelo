@@ -15,6 +15,7 @@ import {
   TOPIC_SET_COVER_CLOSE,
   TOPIC_RINSE,
   TOPIC_MAINTENANCE,
+  TOPIC_DEBUG_DATA,
 } from "../topics_firmware/topics_firmware";
 import {
   TOPIC_SESSION_BEGIN,
@@ -349,6 +350,14 @@ export default function ControlGroup() {
             sx={{ margin: 2 }}
           >
             Goto Maintenance Position
+          </Button>
+          <Button
+            disabled={!isAwake}
+            variant="contained"
+            onClick={() => c?.publish(TOPIC_DEBUG_DATA, "")}
+            sx={{ margin: 2 }}
+          >
+            Toggle debug data
           </Button>
           <Button
             disabled={!isAwake}

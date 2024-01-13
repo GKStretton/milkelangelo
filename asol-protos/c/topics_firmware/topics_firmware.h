@@ -2,6 +2,7 @@
 #define MQTT_CONSTANTS_H
 
 #define TOPIC_COLLECT "mega/req/collect"
+#define TOPIC_DEBUG_DATA "mega/req/debug-data"
 #define TOPIC_DISPENSE "mega/req/dispense"
 #define TOPIC_DISPENSE_RESP "mega/resp/dispense"
 #define TOPIC_FLUID "mega/req/fluid"

@@ -2,6 +2,7 @@ package topics_firmware
 
 const (
 	TOPIC_COLLECT string = "mega/req/collect"
+	TOPIC_DEBUG_DATA string = "mega/req/debug-data"
 	TOPIC_DISPENSE string = "mega/req/dispense"
 	TOPIC_DISPENSE_RESP string = "mega/resp/dispense"
 	TOPIC_FLUID string = "mega/req/fluid"

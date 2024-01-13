@@ -52,6 +52,8 @@ public:
 	bool AtTarget();
 	// Sets the threshold in units that position must be within of target for AtTarget to be true
 	void SetAtTargetUnitThreshold(float t);
+	// true if we last called moveTo, false if setSpeed was last called
+	bool GetPositionWasSetLast();
 
 private:
 	void updateLimitSwitch();

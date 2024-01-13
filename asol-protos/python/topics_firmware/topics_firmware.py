@@ -1,6 +1,7 @@
 from typing import Literal
 
 TOPIC_COLLECT: Literal["mega/req/collect"] = "mega/req/collect"
+TOPIC_DEBUG_DATA: Literal["mega/req/debug-data"] = "mega/req/debug-data"
 TOPIC_DISPENSE: Literal["mega/req/dispense"] = "mega/req/dispense"
 TOPIC_DISPENSE_RESP: Literal["mega/resp/dispense"] = "mega/resp/dispense"
 TOPIC_FLUID: Literal["mega/req/fluid"] = "mega/req/fluid"

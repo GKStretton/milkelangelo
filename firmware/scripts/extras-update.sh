@@ -6,11 +6,6 @@ set -e
 cwd=$(pwd)
 EXTRAS_DIR=../asol-protos
 
-cd $EXTRAS_DIR
-# build
-docker-compose up
-
-cd $cwd
 mkdir -p ./src/extras/
 cp -r $EXTRAS_DIR/c/* ./src/extras/
 

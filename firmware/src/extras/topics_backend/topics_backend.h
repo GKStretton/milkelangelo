@@ -7,6 +7,8 @@
 #define PAYLOAD_SMART_SWITCH_ON "ON"
 #define TOPIC_CLOSE_BLIND "asol/close_bedroom_blind"
 #define TOPIC_EMAIL_SEND "asol/send-email"
+#define TOPIC_FRIDGE_SWITCH "cmnd/tasmota_sw_fridge/Power1"
+#define TOPIC_GENERATE_CONTENT "asol/generate-content"
 #define TOPIC_KV_GET "asol/kv/get/"
 #define TOPIC_KV_GET_RESP "asol/kv/get-resp/"
 #define TOPIC_KV_SET "asol/kv/set/"
@@ -16,6 +18,7 @@
 #define TOPIC_MONITOR_OFF "asol/monitor_off"
 #define TOPIC_MONITOR_ON "asol/monitor_on"
 #define TOPIC_OPEN_BLIND "asol/open_bedroom_blind"
+#define TOPIC_PIECE_SELECTED "asol/piece-selected"
 #define TOPIC_SESSION_BEGAN "asol/session/began"
 #define TOPIC_SESSION_BEGIN "asol/session/begin"
 #define TOPIC_SESSION_END "asol/session/end"
@@ -38,5 +41,6 @@
 #define TOPIC_TRIGGER_DSLR "asol/dslr-crop-capture"
 #define TOPIC_TRIGGER_DSLR_RESP "asol/dslr-crop-capture-resp"
 #define TOPIC_VIDEOS_GENERATED "asol/videos-generated"
+#define TRIGGER_UPLOAD_FROM_LATEST_CONTENT_PLAN "asol/upload-from-latest-content-plan"
 
 #endif // MQTT_CONSTANTS_H

@@ -23,4 +23,12 @@ echo 'Copying typescript files'
 cd $CURRENT_DIR
 cp -r $PROTOS_REPO_DIR/typescript/* ./interface/src/
 
+# C
+
+echo 'Copying c files'
+
+cd firmware
+./scripts/extras-update.sh
+cd $CURRENT_DIR
+
 echo 'Done'

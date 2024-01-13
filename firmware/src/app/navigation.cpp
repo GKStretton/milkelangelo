@@ -232,6 +232,7 @@ Status Navigation::UpdateNodeNavigation(State *s)
 		return FAILURE;
 	}
 
+	//? why the global state?
 	// Check for a change in local target, and set stepper positions if so
 	if (s->localTargetNode != localTargetNode)
 	{
@@ -239,6 +240,7 @@ Status Navigation::UpdateNodeNavigation(State *s)
 		Logger::Debug("Local target changed to " + String(localTargetNode) + ". Setting stepper positions accordingly.");
 		goToNode(s, localTargetNode);
 	}
+	goToNode(s, localTargetNode);
 
 	// Check for arrival at local target
 	if (atLocalTargetNode(s))

@@ -144,3 +144,7 @@ void UnitStepper::SetAtTargetUnitThreshold(float t) {
 bool UnitStepper::HasLimitSwitchBeenPressed() {
 	return limitSwitchContacted_;
 }
+
+bool UnitStepper::GetPositionWasSetLast() {
+	return positionWasSetLast_;
+}

@@ -1,5 +1,6 @@
 
 export const TOPIC_COLLECT: string = "mega/req/collect";
+export const TOPIC_DEBUG_DATA: string = "mega/req/debug-data";
 export const TOPIC_DISPENSE: string = "mega/req/dispense";
 export const TOPIC_DISPENSE_RESP: string = "mega/resp/dispense";
 export const TOPIC_FLUID: string = "mega/req/fluid";
