@@ -15,6 +15,13 @@ Status Controller::evaluateIK(State *s) {
 		return FAILURE;
 	}
 
+	// ensure correct z level before setting others. This ensures the dispense drop down
+	// is undone before moving to prevent smearing.
+	s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z));
+	if (!s->zStepper.AtTarget()) {
+		return RUNNING;
+	}
+
 	s->pitchStepper.moveTo(s->pitchStepper.UnitToPosition(CENTRE_PITCH));
 
 	// note, ring is pre-emptively set elsewhere too, so this line is just ensurance
@@ -24,7 +31,6 @@ Status Controller::evaluateIK(State *s) {
 	//? to time the yaw and ring to arrive at the same time?
 	s->yawStepper.moveTo(s->yawStepper.UnitToPosition(s->target_yaw));
 
-	s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z));
 
 	if (s->pitchStepper.AtTarget() && s->ringStepper.AtTarget() && s->yawStepper.AtTarget() && s->zStepper.AtTarget()) return SUCCESS;
 

@@ -158,3 +158,7 @@ void StateReport_SetLights(bool on) {
 		hasChanged = true;
 	}
 }
+
+machine_Status StateReport_GetStatus() {
+	return stateReport.status;
+}

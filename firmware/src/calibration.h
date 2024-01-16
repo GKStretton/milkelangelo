@@ -40,7 +40,11 @@
 #define VIAL_YAW_OFFSET -6
 #define VIAL_YAW_INCREMENT 36.38
 
+// how much to drop the z level during dispense, after pipette actuation.
+#define DISPENSE_Z_OFFSET -2.0
+// default z position for ik evaluation and pre-dispense
 #define IK_Z 44
+
 #define HANDOVER_Z 50
 #define HANDOVER_PITCH 70
 #define HANDOVER_INNER_YAW 15

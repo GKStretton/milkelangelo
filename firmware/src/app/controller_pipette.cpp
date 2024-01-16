@@ -44,11 +44,20 @@ Status Controller::evaluatePipetteDispense(State *s) {
 		target = PIPETTE_BUFFER + s->pipetteState.ulVolumeHeldTarget - 
 			(s->pipetteState.dispenseRequested ? PIPETTE_BACKLASH_UL : 0);
 	}
-	
+
+	// prepare a drop on tip of pipette
 	s->pipetteStepper.moveTo(s->pipetteStepper.UnitToPosition(target));
 	if (!s->pipetteStepper.AtTarget()) {
 		return RUNNING;
 	}
+
+	// go down to place drop on surface
+	s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z + DISPENSE_Z_OFFSET));
+	if (!s->zStepper.AtTarget()) {
+		return RUNNING;
+	}
+
+	// don't need to go up, ik evaluation will handle that
 	
 	// mark as spent if at target of 0
 	if (s->pipetteState.ulVolumeHeldTarget <= 0 && !s->pipetteState.spent) {

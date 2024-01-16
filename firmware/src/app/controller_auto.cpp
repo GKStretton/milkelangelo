@@ -123,18 +123,22 @@ void Controller::autoUpdate(State *s) {
 
 	// At this point, we have liquid from a vial and are in IK range
 
-	status = evaluateIK(s);
-	if (status == FAILURE) {
-		Logger::Error("evaluate IK failed, returning");
-		StateReport_SetStatus(machine_Status_ERROR);
-		return;
-	} else if (status == SUCCESS) {
-		// Tip is stationary.
-		// Fallthrough, allowing dispense
-	} else if (status == RUNNING) {
-		// block dispense if still moving
-		StateReport_SetStatus(machine_Status_NAVIGATING_IK);
-		return;
+	// only run ik evaluation if we're not currently dispensing. This prevents
+	// ik evaluation from interfering with dispense z movement
+	if (StateReport_GetStatus() != machine_Status_DISPENSING) {
+		status = evaluateIK(s);
+		if (status == FAILURE) {
+			Logger::Error("evaluate IK failed, returning");
+			StateReport_SetStatus(machine_Status_ERROR);
+			return;
+		} else if (status == SUCCESS) {
+			// Tip is stationary.
+			// Fallthrough, allowing dispense
+		} else if (status == RUNNING) {
+			// block dispense if still moving
+			StateReport_SetStatus(machine_Status_NAVIGATING_IK);
+			return;
+		}
 	}
 
 	status = evaluatePipetteDispense(s);
