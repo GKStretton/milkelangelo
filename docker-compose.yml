@@ -1,6 +1,12 @@
 version: "3.7"
 
 services:
+  runner:
+    build:
+      context: .
+      dockerfile: runner/Dockerfile
+    volumes:
+      - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
   rtsp:
     build: rtsp
     restart: unless-stopped

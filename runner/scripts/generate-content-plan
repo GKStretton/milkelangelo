@@ -1,0 +1,7 @@
+#!/bin/bash
+# generate content plan for session $1
+set -e
+
+cd ../tools
+echo "Bash: Launching content plan generator..."
+python3 content_generation_plan.py -n $1

@@ -1,0 +1,13 @@
+#!/bin/bash
+# generate all video content for session $1
+set -e
+
+cd ../tools
+
+echo "Bash: Launching still generator..."
+python3 content_generation_still.py -n $1
+
+echo "Bash: Launching video generators..."
+# python3 content_generation_video.py -y -n $1 -t CONTENT_TYPE_LONGFORM
+python3 content_generation_video.py -y -n $1 -t CONTENT_TYPE_SHORTFORM
+python3 content_generation_video.py -y -n $1 -t CONTENT_TYPE_CLEANING

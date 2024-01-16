@@ -29,8 +29,8 @@ if __name__ == "__main__":
 
     content_statuses = load_content_statuses(args.base_dir, args.session_number)
     if content_statuses is not None and not args.override:
-        print("Error: content statuses already exist for this session. Use -o / --override to overwrite.")
-        exit(1)
+        print("content statuses already exist for this session. Use -o / --override to overwrite.")
+        exit(0)
 
     content_statuses = pb.ContentTypeStatuses()
 
