@@ -48,14 +48,20 @@ Status Controller::evaluatePipetteDispense(State *s) {
 	// prepare a drop on tip of pipette
 	s->pipetteStepper.moveTo(s->pipetteStepper.UnitToPosition(target));
 	if (!s->pipetteStepper.AtTarget()) {
+		s->requestDispenseZAdjustment = true;
 		return RUNNING;
 	}
 
-	// go down to place drop on surface
-	s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z + DISPENSE_Z_OFFSET));
-	if (!s->zStepper.AtTarget()) {
-		return RUNNING;
+
+	if (s->requestDispenseZAdjustment) {
+		// go down to place drop on surface
+		s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z + DISPENSE_Z_OFFSET));
+		if (!s->zStepper.AtTarget()) {
+			return RUNNING;
+		}
 	}
+
+	s->requestDispenseZAdjustment = false;
 
 	// don't need to go up, ik evaluation will handle that
 	

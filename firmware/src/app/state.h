@@ -85,6 +85,7 @@ struct State {
 	bool postCalibrationHandlerCalled;
 	// if true, always go to the idle node when idle
 	bool forceIdleLocation;
+	bool requestDispenseZAdjustment;
 
 	FluidRequest fluidRequest;
 

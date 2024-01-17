@@ -42,6 +42,7 @@ void State::ClearState() {
 	this->postCalibrationHandlerCalled = false;
 	this->manualRequested = false;
 	this->forceIdleLocation = true;
+	this->requestDispenseZAdjustment = false;
 
 	// clear calibration
 	this->pitchStepper.MarkAsNotCalibrated();
@@ -91,6 +92,7 @@ State CreateStateObject() {
 		calibrationCleared: false,
 		postCalibrationHandlerCalled: false,
 		forceIdleLocation: true,
+		requestDispenseZAdjustment: false,
 		fluidRequest: {FluidType::FLUID_UNDEFINED, false, 0, 0, true},
 		ik_target_z: IK_Z,
 		startup_counter: 0,
