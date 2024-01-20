@@ -35,7 +35,7 @@ namespace Sleep {
 				externalSleepHandler(status);
 			}
 
-			delay(200);
+			delay(500);
 
 			Logger::Info("Powering down.");
 			SetDualRelay(V12_RELAY_PIN1, false);

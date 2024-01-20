@@ -5,6 +5,8 @@
 #include "../middleware/sleep.h"
 #include "../drivers/i2c_eeprom.h"
 #include "../drivers/cover_servo.h"
+#include "../drivers/tof10120.h"
+#include "../common/util.h"
 #include "state_report.h"
 
 // this structure is like a pseudo behavior tree. Every update, the program
@@ -65,8 +67,34 @@ void Controller::autoUpdate(State *s) {
 		s->postCalibrationHandlerCalled = true;
 		Logger::Debug("Set all motors to speed 0 after calibration");
 
-		if (Sleep::GetLastSleepStatus() == Sleep::SAFE) {
-			CoverServo_Open();
+		if (ENSURE_COVER_OPEN) {
+			// turn on
+			SetDualRelay(TOF_POWER_PIN, true);
+		}
+
+		// blocking call to open servo
+		CoverServo_Open();
+
+		if (ENSURE_COVER_OPEN) {
+			// ensure cover is open
+			float dist = TOF_GetDistance();
+			// turn off
+			SetDualRelay(TOF_POWER_PIN, false);
+
+			// todo: send email / handle this.
+			if (dist < 14) {
+				// error reading cover position
+				Logger::Error("cover tof invalid reading " + String(dist) + "mm, shutting down");
+				s->shutdownRequested = true;
+				return;
+			}
+			if (dist > 30) {
+				// cover closed
+				Logger::Error("cover tof reading too high at " + String(dist) + "mm, shutting down");
+				s->shutdownRequested = true;
+				return;
+			}
+			Logger::Info("cover tof valid reading at " + String(dist) + "mm, proceeding.");
 		}
 	}
 

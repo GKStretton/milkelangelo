@@ -85,5 +85,16 @@
 
 #define COVER_SERVO_PIN 6
 #define COVER_SERVO_OPEN_US 1600
-#define COVER_SERVO_CLOSED_US 650
+#define COVER_SERVO_CLOSED_US 600
 #define COVER_SERVO_RESOLUTION_US 20
+
+// 0x52
+#define TOF_I2C_ADDRESS 82
+#define TOF_I2C_DISTANCE_REGISTER 0x00
+
+// controls relay that enables grounding for the TOF sensor
+#define TOF_POWER_PIN 31
+
+#define EXTRA_RELAY_CONTROL_PIN 33
+
+#define ENSURE_COVER_OPEN false

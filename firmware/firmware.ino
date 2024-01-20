@@ -21,6 +21,7 @@
 #include "src/middleware/fluid_levels.h"
 #include "src/extras/topics_firmware/topics_firmware.h"
 #include "src/drivers/cover_servo.h"
+#include "src/drivers/tof10120.h"
 
 State s = CreateStateObject();
 
@@ -90,6 +91,10 @@ void setup()
 	InitPin(V12_RELAY_PIN1, HIGH);
 	InitPin(V12_RELAY_PIN2, HIGH);
 	InitPin(V5_RELAY_PIN, HIGH);
+
+	// init extra 2-bank relay to HIGH (HIGH = off)
+	InitPin(TOF_POWER_PIN, HIGH);
+	InitPin(EXTRA_RELAY_CONTROL_PIN, HIGH);
 
 	// make steppers sleep on start
 	InitPin(STEPPER_SLEEP, LOW);
@@ -399,12 +404,12 @@ void dataUpdate()
 
 	// stepper units
 	// SerialMQTT::Publish("mega/d/R_UNIT", String(s.ringStepper.PositionToUnit(s.ringStepper.currentPosition())));
-	SerialMQTT::Publish("mega/d/Z_UNIT", String(s.zStepper.PositionToUnit(s.zStepper.currentPosition())));
-	SerialMQTT::Publish("mega/d/Z_LAST", String(s.zStepper.GetPositionWasSetLast()));
-	SerialMQTT::Publish("mega/d/Y_UNIT", String(s.yawStepper.PositionToUnit(s.yawStepper.currentPosition())));
-	SerialMQTT::Publish("mega/d/Y_LAST", String(s.yawStepper.GetPositionWasSetLast()));
-	SerialMQTT::Publish("mega/d/P_UNIT", String(s.pitchStepper.PositionToUnit(s.pitchStepper.currentPosition())));
-	SerialMQTT::Publish("mega/d/P_LAST", String(s.pipetteStepper.GetPositionWasSetLast()));
+	// SerialMQTT::Publish("mega/d/Z_UNIT", String(s.zStepper.PositionToUnit(s.zStepper.currentPosition())));
+	// SerialMQTT::Publish("mega/d/Z_LAST", String(s.zStepper.GetPositionWasSetLast()));
+	// SerialMQTT::Publish("mega/d/Y_UNIT", String(s.yawStepper.PositionToUnit(s.yawStepper.currentPosition())));
+	// SerialMQTT::Publish("mega/d/Y_LAST", String(s.yawStepper.GetPositionWasSetLast()));
+	// SerialMQTT::Publish("mega/d/P_UNIT", String(s.pitchStepper.PositionToUnit(s.pitchStepper.currentPosition())));
+	// SerialMQTT::Publish("mega/d/P_LAST", String(s.pipetteStepper.GetPositionWasSetLast()));
 	// SerialMQTT::Publish("mega/d/PP_UNIT", String(s.pipetteStepper.PositionToUnit(s.pipetteStepper.currentPosition())));
 
 	// SerialMQTT::Publish("mega/d/PP_L_SW", String(digitalRead(PIPETTE_LIMIT_SWITCH)));
@@ -412,6 +417,8 @@ void dataUpdate()
 
 	// SerialMQTT::Publish("mega/d/DATA_MS", String(millis() - start));
 	// SerialMQTT::Publish("mega/d/UPS", String(s.updatesPerSecond));
+
+	SerialMQTT::Publish("mega/d/TOF_D", String(TOF_GetDistance()));
 }
 
 void runSteppers(State *s)
