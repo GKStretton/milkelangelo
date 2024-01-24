@@ -1,6 +1,7 @@
 #include "controller.h"
 #include "../app/navigation.h"
 #include "../calibration.h"
+#include "../config.h"
 #include "../middleware/logger.h"
 
 Status Controller::evaluateShutdown(State *s) {
@@ -45,9 +46,13 @@ Status Controller::evaluateShutdown(State *s) {
 		failureMarked = true;
 	}
 
-	if (somethingRunning)
+	if (somethingRunning) {
 		return RUNNING;
-	else if (failureMarked)
+	}
+
+	digitalWrite(STEPPER_SLEEP, LOW);
+
+	if (failureMarked)
 		return FAILURE;
 	else 
 		return SUCCESS;

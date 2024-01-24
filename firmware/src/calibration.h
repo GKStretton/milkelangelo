@@ -43,7 +43,7 @@
 // how much to drop the z level during dispense, after pipette actuation.
 #define DISPENSE_Z_OFFSET -2.0f
 // default z position for ik evaluation and pre-dispense
-#define IK_Z 44
+#define IK_Z 48
 
 #define HANDOVER_Z 50
 #define HANDOVER_PITCH 70
