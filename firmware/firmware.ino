@@ -28,7 +28,7 @@ State s = CreateStateObject();
 Controller controller;
 
 int updatesInLastSecond;
-bool debug;
+bool debug = false;
 unsigned long lastUpdatesPerSecondTime = millis();
 
 // eepromStartup reads the startup counter, increments it, writes and prints it.
@@ -376,7 +376,6 @@ void topicHandler(String topic, String payload)
 
 void dataUpdate()
 {
-	if (!PRINT_DATA) return;
 	if (!debug) return;
 	if (millis() - s.lastDataUpdate < 1000) return;
 	s.lastDataUpdate = millis();
