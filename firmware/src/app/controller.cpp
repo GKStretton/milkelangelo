@@ -10,7 +10,7 @@ void Controller::Init(State *s) {
 }
 
 void Controller::Update(State *s) {
-	if (millis() - lastControlUpdate > 100)
+	if (millis() - lastControlUpdate > CONTROLLER_UPDATE_PERIOD_MS)
 	{
 		lastControlUpdate = millis();
 

@@ -21,27 +21,27 @@
 
 // Physical calibration of arm positions etc
 #define STAGE_RADIUS_MM 75
-#define ARM_PATH_RADIUS_MM 164.7
+#define ARM_PATH_RADIUS_MM 164.7f
 // The stage is equivalent to the crop area. But the tip can't target -1 to 1.
 // IK target requests will be bounded to a circle THIS portion of the stage radius
-#define IK_TARGET_RADIUS_FRAC 0.8
+#define IK_TARGET_RADIUS_FRAC 0.8f
 
-#define YAW_ZERO_OFFSET -21.3
+#define YAW_ZERO_OFFSET -21.3f
 // anticlockwise offset of arm from negative x axis
-#define RING_ZERO_OFFSET 4.8
+#define RING_ZERO_OFFSET 4.8f
 
-#define CENTRE_PITCH 48.95
-#define MIN_BOWL_Z 32.5
+#define CENTRE_PITCH 48.95f
+#define MIN_BOWL_Z 32.5f
 
 // NODE CALIBRATION (UNITS)
 #define HOME_TOP_Z 73
 
 #define VIAL_PITCH 0
 #define VIAL_YAW_OFFSET -6
-#define VIAL_YAW_INCREMENT 36.38
+#define VIAL_YAW_INCREMENT 36.38f
 
 // how much to drop the z level during dispense, after pipette actuation.
-#define DISPENSE_Z_OFFSET -2.0
+#define DISPENSE_Z_OFFSET -2.0f
 // default z position for ik evaluation and pre-dispense
 #define IK_Z 44
 
@@ -56,15 +56,15 @@
 // number of milliseconds to open the air valve for after fluid dispense
 #define FLUID_TRAVEL_TIME_MS 5000
 #define OPEN_DRAIN_DELAY_MS 12000
-#define WATER_VOLUME_PER_SECOND_ML 5.5
-#define MILK_VOLUME_PER_SECOND_ML 4.5
-#define DRAIN_VOLUME_PER_SECOND_ML 5
-#define MAX_FLUID_LEVEL 500.0
+#define WATER_VOLUME_PER_SECOND_ML 5.5f
+#define MILK_VOLUME_PER_SECOND_ML 4.5f
+#define DRAIN_VOLUME_PER_SECOND_ML 5.0f
+#define MAX_FLUID_LEVEL 500.0f
 
 // Rinse node calibration
 #define RINSE_CONTAINER_ENTRY_Z 67
 #define RINSE_CONTAINER_LOW_Z 30
 #define RINSE_CONTAINER_PITCH 11
-#define RINSE_CONTAINER_YAW 63.0
+#define RINSE_CONTAINER_YAW 63
 
-#define MAINTENANCE_RING_ANGLE 110.0
+#define MAINTENANCE_RING_ANGLE 110

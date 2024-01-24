@@ -1,5 +1,7 @@
 #pragma once
 
+#define CONTROLLER_UPDATE_PERIOD_MS 100
+
 #define RUN_TESTS true
 #define PRINT_DATA true
 

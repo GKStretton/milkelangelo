@@ -20,7 +20,7 @@ int getRingAndYawFromXY(float x, float y, float lastRing, float *ring, float *ya
 	float x_mm = x * STAGE_RADIUS_MM;
 	float y_mm = y * STAGE_RADIUS_MM;
 
-	double xi, yi, xi_prime, yi_prime;
+	float xi, yi, xi_prime, yi_prime;
 
 	// Find the intersections of two circles about the centre and target
 	// respectively, with radii equal to the arm length.
@@ -37,8 +37,8 @@ int getRingAndYawFromXY(float x, float y, float lastRing, float *ring, float *ya
 
 	// Now we have the 2 intersect points, and target x_mm, y_mm.
 	// Calculate the two outer ring angles from the intersection points
-	double angle = fmod(-atan2(xi, yi) * 180.0 / M_PI + 270.0, 360.0);
-	double angle_prime = fmod(-atan2(xi_prime, yi_prime) * 180.0 / M_PI + 270.0, 360.0);
+	float angle = fmodf(-atan2f(xi, yi) * 180.0f / PI_F + 270.0f, 360.0f);
+	float angle_prime = fmodf(-atan2f(xi_prime, yi_prime) * 180.0f / PI_F + 270.0f, 360.0f);
 
 	Logger::Debug("angle=" + String(angle) + " angle_prime=" + String(angle_prime));
 
@@ -50,24 +50,24 @@ int getRingAndYawFromXY(float x, float y, float lastRing, float *ring, float *ya
 		// move to whichever is closest to previous position
 		if (abs(angle - lastRing) < abs(angle_prime - lastRing))
 		{
-			*ring = (float)angle;
+			*ring = angle;
 		}
 		else
 		{
 			use_i_prime = true;
-			*ring = (float)angle_prime;
+			*ring = angle_prime;
 		}
 	}
 	// otherwise, select the only valid one
 	else if (numInRange(angle, minRingUnit, maxRingUnit))
 	{
-		*ring = (float)angle;
+		*ring = angle;
 	}
 	// otherwise, select the only valid one
 	else if (numInRange(angle_prime, minRingUnit, maxRingUnit))
 	{
 		use_i_prime = true;
-		*ring = (float)angle_prime;
+		*ring = angle_prime;
 	}
 	else
 	{
@@ -82,7 +82,7 @@ int getRingAndYawFromXY(float x, float y, float lastRing, float *ring, float *ya
 
 	// Calculate arm yaw. It's the angle between the vectors from the robot to
 	// a) the centre of the bowl and b) the target.
-	double newYaw;
+	float newYaw;
 	if (use_i_prime)
 	{
 		newYaw = -AngleBetweenVectors(-xi_prime, -yi_prime, x_mm - xi_prime, y_mm - yi_prime);
@@ -93,7 +93,7 @@ int getRingAndYawFromXY(float x, float y, float lastRing, float *ring, float *ya
 	}
 
 	// result is set by pointer
-	*yaw = (float)newYaw;
+	*yaw = newYaw;
 	Logger::Debug("Set ring=" + String(*ring) + " and newYaw=" + String(newYaw));
 
 	// return no error

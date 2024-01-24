@@ -1,10 +1,10 @@
 #include "mathutil.h"
 #include <math.h>
 
-double AngleBetweenVectors(double x0, double y0, double x1, double y1) {
-	double dot = x0*x1 + y0*y1;
-	double det = x0*y1 - y0*x1;
-	return atan2(det, dot) * 180 / M_PI;
+float AngleBetweenVectors(float x0, float y0, float x1, float y1) {
+	float dot = x0*x1 + y0*y1;
+	float det = x0*y1 - y0*x1;
+	return atan2f(det, dot) * 180 / PI_F;
 }
 
 void boundXYToCircle(float *x, float *y, float radius) {

@@ -3,13 +3,13 @@
  *
  * int CircleCircleIntersection(
  *                                // center and radius of 1st circle
- *                                double x0, double y0, double r0,
+ *                                float x0, float y0, float r0,
  *                                // center and radius of 2nd circle
- *                                double x1, double y1, double r1,
+ *                                float x1, float y1, float r1,
  *                                // 1st intersection point
- *                                double *xi, double *yi,              
+ *                                float *xi, float *yi,              
  *                                // 2nd intersection point
- *                                double *xi_prime, double *yi_prime)
+ *                                float *xi_prime, float *yi_prime)
  *
  * This is a public domain work. 3/26/2005 Tim Voght
  *
@@ -18,13 +18,13 @@
 #include <stdio.h>
 #include <math.h>
 
-int CircleCircleIntersection(double x0, double y0, double r0,
-															 double x1, double y1, double r1,
-															 double *xi, double *yi,
-															 double *xi_prime, double *yi_prime)
+int CircleCircleIntersection(float x0, float y0, float r0,
+															 float x1, float y1, float r1,
+															 float *xi, float *yi,
+															 float *xi_prime, float *yi_prime)
 {
-	double a, dx, dy, d, h, rx, ry;
-	double x2, y2;
+	float a, dx, dy, d, h, rx, ry;
+	float x2, y2;
 
 	/* dx and dy are the vertical and horizontal distances between
 	 * the circle centers.
@@ -34,7 +34,7 @@ int CircleCircleIntersection(double x0, double y0, double r0,
 
 	/* Determine the straight-line distance between the centers. */
 	//d = sqrt((dy*dy) + (dx*dx));
-	d = hypot(dx,dy); // Suggested by Keith Briggs
+	d = hypotf(dx,dy); // Suggested by Keith Briggs
 
 	/* Check for solvability. */
 	if (d > (r0 + r1))
@@ -42,7 +42,7 @@ int CircleCircleIntersection(double x0, double y0, double r0,
 		/* no solution. circles do not intersect. */
 		return 0;
 	}
-	if (d < fabs(r0 - r1))
+	if (d < fabsf(r0 - r1))
 	{
 		/* no solution. one circle is contained in the other */
 		return 0;
@@ -63,7 +63,7 @@ int CircleCircleIntersection(double x0, double y0, double r0,
 	/* Determine the distance from point 2 to either of the
 	 * intersection points.
 	 */
-	h = sqrt((r0*r0) - (a*a));
+	h = sqrtf((r0*r0) - (a*a));
 
 	/* Now determine the offsets of the intersection points from
 	 * point 2.
