@@ -30,7 +30,8 @@ void CoverServo_Open() {
 		coverServo.writeMicroseconds(i);
 		delay(20);
 	}
-	delay(500);
+	// extra time to ensure open, if it was stuck at all
+	delay(1500);
 	
 	detach();
 }
