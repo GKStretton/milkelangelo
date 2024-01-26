@@ -7,6 +7,7 @@ export const TOPIC_FLUID: string = "mega/req/fluid";
 export const TOPIC_GOTO_NODE: string = "mega/req/goto-node";
 export const TOPIC_GOTO_XY: string = "mega/req/goto-xy";
 export const TOPIC_GOTO_XY_RESP: string = "mega/resp/goto-xy";
+export const TOPIC_LOGS_CRIT: string = "mega/l/crit";
 export const TOPIC_LOGS_DEBUG: string = "mega/l/debug";
 export const TOPIC_LOGS_ERROR: string = "mega/l/error";
 export const TOPIC_LOGS_INFO: string = "mega/l/info";

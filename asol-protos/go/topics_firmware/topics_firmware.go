@@ -9,6 +9,7 @@ const (
 	TOPIC_GOTO_NODE string = "mega/req/goto-node"
 	TOPIC_GOTO_XY string = "mega/req/goto-xy"
 	TOPIC_GOTO_XY_RESP string = "mega/resp/goto-xy"
+	TOPIC_LOGS_CRIT string = "mega/l/crit"
 	TOPIC_LOGS_DEBUG string = "mega/l/debug"
 	TOPIC_LOGS_ERROR string = "mega/l/error"
 	TOPIC_LOGS_INFO string = "mega/l/info"

@@ -5,6 +5,7 @@ namespace Logger {
 
 	enum Level {
 		NONE,
+		CRIT,
 		ERROR,
 		WARN,
 		INFO,
@@ -13,6 +14,7 @@ namespace Logger {
 
 	void SetLevel(enum Level level);
 
+	void Crit(String str);
 	void Error(String str);
 	void Warn(String str);
 	void Info(String str);

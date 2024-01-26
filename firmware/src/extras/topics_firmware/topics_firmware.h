@@ -9,6 +9,7 @@
 #define TOPIC_GOTO_NODE "mega/req/goto-node"
 #define TOPIC_GOTO_XY "mega/req/goto-xy"
 #define TOPIC_GOTO_XY_RESP "mega/resp/goto-xy"
+#define TOPIC_LOGS_CRIT "mega/l/crit"
 #define TOPIC_LOGS_DEBUG "mega/l/debug"
 #define TOPIC_LOGS_ERROR "mega/l/error"
 #define TOPIC_LOGS_INFO "mega/l/info"

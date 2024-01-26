@@ -3,6 +3,7 @@
 #include "../config.h"
 #include "../middleware/logger.h"
 #include <Servo.h>
+#include "../drivers/tof10120.h"
 
 Servo coverServo;
 
@@ -57,4 +58,26 @@ void CoverServo_SetMicroseconds(int us) {
 	delay(500);
 
 	detach();
+}
+
+bool CoverServo_IsOpen() {
+	SetDualRelay(TOF_POWER_PIN, true);
+	delay(500);
+	// ensure cover is open
+	float dist = TOF_GetDistance();
+	// turn off
+	SetDualRelay(TOF_POWER_PIN, false);
+
+	if (dist < 10) {
+		// error reading cover position
+		Logger::Error("cover tof invalid reading " + String(dist) + "mm.");
+		return false;
+	}
+	if (dist > 25) {
+		Logger::Warn("cover tof reading too high at " + String(dist) + "mm.");
+		return false;
+	}
+	Logger::Info("cover tof valid open reading at " + String(dist) + "mm.");
+
+	return true;
 }
