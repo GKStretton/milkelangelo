@@ -82,7 +82,7 @@ void Controller::autoUpdate(State *s) {
 			SetDualRelay(TOF_POWER_PIN, false);
 
 			// todo: send email / handle this.
-			if (dist < 14) {
+			if (dist < 10) {
 				// error reading cover position
 				Logger::Error("cover tof invalid reading " + String(dist) + "mm, shutting down");
 				s->shutdownRequested = true;

@@ -31,8 +31,8 @@ int updatesInLastSecond;
 bool debug = false;
 unsigned long lastUpdatesPerSecondTime = millis();
 
-// eepromStartup reads the startup counter, increments it, writes and prints it.
-void eepromStartup() {
+// incrementStartupCounter reads the startup counter, increments it, writes and prints it.
+void incrementStartupCounter() {
 	uint8_t counter = I2C_EEPROM::ReadByte(STARTUP_COUNTER_MEM_ADDR);
 	counter++;
 	I2C_EEPROM::WriteByte(STARTUP_COUNTER_MEM_ADDR, counter);
@@ -56,12 +56,15 @@ void sleepHandler(Sleep::SleepStatus sleepStatus) {
 void wakeHandler(Sleep::SleepStatus lastSleepStatus) {
 	s.ClearState();
 
+	incrementStartupCounter();
+
 	RingLight::On();
 }
 
 void setup()
 {
-
+	// probably not needed for stability, but tested with it and it's fine.
+	Wire.setClock(50000);
 	Wire.begin();
 	Serial.begin(1000000);
 	Logger::SetLevel(Logger::DEBUG);
@@ -119,8 +122,6 @@ void setup()
 
 	// disabling so it doesn't always start after flash / gateway restart
 	// Sleep::Wake();
-
-	eepromStartup();
 
 	controller.Init(&s);
 
@@ -417,18 +418,19 @@ void dataUpdate()
 	// SerialMQTT::Publish("mega/d/DATA_MS", String(millis() - start));
 	// SerialMQTT::Publish("mega/d/UPS", String(s.updatesPerSecond));
 
-	SerialMQTT::Publish("mega/d/TOF_D", String(TOF_GetDistance()));
+	// This requires power to the device before calling
+	// SerialMQTT::Publish("mega/d/TOF_D", String(TOF_GetDistance()));
 }
 
 void runSteppers(State *s)
 {
-	digitalWrite(STEP_INDICATOR_PIN, HIGH);
+	// digitalWrite(STEP_INDICATOR_PIN, HIGH);
 	s->ringStepper.Update();
 	s->pitchStepper.Update();
 	s->yawStepper.Update();
 	s->zStepper.Update();
 	s->pipetteStepper.Update();
-	digitalWrite(STEP_INDICATOR_PIN, LOW);
+	// digitalWrite(STEP_INDICATOR_PIN, LOW);
 }
 
 void loop()

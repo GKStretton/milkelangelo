@@ -2,7 +2,9 @@
 
 #define CONTROLLER_UPDATE_PERIOD_MS 100
 
-#define RUN_TESTS true
+// Disabling tests because eeprom has to be read with tof powered
+// meaning 5v power must be on for the relay. And these ran before 5v power.
+#define RUN_TESTS false
 
 // Autonomous configuration
 #define DO_DYE_COLLECTION true
@@ -98,4 +100,4 @@
 
 #define EXTRA_RELAY_CONTROL_PIN 33
 
-#define ENSURE_COVER_OPEN false
+#define ENSURE_COVER_OPEN true
