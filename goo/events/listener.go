@@ -10,6 +10,7 @@ import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
+	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
@@ -87,6 +88,21 @@ func Start(sm *session.SessionManager) {
 			)
 		}
 	})
+
+	mqtt.Subscribe(topics_firmware.TOPIC_LOGS_CRIT, func(topic string, payload []byte) {
+		critErr := string(payload)
+		err := email.SendEmail(&machinepb.Email{
+			Subject:   "Crit. f/w error: " + critErr,
+			Body:      critErr,
+			Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_MAINTENANCE,
+		})
+		if err != nil {
+			fmt.Printf("error sending email for critial firmware error (%s): %s\n", critErr, err)
+			return
+		}
+		fmt.Printf("Emailed maintainer about critial error: %s\n", critErr)
+	})
+
 	RequestStateReport()
 }
 
