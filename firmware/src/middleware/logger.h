@@ -14,6 +14,8 @@ namespace Logger {
 
 	void SetLevel(enum Level level);
 
+	// Critical errors require maintenance attention, maintainer will be emailed
+	// by goo.
 	void Crit(String str);
 	void Error(String str);
 	void Warn(String str);

@@ -15,7 +15,6 @@ namespace Logger {
 	void Crit(String str) {
 		if (level >= ERROR) {
 			SerialMQTT::Publish(TOPIC_LOGS_CRIT, str);
-			//todo: email
 		}
 	}
 
