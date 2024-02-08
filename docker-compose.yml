@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: runner/Dockerfile
     volumes:
-      - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
+      - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}:${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
   rtsp:
     build: rtsp
     restart: unless-stopped
@@ -18,7 +18,7 @@ services:
     volumes:
       - ./rtsp/rtsp-simple-server.yml:/rtsp-simple-server.yml
       - ./rtsp/scripts:/scripts
-      - ${LIGHT_STORES_DIR}/kv:/config
+      - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}/kv:/config
     devices:
       - ${TOP_CAM:-/dev/video2}:/dev/top-cam
       - ${FRONT_CAM:-/dev/video0}:/dev/front-cam
@@ -36,25 +36,25 @@ services:
     build:
       context: .
       dockerfile: goo/Dockerfile
-    command: -basePath ${LIGHT_STORES_DIR}
+    command: -basePath ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
     restart: unless-stopped
     network_mode: host
     volumes:
-      - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
+      - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}:${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
       - /dev:/dev
     user: "1000:1000"
   dslrcapture:
     build:
       context: .
       dockerfile: dslrcapture/Dockerfile
-    command: -basePath ${LIGHT_STORES_DIR}
+    command: -basePath ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
     restart: unless-stopped
     privileged: true
     network_mode: host
     environment:
       MOCK_DSLR: ${MOCK_DSLR:-false}
     volumes:
-      - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
+      - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}:${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
       - /dev:/dev
   interface:
     build:
