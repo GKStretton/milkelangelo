@@ -1,6 +1,8 @@
 package decider
 
 import (
+	"fmt"
+
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
 	"github.com/gkstretton/dark/services/goo/types"
@@ -12,8 +14,8 @@ func NewMockDecider() Decider {
 	return &mockDecider{}
 }
 
-func (d *mockDecider) DecideNextAction(predictedState *machinepb.StateReport) executor.Executor {
-	return nil
+func (d *mockDecider) DecideNextAction(predictedState *machinepb.StateReport) (executor.Executor, error) {
+	return nil, fmt.Errorf("mock DecideNextAction not implemented")
 }
 
 var tempCollectionTracker int

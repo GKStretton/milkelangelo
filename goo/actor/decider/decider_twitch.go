@@ -30,8 +30,8 @@ func NewTwitchDecider(ebs *ebsinterface.ExtensionSession, twitchApi *twitchapi.T
 	}
 }
 
-func (d *twitchDecider) DecideNextAction(predictedState *machinepb.StateReport) executor.Executor {
-	return nil
+func (d *twitchDecider) DecideNextAction(predictedState *machinepb.StateReport) (executor.Executor, error) {
+	return nil, fmt.Errorf("twitch DecideNextAction not implemented")
 }
 
 func (d *twitchDecider) decideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {

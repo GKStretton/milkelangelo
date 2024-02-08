@@ -18,9 +18,14 @@ import (
 var l = log.New(os.Stdout, "[actor] ", log.Flags())
 var waitForUser = flag.Bool("waitForUser", false, "if true, do blocking waits at certain debug points")
 
+type decision struct {
+	e   executor.Executor
+	err error
+}
+
 // LaunchActor is launched to control a session after the canvas is prepared.
 // It should effect art.
-func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) {
+func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) error {
 	fmt.Printf("Launching actor\n")
 
 	// access state reports
@@ -36,14 +41,18 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) {
 	d := decider.NewAutoDecider(actorTimeout)
 
 	awaitDecision := decide(d, events.GetLatestStateReportCopy(), nil)
-	e := <-awaitDecision
+	decision := <-awaitDecision
 
 	for {
-		if e == nil {
+		if decision.err != nil {
+			l.Printf("error in decider, exiting actor: %s\n", decision.err)
+			return decision.err
+		}
+		if decision.e == nil {
 			l.Println("saw nil decision, exiting actor")
 			break
 		}
-		awaitCompletion, predictedCompletionState := executor.RunExecutorNonBlocking(c, e)
+		awaitCompletion, predictedCompletionState := executor.RunExecutorNonBlocking(c, decision.e)
 		// ebs.UpdateCurrentAction(e)
 		// ebs.UpdateUpcomingAction(nil)
 
@@ -52,21 +61,31 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) {
 
 		<-awaitCompletion // ensure last action finished
 		// ebs.UpdateCurrentAction(nil)
-		e = <-awaitDecision
+		decision = <-awaitDecision
 	}
+
+	return nil
 }
 
-func decide(decider decider.Decider, predictedState *machinepb.StateReport, ebs *ebsinterface.ExtensionSession) chan executor.Executor {
-	c := make(chan executor.Executor)
+func decide(decider decider.Decider, predictedState *machinepb.StateReport, ebs *ebsinterface.ExtensionSession) chan decision {
+	c := make(chan decision)
 	go func() {
 		l.Printf("making next decision...\n")
-		e := decider.DecideNextAction(predictedState)
+		e, err := decider.DecideNextAction(predictedState)
 		if *waitForUser {
 			fmt.Scanln()
 		}
-		l.Printf("made next decision: %v\n", e)
+		if err != nil {
+			l.Printf("error making next decision: %v\n", err)
+		} else {
+			l.Printf("made next decision: %v\n", e)
+		}
+
 		// ebs.UpdateUpcomingAction(e)
-		c <- e
+		c <- decision{
+			e:   e,
+			err: err,
+		}
 		close(c)
 	}()
 	return c

@@ -7,6 +7,17 @@ import (
 	"github.com/gkstretton/dark/services/goo/email"
 )
 
+func requestSessionIntervention(e error) {
+	err := email.SendEmail(&machinepb.Email{
+		Subject:   fmt.Sprintf("Intervention required: %s", e),
+		Body:      fmt.Sprintf("Please take over the session manually\n\n%s", e.Error()),
+		Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_MAINTENANCE,
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
 func requestFridgeMilk() {
 	err := email.SendEmail(&machinepb.Email{
 		Subject: fmt.Sprintf(
