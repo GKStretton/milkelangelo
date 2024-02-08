@@ -8,6 +8,7 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/dark/services/goo/filesystem"
+	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/socialmedia"
@@ -46,6 +47,11 @@ func Start(sm *session.SessionManager) {
 	for {
 		<-next
 		next = time.After(time.Minute)
+		if !keyvalue.GetBool("ENABLE_CONTENT_SCHEDULER_LOOP") {
+			fmt.Println("content scheduler loop not enabled")
+			next = time.After(time.Hour)
+			continue
+		}
 
 		err := m.processLatestProductionSession(sm)
 		if err != nil {

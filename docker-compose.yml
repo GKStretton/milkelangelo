@@ -20,8 +20,8 @@ services:
       - ./rtsp/scripts:/scripts
       - ${LIGHT_STORES_DIR}/kv:/config
     devices:
-      - $TOP_CAM:/dev/top-cam
-      - $FRONT_CAM:/dev/front-cam
+      - ${TOP_CAM:-/dev/video2}:/dev/top-cam
+      - ${FRONT_CAM:-/dev/video0}:/dev/front-cam
   pygateway:
     build: pygateway
     devices:
@@ -39,10 +39,6 @@ services:
     command: -basePath ${LIGHT_STORES_DIR}
     restart: unless-stopped
     network_mode: host
-    environment:
-      OBS_LANDSCAPE_URL: ${OBS_LANDSCAPE_URL}
-      EMAIL_RECIPIENT: ${EMAIL_RECIPIENT}
-      ENABLE_SCHEDULER: ${ENABLE_SCHEDULER}
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev
@@ -57,7 +53,6 @@ services:
     network_mode: host
     environment:
       MOCK_DSLR: ${MOCK_DSLR:-false}
-      OBS_LANDSCAPE_URL: ${OBS_LANDSCAPE_URL}
     volumes:
       - ${LIGHT_STORES_DIR}:${LIGHT_STORES_DIR}
       - /dev:/dev

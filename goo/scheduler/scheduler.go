@@ -2,9 +2,9 @@ package scheduler
 
 import (
 	"fmt"
-	"os"
 	"time"
 
+	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 )
@@ -79,7 +79,7 @@ func scheduleWatcher(s *Schedule) {
 		fmt.Printf("[schedule] scheduling %s for %s (%s)\n", s.name, nextRun, timeUntil)
 		<-time.After(timeUntil)
 
-		if !s.enabled {
+		if !s.enabled || !keyvalue.GetBool("ENABLE_SCHEDULER") {
 			fmt.Printf("[schedule] skipping %s, not enabled\n", s.name)
 			continue
 		}
@@ -91,10 +91,6 @@ func scheduleWatcher(s *Schedule) {
 }
 
 func Start(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
-	if os.Getenv("ENABLE_SCHEDULER") == "true" {
-		fmt.Printf("Starting scheduler\n")
-		defineSchedule(sm, twitchApi)
-	} else {
-		fmt.Println("ignoringscheduler, ENABLE_SCHEDULER not set")
-	}
+	fmt.Printf("Starting scheduler\n")
+	defineSchedule(sm, twitchApi)
 }

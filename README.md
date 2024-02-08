@@ -1,9 +1,6 @@
-# A Study of Light - Backend Systems
+# A Study of Light
 
-This is the supporting system monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLight). Also see the other repos:
-
-- [Firmware](https://github.com/GKStretton/asol-firmware)
-- [Protos](https://github.com/GKStretton/asol-protos)
+This is the monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLight).
 
 Backend scope includes:
 
@@ -16,12 +13,33 @@ Backend scope includes:
 - [x] OBS integration for live streaming
 - [x] Automated video, photo, and state report capture
 - [x] Automated post-processing of photos and short- & long-form video content.
-- [ ] Automated social media posting
+- [x] Automated social media posting
+- [x] Automated session control
 
 ## Instructions
 
-Fill out the .env file in root of repo with your configuration. This wasn't initially
-built to be used by others so let me know any problems or missing information!
+### .env settings
+
+These are the environment variables required
+
+TOP_CAM=/dev/video2 (default)
+FRONT_CAM=/dev/video0 (default)
+LIGHT_STORES_DIR=/mnt/md0/light-stores/ (default not set, required in .env)
+
+### kv/ settings:
+
+There's a key value store in e.g. `/mnt/md0/light-stores/kv/` which some configuration.
+
+- ENABLE_CONTENT_SCHEDULER_LOOP: controls whether the content scheduler loop will run to automatically upload at regular intervals
+- ENABLE_SCHEDULER: controls whether the scheduler will run, which automatically runs sessions each week
+
+Snapshot of kv/ 08/02/2024:
+
+EMAIL_RECIPIENT_MAINTENANCE           MAILJET_API_SECRET          TWITCH_REFRESH_TOKEN  vial-profiles
+EMAIL_RECIPIENT_ROUTINE_OPERATIONS    TWITCH_CLIENT_ID            crop_dslr             youtube-credentials.json
+EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS  TWITCH_CLIENT_SECRET        crop_front-cam        youtube_client_secret.json
+ENABLE_CONTENT_SCHEDULER_LOOP         TWITCH_EXTENSION_CLIENT_ID  crop_top-cam			OBS_LANDSCAPE_URL
+MAILJET_API_KEY                       TWITCH_EXTENSION_SECRET     system-vial-profiles
 
 ## Sub-Systems
 

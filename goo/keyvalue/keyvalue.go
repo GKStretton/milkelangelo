@@ -2,6 +2,7 @@ package keyvalue
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/gkstretton/asol-protos/go/topics_backend"
@@ -24,6 +25,28 @@ func Start() {
 	mqtt.Subscribe(TOPIC_GET+"#", reqCallback)
 }
 
+func GetBool(key string) bool {
+	b, err := getKeyValue(key)
+	if err != nil {
+		return false
+	}
+	if strings.TrimSpace(strings.ToLower(string(b))) == "true" {
+		return true
+	}
+	return false
+}
+
+func SetBool(key string, value bool) {
+	val := "false"
+	if value {
+		val = "true"
+	}
+	err := setKeyValue(key, []byte(val))
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
 func Get(key string) []byte {
 	b, err := getKeyValue(key)
 	if err != nil {
@@ -31,6 +54,10 @@ func Get(key string) []byte {
 		return nil
 	}
 	return b
+}
+
+func GetString(key string) string {
+	return string(Get(key))
 }
 
 func Set(key string, value []byte) {
