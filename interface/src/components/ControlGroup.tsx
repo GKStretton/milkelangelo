@@ -18,6 +18,10 @@ import {
   TOPIC_DEBUG_DATA,
 } from "../topics_firmware/topics_firmware";
 import {
+  TOPIC_ACTOR_START,
+  TOPIC_ACTOR_STATUS_GET,
+  TOPIC_ACTOR_STATUS_RESP,
+  TOPIC_ACTOR_STOP,
   TOPIC_SESSION_BEGIN,
   TOPIC_SESSION_END,
   TOPIC_SESSION_PAUSE,
@@ -40,7 +44,7 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import { useSessionStatus, useStateReport, useStreamStatus } from "../util/hooks";
+import { useBoolTopic, useSessionStatus, useStateReport, useStreamStatus } from "../util/hooks";
 import CollectDispense from "./CollectDispense";
 import Profiles from "./Profiles";
 import { useError } from "./ErrorManager";
@@ -125,8 +129,16 @@ export default function ControlGroup() {
 
   const [selectedNode, setSelectedNode] = useState<number>(Node.UNDEFINED);
 
+  const actorRunning = useBoolTopic(TOPIC_ACTOR_STATUS_GET, TOPIC_ACTOR_STATUS_RESP);
+
   return (
     <>
+      {actorRunning ? 
+        <Typography variant="h6" style={{color:"red"}}>Actor Running</Typography>
+        :
+        <Typography variant="h6" style={{color:"purple"}}>Actor Not Running</Typography>
+      }
+
       <Tabs value={tabValue} onChange={handleChange}>
         <Tab label="Core" />
         <Tab label="Overrides" />
@@ -137,6 +149,15 @@ export default function ControlGroup() {
 
       {tabValue === 0 && (
         <>
+          <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
+            <Button disabled={!isAwake || actorRunning} onClick={() => c?.publish(TOPIC_ACTOR_START, "")}>
+              Start Actor
+            </Button>
+            <Button disabled={!isAwake || !actorRunning} onClick={() => c?.publish(TOPIC_ACTOR_STOP, "")}>
+              Stop Actor
+            </Button>
+          </ButtonGroup>
+
           <Typography variant="h6">Basic</Typography>
           <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
             <Button disabled={!streamStatus || streamStatus.live} onClick={() => c?.publish(TOPIC_STREAM_START, "")}>

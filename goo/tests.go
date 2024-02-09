@@ -11,7 +11,6 @@ import (
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
-	"github.com/gkstretton/dark/services/goo/server"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/types"
@@ -21,10 +20,6 @@ import (
 
 // tests for human verification during development
 func runAdHocTests() {
-	server.Start()
-	time.Sleep(time.Minute*600)
-	// testActor()
-	// testEmail()
 }
 
 func testEmail() {

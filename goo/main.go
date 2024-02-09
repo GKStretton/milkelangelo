@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/contentscheduler"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
@@ -42,6 +43,7 @@ func main() {
 	sm := session.NewSessionManager(false)
 	twitchApi := twitchapi.Start()
 
+	actor.Setup()
 	events.Start(sm)
 	livecapture.Start(sm)
 	obs.Start(sm)

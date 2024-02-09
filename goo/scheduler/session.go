@@ -21,11 +21,19 @@ type SessionDescriptor struct {
 	sessionDurationMinutes int
 }
 
+var lock *AutomationLock = &AutomationLock{}
+
 func RunSession(
 	d *SessionDescriptor,
 	sm *session.SessionManager,
 	twitchApi *twitchapi.TwitchApi,
 ) error {
+	if lock.Get() {
+		return fmt.Errorf("automation already running")
+	}
+	lock.Set(true)
+	defer lock.Set(false)
+
 	mqtt.Publish(topics_backend.TOPIC_STREAM_START, "")
 	time.Sleep(time.Duration(d.streamPreStartMinutes) * time.Minute)
 

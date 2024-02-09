@@ -23,9 +23,35 @@ type decision struct {
 	err error
 }
 
+var lock *ActorLock = &ActorLock{}
+
+var exitCh chan struct{} = make(chan struct{}, 1)
+
+func shouldExit() bool {
+	select {
+	case <-exitCh:
+		return true
+	default:
+		return false
+	}
+}
+
+func Setup() {
+	subscribeToBrokerTopics()
+}
+
 // LaunchActor is launched to control a session after the canvas is prepared.
 // It should effect art.
 func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) error {
+	if lock.Get() {
+		return fmt.Errorf("actor already running")
+	}
+	lock.Set(true)
+	defer lock.Set(false)
+
+	// clear exit flag
+	_ = shouldExit()
+
 	fmt.Printf("Launching actor\n")
 
 	// access state reports
@@ -44,6 +70,10 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) err
 	decision := <-awaitDecision
 
 	for {
+		if shouldExit() {
+			l.Printf("exit triggered")
+			break
+		}
 		if decision.err != nil {
 			l.Printf("error in decider, exiting actor: %s\n", decision.err)
 			return decision.err
@@ -69,6 +99,16 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration) err
 
 func decide(decider decider.Decider, predictedState *machinepb.StateReport, ebs *ebsinterface.ExtensionSession) chan decision {
 	c := make(chan decision)
+
+	if predictedState == nil {
+		c <- decision{
+			e:   nil,
+			err: fmt.Errorf("predictatedState nil"),
+		}
+		close(c)
+		return c
+	}
+
 	go func() {
 		l.Printf("making next decision...\n")
 		e, err := decider.DecideNextAction(predictedState)

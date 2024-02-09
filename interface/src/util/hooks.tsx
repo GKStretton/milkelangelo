@@ -7,7 +7,6 @@ import {
   VialProfileCollection,
   SystemVialConfiguration,
 } from "../machinepb/machine";
-import { TOPIC_STATE_REPORT_RAW } from "../topics_firmware/topics_firmware";
 import {
   TOPIC_STREAM_STATUS_RESP_RAW,
   TOPIC_SESSION_STATUS_RESP_RAW,
@@ -18,7 +17,24 @@ import {
   TOPIC_KV_GET,
   TOPIC_STATE_REPORT_JSON,
 } from "../topics_backend/topics_backend";
-import { Type } from "protobufjs";
+
+export function useBoolTopic(reqTopic: string, respTopic: string): boolean {
+  const { client: c, messages } = useContext(MqttContext);
+
+  // Subscribe
+  useEffect(() => {
+    if (!c || !c.connected) {
+      return;
+    }
+    c?.subscribe(respTopic, (m) => {
+      console.log(`subscribed to '${respTopic}': ${m}`);
+      c?.publish(reqTopic, "")
+    });
+  }, [c?.connected]);
+
+  const msg = messages[respTopic];
+  return (msg?.toString() ?? "").toLowerCase() === "true"
+}
 
 export function useProtoTopic(topic: string): Buffer | null {
   const { client: c, messages } = useContext(MqttContext);
