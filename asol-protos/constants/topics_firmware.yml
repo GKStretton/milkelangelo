@@ -32,4 +32,4 @@ constants:
   TOPIC_LOGS_INFO: "mega/l/info"
   TOPIC_LOGS_DEBUG: "mega/l/debug"
 
-  IK_Z_LEVEL_MM: 43
+  IK_Z_LEVEL_MM: 42

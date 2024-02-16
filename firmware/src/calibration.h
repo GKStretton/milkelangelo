@@ -41,7 +41,7 @@
 #define VIAL_YAW_INCREMENT 36.38f
 
 // how much to drop the z level during dispense, after pipette actuation.
-#define DISPENSE_Z_OFFSET -2.0f
+#define DISPENSE_Z_OFFSET -3.0f
 
 #define HANDOVER_Z 50
 #define HANDOVER_PITCH 70
