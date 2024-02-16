@@ -60,6 +60,9 @@ constants:
   TOPIC_ACTOR_STATUS_GET: "asol/actor/status-get"
   TOPIC_ACTOR_STATUS_RESP: "asol/actor/status-resp"
 
+  TOPIC_RUN_START_SEQUENCE: "asol/start-sequence"
+  TOPIC_RUN_END_SEQUENCE: "asol/end-sequence"
+
   # (VialProfileCollection)
   KV_KEY_ALL_VIAL_PROFILES: "vial-profiles"
   # (SystemVialConfiguration)

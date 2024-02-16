@@ -11,7 +11,7 @@ import (
 func sessionTimeout(d time.Duration, doDrain bool) {
 	fmt.Println("error: session timeout not implemented")
 	err := email.SendEmail(&machinepb.Email{
-		Subject:   fmt.Sprintf("session timeout not implemented (%s, %s)", d, doDrain),
+		Subject:   fmt.Sprintf("session timeout not implemented (%s, %t)", d, doDrain),
 		Body:      "session will not be ended automatically",
 		Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_MAINTENANCE,
 	})

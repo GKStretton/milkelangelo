@@ -92,5 +92,6 @@ func scheduleWatcher(s *Schedule) {
 
 func Start(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
 	fmt.Printf("Starting scheduler\n")
+	registerHandlers()
 	defineSchedule(sm, twitchApi)
 }

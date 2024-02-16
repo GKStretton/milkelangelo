@@ -40,7 +40,7 @@ func (e *collectionExecutor) PredictOutcome(state *machinepb.StateReport) *machi
 
 func (e *collectionExecutor) Execute(c chan *machinepb.StateReport) {
 	collect(e.vialNo, e.volUl)
-	<-conditionWaiter(c, func(sr *machinepb.StateReport) bool {
+	<-ConditionWaiter(c, func(sr *machinepb.StateReport) bool {
 		return sr.CollectionRequest.Completed
 	})
 }

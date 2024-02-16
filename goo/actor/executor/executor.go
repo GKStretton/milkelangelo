@@ -21,7 +21,7 @@ type Executor interface {
 	String() string
 }
 
-func conditionWaiter(c chan *machinepb.StateReport, cond func(*machinepb.StateReport) bool) chan *machinepb.StateReport {
+func ConditionWaiter(c chan *machinepb.StateReport, cond func(*machinepb.StateReport) bool) chan *machinepb.StateReport {
 	filterChan := make(chan *machinepb.StateReport)
 	go func() {
 		for {

@@ -22,7 +22,7 @@ func requestFridgeMilk() {
 	err := email.SendEmail(&machinepb.Email{
 		Subject: fmt.Sprintf(
 			"Please provide %d whole milk by %s today",
-			bulkVolume,
+			milkVolume,
 			mainSessionStartTime.fmtLocal(),
 		),
 		Body: fmt.Sprintf(
@@ -54,7 +54,7 @@ func requestCleaning() {
 
 const choosePieceBody = `Please choose the image that will be used for the latest session.
 
-- Go to http://192.168.0.37:5000 "Socials" tab. (Must be on home wifi).
+- Go to http://192.168.0.37:5000/content (Must be on home wifi).
 `
 
 func requestPieceSelection() {

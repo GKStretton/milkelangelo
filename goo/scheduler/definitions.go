@@ -12,7 +12,8 @@ import (
 
 const (
 	//ml of milk
-	bulkVolume            = 200
+	milkVolume            = 200
+	waterVolume           = 300
 	streamPreStartMinutes = 5
 )
 

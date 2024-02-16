@@ -1,5 +1,6 @@
 from typing import Literal
 
+IK_Z_LEVEL_MM: Literal["43"] = "43"
 TOPIC_COLLECT: Literal["mega/req/collect"] = "mega/req/collect"
 TOPIC_DEBUG_DATA: Literal["mega/req/debug-data"] = "mega/req/debug-data"
 TOPIC_DISPENSE: Literal["mega/req/dispense"] = "mega/req/dispense"

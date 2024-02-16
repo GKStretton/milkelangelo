@@ -16,12 +16,15 @@ import {
   TOPIC_RINSE,
   TOPIC_MAINTENANCE,
   TOPIC_DEBUG_DATA,
+  IK_Z_LEVEL_MM,
 } from "../topics_firmware/topics_firmware";
 import {
   TOPIC_ACTOR_START,
   TOPIC_ACTOR_STATUS_GET,
   TOPIC_ACTOR_STATUS_RESP,
   TOPIC_ACTOR_STOP,
+  TOPIC_RUN_END_SEQUENCE,
+  TOPIC_RUN_START_SEQUENCE,
   TOPIC_SESSION_BEGIN,
   TOPIC_SESSION_END,
   TOPIC_SESSION_PAUSE,
@@ -64,11 +67,11 @@ export default function ControlGroup() {
   const [dispenseVolume, setDispenseVolume] = useState(10.0);
   const [collectionVolume, setCollectionVolume] = useState(30.0);
   const [bulkFluidRequestVolume, setBulkFluidRequestVolume] = useState(200.0);
-  const [zLevel, setZLevel] = useState(48);
+  const [zLevel, setZLevel] = useState(parseInt(IK_Z_LEVEL_MM));
 
   useEffect(() => {
     c?.publish(TOPIC_SET_IK_Z, zLevel.toString());
-  }, [zLevel]);
+  }, [c, zLevel]);
 
   // Create an array of marks with a 5µl interval
   const marks = Array.from({ length: 21 }, (_, i) => {
@@ -160,6 +163,14 @@ export default function ControlGroup() {
 
           <Typography variant="h6">Basic</Typography>
           <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
+            <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_RUN_START_SEQUENCE, "")}>
+              Start-Sequence
+            </Button>
+            <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_RUN_END_SEQUENCE, "")}>
+              End-Sequence
+            </Button>
+          </ButtonGroup>
+          <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
             <Button disabled={!streamStatus || streamStatus.live} onClick={() => c?.publish(TOPIC_STREAM_START, "")}>
               Start Stream
             </Button>
@@ -185,7 +196,7 @@ export default function ControlGroup() {
             <Button
               disabled={!isAwake}
               onClick={() =>
-                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_MILK},${bulkFluidRequestVolume},${false}`)
+                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_MILK},200,${false}`)
               }
             >
               Milk
@@ -209,7 +220,7 @@ export default function ControlGroup() {
             <Button
               disabled={!isAwake}
               onClick={() =>
-                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_DRAIN},${bulkFluidRequestVolume},${false}`)
+                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_DRAIN},200,${false}`)
               }
             >
               Drain
@@ -217,10 +228,18 @@ export default function ControlGroup() {
             <Button
               disabled={!isAwake}
               onClick={() =>
-                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_WATER},${bulkFluidRequestVolume},${true}`)
+                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_WATER},300,${false}`)
               }
             >
-              Rinse
+              Water
+            </Button>
+            <Button
+              disabled={!isAwake}
+              onClick={() =>
+                c?.publish(TOPIC_FLUID, `${FluidType.FLUID_DRAIN},300,${false}`)
+              }
+            >
+              Drain
             </Button>
             <Button disabled={!isAwake} onClick={() => c?.publish(TOPIC_SHUTDOWN, "")}>
               Shutdown

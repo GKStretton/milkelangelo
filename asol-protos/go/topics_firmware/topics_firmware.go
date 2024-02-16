@@ -1,6 +1,7 @@
 package topics_firmware
 
 const (
+	IK_Z_LEVEL_MM string = "43"
 	TOPIC_COLLECT string = "mega/req/collect"
 	TOPIC_DEBUG_DATA string = "mega/req/debug-data"
 	TOPIC_DISPENSE string = "mega/req/dispense"

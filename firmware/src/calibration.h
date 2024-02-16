@@ -17,7 +17,7 @@
 // z level from which to take in liquid. (may become dynamic based on dye level in future.)
 #define PIPETTE_INTAKE_Z 40
 // The amount of backlash / slop in ul when changing from collect to dispense.
-#define PIPETTE_BACKLASH_UL 5
+#define PIPETTE_BACKLASH_UL 3
 
 // Physical calibration of arm positions etc
 #define STAGE_RADIUS_MM 75
@@ -42,8 +42,6 @@
 
 // how much to drop the z level during dispense, after pipette actuation.
 #define DISPENSE_Z_OFFSET -2.0f
-// default z position for ik evaluation and pre-dispense
-#define IK_Z 48
 
 #define HANDOVER_Z 50
 #define HANDOVER_PITCH 70
@@ -56,8 +54,8 @@
 // number of milliseconds to open the air valve for after fluid dispense
 #define FLUID_TRAVEL_TIME_MS 5000
 #define OPEN_DRAIN_DELAY_MS 12000
-#define WATER_VOLUME_PER_SECOND_ML 5.5f
-#define MILK_VOLUME_PER_SECOND_ML 4.5f
+#define WATER_VOLUME_PER_SECOND_ML 8.25f
+#define MILK_VOLUME_PER_SECOND_ML 9.0f
 #define DRAIN_VOLUME_PER_SECOND_ML 5.0f
 #define MAX_FLUID_LEVEL 500.0f
 

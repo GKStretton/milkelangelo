@@ -5,6 +5,7 @@
 #include "../drivers/UnitStepper.h"
 #include "../calibration.h"
 #include "../config.h"
+#include "../extras/topics_firmware/topics_firmware.h"
 
 bool State::IsArmCalibrated() {
 	return
@@ -51,7 +52,7 @@ void State::ClearState() {
 	this->ringStepper.MarkAsNotCalibrated();
 	this->pipetteStepper.MarkAsNotCalibrated();
 
-	this->ik_target_z = IK_Z;
+	this->ik_target_z = String(IK_Z_LEVEL_MM).toFloat();
 
 	this->fluidRequest = {FLUID_UNDEFINED, false, 0, 0, true};
 	this->overrideCalibrationBlock = false;
@@ -94,7 +95,7 @@ State CreateStateObject() {
 		forceIdleLocation: true,
 		requestDispenseZAdjustment: false,
 		fluidRequest: {FluidType::FLUID_UNDEFINED, false, 0, 0, true},
-		ik_target_z: IK_Z,
+		ik_target_z: String(IK_Z_LEVEL_MM).toFloat(),
 		startup_counter: 0,
 		overrideCalibrationBlock: false,
 		rinseStatus: machine_RinseStatus_RINSE_COMPLETE

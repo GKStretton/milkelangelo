@@ -63,7 +63,7 @@ func (e *dispenseExecutor) String() string {
 
 // call dispense, and observe transition (-> dispensing -> not dispensing)
 func dispenseBlocking(c chan *machinepb.StateReport) {
-	a1 := conditionWaiter(c, func(sr *machinepb.StateReport) bool {
+	a1 := ConditionWaiter(c, func(sr *machinepb.StateReport) bool {
 		return sr.Status == machinepb.Status_DISPENSING
 	})
 	time.Sleep(time.Millisecond * 250)
@@ -72,7 +72,7 @@ func dispenseBlocking(c chan *machinepb.StateReport) {
 	l.Println("waiting for DISPENSING")
 	<-a1
 	l.Println("waiting for NOT DISPENSING")
-	<-conditionWaiter(c, func(sr *machinepb.StateReport) bool {
+	<-ConditionWaiter(c, func(sr *machinepb.StateReport) bool {
 		return sr.Status != machinepb.Status_DISPENSING
 	})
 }

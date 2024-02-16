@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "interface"
+		},
+		{
+			"path": "firmware"
 		}
 	],
 	"settings": {}

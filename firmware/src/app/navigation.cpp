@@ -3,6 +3,7 @@
 #include "../middleware/logger.h"
 #include "../middleware/sleep.h"
 #include "../calibration.h"
+#include "../extras/topics_firmware/topics_firmware.h"
 
 // atTarget checks if z, pitch, and yaw steppers are approximately at their local (next) target node
 bool atLocalTargetNode(State *s) {
@@ -187,7 +188,7 @@ void goToNode(State *s, machine_Node node) {
 
 	if (node == machine_Node_INNER_HANDOVER)
 	{
-		s->zStepper.moveTo(s->zStepper.UnitToPosition(IK_Z));
+		s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z));
 		s->pitchStepper.moveTo(s->pitchStepper.UnitToPosition(HANDOVER_PITCH));
 		s->yawStepper.moveTo(s->yawStepper.UnitToPosition(HANDOVER_INNER_YAW));
 		return;
