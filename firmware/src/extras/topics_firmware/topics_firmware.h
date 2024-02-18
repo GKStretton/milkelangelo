@@ -1,7 +1,7 @@
 #ifndef MQTT_CONSTANTS_H
 #define MQTT_CONSTANTS_H
 
-#define IK_Z_LEVEL_MM "42"
+#define IK_Z_LEVEL_MM "43"
 #define TOPIC_COLLECT "mega/req/collect"
 #define TOPIC_DEBUG_DATA "mega/req/debug-data"
 #define TOPIC_DISPENSE "mega/req/dispense"
