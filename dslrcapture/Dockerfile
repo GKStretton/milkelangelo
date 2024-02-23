@@ -5,7 +5,7 @@ RUN apt install -y gphoto2
 RUN apt install -y python3 python3-pip
 
 # todo: change to venv
-RUN python3 -m pip install --break-system-packages opencv-python scikit-image matplotlib pyyaml libgl1
+RUN python3 -m pip install --break-system-packages opencv-python-headless scikit-image matplotlib pyyaml
 RUN python3 -m pip install --break-system-packages --pre betterproto==2.0.0b5
 
 WORKDIR /src
