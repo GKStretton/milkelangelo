@@ -1,0 +1,4 @@
+#!/bin/bash
+# updates the control interface at asol.gregstretton.org
+
+ssh greg@BREADTH -t "~/update-asol-cloud"

@@ -21,6 +21,14 @@ This is the monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLigh
 
 ## Instructions
 
+### scripts
+
+- `./scripts/dev/mount-md0` - mount DEPTH's filesystem locally, /mnt/md0/light-stores
+- `./scripts/dev/extras-update` - render protos and xlangconsts, copying to everywhere necessary.
+- `./scripts/dev/update-depth` - update depth with latest version of the backend systems
+- `./scripts/dev/cloud-certs` - update webrtc.gregstretton.org certs for when the webcam stream fails on the cloud system
+- `./scripts/dev/cloud-update` - update asol.gregstretton.org interface with latest build from github action
+
 ### .env settings
 
 These are the environment variables used, and they default to the following in the docker-compose:

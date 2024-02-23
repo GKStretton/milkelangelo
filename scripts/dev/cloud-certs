@@ -1,0 +1,4 @@
+#!/bin/bash
+# renews the webrtc.gregstretton.org certs
+
+ssh greg@BREADTH -t "~/renew-webrtc-cert"
