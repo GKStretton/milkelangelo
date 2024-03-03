@@ -17,7 +17,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 )
 
-var sl = log.New(os.Stdout, "[session scheduler]", log.Flags())
+var sl = log.New(os.Stdout, "[session scheduler] ", log.Flags())
 
 type SessionDescriptor struct {
 	// how many minutes before session should stream start?
@@ -207,8 +207,6 @@ func runEndSequence() error {
 
 	sl.Println("ending stream + sending emails")
 	mqtt.Publish(topics_backend.TOPIC_STREAM_END, "")
-	requestCleaning()
-	requestPieceSelection()
 
 	sl.Println("end sequence done")
 

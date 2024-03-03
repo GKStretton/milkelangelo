@@ -6,7 +6,6 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
-	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 )
@@ -191,10 +190,12 @@ func (sm *SessionManager) EndSession() (*Session, error) {
 		Type:      SESSION_ENDED,
 	}
 	fmt.Printf("Ended session %d\n", latest.Id)
-	email.SendEmail(&machinepb.Email{
-		Subject: fmt.Sprintf("Session %d finished", latest.Id),
-		Body:    "From goo. Session complete",
-	})
+
+	// end of session emails
+	if latest.Production {
+		requestCleaning(latest)
+		requestPieceSelection(latest)
+	}
 
 	return latest, nil
 }

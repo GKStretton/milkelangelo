@@ -20,6 +20,7 @@ import (
 
 // tests for human verification during development
 func runAdHocTests() {
+	testEmail()
 }
 
 func testEmail() {
