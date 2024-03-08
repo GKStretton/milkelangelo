@@ -2,7 +2,9 @@ package actor
 
 import (
 	"fmt"
+	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/topics_backend"
@@ -14,14 +16,29 @@ func subscribeToBrokerTopics() {
 	mqtt.Subscribe(topics_backend.TOPIC_ACTOR_START, func(topic string, payload []byte) {
 		l.Println("mqtt start request")
 		go func() {
-			minutes, err := strconv.Atoi(string(payload))
+			args := strings.Split(string(payload), ",")
+			minutes, err := strconv.Atoi(args[0])
 			if err != nil {
 				defaultMinutes := 10
 				l.Printf("invalid minutes for actor timeout, defaulting to %d: %v\n", defaultMinutes, err)
 				minutes = defaultMinutes
 			}
 
-			err = LaunchActor(nil, time.Duration(minutes)*time.Minute)
+			var actorSeed int64
+			if len(args) == 2 {
+				seed, err := strconv.Atoi(args[1])
+				if err != nil {
+					l.Printf("invalid seed for actor, defaulting to random: %v\n", err)
+					actorSeed = rand.Int63()
+				} else {
+					actorSeed = int64(seed)
+				}
+			} else {
+				l.Println("no seed provided, defaulting to random")
+				actorSeed = rand.Int63()
+			}
+
+			err = LaunchActor(nil, time.Duration(minutes)*time.Minute, actorSeed)
 			if err != nil {
 				l.Printf("error when running actor (mqtt trigger): %v\n", err)
 			}

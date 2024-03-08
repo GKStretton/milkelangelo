@@ -6,7 +6,6 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor"
-	"github.com/gkstretton/dark/services/goo/actor/decider"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
@@ -14,7 +13,6 @@ import (
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/types"
-	"github.com/gkstretton/dark/services/goo/util"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
@@ -39,30 +37,13 @@ func printProfiles() {
 	}
 }
 
-func testRandomVialPos() {
-	i := 0
-	for {
-		if i > 100 {
-			break
-		}
-		i++
-
-		fmt.Print(decider.GetRandomVialPos())
-		fmt.Print(", ")
-	}
-}
-
-func testSampleUnitCircle() {
-	fmt.Println(util.SampleRandomUnitCircleCoordinate())
-}
-
 func testActor() {
 	mqtt.Start()
 	sm := session.NewSessionManager(false)
 	events.Start(sm)
 	twitchApi := twitchapi.Start()
 
-	actor.LaunchActor(twitchApi, 3*time.Minute)
+	actor.LaunchActor(twitchApi, 3*time.Minute, 1)
 }
 
 // subscribes to ebs and twitch chat votes and prints the received votes

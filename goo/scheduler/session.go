@@ -3,6 +3,7 @@ package scheduler
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"time"
 
@@ -70,7 +71,7 @@ func RunSession(
 	}
 
 	sl.Println("launching actor")
-	err = actor.LaunchActor(twitchApi, time.Duration(d.actorDurationMinutes)*time.Minute)
+	err = actor.LaunchActor(twitchApi, time.Duration(d.actorDurationMinutes)*time.Minute, rand.Int63())
 	if err != nil {
 		sl.Println("actor error, erroring")
 		mqtt.Publish(topics_backend.TOPIC_SESSION_PAUSE, "")
