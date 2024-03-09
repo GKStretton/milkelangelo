@@ -70,8 +70,14 @@ func RunSession(
 		return err
 	}
 
+	seed := rand.Int63()
+	err = sm.SetCurrentSessionSeed(seed)
+	if err != nil {
+		sl.Printf("failed to set seed: %v\n", err)
+	}
+
 	sl.Println("launching actor")
-	err = actor.LaunchActor(twitchApi, time.Duration(d.actorDurationMinutes)*time.Minute, rand.Int63())
+	err = actor.LaunchActor(twitchApi, time.Duration(d.actorDurationMinutes)*time.Minute, seed)
 	if err != nil {
 		sl.Println("actor error, erroring")
 		mqtt.Publish(topics_backend.TOPIC_SESSION_PAUSE, "")

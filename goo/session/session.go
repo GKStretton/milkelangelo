@@ -13,11 +13,12 @@ import (
 type ID uint64
 
 type Session struct {
-	Id           ID   `yaml:"id"`
-	Paused       bool `yaml:"paused"`
-	Complete     bool `yaml:"complete"`
-	Production   bool `yaml:"production"`
-	ProductionId ID   `yaml:"production_id"`
+	Id           ID    `yaml:"id"`
+	Paused       bool  `yaml:"paused"`
+	Complete     bool  `yaml:"complete"`
+	Production   bool  `yaml:"production"`
+	ProductionId ID    `yaml:"production_id"`
+	Seed         int64 `yaml:"seed"`
 }
 
 func (s *Session) ToProto() *machinepb.SessionStatus {
@@ -63,6 +64,23 @@ func NewSessionManager(useMemoryStorage bool) *SessionManager {
 	sm.subscribeToBrokerTopics()
 
 	return sm
+}
+
+func (sm *SessionManager) SetCurrentSessionSeed(seed int64) error {
+	latest, err := sm.GetLatestSession()
+	if err != nil {
+		return fmt.Errorf("failed to check if session is in progress: %v", err)
+	}
+	if latest == nil || latest.Complete {
+		return fmt.Errorf("session not in progress")
+	}
+	latest.Seed = seed
+	latest, err = sm.s.updateSession(latest)
+	if err != nil {
+		return fmt.Errorf("failed to update session: %v", err)
+	}
+	sm.clearLatestCache()
+	return nil
 }
 
 // BeginSession will attempt to begin a new session

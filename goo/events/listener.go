@@ -20,6 +20,7 @@ import (
 )
 
 var latest_state_report *machinepb.StateReport
+var srLock sync.Mutex
 
 var subs = []chan *machinepb.StateReport{}
 var lock sync.Mutex
@@ -44,6 +45,9 @@ func Start(sm *session.SessionManager) {
 			sr.LatestDslrFileNumber = filesystem.GetLatestDslrFileNumber(uint64(session.Id))
 		}
 
+		srLock.Lock()
+		defer srLock.Unlock()
+
 		latest_state_report = sr
 		publishStateReport(sr)
 
@@ -54,6 +58,9 @@ func Start(sm *session.SessionManager) {
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_MARK_FAILED_DISPENSE, func(topic string, payload []byte) {
+		srLock.Lock()
+		defer srLock.Unlock()
+
 		if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
 			fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
 			return
@@ -70,6 +77,9 @@ func Start(sm *session.SessionManager) {
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_MARK_DELAYED_DISPENSE, func(topic string, payload []byte) {
+		srLock.Lock()
+		defer srLock.Unlock()
+
 		if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
 			fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
 			return
@@ -285,6 +295,9 @@ func appendDelayedDispense(sessionId, startupCounter, dispenseNumber, delayMs ui
 }
 
 func GetLatestStateReportCopy() *machinepb.StateReport {
+	srLock.Lock()
+	defer srLock.Unlock()
+
 	return proto.Clone(latest_state_report).(*machinepb.StateReport)
 }
 

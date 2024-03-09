@@ -9,9 +9,10 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/dark/services/goo/mqtt"
+	"github.com/gkstretton/dark/services/goo/session"
 )
 
-func subscribeToBrokerTopics() {
+func subscribeToBrokerTopics(sm *session.SessionManager) {
 	l.Println("subscribed to topics")
 	mqtt.Subscribe(topics_backend.TOPIC_ACTOR_START, func(topic string, payload []byte) {
 		l.Println("mqtt start request")
@@ -36,6 +37,11 @@ func subscribeToBrokerTopics() {
 			} else {
 				l.Println("no seed provided, defaulting to random")
 				actorSeed = rand.Int63()
+			}
+
+			err = sm.SetCurrentSessionSeed(actorSeed)
+			if err != nil {
+				l.Printf("failed to set seed: %v\n", err)
 			}
 
 			err = LaunchActor(nil, time.Duration(minutes)*time.Minute, actorSeed)

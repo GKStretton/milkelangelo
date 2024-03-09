@@ -12,6 +12,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/actor/executor"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/events"
+	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 )
 
@@ -36,8 +37,8 @@ func shouldExit() bool {
 	}
 }
 
-func Setup() {
-	subscribeToBrokerTopics()
+func Setup(sm *session.SessionManager) {
+	subscribeToBrokerTopics(sm)
 }
 
 // LaunchActor is launched to control a session after the canvas is prepared.
