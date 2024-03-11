@@ -63,6 +63,8 @@ constants:
   TOPIC_RUN_START_SEQUENCE: "asol/start-sequence"
   TOPIC_RUN_END_SEQUENCE: "asol/end-sequence"
 
+  TOPIC_RUN_FULL_SESSION: "asol/run-full-session"
+
   # (VialProfileCollection)
   KV_KEY_ALL_VIAL_PROFILES: "vial-profiles"
   # (SystemVialConfiguration)

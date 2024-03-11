@@ -24,6 +24,7 @@
 #define TOPIC_OPEN_BLIND "asol/open_bedroom_blind"
 #define TOPIC_PIECE_SELECTED "asol/piece-selected"
 #define TOPIC_RUN_END_SEQUENCE "asol/end-sequence"
+#define TOPIC_RUN_FULL_SESSION "asol/run-full-session"
 #define TOPIC_RUN_START_SEQUENCE "asol/start-sequence"
 #define TOPIC_SESSION_BEGAN "asol/session/began"
 #define TOPIC_SESSION_BEGIN "asol/session/begin"

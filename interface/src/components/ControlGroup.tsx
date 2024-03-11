@@ -24,6 +24,7 @@ import {
   TOPIC_ACTOR_STATUS_RESP,
   TOPIC_ACTOR_STOP,
   TOPIC_RUN_END_SEQUENCE,
+  TOPIC_RUN_FULL_SESSION,
   TOPIC_RUN_START_SEQUENCE,
   TOPIC_SESSION_BEGIN,
   TOPIC_SESSION_END,
@@ -152,6 +153,12 @@ export default function ControlGroup() {
 
       {tabValue === 0 && (
         <>
+          <ButtonGroup size="small" aria-label="outlined button group" sx={{ margin: 1 }}>
+            <Button disabled={isAwake} variant="contained" color="success" onClick={() => c?.publish(TOPIC_RUN_FULL_SESSION, "")}>
+              Run Full Session
+            </Button>
+          </ButtonGroup>
+
           <ButtonGroup size="small" variant="outlined" aria-label="outlined button group" sx={{ margin: 1 }}>
             <Button disabled={!isAwake || actorRunning} onClick={() => c?.publish(TOPIC_ACTOR_START, "")}>
               Start Actor
