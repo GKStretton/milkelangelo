@@ -68,11 +68,14 @@ void Controller::fluidUpdate(State *s) {
 
 		if (s->fluidRequest.fluidType == FluidType::DRAIN) {
 			s->fluidRequest.complete = true;
-			float newLevel = FluidLevels_ReadBowlLevel() - s->fluidRequest.volume_ml;
-			if (newLevel < 0) {
-				newLevel = 0;
+			if (CHECK_BOWL_FLUID_LEVEL) {
+				// disabling because the eeprom reads block and make the motors jolt
+				float newLevel = FluidLevels_ReadBowlLevel() - s->fluidRequest.volume_ml;
+				if (newLevel < 0) {
+					newLevel = 0;
+				}
+				FluidLevels_WriteBowlLevel(newLevel);
 			}
-			FluidLevels_WriteBowlLevel(newLevel);
 			return;
 		}
 
@@ -100,10 +103,14 @@ void Controller::NewFluidRequest(State *s, FluidType fluidType, float volume_ml,
 		Logger::Warn("undefined fluidType request");
 		return;
 	}
-	float fluidLevel = FluidLevels_ReadBowlLevel();
-	if (fluidType != FluidType::DRAIN && fluidLevel + volume_ml > MAX_FLUID_LEVEL) {
-		Logger::Warn("fluid level would exceed maximum, rejecting new request");
-		return;
+	float fluidLevel = 0;
+	if (CHECK_BOWL_FLUID_LEVEL) {
+		// disabling because the eeprom reads block and make the motors jolt
+		fluidLevel = FluidLevels_ReadBowlLevel();
+		if (fluidType != FluidType::DRAIN && fluidLevel + volume_ml > MAX_FLUID_LEVEL) {
+			Logger::Warn("fluid level would exceed maximum, rejecting new request");
+			return;
+		}
 	}
 	if (!s->fluidRequest.complete) {
 		Logger::Warn("current fluid request not complete, rejecting new request");
@@ -117,10 +124,13 @@ void Controller::NewFluidRequest(State *s, FluidType fluidType, float volume_ml,
 	Logger::Info("Set fluid request type " +
 		String(fluidType) + " volume " + String(volume_ml));
 
-	if (s->fluidRequest.fluidType != FluidType::FLUID_UNDEFINED &&
-		s->fluidRequest.fluidType != FluidType::DRAIN &&
-		!s->fluidRequest.open_drain)
-	{
-		FluidLevels_WriteBowlLevel(fluidLevel + s->fluidRequest.volume_ml);
+	if (CHECK_BOWL_FLUID_LEVEL) {
+		// disabling because the eeprom reads block and make the motors jolt
+		if (s->fluidRequest.fluidType != FluidType::FLUID_UNDEFINED &&
+			s->fluidRequest.fluidType != FluidType::DRAIN &&
+			!s->fluidRequest.open_drain)
+		{
+			FluidLevels_WriteBowlLevel(fluidLevel + s->fluidRequest.volume_ml);
+		}
 	}
 }

@@ -101,3 +101,5 @@
 #define EXTRA_RELAY_CONTROL_PIN 33
 
 #define ENSURE_COVER_OPEN true
+
+#define CHECK_BOWL_FLUID_LEVEL false
