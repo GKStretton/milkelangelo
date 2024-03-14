@@ -25,6 +25,7 @@ type SessionDescriptor struct {
 	streamPreStartMinutes  int
 	actorDurationMinutes   int
 	sessionDurationMinutes int
+	runActor               bool
 }
 
 var lock *AutomationLock = &AutomationLock{}
@@ -58,6 +59,24 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 					streamPreStartMinutes:  streamPreStartMinutes,
 					actorDurationMinutes:   10,
 					sessionDurationMinutes: 50,
+					runActor:               true,
+				},
+				sm, twitchApi,
+			)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}()
+	})
+
+	mqtt.Subscribe(topics_backend.TOPIC_RUN_MANUAL_SESSION, func(topic string, payload []byte) {
+		go func() {
+			err := RunSession(
+				&SessionDescriptor{
+					streamPreStartMinutes:  streamPreStartMinutes,
+					actorDurationMinutes:   10,
+					sessionDurationMinutes: 50,
+					runActor:               false,
 				},
 				sm, twitchApi,
 			)
@@ -79,6 +98,8 @@ func RunSession(
 	lock.Set(true)
 	defer lock.Set(false)
 
+	sl.Printf("running session with descriptor: %+v\n", d)
+
 	beginTime := time.Now()
 
 	err := runStartSequence(d.streamPreStartMinutes, true)
@@ -86,25 +107,29 @@ func RunSession(
 		return err
 	}
 
-	seed := rand.Int63()
-	err = sm.SetCurrentSessionSeed(seed)
-	if err != nil {
-		sl.Printf("failed to set seed: %v\n", err)
-	}
+	if d.runActor {
+		seed := rand.Int63()
+		err = sm.SetCurrentSessionSeed(seed)
+		if err != nil {
+			sl.Printf("failed to set seed: %v\n", err)
+		}
 
-	sl.Println("launching actor")
-	err = actor.LaunchActor(twitchApi, time.Duration(d.actorDurationMinutes)*time.Minute, seed)
-	if err != nil {
-		sl.Println("actor error, erroring")
-		mqtt.Publish(topics_backend.TOPIC_SESSION_PAUSE, "")
-		// email for help
-		errWrap := fmt.Errorf("actor returned error, unknown situation: %s", err)
-		requestSessionIntervention(errWrap)
-		// add timeout to end session after a few hours if no human response
-		go sessionTimeout(time.Hour*3, true)
-		return err
+		sl.Println("launching actor")
+		err = actor.LaunchActor(twitchApi, time.Duration(d.actorDurationMinutes)*time.Minute, seed)
+		if err != nil {
+			sl.Println("actor error, erroring")
+			mqtt.Publish(topics_backend.TOPIC_SESSION_PAUSE, "")
+			// email for help
+			errWrap := fmt.Errorf("actor returned error, unknown situation: %s", err)
+			requestSessionIntervention(errWrap)
+			// add timeout to end session after a few hours if no human response
+			go sessionTimeout(time.Hour*3, true)
+			return err
+		}
+		sl.Println("actor success")
+	} else {
+		sl.Println("ready for manual control...")
 	}
-	sl.Println("actor success")
 
 	endTime := beginTime.Add(time.Duration(d.sessionDurationMinutes) * time.Minute)
 

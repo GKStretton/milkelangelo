@@ -58,6 +58,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 					streamPreStartMinutes:  streamPreStartMinutes,
 					actorDurationMinutes:   10,
 					sessionDurationMinutes: 50,
+					runActor:               true,
 				},
 				sm, twitchApi,
 			)

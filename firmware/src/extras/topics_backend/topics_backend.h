@@ -25,6 +25,7 @@
 #define TOPIC_PIECE_SELECTED "asol/piece-selected"
 #define TOPIC_RUN_END_SEQUENCE "asol/end-sequence"
 #define TOPIC_RUN_FULL_SESSION "asol/run-full-session"
+#define TOPIC_RUN_MANUAL_SESSION "asol/run-manual-session"
 #define TOPIC_RUN_START_SEQUENCE "asol/start-sequence"
 #define TOPIC_SESSION_BEGAN "asol/session/began"
 #define TOPIC_SESSION_BEGIN "asol/session/begin"
