@@ -2,7 +2,7 @@ from machinepb import machine as pb
 from content_plan.loader import *
 
 
-def buildCleaning(n_str: str) -> pb.ContentTypeStatus:
+def buildCleaning(n_str: str, unlisted: bool = False) -> pb.ContentTypeStatus:
     ct = pb.ContentType.CONTENT_TYPE_CLEANING
     raw_title, raw_description = get_random_title_and_description(ct)
 
@@ -15,10 +15,11 @@ def buildCleaning(n_str: str) -> pb.ContentTypeStatus:
     platform = pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE
     s.posts.append(pb.Post(
         platform=platform,
-        title=append_title_hashtags(f"{s.raw_title} - {n_str}", ct, platform),
+        title=append_title_hashtags(f"{n_str} (end): {s.raw_title}", ct, platform),
         description=f"{get_hashtags(ct, platform)}\n\n{s.raw_description}\n\n{get_common_text(ct, platform)}",
         crosspost=False,
         scheduled_unix_timetamp=get_schedule_timestamp(ct),
+        unlisted=unlisted,
     ))
 
     # platform = pb.SocialPlatform.SOCIAL_PLATFORM_TIKTOK
@@ -28,16 +29,18 @@ def buildCleaning(n_str: str) -> pb.ContentTypeStatus:
     #     description="N/A",
     #     crosspost=False,
     #     scheduled_unix_timetamp=get_schedule_timestamp(ct),
+    #     unlisted=unlisted,
     # ))
 
-    platform = pb.SocialPlatform.SOCIAL_PLATFORM_INSTAGRAM
-    s.posts.append(pb.Post(
-        platform=platform,
-        title=f"{s.raw_title} - {n_str}\n\n{s.raw_description}\n\n{get_common_text(ct, platform)}\n\n{get_hashtags(ct, platform)}",
-        description="N/A",
-        crosspost=False,
-        scheduled_unix_timetamp=get_schedule_timestamp(ct),
-    ))
+    # platform = pb.SocialPlatform.SOCIAL_PLATFORM_INSTAGRAM
+    # s.posts.append(pb.Post(
+    #     platform=platform,
+    #     title=f"{n_str} (end): {s.raw_title}\n\n{s.raw_description}\n\n{get_common_text(ct, platform)}\n\n{get_hashtags(ct, platform)}",
+    #     description="N/A",
+    #     crosspost=False,
+    #     scheduled_unix_timetamp=get_schedule_timestamp(ct),
+    #     unlisted=unlisted,
+    # ))
 
     # platform = pb.SocialPlatform.SOCIAL_PLATFORM_FACEBOOK
     # s.posts.append(pb.Post(
@@ -46,6 +49,7 @@ def buildCleaning(n_str: str) -> pb.ContentTypeStatus:
     #     description="N/A",
     #     crosspost=False,
     #     scheduled_unix_timetamp=get_schedule_timestamp(ct),
+    #     unlisted=unlisted,
     # ))
 
     # platform = pb.SocialPlatform.SOCIAL_PLATFORM_TWITTER
@@ -55,6 +59,7 @@ def buildCleaning(n_str: str) -> pb.ContentTypeStatus:
     #     description="N/A",
     #     crosspost=False,
     #     scheduled_unix_timetamp=get_schedule_timestamp(ct),
+    #     unlisted=unlisted,
     # ))
 
     return s

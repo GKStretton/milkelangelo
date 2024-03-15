@@ -21,6 +21,7 @@ type UploadRequest struct {
 	Description       string
 	ContentFilePath   string
 	ThumbnailFilePath string
+	Unlisted          bool
 }
 
 type platformManager interface {

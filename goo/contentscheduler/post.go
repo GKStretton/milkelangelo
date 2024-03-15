@@ -27,6 +27,7 @@ func (m *manager) handlePost(ct machinepb.ContentType, post *machinepb.Post, ses
 		Description:       post.Description,
 		ContentFilePath:   contentPath,
 		ThumbnailFilePath: thumbnailPath,
+		Unlisted:          post.Unlisted,
 	}
 	if ct == machinepb.ContentType_CONTENT_TYPE_STILL {
 		req.Type = socialmedia.ImagePost

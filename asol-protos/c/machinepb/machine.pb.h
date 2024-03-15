@@ -262,6 +262,8 @@ typedef struct _machine_Post {
     /* if true, footage of this profile will not be treated differently
  to other footage (no slowdown etc.) */
     uint64_t scheduled_unix_timetamp;
+    /* Volume when this was first put in vial */
+    bool unlisted;
 } machine_Post;
 
 typedef struct _machine_SessionStatus { 
@@ -410,7 +412,7 @@ extern "C" {
 #define machine_ContentTypeStatuses_init_default {{{NULL}, NULL}, {{NULL}, NULL}, 0}
 #define machine_ContentTypeStatuses_ContentStatusesEntry_init_default {{{NULL}, NULL}, false, machine_ContentTypeStatus_init_default}
 #define machine_ContentTypeStatus_init_default   {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
-#define machine_Post_init_default                {_machine_SocialPlatform_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, {{NULL}, NULL}, 0, 0}
+#define machine_Post_init_default                {_machine_SocialPlatform_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, {{NULL}, NULL}, 0, 0, 0}
 #define machine_Email_init_default               {{{NULL}, NULL}, {{NULL}, NULL}, _machine_EmailRecipient_MIN}
 #define machine_VialProfile_init_default         {0, {{NULL}, NULL}, 0, 0, 0, 0, 0, 0, 0, 0, {{NULL}, NULL}, _machine_VialProfile_VialFluid_MIN, {{NULL}, NULL}, {{NULL}, NULL}}
 #define machine_SystemVialConfiguration_init_default {{{NULL}, NULL}}
@@ -434,7 +436,7 @@ extern "C" {
 #define machine_ContentTypeStatuses_init_zero    {{{NULL}, NULL}, {{NULL}, NULL}, 0}
 #define machine_ContentTypeStatuses_ContentStatusesEntry_init_zero {{{NULL}, NULL}, false, machine_ContentTypeStatus_init_zero}
 #define machine_ContentTypeStatus_init_zero      {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
-#define machine_Post_init_zero                   {_machine_SocialPlatform_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, {{NULL}, NULL}, 0, 0}
+#define machine_Post_init_zero                   {_machine_SocialPlatform_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, {{NULL}, NULL}, 0, 0, 0}
 #define machine_Email_init_zero                  {{{NULL}, NULL}, {{NULL}, NULL}, _machine_EmailRecipient_MIN}
 #define machine_VialProfile_init_zero            {0, {{NULL}, NULL}, 0, 0, 0, 0, 0, 0, 0, 0, {{NULL}, NULL}, _machine_VialProfile_VialFluid_MIN, {{NULL}, NULL}, {{NULL}, NULL}}
 #define machine_SystemVialConfiguration_init_zero {{{NULL}, NULL}}
@@ -492,6 +494,7 @@ extern "C" {
 #define machine_Post_url_tag                     6
 #define machine_Post_crosspost_tag               7
 #define machine_Post_scheduled_unix_timetamp_tag 8
+#define machine_Post_unlisted_tag                9
 #define machine_SessionStatus_id_tag             1
 #define machine_SessionStatus_paused_tag         2
 #define machine_SessionStatus_complete_tag       3
@@ -670,7 +673,8 @@ X(a, CALLBACK, SINGULAR, STRING,   description,       4) \
 X(a, STATIC,   SINGULAR, BOOL,     uploaded,          5) \
 X(a, CALLBACK, SINGULAR, STRING,   url,               6) \
 X(a, STATIC,   SINGULAR, BOOL,     crosspost,         7) \
-X(a, STATIC,   SINGULAR, UINT64,   scheduled_unix_timetamp,   8)
+X(a, STATIC,   SINGULAR, UINT64,   scheduled_unix_timetamp,   8) \
+X(a, STATIC,   SINGULAR, BOOL,     unlisted,          9)
 #define machine_Post_CALLBACK pb_default_field_callback
 #define machine_Post_DEFAULT NULL
 

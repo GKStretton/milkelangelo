@@ -168,6 +168,12 @@ func (m *youtubeManager) Upload(req *UploadRequest) (string, error) {
 			Description: req.Description,
 		},
 	}
+	if req.Unlisted {
+		upload.Status = &youtube.VideoStatus{
+			PrivacyStatus: "unlisted",
+		}
+	}
+
 	call := m.s.Videos.Insert([]string{"snippet", "status"}, upload)
 
 	file, err := os.Open(req.ContentFilePath)

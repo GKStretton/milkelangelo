@@ -253,6 +253,8 @@ message Post {
 	bool crosspost = 7;
 	// seconds ts of when to publish. If 0, publish immediately, because 0 is in the past.
 	uint64 scheduled_unix_timetamp = 8;
+	// if true, video will be posted unlisted, accessible by link only. Or not posted if the platform doesn't support it.
+	bool unlisted = 9;
 }
 
 enum EmailRecipient {

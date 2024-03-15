@@ -268,6 +268,9 @@ class Post(betterproto.Message):
     # seconds ts of when to publish. If 0, publish immediately, because 0 is in
     # the past.
     scheduled_unix_timetamp: int = betterproto.uint64_field(8)
+    # if true, video will be posted unlisted, accessible by link only. Or not
+    # posted if the platform doesn't support it.
+    unlisted: bool = betterproto.bool_field(9)
 
 
 @dataclass

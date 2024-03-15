@@ -794,6 +794,8 @@ export interface Post {
   crosspost: boolean;
   /** seconds ts of when to publish. If 0, publish immediately, because 0 is in the past. */
   scheduledUnixTimetamp: number;
+  /** if true, video will be posted unlisted, accessible by link only. Or not posted if the platform doesn't support it. */
+  unlisted: boolean;
 }
 
 /** emails used for administration, not intended for audience distribution */
@@ -2518,6 +2520,7 @@ function createBasePost(): Post {
     url: "",
     crosspost: false,
     scheduledUnixTimetamp: 0,
+    unlisted: false,
   };
 }
 
@@ -2546,6 +2549,9 @@ export const Post = {
     }
     if (message.scheduledUnixTimetamp !== 0) {
       writer.uint32(64).uint64(message.scheduledUnixTimetamp);
+    }
+    if (message.unlisted === true) {
+      writer.uint32(72).bool(message.unlisted);
     }
     return writer;
   },
@@ -2613,6 +2619,13 @@ export const Post = {
 
           message.scheduledUnixTimetamp = longToNumber(reader.uint64() as Long);
           continue;
+        case 9:
+          if (tag !== 72) {
+            break;
+          }
+
+          message.unlisted = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2634,6 +2647,7 @@ export const Post = {
       scheduledUnixTimetamp: isSet(object.scheduled_unix_timetamp)
         ? globalThis.Number(object.scheduled_unix_timetamp)
         : 0,
+      unlisted: isSet(object.unlisted) ? globalThis.Boolean(object.unlisted) : false,
     };
   },
 
@@ -2663,6 +2677,9 @@ export const Post = {
     if (message.scheduledUnixTimetamp !== 0) {
       obj.scheduled_unix_timetamp = Math.round(message.scheduledUnixTimetamp);
     }
+    if (message.unlisted === true) {
+      obj.unlisted = message.unlisted;
+    }
     return obj;
   },
 
@@ -2679,6 +2696,7 @@ export const Post = {
     message.url = object.url ?? "";
     message.crosspost = object.crosspost ?? false;
     message.scheduledUnixTimetamp = object.scheduledUnixTimetamp ?? 0;
+    message.unlisted = object.unlisted ?? false;
     return message;
   },
 };
