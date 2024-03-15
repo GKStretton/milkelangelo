@@ -110,6 +110,7 @@ func selectDslrImage(sessionNo int, name string) error {
 	p := filesystem.GetPostDslrDir(uint64(sessionNo))
 	imagePath := filepath.Join(p, name)
 	linkPath := filepath.Join(p, "selected.jpg")
+	os.Remove(linkPath)
 	return os.Symlink(imagePath, linkPath)
 }
 
