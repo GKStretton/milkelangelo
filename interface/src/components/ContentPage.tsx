@@ -14,11 +14,13 @@ function ContentPage() {
 
   const [imageNames, setImageNames] = useState<string[]>();
   const [selectedImgIndex, setSelectedImgIndex] = useState(0);
+  const [err, setErr] = useState("");
 
   const getList = useCallback(() => {
     if (!sessionStatus?.id) return;
 
-    fetch(`http://localhost:8089/list-dslr-post?session_id=${sessionStatus?.id}`)
+    setErr("");
+    fetch(`http://depth:8089/list-dslr-post?session_id=${sessionStatus?.id}`)
     .then((resp) => {
       console.log("got resp", resp)
       if (!resp.ok) {
@@ -32,6 +34,7 @@ function ContentPage() {
     })
     .catch((e) => {
       console.error(e);
+      setErr(e.toString());
     })
   }, [sessionStatus?.id])
 
@@ -51,8 +54,13 @@ function ContentPage() {
       return;
     }
 
-    fetch(`http://localhost:8089/select-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`)
-    .catch(r => console.error(r))
+    setErr("");
+
+    fetch(`http://depth:8089/select-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`)
+    .catch(r => {
+      console.error(r);
+      setErr(r);
+    })
     .finally(() => {
       getList()
     })
@@ -77,14 +85,17 @@ function ContentPage() {
   const imageSelected = useMemo(() => imageNames?.find((v) => v === "selected.jpg") !== undefined, [imageNames])
 
   return (
-    <>
+    <div style={{padding: "1rem"}}>
+      {err ? 
+        <Typography variant='h4' color='error'>{err}</Typography>
+      : null}
       {imageNames ?
       <>
         <Typography variant="h5">Piece selection session {sessionStatus?.productionId} ({sessionStatus?.id})</Typography>
         <img
           alt={imageNames[selectedImgIndex]}
           width={600}
-          src={`http://localhost:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`}
+          src={`http://depth:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`}
         />
         <br/>
         <div>{imageNames[selectedImgIndex]}</div>
@@ -107,7 +118,7 @@ function ContentPage() {
           <img
             alt="selected.jpg"
             width={600}
-            src={`http://localhost:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=selected.jpg`}
+            src={`http://depth:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=selected.jpg`}
           />
         </>
         : null}
@@ -119,7 +130,7 @@ function ContentPage() {
       <br/>
       <br/>
       <StateReport/>
-    </>
+    </div>
   )
 }
 

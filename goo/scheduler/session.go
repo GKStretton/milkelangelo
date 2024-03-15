@@ -149,7 +149,7 @@ func runStartSequence(streamPreStartMinutes int, realSession bool) error {
 	ch := events.Subscribe()
 	defer events.Unsubscribe(ch)
 
-	sl.Println("starting stream")
+	sl.Println("starting stream, and waiting...")
 	if realSession {
 		mqtt.Publish(topics_backend.TOPIC_STREAM_START, "")
 	}
