@@ -19,7 +19,7 @@ const (
 
 // time the session will begin UTC
 var mainSessionStartTime = RecurringTime{
-	day:    time.Saturday,
+	day:    time.Sunday,
 	hour:   18,
 	minute: 30,
 	second: 0,
@@ -27,7 +27,7 @@ var mainSessionStartTime = RecurringTime{
 
 // time the session will end UTC
 var mainSessionEndTime = RecurringTime{
-	day:    time.Saturday,
+	day:    time.Sunday,
 	hour:   19,
 	minute: 30,
 	second: 0,

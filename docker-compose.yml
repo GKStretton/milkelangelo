@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: runner/Dockerfile
+    user: "1000:1000"
     volumes:
       - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}:${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
   rtsp:

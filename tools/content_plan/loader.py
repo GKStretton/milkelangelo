@@ -45,16 +45,20 @@ def get_schedule_timestamp(ct: pb.ContentType) -> int:
         return 0
     elif ct == pb.ContentType.CONTENT_TYPE_LONGFORM:
         # 1 day later
-        return int((next_schedule).timestamp())
+        # return int((next_schedule).timestamp())
+        # immediate because why not?
+        return 0
     elif ct == pb.ContentType.CONTENT_TYPE_SHORTFORM:
         # 2 days later
-        return int((next_schedule + timedelta(days=1)).timestamp())
+        # return int((next_schedule + timedelta(days=1)).timestamp())
+        # immediate because why not?
+        return 0
     elif ct == pb.ContentType.CONTENT_TYPE_CLEANING:
-        # 3 days later
-        return int((next_schedule + timedelta(days=2)).timestamp())
+        # Immediate because unlisted
+        return 0
     elif ct == pb.ContentType.CONTENT_TYPE_DSLR:
-        # 4 days later
-        return int((next_schedule + timedelta(days=3)).timestamp())
+        # Immediate because unlisted
+        return 0
     else:
         return 0
 

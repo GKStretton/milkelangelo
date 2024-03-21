@@ -86,7 +86,7 @@ def build_twitch_block(pos, duration):
 
     clips.append(
         TextClip(
-            "Join LIVE every Saturday",
+            "Join LIVE every Sunday",
             # color=twitch_color,
             font_size=70,
             font=PIXEL_FONT
