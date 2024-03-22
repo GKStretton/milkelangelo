@@ -110,6 +110,7 @@ function ContentPage() {
         {!imageSelected ? <div>Cannot generate because image has not been selected</div>: null}
         <Button variant="contained" color="warning" disabled={!connected || !imageSelected || generateRequested} onClick={()=>{generateContent()}}>Generate Content</Button>
         <div>{generateMessage}</div>
+        <br/>
         <Button variant="contained" color="warning" disabled={!connected} onClick={()=>{c?.publish(TRIGGER_UPLOAD_FROM_CONTENT_PLAN, String(sessionStatus?.id))}}>Trigger upload</Button>
         <br/>
         <br/>

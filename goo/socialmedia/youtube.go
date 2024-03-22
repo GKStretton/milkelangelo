@@ -177,12 +177,15 @@ func (m *youtubeManager) Upload(req *UploadRequest) (string, error) {
 	call := m.s.Videos.Insert([]string{"snippet", "status"}, upload)
 
 	file, err := os.Open(req.ContentFilePath)
-	defer file.Close()
 	if err != nil {
-		log.Fatalf("Error opening %v: %v", file, err)
+		return "", fmt.Errorf("error opening %s: %v", file.Name(), err)
 	}
+	defer file.Close()
 	resp, err := call.Media(file).Do()
-	handleYoutubeError(err, "")
+	err = handleYoutubeError(err, "")
+	if err != nil {
+		return "", err
+	}
 	fmt.Printf("Youtube upload successful! Video ID: %v\n", resp.Id)
 	return "https://youtube.com/watch?v=" + resp.Id, nil
 }
