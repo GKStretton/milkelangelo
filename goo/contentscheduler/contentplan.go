@@ -41,7 +41,13 @@ func (m *manager) processContentPlan(path string, sessionNumber uint64) error {
 		}
 	}
 
-	return writeContentPlanToFile(path, plan)
+	err = writeContentPlanToFile(path, plan)
+	if err != nil {
+		return fmt.Errorf("failed to write content plan to file: %v", err)
+	}
+
+	fmt.Printf("processed content plan for session %d\n", sessionNumber)
+	return nil
 }
 
 func readContentPlanFromFile(path string) (*machinepb.ContentTypeStatuses, error) {

@@ -99,7 +99,7 @@ def build_main_intro(
         splash, splash_shadow = build_splashtext(
             splash_text,
             splash_hue,
-            (660, 300) if portrait else (470, 515),
+            (660, 290) if portrait else (470, 515),
             duration)
         clips.append(splash_shadow)
         clips.append(splash)
