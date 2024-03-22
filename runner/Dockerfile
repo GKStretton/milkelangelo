@@ -5,6 +5,7 @@ RUN apt install -y python3 python3-setuptools python3-pip python3-venv
 RUN apt install -y libjpeg-dev zlib1g-dev
 RUN apt install -y imagemagick
 RUN apt install -y libgl1
+RUN apt install -y ffmpeg
 RUN sed -i '/<policy domain="path" rights="none" pattern="\@\*"/d' /etc/ImageMagick-6/policy.xml
 
 

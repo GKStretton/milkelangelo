@@ -53,7 +53,8 @@ constants:
 
   TOPIC_EMAIL_SEND: "asol/send-email"
 
-  TRIGGER_UPLOAD_FROM_LATEST_CONTENT_PLAN: "asol/upload-from-latest-content-plan"
+  # session id payload
+  TRIGGER_UPLOAD_FROM_CONTENT_PLAN: "asol/upload-from-content-plan"
 
   TOPIC_ACTOR_START: "asol/actor/start"
   TOPIC_ACTOR_STOP: "asol/actor/stop"

@@ -31,15 +31,17 @@ func getManager() *manager {
 func Start(sm *session.SessionManager) {
 	m := getManager()
 
-	mqtt.Subscribe(topics_backend.TRIGGER_UPLOAD_FROM_LATEST_CONTENT_PLAN, func(topic string, payload []byte) {
+	mqtt.Subscribe(topics_backend.TRIGGER_UPLOAD_FROM_CONTENT_PLAN, func(topic string, payload []byte) {
 		pl := string(payload)
 		sessionNum, err := strconv.Atoi(pl)
 		if err != nil {
 			fmt.Printf("failed to get sessionnumber from payload '%s'\n", pl)
+			return
 		}
 		err = m.processSession(uint64(sessionNum))
 		if err != nil {
 			fmt.Println(err)
+			return
 		}
 	})
 

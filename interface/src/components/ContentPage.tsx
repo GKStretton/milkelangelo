@@ -4,7 +4,7 @@ import StateReport from './StateReport';
 import { Button, Typography } from '@mui/material';
 import { createIncrementalCompilerHost } from 'typescript';
 import MqttContext from '../util/mqttContext';
-import { TOPIC_GENERATE_CONTENT, TOPIC_STILLS_GENERATED } from '../topics_backend/topics_backend';
+import { TOPIC_GENERATE_CONTENT, TOPIC_STILLS_GENERATED, TOPIC_TRIGGER_DSLR, TRIGGER_UPLOAD_FROM_CONTENT_PLAN } from '../topics_backend/topics_backend';
 
 function ContentPage() {
   const { client: c } = useContext(MqttContext);
@@ -110,6 +110,7 @@ function ContentPage() {
         {!imageSelected ? <div>Cannot generate because image has not been selected</div>: null}
         <Button variant="contained" color="warning" disabled={!connected || !imageSelected || generateRequested} onClick={()=>{generateContent()}}>Generate Content</Button>
         <div>{generateMessage}</div>
+        <Button variant="contained" color="warning" disabled={!connected} onClick={()=>{c?.publish(TRIGGER_UPLOAD_FROM_CONTENT_PLAN, String(sessionStatus?.id))}}>Trigger upload</Button>
         <br/>
         <br/>
         {imageSelected ?

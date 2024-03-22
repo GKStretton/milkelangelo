@@ -49,6 +49,6 @@
 #define TOPIC_TRIGGER_DSLR "asol/dslr-crop-capture"
 #define TOPIC_TRIGGER_DSLR_RESP "asol/dslr-crop-capture-resp"
 #define TOPIC_VIDEOS_GENERATED "asol/videos-generated"
-#define TRIGGER_UPLOAD_FROM_LATEST_CONTENT_PLAN "asol/upload-from-latest-content-plan"
+#define TRIGGER_UPLOAD_FROM_CONTENT_PLAN "asol/upload-from-content-plan"
 
 #endif // MQTT_CONSTANTS_H

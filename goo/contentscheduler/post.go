@@ -51,6 +51,15 @@ func getContentFilePaths(ct machinepb.ContentType, sessionNumber uint64) (string
 		}
 
 		return contentPath, thumbnailPath, nil
+	case machinepb.ContentType_CONTENT_TYPE_DSLR:
+		p := filesystem.GetPostVideosDir(sessionNumber)
+		basePath := filepath.Join(p, ct.String())
+		contentPath := findLatest(basePath, "mp4")
+		if contentPath == "" {
+			return "", "", fmt.Errorf("couldn't get contentPath for %d %s", sessionNumber, ct)
+		}
+
+		return contentPath, "", nil
 	case machinepb.ContentType_CONTENT_TYPE_STILL:
 		p, err := filesystem.GetPostStillFile(sessionNumber)
 		if err != nil {

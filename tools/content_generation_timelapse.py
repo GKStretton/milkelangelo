@@ -2,16 +2,17 @@ import subprocess
 import argparse
 import os
 import glob
+from pathlib import Path
 from moviepy.editor import *
 from videoediting.compositor_helpers import *
 import videoediting.loaders as loaders
+import machinepb.machine as pb
 
-CONTENT_TYPE = "DSLR_TIMELAPSE"
+CONTENT_TYPE = pb.ContentType.CONTENT_TYPE_DSLR.name
 FULL_DIMENSIONS = (1080, 1920)
 # dslr footage resize
 FOOTAGE_DIMENSIONS = (1080, 1080)
 INTERPOLATED_FPS = 60
-OUTRO_DURATION = 5
 
 
 def minterpolate(input_file, output_file):
@@ -29,10 +30,10 @@ def minterpolate(input_file, output_file):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--base-dir", action="store",
-                        help="base directory containing session_content and session_metadata", required=True)
+                        help="base directory containing session_content and session_metadata", default="/mnt/md0/light-stores")
     parser.add_argument("-n", "--session-number", action="store", help="session number e.g. 5", required=True)
     parser.add_argument("-f", "--fps", action="store", type=int,
-                        help="dslr frames per second in uninterpolated video, default is 10", default=10)
+                        help="dslr frames per second in uninterpolated video, default is 10", default=7)
 
     args = parser.parse_args()
     print(f"Launching auto_dslr_timelapse.py for session {args.session_number} in '{args.base_dir}'\n")
@@ -76,24 +77,11 @@ if __name__ == "__main__":
 
     # Run the FFmpeg command to apply the minterpolate filter
     input_file = raw_output_file
-    interp_output_file = os.path.join(output_dir, f"{CONTENT_TYPE}.{i}_interpolated{INTERPOLATED_FPS}.mp4")
+    interp_output_file = os.path.join(output_dir, f"{CONTENT_TYPE}.{i}.mp4")
 
     print(f"Running FFmpeg to interpolate {input_file}...")
     minterpolate(input_file, interp_output_file)
     print(f"Saved interpolated video to {interp_output_file}.")
 
-    # still concatenation
-    print("Concatenating still...")
-    interp_video = VideoFileClip(interp_output_file)
-
-    path = os.path.join(args.base_dir, "session_content", str(args.session_number), "stills")
-    outroClip = ImageClip(
-        img=os.path.join(path, f"OUTRO-PORTRAIT.jpg"),
-        duration=OUTRO_DURATION,
-    )
-    clip_with_outro = concatenate_videoclips([
-        interp_video.fadeout(0.2),
-        outroClip.fadein(0.5)
-    ])
-    outro_output = os.path.join(output_dir, f"{CONTENT_TYPE}.{i}.mp4")
-    clip_with_outro.write_videofile(outro_output, codec='libx264', fps=INTERPOLATED_FPS)
+    Path(f"{interp_output_file}.completed").touch()
+    print(f"wrote {interp_output_file}.completed file")
