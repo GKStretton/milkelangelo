@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/util/protoyaml"
 )
 
@@ -22,6 +23,10 @@ func (m *manager) processContentPlan(path string, sessionNumber uint64) error {
 	plan, err := readContentPlanFromFile(path)
 	if err != nil {
 		return fmt.Errorf("failed to get content plan from file: %v", err)
+	}
+
+	if postsStillToUpload(plan) == 0 {
+		return nil
 	}
 
 	for contentType, contentTypeStatus := range plan.ContentStatuses {
@@ -46,8 +51,34 @@ func (m *manager) processContentPlan(path string, sessionNumber uint64) error {
 		return fmt.Errorf("failed to write content plan to file: %v", err)
 	}
 
-	fmt.Printf("processed content plan for session %d\n", sessionNumber)
+	remaining := postsStillToUpload(plan)
+	if remaining == 0 {
+		err = email.SendEmail(&machinepb.Email{
+			Subject:   fmt.Sprintf("Uploads complete for session %d", sessionNumber),
+			Body:      "All posts have been uploaded",
+			Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS,
+		})
+		if err != nil {
+			fmt.Printf("failed to send email on all posts uploaded: %v\n", err)
+		}
+		fmt.Printf("All posts uploaded for session %d\n", sessionNumber)
+		return nil
+	}
+
+	fmt.Printf("partially processed content plan for session %d (%d posts still to upload)\n", sessionNumber, remaining)
 	return nil
+}
+
+func postsStillToUpload(plan *machinepb.ContentTypeStatuses) int {
+	c := 0
+	for _, contentTypeStatus := range plan.ContentStatuses {
+		for _, post := range contentTypeStatus.Posts {
+			if !post.Uploaded {
+				c++
+			}
+		}
+	}
+	return c
 }
 
 func readContentPlanFromFile(path string) (*machinepb.ContentTypeStatuses, error) {
