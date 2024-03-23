@@ -56,7 +56,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 		go func() {
 			err := RunSession(
 				&SessionDescriptor{
-					streamPreStartMinutes:  streamPreStartMinutes,
+					streamPreStartMinutes:  0,
 					actorDurationMinutes:   10,
 					sessionDurationMinutes: 50,
 					runActor:               true,
@@ -73,7 +73,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 		go func() {
 			err := RunSession(
 				&SessionDescriptor{
-					streamPreStartMinutes:  streamPreStartMinutes,
+					streamPreStartMinutes:  0,
 					actorDurationMinutes:   10,
 					sessionDurationMinutes: 50,
 					runActor:               false,
@@ -153,7 +153,7 @@ func runStartSequence(streamPreStartMinutes int, realSession bool) error {
 	if realSession {
 		mqtt.Publish(topics_backend.TOPIC_STREAM_START, "")
 	}
-	time.Sleep(time.Duration(streamPreStartMinutes) * time.Minute)
+	time.Sleep(time.Duration(streamPreStartMinutes)*time.Minute + time.Second*10)
 
 	// start time
 	sl.Println("starting session")
