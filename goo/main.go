@@ -17,16 +17,23 @@ import (
 	"github.com/gkstretton/dark/services/goo/scheduler"
 	"github.com/gkstretton/dark/services/goo/server"
 	"github.com/gkstretton/dark/services/goo/session"
+	"github.com/gkstretton/dark/services/goo/socialmedia"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
 var (
-	test = flag.Bool("test", false, "if true, just run test code")
+	test                      = flag.Bool("test", false, "if true, just run test code")
+	refreshYoutubeCredentials = flag.Bool("yt", false, "if true, refresh youtube credentials")
 )
 
 func main() {
 	flag.Parse()
+
+	if *refreshYoutubeCredentials {
+		socialmedia.RefreshYoutubeCreds()
+		return
+	}
 
 	if *test {
 		runAdHocTests()

@@ -19,17 +19,11 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
-const missingClientSecretsMessage = `
-Please configure OAuth 2.0
-`
-
 // getYoutubeClient uses a Context and Config to retrieve a Token
 // then generate a Client. It returns the generated Client.
 func getYoutubeClient(ctx context.Context, config *oauth2.Config) *http.Client {
-	cacheFile, err := youtubeTokenCacheFile()
-	if err != nil {
-		log.Fatalf("Unable to get path to cached credential file. %v", err)
-	}
+	cacheFile := youtubeTokenCacheFile()
+
 	tok, err := youtubeTokenFromFile(cacheFile)
 	if err != nil {
 		tok = getYoutubeTokenFromWeb(config)
@@ -59,8 +53,8 @@ func getYoutubeTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 
 // youtubeTokenCacheFile generates credential file path/filename.
 // It returns the generated credential path/filename.
-func youtubeTokenCacheFile() (string, error) {
-	return filepath.Join(filesystem.GetBasePath(), "kv", "youtube-credentials.json"), nil
+func youtubeTokenCacheFile() string {
+	return filepath.Join(filesystem.GetBasePath(), "kv", "youtube-credentials-cache.json")
 }
 
 // youtubeTokenFromFile retrieves a Token from a given file path.
@@ -199,7 +193,12 @@ func TestYoutubeClient() {
 		Description:       "api test desc",
 		ContentFilePath:   "/mnt/md0/light-stores/session_content/latest_production/video/post/CONTENT_TYPE_SHORTFORM-overlay.0.mp4",
 		ThumbnailFilePath: "",
+		Unlisted:          true,
 	})
 	fmt.Println(err)
 	fmt.Println(s)
+}
+
+func RefreshYoutubeCreds() {
+	newYoutubeManager()
 }

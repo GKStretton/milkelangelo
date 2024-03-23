@@ -11,6 +11,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
+	"github.com/gkstretton/dark/services/goo/socialmedia"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/types"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
@@ -18,7 +19,7 @@ import (
 
 // tests for human verification during development
 func runAdHocTests() {
-	testEmail()
+	socialmedia.TestYoutubeClient()
 }
 
 func testEmail() {
