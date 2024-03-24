@@ -110,7 +110,7 @@ def get_caption(ct: pb.ContentType) -> str:
 
 def append_title_hashtags(title: str, ct: pb.ContentType, platform: pb.SocialPlatform) -> str:
     max_length = 1000
-    if (ct == pb.ContentType.CONTENT_TYPE_SHORTFORM or ct == pb.ContentType.CONTENT_TYPE_CLEANING) and platform == pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE:
+    if (ct == pb.ContentType.CONTENT_TYPE_SHORTFORM or ct == pb.ContentType.CONTENT_TYPE_CLEANING or ct == pb.ContentType.CONTENT_TYPE_DSLR) and platform == pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE:
         max_length = YOUTUBE_SHORT_TITLE_MAX_LENGTH
 
     tags = get_hashtags_list(ct, platform)
