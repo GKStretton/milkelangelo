@@ -164,7 +164,8 @@ func (m *youtubeManager) Upload(req *UploadRequest) (string, error) {
 	}
 	if req.Unlisted {
 		upload.Status = &youtube.VideoStatus{
-			PrivacyStatus: "unlisted",
+			PrivacyStatus:           "unlisted",
+			SelfDeclaredMadeForKids: false,
 		}
 	}
 
