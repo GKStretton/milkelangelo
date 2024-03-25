@@ -184,7 +184,6 @@ void requestRinse() {
 
 void topicHandler(String topic, String payload)
 {
-	Logger::Debug("topic handler start");
 	if (topic == TOPIC_WAKE)
 	{
 		Sleep::Wake();

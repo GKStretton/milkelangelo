@@ -75,7 +75,7 @@ func (sm *SessionManager) SetCurrentSessionSeed(seed int64) error {
 		return fmt.Errorf("session not in progress")
 	}
 	latest.Seed = seed
-	latest, err = sm.s.updateSession(latest)
+	_, err = sm.s.updateSession(latest)
 	if err != nil {
 		return fmt.Errorf("failed to update session: %v", err)
 	}

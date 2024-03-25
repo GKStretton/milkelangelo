@@ -6,9 +6,17 @@ cd tools
 pwd
 source .venv/bin/activate
 
+echo "generating still..."
 python3 content_generation_still.py -n $1
 
+# echo "generating longform..."
 # python3 content_generation_video.py -y -n $1 -t CONTENT_TYPE_LONGFORM
+
+echo "generating shortform..."
 python3 content_generation_video.py -y -n $1 -t CONTENT_TYPE_SHORTFORM
+
+echo "generating cleaning..."
 python3 content_generation_video.py -y -n $1 -t CONTENT_TYPE_CLEANING
+
+echo "generating timelapse..."
 python3 content_generation_timelapse.py -n $1 -d /mnt/md0/light-stores
