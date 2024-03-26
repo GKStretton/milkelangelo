@@ -8,6 +8,7 @@
 #define TOPIC_DISPENSE_RESP "mega/resp/dispense"
 #define TOPIC_FLUID "mega/req/fluid"
 #define TOPIC_GOTO_NODE "mega/req/goto-node"
+#define TOPIC_GOTO_RING_IDLE_POS "mega/req/goto-ring-idle-pos"
 #define TOPIC_GOTO_XY "mega/req/goto-xy"
 #define TOPIC_GOTO_XY_RESP "mega/resp/goto-xy"
 #define TOPIC_LOGS_CRIT "mega/l/crit"

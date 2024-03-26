@@ -17,6 +17,7 @@ import {
   TOPIC_MAINTENANCE,
   TOPIC_DEBUG_DATA,
   IK_Z_LEVEL_MM,
+  TOPIC_GOTO_RING_IDLE_POS,
 } from "../topics_firmware/topics_firmware";
 import {
   TOPIC_ACTOR_START,
@@ -311,6 +312,15 @@ export default function ControlGroup() {
             aria-label="Z-Level"
             sx={{ margin: 2, width: "50%" }}
           />
+          <br/>
+          <Button
+            disabled={!isAwake}
+            onClick={() =>
+              c?.publish(TOPIC_GOTO_RING_IDLE_POS, "")
+            }
+          >
+            goto ring idle
+          </Button>
         </>
       )}
 

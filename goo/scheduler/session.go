@@ -127,6 +127,7 @@ func RunSession(
 			return err
 		}
 		sl.Println("actor success")
+		mqtt.Publish(topics_firmware.TOPIC_GOTO_RING_IDLE_POS, "")
 	} else {
 		sl.Println("ready for manual control...")
 	}
@@ -200,6 +201,8 @@ func runStartSequence(streamPreStartMinutes int, realSession bool) error {
 func runEndSequence() error {
 	ch := events.Subscribe()
 	defer events.Unsubscribe(ch)
+
+	mqtt.Publish(topics_firmware.TOPIC_GOTO_RING_IDLE_POS, "")
 
 	sl.Println("running end sequence")
 	sl.Println("draining milk")

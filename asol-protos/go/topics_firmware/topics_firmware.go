@@ -8,6 +8,7 @@ const (
 	TOPIC_DISPENSE_RESP string = "mega/resp/dispense"
 	TOPIC_FLUID string = "mega/req/fluid"
 	TOPIC_GOTO_NODE string = "mega/req/goto-node"
+	TOPIC_GOTO_RING_IDLE_POS string = "mega/req/goto-ring-idle-pos"
 	TOPIC_GOTO_XY string = "mega/req/goto-xy"
 	TOPIC_GOTO_XY_RESP string = "mega/resp/goto-xy"
 	TOPIC_LOGS_CRIT string = "mega/l/crit"

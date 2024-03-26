@@ -368,6 +368,9 @@ void topicHandler(String topic, String payload)
 		s.forceIdleLocation = false;
 		Navigation::SetGlobalNavigationTarget(&s, machine_Node_OUTER_HANDOVER);
 	}
+	else if (topic == TOPIC_GOTO_RING_IDLE_POS) {
+		s.target_ring = IDLE_RING_ANGLE;
+	}
 	else
 	{
 		Logger::Debug("no handler for " + topic + " (payload = " + payload + ")");

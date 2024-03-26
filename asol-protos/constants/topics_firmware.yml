@@ -22,6 +22,7 @@ constants:
   TOPIC_RINSE: "mega/req/rinse"
   TOPIC_MAINTENANCE: "mega/req/maintenance"
   TOPIC_DEBUG_DATA: "mega/req/debug-data"
+  TOPIC_GOTO_RING_IDLE_POS: "mega/req/goto-ring-idle-pos"
 
   TOPIC_STATE_REPORT_REQUEST: "mega/req/state-report"
   TOPIC_STATE_REPORT_RAW: "mega/state-report"

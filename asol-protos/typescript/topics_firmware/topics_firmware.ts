@@ -6,6 +6,7 @@ export const TOPIC_DISPENSE: string = "mega/req/dispense";
 export const TOPIC_DISPENSE_RESP: string = "mega/resp/dispense";
 export const TOPIC_FLUID: string = "mega/req/fluid";
 export const TOPIC_GOTO_NODE: string = "mega/req/goto-node";
+export const TOPIC_GOTO_RING_IDLE_POS: string = "mega/req/goto-ring-idle-pos";
 export const TOPIC_GOTO_XY: string = "mega/req/goto-xy";
 export const TOPIC_GOTO_XY_RESP: string = "mega/resp/goto-xy";
 export const TOPIC_LOGS_CRIT: string = "mega/l/crit";
