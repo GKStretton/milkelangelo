@@ -25,14 +25,6 @@ var mainSessionStartTime = RecurringTime{
 	second: 0,
 }
 
-// time the session will end UTC
-var mainSessionEndTime = RecurringTime{
-	day:    time.Sunday,
-	hour:   19,
-	minute: 30,
-	second: 0,
-}
-
 // defineSchedule works by launching go routines watching for the specified
 // time, to trigger the stated action.
 func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
@@ -76,8 +68,8 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 		function: func() {
 			mqtt.Publish(topics_backend.TOPIC_FRIDGE_SWITCH, topics_backend.PAYLOAD_SMART_SWITCH_OFF)
 		},
-		recurringTime: mainSessionEndTime,
-		hourOffset:    1, // an hour later (expect cleaning done by then.)
+		recurringTime: mainSessionStartTime,
+		hourOffset:    2, // 2 hours after session start (expect cleaning done by then.)
 		minuteOffset:  0,
 	})
 }

@@ -131,7 +131,7 @@ func RunSession(
 		sl.Println("ready for manual control...")
 	}
 
-	endTime := beginTime.Add(time.Duration(d.sessionDurationMinutes) * time.Minute)
+	endTime := beginTime.Add(time.Duration(d.sessionDurationMinutes+d.streamPreStartMinutes) * time.Minute)
 
 	waitForTOffset(endTime, -3, 0)
 
@@ -248,12 +248,14 @@ func runEndSequence() error {
 
 	waitForSleeping(ch)
 
+	time.Sleep(2 * time.Second)
+
 	sl.Println("ending session")
 	mqtt.Publish(topics_backend.TOPIC_SESSION_END, "")
 
-	time.Sleep(30 * time.Second)
+	time.Sleep(2 * time.Minute)
 
-	sl.Println("ending stream + sending emails")
+	sl.Println("ending stream")
 	mqtt.Publish(topics_backend.TOPIC_STREAM_END, "")
 
 	sl.Println("end sequence done")
