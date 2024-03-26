@@ -4,6 +4,7 @@ import MqttContext from '../util/mqttContext';
 import { TOPIC_FLUID, TOPIC_MAINTENANCE, TOPIC_RINSE, TOPIC_SHUTDOWN, TOPIC_WAKE } from '../topics_firmware/topics_firmware';
 import { FluidType } from '../machinepb/machine';
 import { Button, Typography } from '@mui/material';
+import Profiles from './Profiles';
 
 function CleaningPage() {
   const { client: c } = useContext(MqttContext);
@@ -12,6 +13,7 @@ function CleaningPage() {
       <br/>
       <Typography variant="h5">Cleaning Page</Typography>
       <ol>
+        <li><input type="checkbox"/>Fill a jug with 650ml of cleaning solution (currently just water)</li>
         <li><input type="checkbox"/>
           <Button variant="contained" onClick={() => {
             c?.publish(TOPIC_WAKE, "")
@@ -20,8 +22,7 @@ function CleaningPage() {
             }, 5000)
           }}>Turn on for maintenance</Button>
         </li>
-        <li><input type="checkbox"/>Fill altar with 250ml cleaning solution</li>
-        <li><input type="checkbox"/>Fill water bucket with 300ml cleaning solution</li>
+        <li><input type="checkbox"/>Fill altar with 250ml cleaning solution. Leave fridge door open.</li>
         <li><input type="checkbox"/>
           <Button variant="contained" onClick={() => {
             c?.publish(TOPIC_FLUID, `${FluidType.FLUID_MILK},200,false`)
@@ -39,10 +40,11 @@ function CleaningPage() {
             c?.publish(TOPIC_MAINTENANCE, "")
           }}>Free glass</Button>
         </li>
-        <li><input type="checkbox"/>Change the rinse glass water</li>
-        <li><input type="checkbox"/>Ensure vials are topped up with correct fluids</li>
+        <li><input type="checkbox"/>Empty the rinse glass water into the waste bucket, and refill with ~100ml of cleaning solution</li>
+        <li><input type="checkbox"/>Fill top water bucket with the rest, ~300ml cleaning solution</li>
+        <li><input type="checkbox"/>Ensure vials are topped up with the correct fluids. See "profiles" section below for information.</li>
         <li><input type="checkbox"/>Wait for cycle to complete (bowl to drain)</li>
-        <li><input type="checkbox"/>Wipe bowl clean.{' '}
+        <li><input type="checkbox"/>Wipe bowl clean. Careful to not rotate bowl. {' '}
           <Button variant="contained" onClick={() => {
             c?.publish(TOPIC_RINSE, "")
           }}>Rinse</Button>
@@ -62,6 +64,11 @@ function CleaningPage() {
       <Button variant="outlined" color="warning" onClick={() => {
         c?.publish(TOPIC_FLUID, `${FluidType.FLUID_DRAIN},50,false`)
       }}>Drain bowl more</Button>
+      <hr/>
+      <br/>
+      <Typography variant="h5">Vial locations from RIGHT to LEFT are 2, 3, 4, 5, 6, vials have an id, mapped to the location</Typography>
+      <br/>
+      <Profiles/>
     </div>
   )
 }
