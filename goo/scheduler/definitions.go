@@ -77,7 +77,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 			mqtt.Publish(topics_backend.TOPIC_FRIDGE_SWITCH, topics_backend.PAYLOAD_SMART_SWITCH_OFF)
 		},
 		recurringTime: mainSessionEndTime,
-		hourOffset:    17, // around midday the next day (expect cleaning done by then.)
-		minuteOffset:  1,
+		hourOffset:    1, // an hour later (expect cleaning done by then.)
+		minuteOffset:  0,
 	})
 }
