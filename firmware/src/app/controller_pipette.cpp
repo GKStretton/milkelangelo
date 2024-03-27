@@ -2,6 +2,7 @@
 #include "../app/navigation.h"
 #include "../calibration.h"
 #include "../middleware/logger.h"
+#include "../common/ik_algorithm.h"
 
 Status Controller::evaluatePipetteCollection(State *s) {
 	// We have a request, time to collect dye!
@@ -55,7 +56,7 @@ Status Controller::evaluatePipetteDispense(State *s) {
 
 	if (s->requestDispenseZAdjustment) {
 		// go down to place drop on surface
-		s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z + DISPENSE_Z_OFFSET));
+		s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z + DISPENSE_Z_OFFSET + calculateZCalibrationOffset(s->target_yaw, s->target_ring)));
 		if (!s->zStepper.AtTarget()) {
 			return RUNNING;
 		}

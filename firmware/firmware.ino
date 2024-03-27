@@ -405,12 +405,12 @@ void dataUpdate()
 	// SerialMQTT::Publish("mega/d/PP_POS", String(s.pipetteStepper.currentPosition()));
 
 	// stepper units
-	// SerialMQTT::Publish("mega/d/R_UNIT", String(s.ringStepper.PositionToUnit(s.ringStepper.currentPosition())));
-	// SerialMQTT::Publish("mega/d/Z_UNIT", String(s.zStepper.PositionToUnit(s.zStepper.currentPosition())));
+	SerialMQTT::Publish("mega/d/R_UNIT", String(s.ringStepper.PositionToUnit(s.ringStepper.currentPosition())));
+	SerialMQTT::Publish("mega/d/Z_UNIT", String(s.zStepper.PositionToUnit(s.zStepper.currentPosition())));
 	// SerialMQTT::Publish("mega/d/Z_LAST", String(s.zStepper.GetPositionWasSetLast()));
-	// SerialMQTT::Publish("mega/d/Y_UNIT", String(s.yawStepper.PositionToUnit(s.yawStepper.currentPosition())));
+	SerialMQTT::Publish("mega/d/Y_UNIT", String(s.yawStepper.PositionToUnit(s.yawStepper.currentPosition())));
 	// SerialMQTT::Publish("mega/d/Y_LAST", String(s.yawStepper.GetPositionWasSetLast()));
-	// SerialMQTT::Publish("mega/d/P_UNIT", String(s.pitchStepper.PositionToUnit(s.pitchStepper.currentPosition())));
+	SerialMQTT::Publish("mega/d/P_UNIT", String(s.pitchStepper.PositionToUnit(s.pitchStepper.currentPosition())));
 	// SerialMQTT::Publish("mega/d/P_LAST", String(s.pipetteStepper.GetPositionWasSetLast()));
 	// SerialMQTT::Publish("mega/d/PP_UNIT", String(s.pipetteStepper.PositionToUnit(s.pipetteStepper.currentPosition())));
 

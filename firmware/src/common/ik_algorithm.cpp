@@ -99,3 +99,9 @@ int getRingAndYawFromXY(float x, float y, float lastRing, float *ring, float *ya
 	// return no error
 	return 0;
 }
+
+float calculateZCalibrationOffset(float yaw, float ring) {
+	float yawZOffset = yaw * IK_Z_CALIB_YAW_MM_PER_DEG;
+
+	return yawZOffset;
+}

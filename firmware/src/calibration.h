@@ -67,3 +67,7 @@
 
 #define MAINTENANCE_RING_ANGLE 110
 #define IDLE_RING_ANGLE 16
+
+// Finer calibration for IK movements. See Z variance calibration google sheet.
+// z mm offset per yaw degree. 
+#define IK_Z_CALIB_YAW_MM_PER_DEG 0.08111f
