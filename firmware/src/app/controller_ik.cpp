@@ -15,12 +15,7 @@ Status Controller::evaluateIK(State *s) {
 		return FAILURE;
 	}
 
-	// ensure correct z level before setting others. This ensures the dispense drop down
-	// is undone before moving to prevent smearing.
 	s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z + calculateZCalibrationOffset(s->target_yaw, s->target_ring)));
-	if (!s->zStepper.AtTarget()) {
-		return RUNNING;
-	}
 
 	s->pitchStepper.moveTo(s->pitchStepper.UnitToPosition(CENTRE_PITCH));
 

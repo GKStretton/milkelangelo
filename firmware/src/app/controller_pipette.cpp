@@ -64,7 +64,11 @@ Status Controller::evaluatePipetteDispense(State *s) {
 
 	s->requestDispenseZAdjustment = false;
 
-	// don't need to go up, ik evaluation will handle that
+	// go back up
+	s->zStepper.moveTo(s->zStepper.UnitToPosition(s->ik_target_z + calculateZCalibrationOffset(s->target_yaw, s->target_ring)));
+	if (!s->zStepper.AtTarget()) {
+		return RUNNING;
+	}
 	
 	// mark as spent if at target of 0
 	if (s->pipetteState.ulVolumeHeldTarget <= 0 && !s->pipetteState.spent) {
