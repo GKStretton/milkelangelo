@@ -53,20 +53,32 @@ func (m *manager) processContentPlan(path string, sessionNumber uint64) error {
 
 	remaining := postsStillToUpload(plan)
 	if remaining == 0 {
-		err = email.SendEmail(&machinepb.Email{
-			Subject:   fmt.Sprintf("Uploads complete for session %d", sessionNumber),
-			Body:      "All posts have been uploaded",
-			Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS,
-		})
-		if err != nil {
-			fmt.Printf("failed to send email on all posts uploaded: %v\n", err)
-		}
+		sendUploadsCompleteEmail(plan, sessionNumber)
 		fmt.Printf("All posts uploaded for session %d\n", sessionNumber)
 		return nil
 	}
 
 	fmt.Printf("partially processed content plan for session %d (%d posts still to upload)\n", sessionNumber, remaining)
 	return nil
+}
+func sendUploadsCompleteEmail(plan *machinepb.ContentTypeStatuses, sessionNumber uint64) {
+	body := "All posts have been uploaded.\n\n"
+	for contentType, contentTypeStatus := range plan.ContentStatuses {
+		for _, post := range contentTypeStatus.Posts {
+			if post.Uploaded {
+				body += fmt.Sprintf("%s post uploaded to %s: %s\n", contentType, post.Platform, post.Url)
+			}
+		}
+	}
+
+	err := email.SendEmail(&machinepb.Email{
+		Subject:   fmt.Sprintf("Uploads complete for session %d", sessionNumber),
+		Body:      body,
+		Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_SOCIAL_NOTIFICATIONS,
+	})
+	if err != nil {
+		fmt.Printf("failed to send email on all posts uploaded: %v\n", err)
+	}
 }
 
 func postsStillToUpload(plan *machinepb.ContentTypeStatuses) int {
