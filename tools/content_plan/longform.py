@@ -13,13 +13,13 @@ def buildLongform(n_str: str) -> pb.ContentTypeStatus:
     )
 
     # disabling until it's been shortened
-    # platform = pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE
-    # s.posts.append(pb.Post(
-    #     platform=platform,
-    #     title=f"{n_str} - {s.raw_title} - Robotic Art Generation Long Cut",
-    #     description=f"{s.raw_description}\n\n{get_hashtags(ct, platform)}\n\n{get_common_text(ct, platform)}",
-    #     crosspost=False,
-    #     scheduled_unix_timetamp=get_schedule_timestamp(ct),
-    # ))
+    platform = pb.SocialPlatform.SOCIAL_PLATFORM_YOUTUBE
+    s.posts.append(pb.Post(
+        platform=platform,
+        title=f"{n_str} - {s.raw_title} - Robotic Art Generation Long Cut",
+        description=f"{s.raw_description}\n\n{get_hashtags(ct, platform)}\n\n{get_common_text(ct, platform)}",
+        crosspost=False,
+        scheduled_unix_timetamp=get_schedule_timestamp(ct),
+    ))
 
     return s

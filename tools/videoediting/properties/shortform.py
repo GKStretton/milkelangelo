@@ -30,8 +30,9 @@ class ShortFormPropertyManager(BasePropertyManager):
         state_report: pb.StateReport,
         dm_wrapper: DispenseMetadataWrapper,
         misc_data: MiscData,
-        profile_snapshot: pb.SystemVialConfigurationSnapshot
-    ) -> [SectionProperties, float, float]:
+        profile_snapshot: pb.SystemVialConfigurationSnapshot,
+        seconds_into_session: float,
+    ) -> typing.Tuple[SectionProperties, float, float]:
         props, delay, min_duration = current
         if props.skip:
             return props, delay, min_duration
@@ -48,14 +49,20 @@ class ShortFormPropertyManager(BasePropertyManager):
             props.skip = True
             return props, delay, min_duration
         elif state_report.status == pb.Status.WAITING_FOR_DISPENSE:
-            props.speed = 15
-        elif state_report.pipette_state.dispense_request_number < 1:
-            # initial collection and movement is slower
             props.speed = 10
+        elif state_report.pipette_state.dispense_request_number < 2:
+            # initial collection and movement is slower
+            props.speed = 7
         elif state_report.status == pb.Status.NAVIGATING_IK:
-            props.speed = 15
+            props.speed = 10
         elif state_report.status == pb.Status.IDLE_STATIONARY:
-            props.speed = 100
+            base_speed = 50
+            cutoff_minutes = 10
+            m = seconds_into_session / 60
+            if m <= cutoff_minutes:
+                props.speed = base_speed
+            else:
+                props.speed = cutoff_minutes + (m - cutoff_minutes) * 10
         else:
             props.speed = 50
 

@@ -71,3 +71,6 @@ constants:
   KV_KEY_ALL_VIAL_PROFILES: "vial-profiles"
   # (SystemVialConfiguration)
   KV_KEY_SYSTEM_VIAL_PROFILES: "system-vial-profiles"
+
+  KV_SCHEDULED_SESSION_FLAG_SKIP: "scheduled-session-flag-skip"
+  KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR: "scheduled-session-flag-disable-actor"

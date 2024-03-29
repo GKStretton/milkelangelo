@@ -11,8 +11,7 @@ class LongFormPropertyManager(BasePropertyManager):
         return False
 
     def get_max_content_duration(self) -> typing.Optional[float]:
-        return None
-        # return 20*60.0
+        return 5*60.0
 
     def get_stills_config(self) -> StillsConfig:
         return StillsConfig(
@@ -30,14 +29,38 @@ class LongFormPropertyManager(BasePropertyManager):
         state_report: pb.StateReport,
         dm_wrapper: DispenseMetadataWrapper,
         misc_data: MiscData,
-        profile_snapshot: pb.SystemVialConfigurationSnapshot
+        profile_snapshot: pb.SystemVialConfigurationSnapshot,
+        seconds_into_session: float,
     ) -> typing.Tuple[SectionProperties, float, float]:
         props, delay, min_duration = current
         if props.skip:
             return props, delay, min_duration
-
+        
         if state_report.status == pb.Status.WAKING_UP:
             delay += 1
+        
+        if not state_report.fluid_request.complete:
+            props.speed = 2
+        elif state_report.pipette_state.dispense_request_number < 1:
+            # initial collection and movement is slower
+            props.speed = 1
+        elif state_report.status == pb.Status.WAITING_FOR_DISPENSE:
+            props.speed = 2
+        elif state_report.status == pb.Status.NAVIGATING_IK:
+            props.speed = 2
+        elif state_report.status == pb.Status.IDLE_STATIONARY:
+            base_speed = 20
+            cutoff_minutes = 10
+            m = seconds_into_session / 60
+            if m <= cutoff_minutes:
+                props.speed = base_speed
+            else:
+                props.speed = cutoff_minutes + (m - cutoff_minutes) * 4
+        elif state_report.status == pb.Status.IDLE_MOVING:
+            props.speed = 5
+        else:
+            props.speed = 5
+
 
         # DISPENSE
         if state_report.status == pb.Status.DISPENSING:
@@ -51,6 +74,7 @@ class LongFormPropertyManager(BasePropertyManager):
             # we use min_duration to prevent early speedup when system goes idle
             vial_profile = profile_snapshot.profiles.get(str(state_report.pipette_state.vial_held))
             if vial_profile and not vial_profile.footage_ignore:
+                props.speed = 1
                 min_duration = vial_profile.footage_min_duration_ms / 1000.0
 
             # per-dispense min_duration override
@@ -60,17 +84,5 @@ class LongFormPropertyManager(BasePropertyManager):
 
             # Basically forces speed 1 for at least 30 seconds after the latest dispense
             min_duration = min(20, min_duration)
-
-        if state_report.status == pb.Status.WAITING_FOR_DISPENSE:
-            # we shouldn't be waiting for dispense. In future could add a timeout
-            # that forces dispense after being still a certain time. liquid should
-            # be "hot" in this way. also, speed 1 adds to the suspense.
-            props.speed = 1
-
-        if (
-                state_report.status == pb.Status.IDLE_STATIONARY and
-                state_report.fluid_request.complete
-        ):
-            props.speed = 20
 
         return props, delay, min_duration

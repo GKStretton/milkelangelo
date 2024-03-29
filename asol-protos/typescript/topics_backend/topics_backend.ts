@@ -1,6 +1,8 @@
 
 export const KV_KEY_ALL_VIAL_PROFILES: string = "vial-profiles";
 export const KV_KEY_SYSTEM_VIAL_PROFILES: string = "system-vial-profiles";
+export const KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR: string = "scheduled-session-flag-disable-actor";
+export const KV_SCHEDULED_SESSION_FLAG_SKIP: string = "scheduled-session-flag-skip";
 export const PAYLOAD_SMART_SWITCH_OFF: string = "OFF";
 export const PAYLOAD_SMART_SWITCH_ON: string = "ON";
 export const TOPIC_ACTOR_START: string = "asol/actor/start";

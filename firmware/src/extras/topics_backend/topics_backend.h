@@ -3,6 +3,8 @@
 
 #define KV_KEY_ALL_VIAL_PROFILES "vial-profiles"
 #define KV_KEY_SYSTEM_VIAL_PROFILES "system-vial-profiles"
+#define KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR "scheduled-session-flag-disable-actor"
+#define KV_SCHEDULED_SESSION_FLAG_SKIP "scheduled-session-flag-skip"
 #define PAYLOAD_SMART_SWITCH_OFF "OFF"
 #define PAYLOAD_SMART_SWITCH_ON "ON"
 #define TOPIC_ACTOR_START "asol/actor/start"

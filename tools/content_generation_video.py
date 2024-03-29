@@ -148,7 +148,7 @@ def run():
     state_reports = loaders.get_state_reports(base_dir, session_number)
     dispense_metadata_wrapper = DispenseMetadataWrapper(
         base_dir, session_number)
-    misc_data = loaders.get_misc_data(base_dir, session_number)
+    misc_data = loaders.get_misc_data(base_dir, session_number, state_reports)
     content_plan = loaders.get_content_plan(base_dir, session_number)
     profile_snapshot = loaders.get_profile_snapshot(base_dir, session_number)
 

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/topics_backend"
+	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
@@ -45,12 +46,19 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 		name:    "RUN_SESSION",
 		enabled: true,
 		function: func() {
+			s := processOneTimeSettings()
+
+			if s.skip {
+				fmt.Println("one time settings skip flag set, skipping session!")
+				return
+			}
+
 			err := RunSession(
 				&SessionDescriptor{
 					streamPreStartMinutes:  streamPreStartMinutes,
 					actorDurationMinutes:   10,
 					sessionDurationMinutes: 50,
-					runActor:               true,
+					runActor:               !s.disableActor,
 				},
 				sm, twitchApi,
 			)
@@ -72,4 +80,24 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 		hourOffset:    2, // 2 hours after session start (expect cleaning done by then.)
 		minuteOffset:  0,
 	})
+}
+
+type oneTimeSettings struct {
+	skip         bool
+	disableActor bool
+}
+
+// processOneTimeSettings checks for one time settings and returns them, resetting
+// the flags to false afterwards.
+func processOneTimeSettings() *oneTimeSettings {
+	skip := keyvalue.GetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_SKIP)
+	keyvalue.SetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_SKIP, false)
+
+	disableActor := keyvalue.GetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR)
+	keyvalue.SetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR, false)
+
+	return &oneTimeSettings{
+		skip:         skip,
+		disableActor: disableActor,
+	}
 }

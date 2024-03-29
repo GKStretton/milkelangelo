@@ -2,6 +2,8 @@ from typing import Literal
 
 KV_KEY_ALL_VIAL_PROFILES: Literal["vial-profiles"] = "vial-profiles"
 KV_KEY_SYSTEM_VIAL_PROFILES: Literal["system-vial-profiles"] = "system-vial-profiles"
+KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR: Literal["scheduled-session-flag-disable-actor"] = "scheduled-session-flag-disable-actor"
+KV_SCHEDULED_SESSION_FLAG_SKIP: Literal["scheduled-session-flag-skip"] = "scheduled-session-flag-skip"
 PAYLOAD_SMART_SWITCH_OFF: Literal["OFF"] = "OFF"
 PAYLOAD_SMART_SWITCH_ON: Literal["ON"] = "ON"
 TOPIC_ACTOR_START: Literal["asol/actor/start"] = "asol/actor/start"

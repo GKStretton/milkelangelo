@@ -7,8 +7,8 @@ cd ../tools
 echo "Bash: generating still..."
 python3 content_generation_still.py -n $1
 
-# echo "Bash: generating longform..."
-# python3 content_generation_video.py -y -n $1 -t CONTENT_TYPE_LONGFORM
+echo "Bash: generating longform..."
+python3 content_generation_video.py -y -n $1 -t CONTENT_TYPE_LONGFORM
 
 echo "Bash: generating shortform..."
 python3 content_generation_video.py -y -n $1 -t CONTENT_TYPE_SHORTFORM

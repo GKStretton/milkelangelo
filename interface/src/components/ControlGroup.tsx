@@ -20,6 +20,8 @@ import {
   TOPIC_GOTO_RING_IDLE_POS,
 } from "../topics_firmware/topics_firmware";
 import {
+  KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR,
+  KV_SCHEDULED_SESSION_FLAG_SKIP,
   TOPIC_ACTOR_START,
   TOPIC_ACTOR_STATUS_GET,
   TOPIC_ACTOR_STATUS_RESP,
@@ -54,6 +56,7 @@ import { useBoolTopic, useSessionStatus, useStateReport, useStreamStatus } from 
 import CollectDispense from "./CollectDispense";
 import Profiles from "./Profiles";
 import { useError } from "./ErrorManager";
+import KVBool from "../util/KVBool";
 
 export default function ControlGroup() {
   const error = useError();
@@ -515,21 +518,10 @@ export default function ControlGroup() {
 
       {tabValue === 3 && (
         <>
-          <Typography variant="h4"> after session </Typography>
-          <code>cd ~/asol/software/asol-backend</code>
-          <ol>
-            <li>choose image</li>
-            <code>./scripts/interactive/feh-dslr-selection-utility $session</code>
-            <li>generate content plan</li>
-            <code>./scripts/generation/generate-content-plan $session</code>
-            <li>generate content</li>
-            <code>./scripts/generation/generate-content $session</code>
-            <li>publish</li>
-            <code>./scripts/interactive/publish-session $session</code>
-          </ol>
-          <Typography variant="h4"> video generation modifications </Typography>
-          <Typography> If changes to the pipeline required: </Typography>
-
+          <Typography variant="h4"> one-time auto-session config </Typography>
+          <Typography variant="body1"> Note this is only for the weekly scheduled sessions </Typography>
+          <KVBool desc={"skip next session?"} kv_name={KV_SCHEDULED_SESSION_FLAG_SKIP}/>
+          <KVBool desc={"skip next actor run?"} kv_name={KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR}/>
         </>
       )}
 

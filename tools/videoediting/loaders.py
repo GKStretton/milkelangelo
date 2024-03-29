@@ -80,11 +80,13 @@ def get_selected_dslr_image_number(base_dir: str, session_number: int) -> int:
 class MiscData:
     """Miscellaneous data to be passed to the pipeline"""
     selected_dslr_number: int = 0
+    start_timestamp_s: int = 0
 
 
-def get_misc_data(base_dir: str, session_number: int) -> MiscData:
+def get_misc_data(base_dir: str, session_number: int, state_reports: typing.Tuple[float, pb.StateReport]) -> MiscData:
     return MiscData(
-        selected_dslr_number=get_selected_dslr_image_number(base_dir, session_number)
+        selected_dslr_number=get_selected_dslr_image_number(base_dir, session_number),
+        start_timestamp_s=state_reports[0][0]
     )
 
 

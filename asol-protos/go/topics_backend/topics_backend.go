@@ -3,6 +3,8 @@ package topics_backend
 const (
 	KV_KEY_ALL_VIAL_PROFILES string = "vial-profiles"
 	KV_KEY_SYSTEM_VIAL_PROFILES string = "system-vial-profiles"
+	KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR string = "scheduled-session-flag-disable-actor"
+	KV_SCHEDULED_SESSION_FLAG_SKIP string = "scheduled-session-flag-skip"
 	PAYLOAD_SMART_SWITCH_OFF string = "OFF"
 	PAYLOAD_SMART_SWITCH_ON string = "ON"
 	TOPIC_ACTOR_START string = "asol/actor/start"

@@ -89,6 +89,10 @@ class BasePropertyManager(ABC):
     ) -> typing.Tuple[SectionProperties, float, float]:
         self._update_state_pre(video_state, state_report)
 
+
+        ts_s = state_report.timestamp_unix_micros / 1.0e6
+        seconds_since_session_start = ts_s - misc_data.start_timestamp_s
+
         props, delay, min_duration = self._common_get_section_properties(video_state, state_report)
         props, delay, min_duration = self._get_specific_section_properties(
             (props, delay, min_duration),
@@ -96,7 +100,8 @@ class BasePropertyManager(ABC):
             state_report,
             dm_wrapper,
             misc_data,
-            profile_snapshot
+            profile_snapshot,
+            seconds_since_session_start,
         )
 
         self._update_state_post(video_state, state_report)

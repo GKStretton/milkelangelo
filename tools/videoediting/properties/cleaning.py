@@ -23,8 +23,9 @@ class CleaningPropertyManager(BasePropertyManager):
         state_report: pb.StateReport,
         dm_wrapper: DispenseMetadataWrapper,
         misc_data: MiscData,
-        profile_snapshot: pb.SystemVialConfigurationSnapshot
-    ) -> [SectionProperties, float, float]:
+        profile_snapshot: pb.SystemVialConfigurationSnapshot,
+        seconds_into_session: float,
+    ) -> typing.Tuple[SectionProperties, float, float]:
         props, delay, min_duration = current
         if props.skip:
             return props, delay, min_duration
