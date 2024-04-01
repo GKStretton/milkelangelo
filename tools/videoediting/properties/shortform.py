@@ -75,9 +75,11 @@ class ShortFormPropertyManager(BasePropertyManager):
 
             vial_profile = profile_snapshot.profiles.get(str(state_report.pipette_state.vial_held))
             if vial_profile and not vial_profile.footage_ignore:
-                min_duration = vial_profile.footage_min_duration_ms / 1000.0
                 delay += vial_profile.footage_delay_ms / 1000.0
-                props.speed = vial_profile.footage_speed_mult
+                if vial_profile.footage_min_duration_ms > 0:
+                    min_duration = vial_profile.footage_min_duration_ms / 1000.0
+                if vial_profile.footage_speed_mult > 0:
+                    props.speed = vial_profile.footage_speed_mult
 
             # per-dispense overrides
             if dispense_metadata:
@@ -91,4 +93,6 @@ class ShortFormPropertyManager(BasePropertyManager):
                 props.speed = 3
                 min_duration = 3
 
+        if props.speed == 0:
+            print("YES")
         return props, delay, min_duration

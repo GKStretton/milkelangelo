@@ -76,13 +76,15 @@ class LongFormPropertyManager(BasePropertyManager):
             if vial_profile and not vial_profile.footage_ignore:
                 props.speed = 1
                 min_duration = vial_profile.footage_min_duration_ms / 1000.0
+            else:
+                props.speed = 2
 
             # per-dispense min_duration override
             if dispense_metadata:
                 if dispense_metadata.min_duration_override_ms != 0:
                     min_duration = dispense_metadata.min_duration_override_ms / 1000.0
 
-            # Basically forces speed 1 for at least 30 seconds after the latest dispense
-            min_duration = min(20, min_duration)
+            # Basically forces the speed for at least 3 seconds after the latest dispense
+            min_duration = max(10, min_duration)
 
         return props, delay, min_duration

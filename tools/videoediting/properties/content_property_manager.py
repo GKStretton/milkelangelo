@@ -93,9 +93,9 @@ class BasePropertyManager(ABC):
         ts_s = state_report.timestamp_unix_micros / 1.0e6
         seconds_since_session_start = ts_s - misc_data.start_timestamp_s
 
-        props, delay, min_duration = self._common_get_section_properties(video_state, state_report)
+        cprops, cdelay, cmin_duration = self._common_get_section_properties(video_state, state_report)
         props, delay, min_duration = self._get_specific_section_properties(
-            (props, delay, min_duration),
+            (cprops, cdelay, cmin_duration),
             video_state,
             state_report,
             dm_wrapper,
@@ -103,6 +103,8 @@ class BasePropertyManager(ABC):
             profile_snapshot,
             seconds_since_session_start,
         )
+        if props.speed == 0:
+            print(ts_s, "PROPS SPEED IS 0")
 
         self._update_state_post(video_state, state_report)
 
