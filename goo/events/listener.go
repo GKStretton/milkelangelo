@@ -37,7 +37,7 @@ func Start(sm *session.SessionManager) {
 		}
 		sr.TimestampUnixMicros = uint64(t)
 		sr.TimestampReadable = time.UnixMicro(t).
-			Format("2006-03-02 15:04:05.000000")
+			Format("2006-01-02 15:04:05.000000")
 
 		session, _ := sm.GetLatestSession()
 		if session != nil {
