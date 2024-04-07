@@ -181,8 +181,33 @@ func (m *youtubeManager) Upload(req *UploadRequest) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("Youtube upload successful! Video ID: %v\n", resp.Id)
+	fmt.Printf("Youtube upload successful! Video ID: %s\n", resp.Id)
+
+	if req.ThumbnailFilePath != "" {
+		err = m.setThumbnail(resp.Id, req.ThumbnailFilePath)
+		if err != nil {
+			fmt.Printf("error setting thumbnail: %v\n", err)
+		}
+	}
+
 	return "https://youtube.com/watch?v=" + resp.Id, nil
+}
+
+func (m *youtubeManager) setThumbnail(videoId string, thumbnailPath string) error {
+	tnCall := m.s.Thumbnails.Set(videoId)
+
+	tn, err := os.Open(thumbnailPath)
+	if err != nil {
+		return fmt.Errorf("error opening thumbnail %s: %v", thumbnailPath, err)
+	}
+	defer tn.Close()
+
+	_, err = tnCall.Media(tn).Do()
+	if err != nil {
+		return fmt.Errorf("error setting thumbnail: %v", err)
+	}
+	fmt.Printf("Thumbnail set for video ID: %s\n", videoId)
+	return nil
 }
 
 func TestYoutubeClient() {
