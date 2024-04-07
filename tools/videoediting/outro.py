@@ -174,8 +174,14 @@ def build_outro(
 
     # SOCIAL ICONS
     SI_BASEPATH = "../resources/social_icons"
-    SI_PATHS = [f"{SI_BASEPATH}/youtube.png", f"{SI_BASEPATH}/tiktok.png",
-                f"{SI_BASEPATH}/instagram.png", f"{SI_BASEPATH}/twitter.png"]
+    SI_PATHS = [
+        f"{SI_BASEPATH}/empty.png",
+        f"{SI_BASEPATH}/youtube.png",
+        # f"{SI_BASEPATH}/tiktok.png",
+        f"{SI_BASEPATH}/instagram.png",
+        # f"{SI_BASEPATH}/twitter.png",
+        f"{SI_BASEPATH}/empty.png",
+    ]
 
     for i, p in enumerate(SI_PATHS):
         clips.append(

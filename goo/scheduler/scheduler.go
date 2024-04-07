@@ -18,7 +18,7 @@ type RecurringTime struct {
 
 // fmtLocal gets just the hh:mm in local time
 func (r RecurringTime) fmtLocal() string {
-	now := time.Now()
+	now := time.Now().UTC()
 	d := time.Date(
 		now.Year(),
 		now.Month(),
@@ -28,7 +28,7 @@ func (r RecurringTime) fmtLocal() string {
 		mainSessionStartTime.second,
 		0,
 		now.Location(),
-	)
+	).Local()
 	return fmt.Sprintf("%d:%d", d.Hour(), d.Minute())
 }
 

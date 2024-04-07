@@ -11,7 +11,7 @@ class LongFormPropertyManager(BasePropertyManager):
         return False
 
     def get_max_content_duration(self) -> typing.Optional[float]:
-        return 5*60.0
+        return 4*60.0
 
     def get_stills_config(self) -> StillsConfig:
         return StillsConfig(
@@ -41,11 +41,8 @@ class LongFormPropertyManager(BasePropertyManager):
         
         if not state_report.fluid_request.complete:
             props.speed = 2
-        elif state_report.pipette_state.dispense_request_number < 1:
-            # initial collection and movement is slower
-            props.speed = 1
         elif state_report.status == pb.Status.WAITING_FOR_DISPENSE:
-            props.speed = 2
+            props.speed = 5
         elif state_report.status == pb.Status.NAVIGATING_IK:
             props.speed = 2
         elif state_report.status == pb.Status.IDLE_STATIONARY:
@@ -56,6 +53,9 @@ class LongFormPropertyManager(BasePropertyManager):
                 props.speed = base_speed
             else:
                 props.speed = cutoff_minutes + (m - cutoff_minutes) * 4
+        elif state_report.pipette_state.dispense_request_number < 1:
+            # initial collection and movement is slower
+            props.speed = 2
         elif state_report.status == pb.Status.IDLE_MOVING:
             props.speed = 5
         else:
@@ -85,6 +85,6 @@ class LongFormPropertyManager(BasePropertyManager):
                     min_duration = dispense_metadata.min_duration_override_ms / 1000.0
 
             # Basically forces the speed for at least 3 seconds after the latest dispense
-            min_duration = max(10, min_duration)
+            min_duration = max(3, min_duration)
 
         return props, delay, min_duration
