@@ -28,7 +28,7 @@ function CleaningPage() {
             c?.publish(TOPIC_FLUID, `${FluidType.FLUID_MILK},200,false`)
             setTimeout(()=>{
               c?.publish(TOPIC_FLUID, `${FluidType.FLUID_DRAIN},200,false`)
-            }, 30000)
+            }, 35000)
           }}>Run Cleaning Cycle</Button>
         </li>
         <li><input type="checkbox"/>To ensure pipette is unblocked, {' '}
