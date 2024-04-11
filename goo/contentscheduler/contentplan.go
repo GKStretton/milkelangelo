@@ -43,6 +43,7 @@ func (m *manager) processContentPlan(path string, sessionNumber uint64) error {
 			}
 			post.Url = url
 			post.Uploaded = true
+			fmt.Printf("new upload:\n\t%s\n\t%s\n\t%s\n", post.Platform, ct, post.Url)
 		}
 	}
 

@@ -27,6 +27,8 @@ Save the refresh token in `kv/TWITCH_REFRESH_TOKEN`
 	- Locally, **With /mnt/md0/light-stores mounted**, run `cd goo && go run . -yt`
 	- Follow the link and the instructions
 	- After the redirect, copy the `code=` value and paste it in terminal.
+	- restart `goo` with `d && dc restart goo` on `depth`
+	- `goo` retries the upload every 10 minutes
 
 Not sure if we should be updating the credentials cache file after the token gets refreshed.
 If the above error happens every week, this needs more work.
