@@ -16,7 +16,7 @@ type RecurringTime struct {
 	second int
 }
 
-// fmtLocal gets just the hh:mm in local time
+// fmtLocal gets just the hh:mm in local time for the maintainer (London)
 func (r RecurringTime) fmtLocal() string {
 	now := time.Now().UTC()
 	d := time.Date(
@@ -28,7 +28,13 @@ func (r RecurringTime) fmtLocal() string {
 		mainSessionStartTime.second,
 		0,
 		now.Location(),
-	).Local()
+	)
+	localTz, err := time.LoadLocation("Europe/London")
+	if err != nil {
+		fmt.Printf("error loading tz location: %s\n", err)
+		return fmt.Sprintf("%d:%d", d.Hour(), d.Minute())
+	}
+	d = d.In(localTz)
 	return fmt.Sprintf("%d:%d", d.Hour(), d.Minute())
 }
 
