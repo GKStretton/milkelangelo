@@ -244,7 +244,9 @@ void topicHandler(String topic, String payload)
 		Logger::Info("set valve " + String(valve) + " to " + String(open));
 
 		// to make this play nice as an override
-		FluidLevels_WriteBowlLevel(0);
+		if (CHECK_BOWL_FLUID_LEVEL) {
+			FluidLevels_WriteBowlLevel(0);
+		}
 	}
 	else if (topic == TOPIC_DISPENSE) {
 		String values[] = {""};

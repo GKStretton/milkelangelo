@@ -62,7 +62,7 @@ func (d *autoDecider) decideDispense(predictedState *machinepb.StateReport) *typ
 }
 
 func (d *autoDecider) DecideNextAction(predictedState *machinepb.StateReport) (executor.Executor, error) {
-	if predictedState.Status == machinepb.Status_SLEEPING {
+	if predictedState.Status <= machinepb.Status_SHUTTING_DOWN {
 		l.Println("invalid state for actor, decided nil.")
 		return nil, fmt.Errorf("invalid machine status for decision: %s", predictedState.Status)
 	}

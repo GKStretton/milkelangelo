@@ -19,7 +19,7 @@ function CleaningPage() {
             c?.publish(TOPIC_WAKE, "")
             setTimeout(()=>{
               c?.publish(TOPIC_MAINTENANCE, "")
-            }, 5000)
+            }, 8000)
           }}>Turn on for maintenance</Button>
         </li>
         <li><input type="checkbox"/>Fill altar with 250ml cleaning solution. Leave fridge door open.</li>
