@@ -1,5 +1,5 @@
 
-export const IK_Z_LEVEL_MM: string = "45";
+export const IK_Z_LEVEL_MM: string = "44";
 export const TOPIC_COLLECT: string = "mega/req/collect";
 export const TOPIC_DEBUG_DATA: string = "mega/req/debug-data";
 export const TOPIC_DISPENSE: string = "mega/req/dispense";
