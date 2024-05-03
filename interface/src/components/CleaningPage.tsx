@@ -25,10 +25,10 @@ function CleaningPage() {
         <li><input type="checkbox"/>Fill altar with 250ml cleaning solution. Leave fridge door open.</li>
         <li><input type="checkbox"/>
           <Button variant="contained" onClick={() => {
-            c?.publish(TOPIC_FLUID, `${FluidType.FLUID_MILK},200,false`)
+            c?.publish(TOPIC_FLUID, `${FluidType.FLUID_MILK},250,false`)
             setTimeout(()=>{
-              c?.publish(TOPIC_FLUID, `${FluidType.FLUID_DRAIN},200,false`)
-            }, 35000)
+              c?.publish(TOPIC_FLUID, `${FluidType.FLUID_DRAIN},250,false`)
+            }, 44000)
           }}>Run Cleaning Cycle</Button>
         </li>
         <li><input type="checkbox"/>To ensure pipette is unblocked, {' '}
