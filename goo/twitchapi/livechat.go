@@ -47,6 +47,10 @@ func Start() *TwitchApi {
 			Timeout: 10 * time.Second,
 		},
 	})
+	if err != nil {
+		fmt.Printf("failed to create twitch helix client: %v\n", err)
+		return nil
+	}
 
 	// IRC api
 	ircClient := twitch.NewClient(channelName, "oauth:x") // will be refreshed by helix client
@@ -68,7 +72,7 @@ func Start() *TwitchApi {
 		Color: "primary",
 	})
 	if err != nil {
-		panic(fmt.Sprintf("failed to send initial helix broadcast: %v\n", err))
+		fmt.Printf("failed to send initial helix broadcast: %v\n", err)
 	}
 	fmt.Println("sent twitch startup announcement.")
 
@@ -87,7 +91,7 @@ func Start() *TwitchApi {
 		fmt.Println("connecting to twitch irc")
 		err = ircClient.Connect()
 		if err != nil {
-			panic(err)
+			fmt.Printf("failed to listen to twitch irc: %v\n", err)
 		}
 	}()
 

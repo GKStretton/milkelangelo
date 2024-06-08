@@ -67,8 +67,8 @@ func dispenseBlocking(c chan *machinepb.StateReport) {
 		return sr.Status == machinepb.Status_DISPENSING
 	})
 	time.Sleep(time.Millisecond * 250)
+	//! sometimes this doesn't get through...
 	dispense()
-	//! this is buggy. Maybe change to watch for the dispense number incrementing?
 	l.Println("waiting for DISPENSING")
 	<-a1
 	l.Println("waiting for NOT DISPENSING")

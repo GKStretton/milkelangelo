@@ -24,7 +24,7 @@ var lock = &sync.Mutex{}
 
 var subs = subscriptions{}
 
-const timeout = time.Millisecond * time.Duration(250)
+const timeout = time.Second * time.Duration(5)
 
 func Start() {
 	_ = paho.CRITICAL
@@ -75,14 +75,20 @@ func on_connect(client paho.Client) {
 
 func Publish(topic string, payload interface{}) error {
 	if client == nil {
-		return fmt.Errorf("mqtt client not initialised")
+		err := fmt.Errorf("cannot publish to %s: mqtt client not initialised", topic)
+		fmt.Println(err)
+		return err
 	}
 	token := client.Publish(topic, QOS, false, payload)
 	if !token.WaitTimeout(timeout) {
-		return fmt.Errorf("publish to %s timed out", topic)
+		err := fmt.Errorf("publish to %s timed out", topic)
+		fmt.Println(err)
+		return err
 	}
 	if token.Error() != nil {
-		return fmt.Errorf("error publishing to %s: %v", topic, token.Error())
+		err := fmt.Errorf("error publishing to %s: %v", topic, token.Error())
+		fmt.Println(err)
+		return err
 	}
 	return nil
 }
