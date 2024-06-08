@@ -29,11 +29,15 @@ func Start(s *session.SessionManager) {
 	go sessionListener(s)
 	go connectionListener(s)
 
-	mqtt.Subscribe(topics_backend.TOPIC_STREAM_START, startStream)
-	mqtt.Subscribe(topics_backend.TOPIC_STREAM_END, endStream)
+	mqtt.Subscribe(topics_backend.TOPIC_STREAM_START, func(topic string, payload []byte) {
+		go startStream(topic, payload)
+	})
+	mqtt.Subscribe(topics_backend.TOPIC_STREAM_END, func(topic string, payload []byte) {
+		go endStream(topic, payload)
+	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_STREAM_STATUS_GET, func(topic string, payload []byte) {
-		publishStreamStatus(isStreamLive())
+		go publishStreamStatus(isStreamLive())
 	})
 
 	publishStreamStatus(isStreamLive())

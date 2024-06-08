@@ -118,37 +118,45 @@ func (sm *SessionManager) subscribeToBrokerTopics() {
 			production = true
 		}
 		fmt.Printf("received mqtt request to begin session, production=%t\n", production)
-		_, err := sm.BeginSession(production)
-		if err != nil {
-			fmt.Printf("cannot begin session: %v\n", err)
-		}
+		go func() {
+			_, err := sm.BeginSession(production)
+			if err != nil {
+				fmt.Printf("cannot begin session: %v\n", err)
+			}
+		}()
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_SESSION_END, func(topic string, payload []byte) {
 		fmt.Println("received mqtt request to end session")
-		_, err := sm.EndSession()
-		if err != nil {
-			fmt.Printf("cannot end session: %v\n", err)
-		}
+		go func() {
+			_, err := sm.EndSession()
+			if err != nil {
+				fmt.Printf("cannot end session: %v\n", err)
+			}
+		}()
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_SESSION_PAUSE, func(topic string, payload []byte) {
 		fmt.Println("received mqtt request to pause session")
-		_, err := sm.PauseSession()
-		if err != nil {
-			fmt.Printf("cannot pause session: %v\n", err)
-		}
+		go func() {
+			_, err := sm.PauseSession()
+			if err != nil {
+				fmt.Printf("cannot pause session: %v\n", err)
+			}
+		}()
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_SESSION_RESUME, func(topic string, payload []byte) {
 		fmt.Println("received mqtt request to resume session")
-		_, err := sm.ResumeSession()
-		if err != nil {
-			fmt.Printf("cannot resume session: %v\n", err)
-		}
+		go func() {
+			_, err := sm.ResumeSession()
+			if err != nil {
+				fmt.Printf("cannot resume session: %v\n", err)
+			}
+		}()
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_SESSION_STATUS_GET, func(topic string, payload []byte) {
-		sm.publishSessionStatus()
+		go sm.publishSessionStatus()
 	})
 }

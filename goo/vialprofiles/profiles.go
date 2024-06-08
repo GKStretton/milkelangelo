@@ -23,7 +23,7 @@ func Start(sm *session.SessionManager) {
 		if err != nil {
 			fmt.Printf("cannot convert id '%s' to int for profile snapshot: %v\n", payload, err)
 		}
-		saveSnapshot(uint64(id))
+		go saveSnapshot(uint64(id))
 	})
 
 	go func() {

@@ -23,7 +23,8 @@ var latest_state_report *machinepb.StateReport
 var srLock sync.Mutex
 
 var subs = []chan *machinepb.StateReport{}
-var lock sync.Mutex
+
+var subsLock sync.Mutex
 
 func Start(sm *session.SessionManager) {
 	mqtt.Subscribe(topics_firmware.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
@@ -58,75 +59,81 @@ func Start(sm *session.SessionManager) {
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_MARK_FAILED_DISPENSE, func(topic string, payload []byte) {
-		srLock.Lock()
-		defer srLock.Unlock()
+		go func() {
+			srLock.Lock()
+			defer srLock.Unlock()
 
-		if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
-			fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
-			return
-		}
+			if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
+				fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
+				return
+			}
 
-		session, _ := sm.GetLatestSession()
-		if session != nil && !session.Complete {
-			appendFailedDispense(
-				uint64(session.Id),
-				latest_state_report.StartupCounter,
-				uint64(latest_state_report.PipetteState.DispenseRequestNumber),
-			)
-		}
+			session, _ := sm.GetLatestSession()
+			if session != nil && !session.Complete {
+				appendFailedDispense(
+					uint64(session.Id),
+					latest_state_report.StartupCounter,
+					uint64(latest_state_report.PipetteState.DispenseRequestNumber),
+				)
+			}
+		}()
 	})
 
 	mqtt.Subscribe(topics_backend.TOPIC_MARK_DELAYED_DISPENSE, func(topic string, payload []byte) {
-		srLock.Lock()
-		defer srLock.Unlock()
+		go func() {
+			srLock.Lock()
+			defer srLock.Unlock()
 
-		if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
-			fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
-			return
-		}
+			if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
+				fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
+				return
+			}
 
-		// could change to payload in future
-		delayMs := uint64(1000)
+			// could change to payload in future
+			delayMs := uint64(1000)
 
-		session, _ := sm.GetLatestSession()
-		if session != nil && !session.Complete {
-			appendDelayedDispense(
-				uint64(session.Id),
-				latest_state_report.StartupCounter,
-				uint64(latest_state_report.PipetteState.DispenseRequestNumber),
-				delayMs,
-			)
-		}
+			session, _ := sm.GetLatestSession()
+			if session != nil && !session.Complete {
+				appendDelayedDispense(
+					uint64(session.Id),
+					latest_state_report.StartupCounter,
+					uint64(latest_state_report.PipetteState.DispenseRequestNumber),
+					delayMs,
+				)
+			}
+		}()
 	})
 
 	mqtt.Subscribe(topics_firmware.TOPIC_LOGS_CRIT, func(topic string, payload []byte) {
-		critErr := string(payload)
-		err := email.SendEmail(&machinepb.Email{
-			Subject:   "Crit. f/w error: " + critErr,
-			Body:      critErr,
-			Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_MAINTENANCE,
-		})
-		if err != nil {
-			fmt.Printf("error sending email for critial firmware error (%s): %s\n", critErr, err)
-			return
-		}
-		fmt.Printf("Emailed maintainer about critial error: %s\n", critErr)
+		go func() {
+			critErr := string(payload)
+			err := email.SendEmail(&machinepb.Email{
+				Subject:   "Crit. f/w error: " + critErr,
+				Body:      critErr,
+				Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_MAINTENANCE,
+			})
+			if err != nil {
+				fmt.Printf("error sending email for critial firmware error (%s): %s\n", critErr, err)
+				return
+			}
+			fmt.Printf("Emailed maintainer about critial error: %s\n", critErr)
+		}()
 	})
 
 	RequestStateReport()
 }
 
 func Subscribe() chan *machinepb.StateReport {
-	lock.Lock()
-	defer lock.Unlock()
+	subsLock.Lock()
+	defer subsLock.Unlock()
 	c := make(chan *machinepb.StateReport, 10)
 	subs = append(subs, c)
 	return c
 }
 
 func Unsubscribe(c chan *machinepb.StateReport) {
-	lock.Lock()
-	defer lock.Unlock()
+	subsLock.Lock()
+	defer subsLock.Unlock()
 	for i, sub := range subs {
 		if sub == c {
 			subs = append(subs[:i], subs[i+1:]...)
@@ -138,7 +145,7 @@ func Unsubscribe(c chan *machinepb.StateReport) {
 
 // publish to internal channels and to broker
 func publishStateReport(sr *machinepb.StateReport) {
-	lock.Lock()
+	subsLock.Lock()
 	// internal
 	for _, c := range subs {
 		select {
@@ -146,7 +153,7 @@ func publishStateReport(sr *machinepb.StateReport) {
 		default:
 		}
 	}
-	lock.Unlock()
+	subsLock.Unlock()
 
 	// broker
 	m := protojson.MarshalOptions{
@@ -160,11 +167,13 @@ func publishStateReport(sr *machinepb.StateReport) {
 		fmt.Printf("error marshalling state report: %v\n", err)
 		return
 	}
-	err = mqtt.Publish(topics_backend.TOPIC_STATE_REPORT_JSON, string(b))
-	if err != nil {
-		fmt.Printf("error publishing json state report: %v\n", err)
-		return
-	}
+	go func() {
+		err = mqtt.Publish(topics_backend.TOPIC_STATE_REPORT_JSON, string(b))
+		if err != nil {
+			fmt.Printf("error publishing json state report: %v\n", err)
+			return
+		}
+	}()
 }
 
 func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
