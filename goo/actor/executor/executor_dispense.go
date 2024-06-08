@@ -67,12 +67,24 @@ func dispenseBlocking(c chan *machinepb.StateReport) {
 		return sr.Status == machinepb.Status_DISPENSING
 	})
 	time.Sleep(time.Millisecond * 250)
+
 	//! sometimes this doesn't get through...
-	dispense()
+	//! I've increased the mqtt timeout and added a single retry to help with this
+	err := dispense()
+	if err != nil {
+		l.Printf("dispense error: %v\n", err)
+		innerErr := dispense()
+		if innerErr != nil {
+			l.Printf("dispense error after retry: %v\n", innerErr)
+		}
+	}
+
 	l.Println("waiting for DISPENSING")
 	<-a1
-	l.Println("waiting for NOT DISPENSING")
-	<-ConditionWaiter(c, func(sr *machinepb.StateReport) bool {
+
+	a2 := ConditionWaiter(c, func(sr *machinepb.StateReport) bool {
 		return sr.Status != machinepb.Status_DISPENSING
 	})
+	l.Println("waiting for NOT DISPENSING")
+	<-a2
 }

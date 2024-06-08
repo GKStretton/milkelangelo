@@ -21,8 +21,8 @@ func goTo(x, y float32) {
 	mqtt.Publish(topics_firmware.TOPIC_GOTO_XY, fmt.Sprintf("%.3f,%.3f", x, y))
 }
 
-func dispense() {
-	mqtt.Publish(
+func dispense() error {
+	return mqtt.Publish(
 		topics_firmware.TOPIC_DISPENSE,
 		fmt.Sprintf("%.1f", getDispenseVolume()),
 	)
