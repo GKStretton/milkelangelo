@@ -27,6 +27,7 @@ export const TOPIC_RUN_END_SEQUENCE: string = "asol/end-sequence";
 export const TOPIC_RUN_FULL_SESSION: string = "asol/run-full-session";
 export const TOPIC_RUN_MANUAL_SESSION: string = "asol/run-manual-session";
 export const TOPIC_RUN_START_SEQUENCE: string = "asol/start-sequence";
+export const TOPIC_RUN_TEST_SESSION: string = "asol/run-test-session";
 export const TOPIC_SESSION_BEGAN: string = "asol/session/began";
 export const TOPIC_SESSION_BEGIN: string = "asol/session/begin";
 export const TOPIC_SESSION_END: string = "asol/session/end";

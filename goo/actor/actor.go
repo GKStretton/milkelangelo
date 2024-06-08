@@ -43,7 +43,7 @@ func Setup(sm *session.SessionManager) {
 
 // LaunchActor is launched to control a session after the canvas is prepared.
 // It should effect art.
-func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, seed int64) error {
+func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, seed int64, testing bool) error {
 	if lock.Get() {
 		return fmt.Errorf("actor already running")
 	}
@@ -65,7 +65,7 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, see
 	// }
 
 	// d := decider.NewTwitchDecider(ebs, twitchApi, time.Second*5, decider.NewMockDecider())
-	d := decider.NewAutoDecider(actorTimeout, seed)
+	d := decider.NewAutoDecider(actorTimeout, seed, testing)
 
 	awaitDecision := decide(d, events.GetLatestStateReportCopy(), nil)
 	decision := <-awaitDecision

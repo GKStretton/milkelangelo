@@ -44,7 +44,7 @@ func testActor() {
 	events.Start(sm)
 	twitchApi := twitchapi.Start()
 
-	actor.LaunchActor(twitchApi, 3*time.Minute, 1)
+	actor.LaunchActor(twitchApi, 3*time.Minute, 1, true)
 }
 
 // subscribes to ebs and twitch chat votes and prints the received votes

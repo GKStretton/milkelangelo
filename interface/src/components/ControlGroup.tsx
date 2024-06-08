@@ -30,6 +30,7 @@ import {
   TOPIC_RUN_FULL_SESSION,
   TOPIC_RUN_MANUAL_SESSION,
   TOPIC_RUN_START_SEQUENCE,
+  TOPIC_RUN_TEST_SESSION,
   TOPIC_SESSION_BEGIN,
   TOPIC_SESSION_END,
   TOPIC_SESSION_PAUSE,
@@ -70,6 +71,7 @@ export default function ControlGroup() {
   const sessionStatus: SessionStatus | null = useSessionStatus();
   const streamStatus: StreamStatus | null = useStreamStatus();
 
+  const [testMins, setTestMins] = useState(5);
   const [dispenseVolume, setDispenseVolume] = useState(10.0);
   const [collectionVolume, setCollectionVolume] = useState(30.0);
   const [bulkFluidRequestVolume, setBulkFluidRequestVolume] = useState(200.0);
@@ -510,6 +512,21 @@ export default function ControlGroup() {
             sx={{ margin: 2 }}
           >
             Rinse
+          </Button>
+
+          <Typography variant="h6">Test session</Typography>
+          <Slider
+            value={testMins}
+            onChange={(e, value) => (typeof value === "number" ? setTestMins(testMins) : null)}
+            min={0}
+            max={60*4} // Adjust the max value according to your requirements
+            step={5}
+            valueLabelDisplay="auto"
+            aria-label="Dispense volume"
+            sx={{ margin: 2, width: "50%" }}
+          />
+          <Button disabled={isAwake} variant="contained" color="secondary" onClick={() => c?.publish(TOPIC_RUN_TEST_SESSION, `${testMins}`)}>
+            Run Test Session
           </Button>
         </>
       )}

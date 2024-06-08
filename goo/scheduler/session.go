@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
@@ -85,6 +86,77 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 			}
 		}()
 	})
+
+	mqtt.Subscribe(topics_backend.TOPIC_RUN_TEST_SESSION, func(topic string, payload []byte) {
+		go func() {
+			n, err := strconv.Atoi(string(payload))
+			if err != nil {
+				fmt.Printf("couldn't get minutes from payload: %v, defaulting to 5 minutes\n", err)
+				n = 5
+			}
+			err = RunTestSession(
+				sm,
+				time.Duration(n)*time.Minute,
+			)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}()
+	})
+}
+
+func RunTestSession(sm *session.SessionManager, d time.Duration) error {
+	if lock.Get() {
+		return fmt.Errorf("automation already running")
+	}
+	lock.Set(true)
+	defer lock.Set(false)
+
+	ch := events.Subscribe()
+	defer events.Unsubscribe(ch)
+
+	s, err := sm.BeginSession(false)
+	if err != nil {
+		return err
+	}
+
+	sl.Printf("running test session %d\n", s.Id)
+
+	sl.Println("requesting wake")
+	mqtt.Publish(topics_firmware.TOPIC_WAKE, "")
+
+	time.Sleep(time.Second * 15)
+	// if not awake, abort and error
+	sl.Println("checking for awake status")
+	sr := events.GetLatestStateReportCopy()
+	if sr.Status != machinepb.Status_IDLE_MOVING && sr.Status != machinepb.Status_IDLE_STATIONARY {
+		sl.Println("invalid status, erroring")
+		return fmt.Errorf("status was %s after waking but expected idle", sr.Status)
+	}
+
+	sl.Println("valid status")
+
+	// set seed
+	seed := rand.Int63()
+	err = sm.SetCurrentSessionSeed(seed)
+	if err != nil {
+		sl.Printf("failed to set seed: %v\n", err)
+	}
+
+	sl.Println("launching actor")
+	err = actor.LaunchActor(nil, d, seed, true)
+	if err != nil {
+		sl.Printf("actor error: %v\n", err)
+	}
+
+	sl.Println("shutting down")
+	mqtt.Publish(topics_firmware.TOPIC_SHUTDOWN, "")
+
+	waitForSleeping(ch)
+
+	sm.EndSession()
+
+	return nil
 }
 
 func RunSession(
@@ -115,7 +187,7 @@ func RunSession(
 		}
 
 		sl.Println("launching actor")
-		err = actor.LaunchActor(twitchApi, time.Duration(d.actorDurationMinutes)*time.Minute, seed)
+		err = actor.LaunchActor(twitchApi, time.Duration(d.actorDurationMinutes)*time.Minute, seed, false)
 		if err != nil {
 			sl.Println("actor error, erroring")
 			mqtt.Publish(topics_backend.TOPIC_SESSION_PAUSE, "")

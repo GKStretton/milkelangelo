@@ -29,6 +29,7 @@ const (
 	TOPIC_RUN_FULL_SESSION string = "asol/run-full-session"
 	TOPIC_RUN_MANUAL_SESSION string = "asol/run-manual-session"
 	TOPIC_RUN_START_SEQUENCE string = "asol/start-sequence"
+	TOPIC_RUN_TEST_SESSION string = "asol/run-test-session"
 	TOPIC_SESSION_BEGAN string = "asol/session/began"
 	TOPIC_SESSION_BEGIN string = "asol/session/begin"
 	TOPIC_SESSION_END string = "asol/session/end"

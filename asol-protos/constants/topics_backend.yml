@@ -66,6 +66,7 @@ constants:
 
   TOPIC_RUN_FULL_SESSION: "asol/run-full-session"
   TOPIC_RUN_MANUAL_SESSION: "asol/run-manual-session"
+  TOPIC_RUN_TEST_SESSION: "asol/run-test-session"
 
   # (VialProfileCollection)
   KV_KEY_ALL_VIAL_PROFILES: "vial-profiles"

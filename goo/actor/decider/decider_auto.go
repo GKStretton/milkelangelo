@@ -15,19 +15,25 @@ import (
 type autoDecider struct {
 	endTime time.Time
 	rand    *rand.Rand
+	testing bool
 }
 
-func NewAutoDecider(timeout time.Duration, seed int64) Decider {
+func NewAutoDecider(timeout time.Duration, seed int64, testing bool) Decider {
 	t := time.Now().Add(timeout)
 	seededRand := rand.New(rand.NewSource(seed))
 	return &autoDecider{
 		endTime: t,
 		rand:    seededRand,
+		testing: testing,
 	}
 }
 
 // GetRandomVialPos returns a vial position that meets criteria
 func (d *autoDecider) GetRandomVialPos() uint64 {
+	if d.testing {
+		// pos 2 is empty
+		return 2
+	}
 	options := []uint64{}
 	snapshot := vialprofiles.GetSystemVialConfigurationSnapshot()
 	for i, p := range snapshot.Profiles {
