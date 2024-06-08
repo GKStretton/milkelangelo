@@ -21,6 +21,17 @@ type Session struct {
 	Seed         int64 `yaml:"seed"`
 }
 
+func (s *Session) copy() *Session {
+	return &Session{
+		Id:           s.Id,
+		Paused:       s.Paused,
+		Complete:     s.Complete,
+		Production:   s.Production,
+		ProductionId: s.ProductionId,
+		Seed:         s.Seed,
+	}
+}
+
 func (s *Session) ToProto() *machinepb.SessionStatus {
 	return &machinepb.SessionStatus{
 		Id:           uint64(s.Id),
@@ -224,7 +235,7 @@ func (sm *SessionManager) GetLatestSession() (*Session, error) {
 	defer sm.lock.Unlock()
 
 	if sm.latestSessionCache != nil {
-		return sm.latestSessionCache, nil
+		return sm.latestSessionCache.copy(), nil
 	}
 
 	latest, err := sm.s.getLatest()
@@ -232,7 +243,7 @@ func (sm *SessionManager) GetLatestSession() (*Session, error) {
 		return nil, err
 	}
 	sm.latestSessionCache = latest
-	return latest, nil
+	return latest.copy(), nil
 }
 
 // GetLatestProductionSession returns nil, nil if there are no sessions yet
