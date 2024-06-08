@@ -14,11 +14,11 @@ import (
 var goToLock sync.Mutex
 
 func collect(vialNo int, volUl int) {
-	mqtt.Publish(topics_firmware.TOPIC_COLLECT, fmt.Sprintf("%d,%d", vialNo, volUl))
+	go mqtt.Publish(topics_firmware.TOPIC_COLLECT, fmt.Sprintf("%d,%d", vialNo, volUl))
 }
 
 func goTo(x, y float32) {
-	mqtt.Publish(topics_firmware.TOPIC_GOTO_XY, fmt.Sprintf("%.3f,%.3f", x, y))
+	go mqtt.Publish(topics_firmware.TOPIC_GOTO_XY, fmt.Sprintf("%.3f,%.3f", x, y))
 }
 
 func dispense() error {
