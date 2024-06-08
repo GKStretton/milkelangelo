@@ -30,6 +30,7 @@ def debugf(msg, *args):
 
 
 def on_connect(client, userdata, flags, rc):
+    global mqtt_connected
     mqtt_connected = True
     client.subscribe([
         ("mega/req/#", 1),
@@ -45,6 +46,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_disconnect(client, userdata, rc):
+    global mqtt_connected
     mqtt_connected = False
     print("MQTT disconnected")
     serialConn.close()
