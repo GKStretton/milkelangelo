@@ -2,6 +2,7 @@ package executor
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/events"
@@ -41,6 +42,8 @@ func (e *collectionExecutor) PredictOutcome(state *machinepb.StateReport) *machi
 
 func (e *collectionExecutor) Execute() {
 	collect(e.vialNo, e.volUl)
+	// wait for collection to start
+	time.Sleep(time.Second * 1)
 	<-events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
 		return sr.CollectionRequest.Completed
 	})

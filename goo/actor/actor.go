@@ -80,14 +80,11 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, see
 			break
 		}
 		awaitCompletion, predictedCompletionState := executor.RunExecutorNonBlocking(decision.e)
-		// ebs.UpdateCurrentAction(e)
-		// ebs.UpdateUpcomingAction(nil)
 
 		// get next action while the action is being performed
 		awaitDecision = decide(d, predictedCompletionState, nil)
 
 		<-awaitCompletion // ensure last action finished
-		// ebs.UpdateCurrentAction(nil)
 		decision = <-awaitDecision
 	}
 
@@ -118,7 +115,6 @@ func decide(decider decider.Decider, predictedState *machinepb.StateReport, ebs 
 			l.Printf("made next decision: %v\n", e)
 		}
 
-		// ebs.UpdateUpcomingAction(e)
 		c <- decision{
 			e:   e,
 			err: err,

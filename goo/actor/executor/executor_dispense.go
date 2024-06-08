@@ -56,6 +56,8 @@ func (e *dispenseExecutor) Execute() {
 	l.Printf("Going to %f, %f\n", e.X, e.Y)
 	goTo(e.X, e.Y)
 
+	time.Sleep(time.Second * 1)
+
 	<-events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
 		return sr.Status == machinepb.Status_WAITING_FOR_DISPENSE
 	})
