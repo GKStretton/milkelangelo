@@ -71,7 +71,7 @@ export default function ControlGroup() {
   const sessionStatus: SessionStatus | null = useSessionStatus();
   const streamStatus: StreamStatus | null = useStreamStatus();
 
-  const [testMins, setTestMins] = useState(5);
+  const [testMins, setTestMins] = useState(5.0);
   const [dispenseVolume, setDispenseVolume] = useState(10.0);
   const [collectionVolume, setCollectionVolume] = useState(30.0);
   const [bulkFluidRequestVolume, setBulkFluidRequestVolume] = useState(200.0);
@@ -514,13 +514,13 @@ export default function ControlGroup() {
             Rinse
           </Button>
 
-          <Typography variant="h6">Test session</Typography>
+          <Typography variant="h6">Test session (actor minutes)</Typography>
           <Slider
             value={testMins}
-            onChange={(e, value) => (typeof value === "number" ? setTestMins(testMins) : null)}
+            onChange={(e, value) => (typeof value === "number" ? setTestMins(value) : null)}
             min={0}
             max={60*4} // Adjust the max value according to your requirements
-            step={5}
+            step={1}
             valueLabelDisplay="auto"
             aria-label="Dispense volume"
             sx={{ margin: 2, width: "50%" }}
