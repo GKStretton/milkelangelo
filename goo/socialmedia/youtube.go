@@ -16,6 +16,7 @@ func (m *youtubeManager) Upload(req *UploadRequest) (string, error) {
 	}
 	upload := &youtube.Video{
 		Snippet: &youtube.VideoSnippet{
+			ChannelId:   youtubeChannelId,
 			Title:       req.Title,
 			Description: req.Description,
 		},

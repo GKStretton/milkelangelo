@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
-rm /mnt/md0/light-stores/kv/youtube-credentials-cache.json
+rm -f /mnt/md0/light-stores/kv/youtube-credentials-cache.json
 echo "copy 'code=' value and paste here"
 cd goo && go run . -yt
