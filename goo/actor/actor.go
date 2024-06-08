@@ -55,10 +55,6 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, see
 
 	fmt.Printf("Launching actor with seed: %d\n", seed)
 
-	// access state reports
-	c := events.Subscribe()
-	defer events.Unsubscribe(c)
-
 	// ebs, err := ebsinterface.NewExtensionSession(time.Hour * 2)
 	// if err != nil {
 	// 	fmt.Printf("failed to create ebs interface in LaunchActor: %v\n", err)
@@ -83,7 +79,7 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, see
 			l.Println("saw nil decision, exiting actor")
 			break
 		}
-		awaitCompletion, predictedCompletionState := executor.RunExecutorNonBlocking(c, decision.e)
+		awaitCompletion, predictedCompletionState := executor.RunExecutorNonBlocking(decision.e)
 		// ebs.UpdateCurrentAction(e)
 		// ebs.UpdateUpcomingAction(nil)
 

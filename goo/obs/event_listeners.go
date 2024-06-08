@@ -3,39 +3,16 @@ package obs
 import (
 	"fmt"
 
-	"github.com/gkstretton/asol-protos/go/machinepb"
-	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/session"
 )
 
 func sessionListener(sm *session.SessionManager) {
 	sessionChan := sm.SubscribeToEvents()
-	stateReportChan := events.Subscribe()
+
 	for {
-		select {
-		case <-sessionChan:
-			handleSessionEvent(sm)
-		case sr := <-stateReportChan:
-			handleStateReport(sr)
-		}
+		<-sessionChan
+		handleSessionEvent(sm)
 	}
-}
-
-func handleStateReport(sr *machinepb.StateReport) {
-	// var scene string
-
-	// todo: proper obs scene logic
-	// if sr.Status == machinepb.Status_IDLE_MOVING ||
-	// 	sr.Status == machinepb.Status_IDLE_STATIONARY {
-	// 	scene = SCENE_IDLE
-	// } else {
-	// 	scene = SCENE_LIVE
-	// }
-
-	// err := setScene(scene)
-	// if err != nil {
-	// 	fmt.Printf("error setting scene in session listener: %v\n", err)
-	// }
 }
 
 func handleSessionEvent(e *session.SessionManager) {

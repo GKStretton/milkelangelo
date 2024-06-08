@@ -125,15 +125,23 @@ func Start(sm *session.SessionManager) {
 
 func Subscribe() chan *machinepb.StateReport {
 	subsLock.Lock()
+	srLock.Lock()
 	defer subsLock.Unlock()
+	defer srLock.Unlock()
+
 	c := make(chan *machinepb.StateReport, 10)
 	subs = append(subs, c)
+
+	// send latest state report to channel
+	c <- latest_state_report
+
 	return c
 }
 
 func Unsubscribe(c chan *machinepb.StateReport) {
 	subsLock.Lock()
 	defer subsLock.Unlock()
+
 	for i, sub := range subs {
 		if sub == c {
 			subs = append(subs[:i], subs[i+1:]...)

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/types"
 )
 
@@ -46,14 +47,14 @@ func (e *dispenseExecutor) PredictOutcome(state *machinepb.StateReport) *machine
 	return state
 }
 
-func (e *dispenseExecutor) Execute(c chan *machinepb.StateReport) {
+func (e *dispenseExecutor) Execute() {
 	goToLock.Lock()
 	defer goToLock.Unlock()
 
 	l.Printf("Going to %f, %f\n", e.X, e.Y)
 	goTo(e.X, e.Y)
 	l.Println("dispensing...")
-	dispenseBlocking(c)
+	dispenseBlocking()
 	l.Println("done...")
 }
 
@@ -62,8 +63,8 @@ func (e *dispenseExecutor) String() string {
 }
 
 // call dispense, and observe transition (-> dispensing -> not dispensing)
-func dispenseBlocking(c chan *machinepb.StateReport) {
-	a1 := ConditionWaiter(c, func(sr *machinepb.StateReport) bool {
+func dispenseBlocking() {
+	a1 := events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
 		return sr.Status == machinepb.Status_DISPENSING
 	})
 	time.Sleep(time.Millisecond * 250)
@@ -82,7 +83,7 @@ func dispenseBlocking(c chan *machinepb.StateReport) {
 	l.Println("waiting for DISPENSING")
 	<-a1
 
-	a2 := ConditionWaiter(c, func(sr *machinepb.StateReport) bool {
+	a2 := events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
 		return sr.Status != machinepb.Status_DISPENSING
 	})
 	l.Println("waiting for NOT DISPENSING")

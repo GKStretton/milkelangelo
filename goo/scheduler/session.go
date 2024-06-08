@@ -12,7 +12,6 @@ import (
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
 	"github.com/gkstretton/dark/services/goo/actor"
-	"github.com/gkstretton/dark/services/goo/actor/executor"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
@@ -112,9 +111,6 @@ func RunTestSession(sm *session.SessionManager, d time.Duration) error {
 	lock.Set(true)
 	defer lock.Set(false)
 
-	ch := events.Subscribe()
-	defer events.Unsubscribe(ch)
-
 	s, err := sm.BeginSession(false)
 	if err != nil {
 		return err
@@ -152,7 +148,7 @@ func RunTestSession(sm *session.SessionManager, d time.Duration) error {
 	sl.Println("shutting down")
 	mqtt.Publish(topics_firmware.TOPIC_SHUTDOWN, "")
 
-	waitForSleeping(ch)
+	waitForSleeping()
 
 	sm.EndSession()
 
@@ -219,9 +215,6 @@ func RunSession(
 func runStartSequence(streamPreStartMinutes int, realSession bool) error {
 	sl.Println("running start sequence...")
 
-	ch := events.Subscribe()
-	defer events.Unsubscribe(ch)
-
 	sl.Println("starting stream, and waiting...")
 	if realSession {
 		mqtt.Publish(topics_backend.TOPIC_STREAM_START, "")
@@ -271,9 +264,6 @@ func runStartSequence(streamPreStartMinutes int, realSession bool) error {
 }
 
 func runEndSequence() error {
-	ch := events.Subscribe()
-	defer events.Unsubscribe(ch)
-
 	mqtt.Publish(topics_firmware.TOPIC_GOTO_RING_IDLE_POS, "")
 
 	sl.Println("running end sequence")
@@ -290,7 +280,7 @@ func runEndSequence() error {
 		),
 	)
 
-	waitForFluidComplete(ch)
+	waitForFluidComplete()
 	sl.Println("dispensing water")
 
 	mqtt.Publish(
@@ -303,7 +293,7 @@ func runEndSequence() error {
 		),
 	)
 
-	waitForFluidComplete(ch)
+	waitForFluidComplete()
 
 	sl.Println("draining water")
 	mqtt.Publish(
@@ -321,7 +311,7 @@ func runEndSequence() error {
 	sl.Println("shutting down")
 	mqtt.Publish(topics_firmware.TOPIC_SHUTDOWN, "")
 
-	waitForSleeping(ch)
+	waitForSleeping()
 
 	time.Sleep(2 * time.Second)
 
@@ -348,17 +338,17 @@ func waitForTOffset(t time.Time, minutesOffset, secondsOffset int) {
 	)
 }
 
-func waitForSleeping(ch chan *machinepb.StateReport) {
-	w := executor.ConditionWaiter(ch, func(sr *machinepb.StateReport) bool {
+func waitForSleeping() {
+	w := events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
 		return sr.Status == machinepb.Status_SLEEPING
 	})
 	<-w
 }
 
-func waitForFluidComplete(ch chan *machinepb.StateReport) {
+func waitForFluidComplete() {
 	time.Sleep(2 * time.Second)
-	w := executor.ConditionWaiter(ch, func(sr *machinepb.StateReport) bool {
-		return sr.FluidRequest.Complete == true
+	w := events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
+		return sr.FluidRequest.Complete
 	})
 	<-w
 }

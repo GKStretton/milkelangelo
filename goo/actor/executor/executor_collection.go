@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/types"
 )
 
@@ -38,9 +39,9 @@ func (e *collectionExecutor) PredictOutcome(state *machinepb.StateReport) *machi
 	return state
 }
 
-func (e *collectionExecutor) Execute(c chan *machinepb.StateReport) {
+func (e *collectionExecutor) Execute() {
 	collect(e.vialNo, e.volUl)
-	<-ConditionWaiter(c, func(sr *machinepb.StateReport) bool {
+	<-events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
 		return sr.CollectionRequest.Completed
 	})
 }
