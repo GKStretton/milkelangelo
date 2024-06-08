@@ -41,6 +41,8 @@ func (e *dispenseExecutor) PredictOutcome(state *machinepb.StateReport) *machine
 	state.PipetteState.VolumeTargetUl -= getDispenseVolume()
 	if state.PipetteState.VolumeTargetUl < 1 {
 		state.PipetteState.Spent = true
+	} else {
+		state.PipetteState.Spent = false
 	}
 
 	// status will change too, but not used in decision making

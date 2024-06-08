@@ -16,7 +16,7 @@ func getVialDropVolume(vialNo int) float32 {
 	profile := vialprofiles.GetSystemVialProfile(vialNo)
 
 	if profile == nil {
-		l.Printf("error getting vial volume, using fallback %.1f\n", fallbackVolume)
+		l.Printf("error getting vial %d volume, using fallback %.1f\n", vialNo, fallbackVolume)
 		return fallbackVolume
 	}
 
