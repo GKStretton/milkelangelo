@@ -38,7 +38,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 			requestFridgeMilk()
 		},
 		recurringTime: mainSessionStartTime,
-		hourOffset:    -10,
+		hourOffset:    -6,
 		minuteOffset:  0,
 	})
 
