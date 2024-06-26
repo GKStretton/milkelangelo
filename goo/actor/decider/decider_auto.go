@@ -13,9 +13,10 @@ import (
 )
 
 type autoDecider struct {
-	endTime time.Time
-	rand    *rand.Rand
-	testing bool
+	endTime        time.Time
+	rand           *rand.Rand
+	testing        bool
+	emulsifierUsed bool
 }
 
 func NewAutoDecider(timeout time.Duration, seed int64, testing bool) Decider {
@@ -29,17 +30,25 @@ func NewAutoDecider(timeout time.Duration, seed int64, testing bool) Decider {
 }
 
 // GetRandomVialPos returns a vial position that meets criteria
-func (d *autoDecider) GetRandomVialPos() uint64 {
+func (d *autoDecider) GetRandomVialPos(predictedState *machinepb.StateReport) uint64 {
 	if d.testing {
 		// pos 2 is empty
 		return 2
 	}
+
+	// only allow one emul, and ensure it's not first
+	emulsifierAllowed := predictedState.CollectionRequest.RequestNumber >= 1 && !d.emulsifierUsed
+
 	options := []uint64{}
 	snapshot := vialprofiles.GetSystemVialConfigurationSnapshot()
 	for i, p := range snapshot.Profiles {
 		if p.VialFluid == machinepb.VialProfile_VIAL_FLUID_DYE_WATER_BASED ||
-			p.VialFluid == machinepb.VialProfile_VIAL_FLUID_EMULSIFIER {
+			(p.VialFluid == machinepb.VialProfile_VIAL_FLUID_EMULSIFIER && emulsifierAllowed) {
 			options = append(options, i)
+
+			if p.VialFluid == machinepb.VialProfile_VIAL_FLUID_EMULSIFIER {
+				d.emulsifierUsed = true
+			}
 		}
 	}
 
@@ -53,7 +62,7 @@ func (d *autoDecider) GetRandomVialPos() uint64 {
 
 func (d *autoDecider) decideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
 	return &types.CollectionDecision{
-		VialNo:  int(d.GetRandomVialPos()),
+		VialNo:  int(d.GetRandomVialPos(predictedState)),
 		DropsNo: 3,
 	}
 }
