@@ -35,3 +35,31 @@ func requestFridgeMilk() {
 		fmt.Println(err)
 	}
 }
+
+func sendReminder(skip bool) {
+	var subject, body string
+
+	if skip {
+		subject = "No aSoL session today"
+		body = "Session is being skipped"
+	} else {
+		subject = fmt.Sprintf(
+			"Reminder: A Study of Light @ %s today",
+			mainSessionStartTime.fmtLocal(),
+		)
+		body = fmt.Sprintf(
+			"A Study of Light session will begin at %s today.",
+			mainSessionStartTime.fmtLocal(),
+		)
+
+	}
+
+	err := email.SendEmail(&machinepb.Email{
+		Subject:   subject,
+		Body:      body,
+		Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_ROUTINE_OPERATIONS,
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
+}

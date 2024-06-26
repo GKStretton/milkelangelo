@@ -30,15 +30,36 @@ var mainSessionStartTime = RecurringTime{
 // time, to trigger the stated action.
 func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
 	go scheduleWatcher(&Schedule{
+		name:    "REMINDER",
+		enabled: true,
+		function: func() {
+			s := readOneTimeSettings()
+
+			// remind routine operator
+			sendReminder(s.skip)
+		},
+		recurringTime: mainSessionStartTime,
+		hourOffset:    -11,
+		minuteOffset:  0,
+	})
+
+	go scheduleWatcher(&Schedule{
 		name:    "FRIDGE_ON",
 		enabled: true,
 		function: func() {
+			s := readOneTimeSettings()
+
+			if s.skip {
+				fmt.Println("one time settings skip flag set, skipping milk request!")
+				return
+			}
+
 			mqtt.Publish(topics_backend.TOPIC_FRIDGE_SWITCH, topics_backend.PAYLOAD_SMART_SWITCH_ON)
 			// notify routine operator to fill with milk
 			requestFridgeMilk()
 		},
 		recurringTime: mainSessionStartTime,
-		hourOffset:    -6,
+		hourOffset:    -3,
 		minuteOffset:  0,
 	})
 
@@ -46,7 +67,8 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 		name:    "RUN_SESSION",
 		enabled: true,
 		function: func() {
-			s := processOneTimeSettings()
+			s := readOneTimeSettings()
+			resetOneTimeSettings()
 
 			if s.skip {
 				fmt.Println("one time settings skip flag set, skipping session!")
@@ -87,17 +109,19 @@ type oneTimeSettings struct {
 	disableActor bool
 }
 
-// processOneTimeSettings checks for one time settings and returns them, resetting
+// readOneTimeSettings checks for one time settings and returns them, resetting
 // the flags to false afterwards.
-func processOneTimeSettings() *oneTimeSettings {
+func readOneTimeSettings() *oneTimeSettings {
 	skip := keyvalue.GetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_SKIP)
-	keyvalue.SetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_SKIP, false)
-
 	disableActor := keyvalue.GetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR)
-	keyvalue.SetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR, false)
 
 	return &oneTimeSettings{
 		skip:         skip,
 		disableActor: disableActor,
 	}
+}
+
+func resetOneTimeSettings() {
+	keyvalue.SetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_SKIP, false)
+	keyvalue.SetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR, false)
 }
