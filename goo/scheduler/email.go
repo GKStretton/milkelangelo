@@ -21,7 +21,7 @@ func requestSessionIntervention(e error) {
 func requestFridgeMilk() {
 	err := email.SendEmail(&machinepb.Email{
 		Subject: fmt.Sprintf(
-			"Please provide %d whole milk by %s today",
+			"Please provide %dml whole milk & align tripod by %s today",
 			milkVolume,
 			mainSessionStartTime.fmtLocal(),
 		),
