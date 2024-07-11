@@ -56,12 +56,12 @@ func generateContent(sessionNumber int) {
 	}
 
 	fmt.Printf("generated content for %d\n", sessionNumber)
-	handleSuccess(sessionNumber)
+	// handleSuccess(sessionNumber)
 }
 
 func handleSuccess(sessionNumber int) {
 	e := &machinepb.Email{
-		Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_MAINTENANCE,
+		Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_ROUTINE_OPERATIONS,
 		Subject:   fmt.Sprintf("Generated content for %d", sessionNumber),
 		Body:      fmt.Sprintf("successfully generated content for session id %d\n", sessionNumber),
 	}
