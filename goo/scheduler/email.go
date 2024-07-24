@@ -26,7 +26,7 @@ func requestFridgeMilk() {
 			mainSessionStartTime.fmtLocal(),
 		),
 		Body: fmt.Sprintf(
-			"As required for the next session at %s today.",
+			"As required for the next session at %s today.\n\nPlease also ensure tripod is aligned, camera pointing at robot with feet in the black floor holders",
 			mainSessionStartTime.fmtLocal(),
 		),
 		Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_ROUTINE_OPERATIONS,
