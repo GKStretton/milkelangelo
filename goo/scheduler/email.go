@@ -9,8 +9,8 @@ import (
 
 func requestSessionIntervention(e error) {
 	err := email.SendEmail(&machinepb.Email{
-		Subject:   fmt.Sprintf("Intervention required: %s", e),
-		Body:      fmt.Sprintf("Please take over the session manually\n\n%s", e.Error()),
+		Subject:   fmt.Sprintf("Intervention required (smart plug on?): %s", e),
+		Body:      fmt.Sprintf("Please take over the session manually\n\n%s\n\nPlease ensure the smart plug is powered", e.Error()),
 		Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_MAINTENANCE,
 	})
 	if err != nil {

@@ -75,8 +75,10 @@ void Controller::autoUpdate(State *s) {
 				CoverServo_Open();
 
 				if (!CoverServo_IsOpen()) {
-					Logger::Crit("failed 2 attempts to open cover, shutting down.");
-					s->shutdownRequested = true;
+					// Logger::Crit("failed 2 attempts to open cover, shutting down.");
+					// s->shutdownRequested = true;
+
+					Logger::Warn("failed 2 attempts to read open cover, proceeding anyway. (pls no breakage)");
 					return;
 				}
 			}
