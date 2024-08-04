@@ -8,10 +8,10 @@ services:
     user: "1000:1000"
     volumes:
       - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}:${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
-    restart: unless-stopped
+    restart: always
   rtsp:
     build: rtsp
-    restart: unless-stopped
+    restart: always
     network_mode: host
     ports:
       - 8554:8554
@@ -29,7 +29,7 @@ services:
     devices:
       - /dev/ttyACM0
     tty: true
-    restart: unless-stopped
+    restart: always
     network_mode: host
     environment:
       BROKER_HOST: ${BROKER_HOST:-localhost}
@@ -39,7 +39,7 @@ services:
       context: .
       dockerfile: goo/Dockerfile
     command: -basePath ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
-    restart: unless-stopped
+    restart: always
     network_mode: host
     volumes:
       - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}:${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
@@ -50,7 +50,7 @@ services:
       context: .
       dockerfile: dslrcapture/Dockerfile
     command: -basePath ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
-    restart: unless-stopped
+    restart: always
     privileged: true
     network_mode: host
     environment:
@@ -62,6 +62,6 @@ services:
     build:
       context: ./interface
       dockerfile: Dockerfile
-    restart: unless-stopped
+    restart: always
     ports:
       - "5000:80"
