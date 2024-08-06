@@ -45,10 +45,6 @@ func (d *autoDecider) GetRandomVialPos(predictedState *machinepb.StateReport) ui
 		if p.VialFluid == machinepb.VialProfile_VIAL_FLUID_DYE_WATER_BASED ||
 			(p.VialFluid == machinepb.VialProfile_VIAL_FLUID_EMULSIFIER && emulsifierAllowed) {
 			options = append(options, i)
-
-			if p.VialFluid == machinepb.VialProfile_VIAL_FLUID_EMULSIFIER {
-				d.emulsifierUsed = true
-			}
 		}
 	}
 
@@ -57,7 +53,12 @@ func (d *autoDecider) GetRandomVialPos(predictedState *machinepb.StateReport) ui
 		return 0
 	}
 	choiceIndex := d.rand.Intn(len(options))
-	return options[choiceIndex]
+
+	choice := options[choiceIndex]
+	if snapshot.Profiles[choice].VialFluid == machinepb.VialProfile_VIAL_FLUID_EMULSIFIER {
+		d.emulsifierUsed = true
+	}
+	return choice
 }
 
 func (d *autoDecider) decideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
