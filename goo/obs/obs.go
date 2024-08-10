@@ -28,6 +28,7 @@ func Start(s *session.SessionManager) {
 
 	go sessionListener(s)
 	go connectionListener(s)
+	go countdownRunner()
 
 	mqtt.Subscribe(topics_backend.TOPIC_STREAM_START, func(topic string, payload []byte) {
 		go startStream(topic, payload)

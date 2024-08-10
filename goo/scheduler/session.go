@@ -14,6 +14,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
+	"github.com/gkstretton/dark/services/goo/obs"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 )
@@ -202,7 +203,12 @@ func RunSession(
 
 	endTime := beginTime.Add(time.Duration(d.sessionDurationMinutes+d.streamPreStartMinutes) * time.Minute)
 
-	waitForTOffset(endTime, -3, 0)
+	drainOffsetMins := 3
+	obs.SetCountdown(
+		"Time until drainage",
+		endTime.Add(-time.Minute*time.Duration(drainOffsetMins)),
+	)
+	waitForTOffset(endTime, -drainOffsetMins, 0)
 
 	err = runEndSequence()
 	if err != nil {
@@ -219,7 +225,13 @@ func runStartSequence(streamPreStartMinutes int, realSession bool) error {
 	if realSession {
 		mqtt.Publish(topics_backend.TOPIC_STREAM_START, "")
 	}
-	time.Sleep(time.Duration(streamPreStartMinutes)*time.Minute + time.Second*10)
+
+	wait := time.Duration(streamPreStartMinutes)*time.Minute + time.Second*10
+	obs.SetCountdown(
+		"Time until start",
+		time.Now().Add(wait),
+	)
+	time.Sleep(wait)
 
 	// start time
 	sl.Println("starting session")
