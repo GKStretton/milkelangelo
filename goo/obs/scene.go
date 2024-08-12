@@ -28,3 +28,19 @@ func setScene(sceneName string) error {
 	fmt.Printf("set scene to %s\n", sceneName)
 	return nil
 }
+
+func getScene() (string, error) {
+	lock.Lock()
+	defer lock.Unlock()
+
+	if c == nil {
+		return "", fmt.Errorf("cannot get obs scene because client is nil")
+	}
+
+	resp, err := c.Scenes.GetCurrentProgramScene(&scenes.GetCurrentProgramSceneParams{})
+	if err != nil {
+		return "", fmt.Errorf("error getting obs scene: %w", err)
+	}
+
+	return resp.CurrentProgramSceneName, nil
+}

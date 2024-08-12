@@ -56,10 +56,18 @@ func countdownLoop() {
 }
 
 func updateCountdownElement(title, dur string) {
-	_, err := c.Inputs.SetInputSettings(&inputs.SetInputSettingsParams{
+	scene, err := getScene()
+	if err != nil {
+		fmt.Println(err)
+	}
+	if scene != SCENE_LIVE {
+		return
+	}
+
+	_, err = c.Inputs.SetInputSettings(&inputs.SetInputSettingsParams{
 		InputName: "Countdown Title",
 		InputSettings: map[string]interface{}{
-			"text": title,
+			"text": fmt.Sprintf("%23s", title),
 		},
 	})
 	if err != nil {
@@ -69,7 +77,7 @@ func updateCountdownElement(title, dur string) {
 	_, err = c.Inputs.SetInputSettings(&inputs.SetInputSettingsParams{
 		InputName: "Countdown Timer",
 		InputSettings: map[string]interface{}{
-			"text": dur,
+			"text": fmt.Sprintf("%10s", dur),
 		},
 	})
 	if err != nil {

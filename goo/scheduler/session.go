@@ -205,7 +205,7 @@ func RunSession(
 
 	drainOffsetMins := 3
 	obs.SetCountdown(
-		"Time until drainage",
+		"Time until drainage:",
 		endTime.Add(-time.Minute*time.Duration(drainOffsetMins)),
 	)
 	waitForTOffset(endTime, -drainOffsetMins, 0)
@@ -228,7 +228,7 @@ func runStartSequence(streamPreStartMinutes int, realSession bool) error {
 
 	wait := time.Duration(streamPreStartMinutes)*time.Minute + time.Second*10
 	obs.SetCountdown(
-		"Time until start",
+		"Time until start:",
 		time.Now().Add(wait),
 	)
 	time.Sleep(wait)

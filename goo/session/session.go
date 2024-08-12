@@ -22,6 +22,9 @@ type Session struct {
 }
 
 func (s *Session) copy() *Session {
+	if s == nil {
+		return nil
+	}
 	return &Session{
 		Id:           s.Id,
 		Paused:       s.Paused,

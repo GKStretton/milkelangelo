@@ -10,6 +10,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
+	"github.com/gkstretton/dark/services/goo/obs"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/types"
@@ -18,8 +19,10 @@ import (
 
 // tests for human verification during development
 func runAdHocTests() {
-	p := vialprofiles.GetSystemVialConfigurationSnapshot()
-	fmt.Println(p.Profiles[uint64(2)])
+	obs.Start(session.NewSessionManager(true))
+	time.Sleep(time.Second)
+	obs.SetCountdown("Time until drainage:", time.Now().Add(time.Second*10))
+	time.Sleep(12 * time.Second)
 }
 
 func testEmail() {
