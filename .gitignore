@@ -4,4 +4,5 @@
 */package-lock.json
 .venv
 *.mp4
+*.bak
 Comic-Sans-MS.ttf
