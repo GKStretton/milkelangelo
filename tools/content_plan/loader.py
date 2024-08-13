@@ -177,3 +177,21 @@ def generate_splashtext_hue():
             continue
         choices.append(i)
     return random.choice(choices)
+
+# get_music returns file and friendly name for track to use
+def get_music(base_dir: str, ct: pb.ContentType) -> typing.Tuple[str, str]:
+    if ct == pb.ContentType.CONTENT_TYPE_LONGFORM:
+        return "rain.mp3", "Rain"
+    
+    genre = "lofi"
+    album = "18. Moonwalk"
+
+    files = os.listdir(os.path.join(base_dir, "music", genre, album))
+    
+    # Filter the files to only include .wav files
+    wav_files = [f for f in files if f.endswith('.wav')]
+    
+    # Choose a random .wav file
+    choice = random.choice(wav_files).replace('.wav', '')
+    
+    return f"lofi/18. Moonwalk/{choice}.wav", f"{choice} - Moonwalk - StreamBeats by Harris Heller"

@@ -21,6 +21,7 @@ from videoediting.dispense_metadata import DispenseMetadataWrapper
 from videoediting.properties.factory import create_property_manager
 from videoediting.content_descriptor import ContentDescriptor
 from videoediting.still import add_stills
+from videoediting.music import add_music
 
 import machinepb.machine as pb
 
@@ -206,6 +207,8 @@ def run():
         overlay_clip,
         content_clip,
     )
+
+    content_clip = add_music(base_dir, content_clip, content_plan[content_type.name].music_file)
 
     logging.info(f"length with stills: {dur_fmt(content_clip.duration)}")
     logging.info(f"total generation time: {str(datetime.now() - gen_start)}")

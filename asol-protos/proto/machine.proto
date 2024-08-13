@@ -229,6 +229,8 @@ message ContentTypeStatus {
 	string raw_description = 2;
 	string caption = 3;
 	repeated Post posts = 5;
+	string music_file = 7;
+	string music_name = 8;
 }
 
 enum SocialPlatform {

@@ -12,7 +12,6 @@ from content_plan.still import *
 
 from content_plan.loader import *
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--base-dir", action="store",
@@ -37,9 +36,9 @@ if __name__ == "__main__":
     content_statuses.splashtext = get_splashtext()
     content_statuses.splashtext_hue = generate_splashtext_hue()
 
-    content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_LONGFORM.name] = buildLongform(session_number_text)
-    content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_SHORTFORM.name] = buildShortform(session_number_text)
-    content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_CLEANING.name] = buildCleaning(session_number_text, unlisted=True)
+    content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_LONGFORM.name] = buildLongform(args.base_dir, session_number_text)
+    content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_SHORTFORM.name] = buildShortform(args.base_dir, session_number_text)
+    content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_CLEANING.name] = buildCleaning(args.base_dir, session_number_text, unlisted=True)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_DSLR.name] = buildDslr(session_number_text, unlisted=True)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_STILL.name] = buildStill(session_number_text)
 

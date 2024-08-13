@@ -780,6 +780,8 @@ export interface ContentTypeStatus {
   rawDescription: string;
   caption: string;
   posts: Post[];
+  musicFile: string;
+  musicName: string;
 }
 
 export interface Post {
@@ -2407,7 +2409,7 @@ export const ContentTypeStatuses_ContentStatusesEntry = {
 };
 
 function createBaseContentTypeStatus(): ContentTypeStatus {
-  return { rawTitle: "", rawDescription: "", caption: "", posts: [] };
+  return { rawTitle: "", rawDescription: "", caption: "", posts: [], musicFile: "", musicName: "" };
 }
 
 export const ContentTypeStatus = {
@@ -2423,6 +2425,12 @@ export const ContentTypeStatus = {
     }
     for (const v of message.posts) {
       Post.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.musicFile !== "") {
+      writer.uint32(58).string(message.musicFile);
+    }
+    if (message.musicName !== "") {
+      writer.uint32(66).string(message.musicName);
     }
     return writer;
   },
@@ -2462,6 +2470,20 @@ export const ContentTypeStatus = {
 
           message.posts.push(Post.decode(reader, reader.uint32()));
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.musicFile = reader.string();
+          continue;
+        case 8:
+          if (tag !== 66) {
+            break;
+          }
+
+          message.musicName = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2477,6 +2499,8 @@ export const ContentTypeStatus = {
       rawDescription: isSet(object.raw_description) ? globalThis.String(object.raw_description) : "",
       caption: isSet(object.caption) ? globalThis.String(object.caption) : "",
       posts: globalThis.Array.isArray(object?.posts) ? object.posts.map((e: any) => Post.fromJSON(e)) : [],
+      musicFile: isSet(object.music_file) ? globalThis.String(object.music_file) : "",
+      musicName: isSet(object.music_name) ? globalThis.String(object.music_name) : "",
     };
   },
 
@@ -2494,6 +2518,12 @@ export const ContentTypeStatus = {
     if (message.posts?.length) {
       obj.posts = message.posts.map((e) => Post.toJSON(e));
     }
+    if (message.musicFile !== "") {
+      obj.music_file = message.musicFile;
+    }
+    if (message.musicName !== "") {
+      obj.music_name = message.musicName;
+    }
     return obj;
   },
 
@@ -2506,6 +2536,8 @@ export const ContentTypeStatus = {
     message.rawDescription = object.rawDescription ?? "";
     message.caption = object.caption ?? "";
     message.posts = object.posts?.map((e) => Post.fromPartial(e)) || [];
+    message.musicFile = object.musicFile ?? "";
+    message.musicName = object.musicName ?? "";
     return message;
   },
 };

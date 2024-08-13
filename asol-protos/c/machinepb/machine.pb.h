@@ -136,6 +136,8 @@ typedef struct _machine_ContentTypeStatus {
     pb_callback_t raw_description;
     pb_callback_t caption;
     pb_callback_t posts;
+    pb_callback_t music_file;
+    pb_callback_t music_name;
 } machine_ContentTypeStatus;
 
 typedef struct _machine_DispenseMetadataMap { 
@@ -411,7 +413,7 @@ extern "C" {
 #define machine_DispenseMetadata_init_default    {0, 0, 0, 0}
 #define machine_ContentTypeStatuses_init_default {{{NULL}, NULL}, {{NULL}, NULL}, 0}
 #define machine_ContentTypeStatuses_ContentStatusesEntry_init_default {{{NULL}, NULL}, false, machine_ContentTypeStatus_init_default}
-#define machine_ContentTypeStatus_init_default   {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
+#define machine_ContentTypeStatus_init_default   {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define machine_Post_init_default                {_machine_SocialPlatform_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, {{NULL}, NULL}, 0, 0, 0}
 #define machine_Email_init_default               {{{NULL}, NULL}, {{NULL}, NULL}, _machine_EmailRecipient_MIN}
 #define machine_VialProfile_init_default         {0, {{NULL}, NULL}, 0, 0, 0, 0, 0, 0, 0, 0, {{NULL}, NULL}, _machine_VialProfile_VialFluid_MIN, {{NULL}, NULL}, {{NULL}, NULL}}
@@ -435,7 +437,7 @@ extern "C" {
 #define machine_DispenseMetadata_init_zero       {0, 0, 0, 0}
 #define machine_ContentTypeStatuses_init_zero    {{{NULL}, NULL}, {{NULL}, NULL}, 0}
 #define machine_ContentTypeStatuses_ContentStatusesEntry_init_zero {{{NULL}, NULL}, false, machine_ContentTypeStatus_init_zero}
-#define machine_ContentTypeStatus_init_zero      {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
+#define machine_ContentTypeStatus_init_zero      {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}}
 #define machine_Post_init_zero                   {_machine_SocialPlatform_MIN, {{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, {{NULL}, NULL}, 0, 0, 0}
 #define machine_Email_init_zero                  {{{NULL}, NULL}, {{NULL}, NULL}, _machine_EmailRecipient_MIN}
 #define machine_VialProfile_init_zero            {0, {{NULL}, NULL}, 0, 0, 0, 0, 0, 0, 0, 0, {{NULL}, NULL}, _machine_VialProfile_VialFluid_MIN, {{NULL}, NULL}, {{NULL}, NULL}}
@@ -451,6 +453,8 @@ extern "C" {
 #define machine_ContentTypeStatus_raw_description_tag 2
 #define machine_ContentTypeStatus_caption_tag    3
 #define machine_ContentTypeStatus_posts_tag      5
+#define machine_ContentTypeStatus_music_file_tag 7
+#define machine_ContentTypeStatus_music_name_tag 8
 #define machine_DispenseMetadataMap_dispense_metadata_tag 1
 #define machine_StateReportList_StateReports_tag 1
 #define machine_SystemVialConfiguration_vials_tag 1
@@ -660,7 +664,9 @@ X(a, STATIC,   OPTIONAL, MESSAGE,  value,             2)
 X(a, CALLBACK, SINGULAR, STRING,   raw_title,         1) \
 X(a, CALLBACK, SINGULAR, STRING,   raw_description,   2) \
 X(a, CALLBACK, SINGULAR, STRING,   caption,           3) \
-X(a, CALLBACK, REPEATED, MESSAGE,  posts,             5)
+X(a, CALLBACK, REPEATED, MESSAGE,  posts,             5) \
+X(a, CALLBACK, SINGULAR, STRING,   music_file,        7) \
+X(a, CALLBACK, SINGULAR, STRING,   music_name,        8)
 #define machine_ContentTypeStatus_CALLBACK pb_default_field_callback
 #define machine_ContentTypeStatus_DEFAULT NULL
 #define machine_ContentTypeStatus_posts_MSGTYPE machine_Post

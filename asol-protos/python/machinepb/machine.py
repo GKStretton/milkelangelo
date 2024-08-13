@@ -252,6 +252,8 @@ class ContentTypeStatus(betterproto.Message):
     raw_description: str = betterproto.string_field(2)
     caption: str = betterproto.string_field(3)
     posts: List["Post"] = betterproto.message_field(5)
+    music_file: str = betterproto.string_field(7)
+    music_name: str = betterproto.string_field(8)
 
 
 @dataclass
