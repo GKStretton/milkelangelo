@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
     while not exiting:
         # Reconnect serial if down
-        if mqtt_connected and not serialConn.isOpen():
+        if mqtt_connected and not flashing and not serialConn.isOpen():
             serialConn.open()
             time.sleep(0.5)
 
