@@ -191,8 +191,6 @@ func RunSession(
 			// email for help
 			errWrap := fmt.Errorf("actor returned error, unknown situation: %s", err)
 			requestSessionIntervention(errWrap)
-			// add timeout to end session after a few hours if no human response
-			go sessionTimeout(time.Hour*3, true)
 			return err
 		}
 		sl.Println("actor success")
@@ -252,8 +250,6 @@ func runStartSequence(streamPreStartMinutes int, realSession bool) error {
 		err := fmt.Errorf("status was %s after waking but expected idle. Pausing and aborting automation", sr.Status)
 		// email for help
 		requestSessionIntervention(err)
-		// add timeout to end session after a few hours if no human response
-		go sessionTimeout(time.Hour*3, false)
 		return err
 	}
 	sl.Println("valid status")
