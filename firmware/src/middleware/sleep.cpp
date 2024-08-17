@@ -120,7 +120,7 @@ namespace Sleep {
 			if (eStopActive()) {
 				Logger::Info("E_STOP ACTIVE");
 			} else if (sleeping) {
-				Logger::Info("sleeping");
+				Logger::Info("sleeping...");
 			} else {
 				Logger::Info("awake");
 			}

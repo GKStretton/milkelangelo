@@ -70,7 +70,7 @@ bool CoverServo_IsOpen() {
 
 	if (dist < 10) {
 		// error reading cover position
-		Logger::Crit("cover tof invalid reading " + String(dist) + "mm.");
+		Logger::Warn("cover tof invalid reading " + String(dist) + "mm.");
 		return false;
 	}
 	if (dist > 25) {

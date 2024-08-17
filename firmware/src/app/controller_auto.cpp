@@ -79,7 +79,6 @@ void Controller::autoUpdate(State *s) {
 					// s->shutdownRequested = true;
 
 					Logger::Warn("failed 2 attempts to read open cover, proceeding anyway. (pls no breakage)");
-					return;
 				}
 			}
 		}
