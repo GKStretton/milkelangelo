@@ -5,6 +5,7 @@ import { TOPIC_FLUID, TOPIC_MAINTENANCE, TOPIC_RINSE, TOPIC_SHUTDOWN, TOPIC_WAKE
 import { FluidType } from '../machinepb/machine';
 import { Button, Typography } from '@mui/material';
 import Profiles from './Profiles';
+import { PAYLOAD_SMART_SWITCH_OFF, PAYLOAD_SMART_SWITCH_ON, TOPIC_FRIDGE_SWITCH } from '../topics_backend/topics_backend';
 
 function CleaningPage() {
   const { client: c } = useContext(MqttContext);
@@ -64,6 +65,14 @@ function CleaningPage() {
       <Button variant="outlined" color="warning" onClick={() => {
         c?.publish(TOPIC_FLUID, `${FluidType.FLUID_DRAIN},50,false`)
       }}>Drain bowl more</Button>
+      {" "}
+      <Button variant="contained" onClick={() => {
+        c?.publish(TOPIC_FRIDGE_SWITCH, PAYLOAD_SMART_SWITCH_ON)
+      }}>Fridge On</Button>
+      {" "}
+      <Button variant="contained" onClick={() => {
+        c?.publish(TOPIC_FRIDGE_SWITCH, PAYLOAD_SMART_SWITCH_OFF)
+      }}>Fridge Off</Button>
       <hr/>
       <br/>
       <Typography variant="h5">Vial locations from RIGHT to LEFT are 2, 3, 4, 5, 6, vials have an id, mapped to the location</Typography>
