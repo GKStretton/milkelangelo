@@ -118,16 +118,15 @@ def render(
     content.save_frame(thumbnail_file, t=thumbnail_time, with_mask=False)
     logging.info(f"wrote thumbnail to {thumbnail_file}")
 
-    temp_audiofile = "tmp.mp3"
-    temp_audiofile_path = os.path.join(base_dir, "tmp")
+    temp_audiofile = os.path.join(base_dir, "tmp", "tmp.mp3")
 
     overlay_render_start = datetime.now()
-    overlay.write_videofile(overlay_file, codec='libx264', fps=FPS, temp_audiofile=temp_audiofile, temp_audiofile_path=temp_audiofile_path)
+    overlay.write_videofile(overlay_file, codec='libx264', fps=FPS, temp_audiofile=temp_audiofile)
     logging.info(
         f"overlay generation time: {str(datetime.now() - overlay_render_start)}")
 
     content_render_start = datetime.now()
-    content.write_videofile(content_file, codec='libx264', fps=FPS, temp_audiofile=temp_audiofile, temp_audiofile_path=temp_audiofile_path)
+    content.write_videofile(content_file, codec='libx264', fps=FPS, temp_audiofile=temp_audiofile)
     logging.info(
         f"content generation time: {str(datetime.now() - content_render_start)}")
 
