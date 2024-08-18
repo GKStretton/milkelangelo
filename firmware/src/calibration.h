@@ -53,10 +53,10 @@
 
 // number of milliseconds to open the air valve for after fluid dispense
 #define FLUID_TRAVEL_TIME_MS 5000
-#define OPEN_DRAIN_DELAY_MS 12000
+#define OPEN_DRAIN_DELAY_MS 8000
 #define WATER_VOLUME_PER_SECOND_ML 8.25f
 #define MILK_VOLUME_PER_SECOND_ML 7.5f
-#define DRAIN_VOLUME_PER_SECOND_ML 5.0f
+#define DRAIN_VOLUME_PER_SECOND_ML 4.5f
 #define MAX_FLUID_LEVEL 500.0f
 
 // Rinse node calibration
