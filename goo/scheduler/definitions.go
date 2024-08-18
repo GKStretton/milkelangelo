@@ -15,7 +15,7 @@ const (
 	//ml of milk
 	milkVolume            = 200
 	waterVolume           = 300
-	streamPreStartMinutes = 5
+	streamPreStartMinutes = 10
 )
 
 // time the session will begin UTC
@@ -45,7 +45,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 
 	go scheduleWatcher(&Schedule{
 		name:    "FRIDGE_ON",
-		enabled: true,
+		enabled: false,
 		function: func() {
 			s := readOneTimeSettings()
 
@@ -79,7 +79,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 				&SessionDescriptor{
 					streamPreStartMinutes:  streamPreStartMinutes,
 					actorDurationMinutes:   10,
-					sessionDurationMinutes: 50,
+					sessionDurationMinutes: 45,
 					runActor:               !s.disableActor,
 				},
 				sm, twitchApi,
@@ -94,7 +94,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 
 	go scheduleWatcher(&Schedule{
 		name:    "FRIDGE_OFF",
-		enabled: true,
+		enabled: false,
 		function: func() {
 			mqtt.Publish(topics_backend.TOPIC_FRIDGE_SWITCH, topics_backend.PAYLOAD_SMART_SWITCH_OFF)
 		},
