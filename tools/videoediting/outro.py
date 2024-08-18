@@ -19,8 +19,8 @@ def timezones():
     from dateutil.relativedelta import relativedelta
     import pytz
 
-    # Create a datetime object for 18:30 UTC
-    dt_utc = datetime.combine(datetime.today() + relativedelta(weeks=1), time(18, 30)).replace(tzinfo=pytz.UTC)
+    # Create a datetime object for start time UTC
+    dt_utc = datetime.combine(datetime.today() + relativedelta(weeks=1), time(17, 0)).replace(tzinfo=pytz.UTC)
 
     # Convert to UK time
     zones = [

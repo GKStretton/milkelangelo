@@ -32,8 +32,8 @@ def write_content_statuses(content_statuses: pb.ContentTypeStatuses, base_dir: s
 
 
 def get_schedule_timestamp(ct: pb.ContentType) -> int:
-    schedule_hour = 18
-    schedule_minute = 30
+    schedule_hour = 17
+    schedule_minute = 0
 
     now = datetime.now(pytz.utc)
 
