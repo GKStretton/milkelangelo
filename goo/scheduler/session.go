@@ -176,6 +176,14 @@ func RunSession(
 		return err
 	}
 
+	endTime := beginTime.Add(time.Duration(d.sessionDurationMinutes+d.streamPreStartMinutes) * time.Minute)
+	drainOffsetMins := 3
+
+	obs.SetCountdown(
+		"Time until drainage:",
+		endTime.Add(-time.Minute*time.Duration(drainOffsetMins)),
+	)
+
 	if d.runActor {
 		seed := rand.Int63()
 		err = sm.SetCurrentSessionSeed(seed)
@@ -199,13 +207,6 @@ func RunSession(
 		sl.Println("ready for manual control...")
 	}
 
-	endTime := beginTime.Add(time.Duration(d.sessionDurationMinutes+d.streamPreStartMinutes) * time.Minute)
-
-	drainOffsetMins := 3
-	obs.SetCountdown(
-		"Time until drainage:",
-		endTime.Add(-time.Minute*time.Duration(drainOffsetMins)),
-	)
 	waitForTOffset(endTime, -drainOffsetMins, 0)
 
 	err = runEndSequence()

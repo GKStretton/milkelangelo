@@ -49,7 +49,7 @@ func countdownLoop() {
 
 	m := int(until.Minutes())
 	if m > 0 {
-		tStr = fmt.Sprintf("%dm", m) + tStr
+		tStr = fmt.Sprintf("%dm ", m) + tStr
 	}
 
 	updateCountdownElement(countdownTitle, tStr)
