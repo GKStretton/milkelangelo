@@ -60,7 +60,7 @@ func updateCountdownElement(title, dur string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	if scene != SCENE_LIVE {
+	if !(scene == SCENE_LIVE || scene == SCENE_COMPLETE) {
 		return
 	}
 

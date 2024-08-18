@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"name": "twitch-extension",
+			"path": "twitch-extension"
+		},
+		{
+			"path": "twitch-ebs"
+		}
+	],
+	"settings": {}
+}
