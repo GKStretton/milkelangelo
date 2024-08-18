@@ -208,7 +208,8 @@ def run():
         content_clip,
     )
 
-    content_clip = add_music(base_dir, content_clip, content_plan[content_type.name].music_file)
+    music_file=content_plan.content_statuses[content_type.name].music_file
+    content_clip = add_music(base_dir, content_clip, music_file)
 
     logging.info(f"length with stills: {dur_fmt(content_clip.duration)}")
     logging.info(f"total generation time: {str(datetime.now() - gen_start)}")
