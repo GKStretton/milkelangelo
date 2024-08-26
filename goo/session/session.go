@@ -104,7 +104,11 @@ func (sm *SessionManager) BeginSession(production bool) (*Session, error) {
 		return nil, fmt.Errorf("failed to check if session is in progress: %v", err)
 	}
 	if latest != nil && !latest.Complete {
-		return nil, fmt.Errorf("session already in progress")
+		if !latest.Paused {
+			return nil, fmt.Errorf("session already in progress and unpaused")
+		}
+		fmt.Println("Paused session in progress, resuming instead of starting")
+		return sm.ResumeSession()
 	}
 
 	// okay to start a session

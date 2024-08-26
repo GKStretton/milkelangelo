@@ -44,8 +44,8 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 	})
 
 	go scheduleWatcher(&Schedule{
-		name:    "FRIDGE_ON",
-		enabled: false,
+		name:    "REQUEST_MILK",
+		enabled: true,
 		function: func() {
 			s := readOneTimeSettings()
 
@@ -54,7 +54,9 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 				return
 			}
 
-			mqtt.Publish(topics_backend.TOPIC_FRIDGE_SWITCH, topics_backend.PAYLOAD_SMART_SWITCH_ON)
+			// disabling fridge to reduce convection
+			// mqtt.Publish(topics_backend.TOPIC_FRIDGE_SWITCH, topics_backend.PAYLOAD_SMART_SWITCH_ON)
+
 			// notify routine operator to fill with milk
 			requestFridgeMilk()
 		},
