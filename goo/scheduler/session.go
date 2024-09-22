@@ -58,7 +58,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 			err := RunSession(
 				&SessionDescriptor{
 					streamPreStartMinutes:  0,
-					actorDurationMinutes:   10,
+					actorDurationMinutes:   12,
 					sessionDurationMinutes: 45,
 					runActor:               true,
 				},
@@ -75,7 +75,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 			err := RunSession(
 				&SessionDescriptor{
 					streamPreStartMinutes:  0,
-					actorDurationMinutes:   10,
+					actorDurationMinutes:   12,
 					sessionDurationMinutes: 45,
 					runActor:               false,
 				},

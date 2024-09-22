@@ -36,8 +36,8 @@ func (d *autoDecider) GetRandomVialPos(predictedState *machinepb.StateReport) ui
 		return 2
 	}
 
-	// only allow one emul, and ensure it's not first
-	emulsifierAllowed := predictedState.CollectionRequest.RequestNumber >= 1 && !d.emulsifierUsed
+	// only allow one emul, and ensure it's not too early (>= 1 means only from second collection)
+	emulsifierAllowed := predictedState.CollectionRequest.RequestNumber >= 3 && !d.emulsifierUsed
 
 	options := []uint64{}
 	snapshot := vialprofiles.GetSystemVialConfigurationSnapshot()
