@@ -31,6 +31,8 @@ type SessionDescriptor struct {
 
 var lock *AutomationLock = &AutomationLock{}
 
+const actorDurationMins = 11
+
 func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
 	mqtt.Subscribe("asol/debug/runStartSequence", func(topic string, payload []byte) {
 		go func() {
@@ -58,7 +60,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 			err := RunSession(
 				&SessionDescriptor{
 					streamPreStartMinutes:  0,
-					actorDurationMinutes:   12,
+					actorDurationMinutes:   actorDurationMins,
 					sessionDurationMinutes: 45,
 					runActor:               true,
 				},
@@ -75,7 +77,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 			err := RunSession(
 				&SessionDescriptor{
 					streamPreStartMinutes:  0,
-					actorDurationMinutes:   12,
+					actorDurationMinutes:   actorDurationMins,
 					sessionDurationMinutes: 45,
 					runActor:               false,
 				},

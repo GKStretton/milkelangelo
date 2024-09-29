@@ -80,7 +80,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 			err := RunSession(
 				&SessionDescriptor{
 					streamPreStartMinutes:  streamPreStartMinutes,
-					actorDurationMinutes:   12,
+					actorDurationMinutes:   actorDurationMins,
 					sessionDurationMinutes: 45,
 					runActor:               !s.disableActor,
 				},
