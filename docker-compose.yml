@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: runner/Dockerfile
+    network_mode: host
     user: "1000:1000"
     volumes:
       - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}:${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
@@ -65,3 +66,4 @@ services:
     restart: always
     ports:
       - "5000:80"
+    network_mode: host
