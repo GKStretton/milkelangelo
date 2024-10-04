@@ -1,0 +1,130 @@
+openapi: 3.0.1
+info:
+  title: Twitch Extension Backend Service API
+  version: 1.0.0
+  description: API for the Twitch Extension Backend Service, proxying requests to the internal platform.
+
+servers:
+  - url: http://localhost:8888
+    description: Local development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+
+# apply security to all endpoints
+security:
+  - bearerAuth: []
+
+paths:
+  /goto:
+    post:
+      summary: Move the robot to a specific position
+      operationId: gotoPosition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                x:
+                  type: number
+                  format: float
+                  description: The x-coordinate to move to
+                y:
+                  type: number
+                  format: float
+                  description: The y-coordinate to move to
+      responses:
+        202:
+          description: Movement request accepted
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        429:
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /collect:
+    post:
+      summary: Collect an item
+      operationId: collectItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: The ID of the item to collect
+      responses:
+        202:
+          description: Collection request accepted
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        429:
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /dispense:
+    post:
+      summary: Dispense an item
+      operationId: dispenseItem
+      responses:
+        202:
+          description: Dispense request accepted
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        429:
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
