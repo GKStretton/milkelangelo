@@ -8,7 +8,10 @@ import (
 	"github.com/gkstretton/study-of-light/twitch-ebs/common"
 	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
 	"github.com/gkstretton/study-of-light/twitch-ebs/openapi"
+	"github.com/op/go-logging"
 )
+
+var l = logging.MustGetLogger("server")
 
 type server struct {
 	r   *gin.Engine
@@ -20,6 +23,7 @@ type server struct {
 }
 
 func (s *server) Run() {
+	l.Infof("listening for twitch requests on %s...", s.addr)
 	s.r.Run(s.addr)
 }
 
@@ -33,6 +37,7 @@ func NewServer(addr string, sharedSecretPath string, goo gooapi.GooApi) (*server
 
 	s := &server{
 		r:            r,
+		goo:          goo,
 		addr:         addr,
 		sharedSecret: sharedSecret,
 	}

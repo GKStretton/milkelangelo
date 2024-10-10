@@ -46,7 +46,7 @@ type ServerInterface interface {
 	// (POST /dispense)
 	Dispense(c *gin.Context)
 	// Move the pipette tip to a specific position
-	// (POST /goto)
+	// (PUT /goto)
 	GoToPosition(c *gin.Context)
 }
 
@@ -133,5 +133,5 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.POST(options.BaseURL+"/collect", wrapper.CollectFromVial)
 	router.POST(options.BaseURL+"/dispense", wrapper.Dispense)
-	router.POST(options.BaseURL+"/goto", wrapper.GoToPosition)
+	router.PUT(options.BaseURL+"/goto", wrapper.GoToPosition)
 }

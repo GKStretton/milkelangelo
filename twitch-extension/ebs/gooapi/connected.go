@@ -2,7 +2,6 @@ package gooapi
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"sync"
 
@@ -36,7 +35,10 @@ func NewConnectedGooApi(internalSecretPath string, listenAddr string) (*connecte
 }
 
 func (g *connectedGooApi) Start() {
-	log.Fatal(http.ListenAndServe(g.listenAddr, nil))
+	err := http.ListenAndServe(g.listenAddr, nil)
+	if err != nil {
+		l.Fatalf("error in listen and server for goo requests", err)
+	}
 }
 
 func (g *connectedGooApi) CollectFromVial(vial int) error {

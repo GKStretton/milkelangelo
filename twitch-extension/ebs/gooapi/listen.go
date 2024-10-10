@@ -38,6 +38,8 @@ func (g *connectedGooApi) registerMessageListener(c chan *message) {
 	defer g.subsLock.Unlock()
 
 	g.subs = append(g.subs, c)
+
+	l.Debug("registered new message listener (i.e. goo instance)")
 }
 
 func (g *connectedGooApi) removeMessageListener(c chan *message) {
@@ -51,6 +53,8 @@ func (g *connectedGooApi) removeMessageListener(c chan *message) {
 			break
 		}
 	}
+
+	l.Debug("removed a message listener (i.e. goo instance)")
 }
 
 func (g *connectedGooApi) sendMessage(msg *message) error {
@@ -58,7 +62,7 @@ func (g *connectedGooApi) sendMessage(msg *message) error {
 	defer g.subsLock.Unlock()
 
 	if len(g.subs) == 0 {
-		return errors.New("no listener")
+		return errors.New("no listener (i.e. no goo instance)")
 	}
 
 	for _, sub := range g.subs {
@@ -67,6 +71,9 @@ func (g *connectedGooApi) sendMessage(msg *message) error {
 		default:
 		}
 	}
+
+	l.Debugf("sent message to %d connected goo instance(s): %s - %+v", len(g.subs), msg.MessageType, msg.Data)
+
 	return nil
 }
 
@@ -124,20 +131,23 @@ func enableCors(w *http.ResponseWriter) {
 
 // PrintRequesterInfo prints information about the requester from an http.Request
 func PrintRequesterInfo(r *http.Request, claims *jwt.StandardClaims) {
-	fmt.Printf("verified new listener request from %s\n", r.RemoteAddr)
+	if claims == nil {
+		return
+	}
+	l.Infof("verified new listener request from %s\n", r.RemoteAddr)
 
-	fmt.Println("Headers:")
+	l.Infof("Headers:")
 	for name, headers := range r.Header {
 		for _, h := range headers {
-			fmt.Printf("\t%v: %v\n", name, h)
+			l.Infof("\t%v: %v", name, h)
 		}
 	}
-	fmt.Printf("claims: %+v\n\n\n", claims)
+	l.Infof("claims: %+v\n\n", claims)
 }
 
 func httpErr(w *http.ResponseWriter, code int, s string, args ...interface{}) {
 	msg := fmt.Errorf(s, args...)
 	(*w).WriteHeader(code)
 	fmt.Fprintln(*w, msg)
-	fmt.Printf("%d: %s", code, msg)
+	l.Errorf("%d: %s", code, msg)
 }
