@@ -16,14 +16,14 @@ type Error struct {
 	Message *string `json:"message,omitempty"`
 }
 
-// CollectItemJSONBody defines parameters for CollectItem.
-type CollectItemJSONBody struct {
-	// Id The ID of the item to collect
+// CollectFromVialJSONBody defines parameters for CollectFromVial.
+type CollectFromVialJSONBody struct {
+	// Id The ID of the vial to collect
 	Id *int `json:"id,omitempty"`
 }
 
-// GotoPositionJSONBody defines parameters for GotoPosition.
-type GotoPositionJSONBody struct {
+// GoToPositionJSONBody defines parameters for GoToPosition.
+type GoToPositionJSONBody struct {
 	// X The x-coordinate to move to
 	X *float32 `json:"x,omitempty"`
 
@@ -31,23 +31,23 @@ type GotoPositionJSONBody struct {
 	Y *float32 `json:"y,omitempty"`
 }
 
-// CollectItemJSONRequestBody defines body for CollectItem for application/json ContentType.
-type CollectItemJSONRequestBody CollectItemJSONBody
+// CollectFromVialJSONRequestBody defines body for CollectFromVial for application/json ContentType.
+type CollectFromVialJSONRequestBody CollectFromVialJSONBody
 
-// GotoPositionJSONRequestBody defines body for GotoPosition for application/json ContentType.
-type GotoPositionJSONRequestBody GotoPositionJSONBody
+// GoToPositionJSONRequestBody defines body for GoToPosition for application/json ContentType.
+type GoToPositionJSONRequestBody GoToPositionJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Collect an item
+	// Collect from a vial
 	// (POST /collect)
-	CollectItem(c *gin.Context)
-	// Dispense an item
+	CollectFromVial(c *gin.Context)
+	// Dispense from pipette
 	// (POST /dispense)
-	DispenseItem(c *gin.Context)
-	// Move the robot to a specific position
+	Dispense(c *gin.Context)
+	// Move the pipette tip to a specific position
 	// (POST /goto)
-	GotoPosition(c *gin.Context)
+	GoToPosition(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -59,8 +59,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// CollectItem operation middleware
-func (siw *ServerInterfaceWrapper) CollectItem(c *gin.Context) {
+// CollectFromVial operation middleware
+func (siw *ServerInterfaceWrapper) CollectFromVial(c *gin.Context) {
 
 	c.Set(BearerAuthScopes, []string{})
 
@@ -71,11 +71,11 @@ func (siw *ServerInterfaceWrapper) CollectItem(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.CollectItem(c)
+	siw.Handler.CollectFromVial(c)
 }
 
-// DispenseItem operation middleware
-func (siw *ServerInterfaceWrapper) DispenseItem(c *gin.Context) {
+// Dispense operation middleware
+func (siw *ServerInterfaceWrapper) Dispense(c *gin.Context) {
 
 	c.Set(BearerAuthScopes, []string{})
 
@@ -86,11 +86,11 @@ func (siw *ServerInterfaceWrapper) DispenseItem(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DispenseItem(c)
+	siw.Handler.Dispense(c)
 }
 
-// GotoPosition operation middleware
-func (siw *ServerInterfaceWrapper) GotoPosition(c *gin.Context) {
+// GoToPosition operation middleware
+func (siw *ServerInterfaceWrapper) GoToPosition(c *gin.Context) {
 
 	c.Set(BearerAuthScopes, []string{})
 
@@ -101,7 +101,7 @@ func (siw *ServerInterfaceWrapper) GotoPosition(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GotoPosition(c)
+	siw.Handler.GoToPosition(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -131,7 +131,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.POST(options.BaseURL+"/collect", wrapper.CollectItem)
-	router.POST(options.BaseURL+"/dispense", wrapper.DispenseItem)
-	router.POST(options.BaseURL+"/goto", wrapper.GotoPosition)
+	router.POST(options.BaseURL+"/collect", wrapper.CollectFromVial)
+	router.POST(options.BaseURL+"/dispense", wrapper.Dispense)
+	router.POST(options.BaseURL+"/goto", wrapper.GoToPosition)
 }

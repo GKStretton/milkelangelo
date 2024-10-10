@@ -26,10 +26,78 @@ security:
   - bearerAuth: []
 
 paths:
-  /goto:
+  /collect:
     post:
-      summary: Move the robot to a specific position
-      operationId: gotoPosition
+      summary: Collect from a vial
+      operationId: collectFromVial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  description: The ID of the vial to collect
+      responses:
+        202:
+          description: Collection request accepted
+        400:
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        429:
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /dispense:
+    post:
+      summary: Dispense from pipette
+      operationId: dispense
+      responses:
+        202:
+          description: Dispense request accepted
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        429:
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /goto:
+    put:
+      summary: Move the pipette tip to a specific position
+      operationId: goToPosition
       requestBody:
         required: true
         content:
@@ -66,64 +134,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
-  /collect:
-    post:
-      summary: Collect an item
-      operationId: collectItem
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: integer
-                  description: The ID of the item to collect
-      responses:
-        202:
-          description: Collection request accepted
-        400:
-          description: "Bad Request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        429:
-          description: Too many requests
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /dispense:
-    post:
-      summary: Dispense an item
-      operationId: dispenseItem
-      responses:
-        202:
-          description: Dispense request accepted
-        400:
-          description: "Bad Request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        401:
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        429:
-          description: Too many requests
+        500:
+          description: Internal error
           content:
             application/json:
               schema:

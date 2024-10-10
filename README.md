@@ -19,6 +19,17 @@ This is the monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLigh
 	- [x] Automated social media posting
 	- [x] Automated session control
 
+## Dependencies
+
+Some parts of the project are not representing by source code:
+- DEPTH, the pc the backend stack runs on, is a debian installation
+- relies on `depth-srv` docker-compose repo being run on same machine (mosquitto)
+- OBS
+  - Used compositing the live stream
+  - Installed with flatpak, specifically the 2023-12-11 version. WARNING: newer versions break the gstreamer plugin currently (08/10/2024)
+  - require gstreamer plugin
+  - profile and scene collections are in `resources/obs`
+
 ## Instructions
 
 ### scripts
@@ -39,7 +50,7 @@ LIGHT_STORES_DIR=/mnt/md0/light-stores/
 
 ### kv/ settings:
 
-There's a key value store in e.g. `/mnt/md0/light-stores/kv/` with most configuration.
+There's a key-value store in e.g. `/mnt/md0/light-stores/kv/` with most configuration.
 
 - ENABLE_CONTENT_SCHEDULER_LOOP: controls whether the content scheduler loop will run to automatically upload at regular intervals
 - ENABLE_SCHEDULER: controls whether the scheduler will run, which automatically runs sessions each week
