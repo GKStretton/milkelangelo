@@ -11,7 +11,6 @@ import (
 	"github.com/nicklaw5/helix/v2"
 )
 
-const refreshTokenKey = "TWITCH_REFRESH_TOKEN"
 const channelName = "studyoflight"
 const channelId = "807784320"
 
@@ -99,9 +98,9 @@ func Start() *TwitchApi {
 }
 
 func getRefreshToken() string {
-	return string(keyvalue.Get(refreshTokenKey))
+	return string(keyvalue.Get("TWITCH_REFRESH_TOKEN"))
 }
 
 func setRefreshToken(token string) {
-	keyvalue.Set(refreshTokenKey, []byte(token))
+	keyvalue.Set("TWITCH_REFRESH_TOKEN", []byte(token))
 }

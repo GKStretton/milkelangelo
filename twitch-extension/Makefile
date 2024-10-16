@@ -7,5 +7,5 @@ deps:
 
 # Auto-generates the OpenAPI client and server code from the yaml file.
 openapi:
-	mkdir -p ./ebs/openapi
-	oapi-codegen -generate gin,models -package openapi ./openapi/openapi.yaml > ./ebs/openapi/api.gen.go
+	mkdir -p ./ebs/server/openapi
+	oapi-codegen -generate gin,models -package openapi ./openapi/openapi.yaml > ./ebs/server/openapi/api.gen.go

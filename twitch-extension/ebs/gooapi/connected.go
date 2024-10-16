@@ -30,6 +30,7 @@ func NewConnectedGooApi(internalSecretPath string, listenAddr string) (*connecte
 	}
 
 	http.HandleFunc("/listen", g.listenHandler)
+	http.HandleFunc("/send-update", g.updateHandler)
 
 	return g, nil
 }

@@ -11,28 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// returns token used to send to extensions pubsub through Helix api.
-func getBroadcastToken(dur time.Duration) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":        time.Now().Add(dur).UTC().Unix(),
-		"user_id":    channelId,
-		"role":       "external",
-		"channel_id": channelId,
-		"pubsub_perms": map[string]interface{}{
-			"send": []string{"broadcast"},
-		},
-	})
-	secret, err := getSharedTwitchSecret()
-	if err != nil {
-		return "", err
-	}
-	signedToken, err := token.SignedString([]byte(secret))
-	if err != nil {
-		return "", err
-	}
-	return signedToken, nil
-}
-
 // returns custom token for listening from the EBS
 func getEBSListeningToken(dur time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
@@ -53,18 +31,6 @@ func getEBSListeningToken(dur time.Duration) (string, error) {
 		return "", err
 	}
 	return signedToken, nil
-}
-
-func getSharedTwitchSecret() (string, error) {
-	secret := keyvalue.Get("TWITCH_EXTENSION_SECRET")
-	if secret == nil {
-		return "", errors.New("no value for TWITCH_EXTENSION_SECRET in kv")
-	}
-	decodedBytes, err := base64.StdEncoding.DecodeString(string(secret))
-	if err != nil {
-		return "", fmt.Errorf("failed to decode shared secret: %v", err)
-	}
-	return string(decodedBytes), nil
 }
 
 func getInternalSecret() (string, error) {

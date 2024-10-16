@@ -5,6 +5,7 @@ import (
 
 	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
 	"github.com/gkstretton/study-of-light/twitch-ebs/server"
+	"github.com/gkstretton/study-of-light/twitch-ebs/twitchapi"
 	"github.com/op/go-logging"
 )
 
@@ -13,6 +14,8 @@ var (
 	internalAddr       = flag.String("internalAddr", ":8788", "address to listen for internal (goo) requests on")
 	internalSecretPath = flag.String("internalSecretPath", "/mnt/md0/light-stores/kv/EBS_INTERNAL_SECRET", "path for secret used for internal jwt verification")
 	sharedSecretPath   = flag.String("sharedSecretPath", ".shared-secret", "path for shared secret used for twitch jwt verification")
+	channelID          = flag.String("channelID", "807784320", "twitch channel id")
+	extensionClientID  = flag.String("extensionClientID", "ihiyqlxtem517wq76f4hn8pvo9is30", "twitch extension client id")
 
 	l = logging.MustGetLogger("ebs")
 )
@@ -22,13 +25,19 @@ func main() {
 
 	goo, err := gooapi.NewConnectedGooApi(*internalSecretPath, *internalAddr)
 	if err != nil {
-		l.Fatalf("failed to create goo api: %v\n", err)
+		l.Fatalf("failed to create goo api: %w\n", err)
 	}
+
+	twitchapi, err := twitchapi.NewConnectedTwitchAPI(*sharedSecretPath, *channelID, *extensionClientID)
+	if err != nil {
+		l.Fatalf("failed to create twitch api: %w\n", err)
+	}
+	_ = twitchapi
 
 	s, err := server.NewServer(*addr, *sharedSecretPath, goo)
 
 	if err != nil {
-		l.Fatalf("failed to create server: %v\n", err)
+		l.Fatalf("failed to create server: %w\n", err)
 	}
 
 	// listen for internal (goo) connections

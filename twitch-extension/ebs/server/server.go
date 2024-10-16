@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gkstretton/study-of-light/twitch-ebs/common"
 	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
-	"github.com/gkstretton/study-of-light/twitch-ebs/openapi"
+	"github.com/gkstretton/study-of-light/twitch-ebs/server/openapi"
 	"github.com/op/go-logging"
 )
 

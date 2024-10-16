@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gkstretton/study-of-light/twitch-ebs/openapi"
+	"github.com/gkstretton/study-of-light/twitch-ebs/server/openapi"
 )
 
 func (s *server) CollectFromVial(c *gin.Context) {
