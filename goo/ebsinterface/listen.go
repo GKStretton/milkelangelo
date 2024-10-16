@@ -3,61 +3,53 @@ package ebsinterface
 import (
 	"encoding/json"
 	"fmt"
-	"sync"
+	"net/url"
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/types"
 	"github.com/r3labs/sse"
 )
 
-const ebsListenUrl = "http://localhost:8080/listen"
+func (e *extensionSession) SubscribeVotes() <-chan *types.EbsMessage {
+	e.subsLock.Lock()
+	defer e.subsLock.Unlock()
 
-var subs = []chan *types.Vote{}
-var subsLock = sync.Mutex{}
-
-func (e *ExtensionSession) SubscribeVotes() <-chan *types.Vote {
-	subsLock.Lock()
-	defer subsLock.Unlock()
-
-	c := make(chan *types.Vote)
-	subs = append(subs, c)
+	c := make(chan *types.EbsMessage)
+	e.subs = append(e.subs, c)
 	return c
 }
 
-func (e *ExtensionSession) UnsubscribeVotes(c <-chan *types.Vote) {
-	subsLock.Lock()
-	defer subsLock.Unlock()
+func (e *extensionSession) UnsubscribeVotes(c <-chan *types.EbsMessage) {
+	e.subsLock.Lock()
+	defer e.subsLock.Unlock()
 
-	for i, sub := range subs {
+	for i, sub := range e.subs {
 		if sub == c {
-			subs = append(subs[:i], subs[i+1:]...)
+			e.subs = append(e.subs[:i], e.subs[i+1:]...)
 			return
 		}
 	}
 }
 
-func (e *ExtensionSession) distributeVote(data *types.Vote) {
-	subsLock.Lock()
-	defer subsLock.Unlock()
+func (e *extensionSession) distributeMessage(msg *types.EbsMessage) {
+	e.subsLock.Lock()
+	defer e.subsLock.Unlock()
 
-	for _, sub := range subs {
+	for _, sub := range e.subs {
 		select {
-		case sub <- data:
+		case sub <- msg:
 		default:
 		}
 	}
 }
 
-// rawVote is received over sse channel
-type rawVote struct {
-	Data          []byte
-	OpaqueUserID  string
-	IsBroadcaster bool
-}
-
-// connect listens to the ebs vote stream
-func (e *ExtensionSession) connect() error {
-	client := sse.NewClient(ebsListenUrl)
+// connect listens to the ebs message stream
+func (e *extensionSession) connect() error {
+	result, err := url.JoinPath(e.ebsAddress, "/listen")
+	if err != nil {
+		return fmt.Errorf("error forming ebs listen url: %w", err)
+	}
+	client := sse.NewClient(result)
 	client.Headers["Authorization"] = "Bearer " + e.ebsListeningToken
 	// client.ReconnectStrategy = &backoff.StopBackOff{}
 	client.ReconnectNotify = func(err error, d time.Duration) {
@@ -68,7 +60,7 @@ func (e *ExtensionSession) connect() error {
 	client.OnDisconnect(func(c *sse.Client) {
 		l.Printf("disconnected: %v\n", c)
 	})
-	err := client.SubscribeChan("", ch)
+	err = client.SubscribeChan("", ch)
 	if err != nil {
 		return fmt.Errorf("failed to subscribe to twitch ebs sse: %v", err)
 	}
@@ -76,34 +68,42 @@ func (e *ExtensionSession) connect() error {
 		for {
 			event, ok := <-ch
 			if !ok {
-				l.Println("closing twitch ebs vote listener")
+				l.Println("closing twitch ebs message listener")
 				return
 			}
-			//todo: rate limit to prevent ddos, here or in ebs?
-			vote := &rawVote{}
-			err := json.Unmarshal(event.Data, vote)
-			if err != nil {
-				l.Printf("failed to unmarshal rawVote: %v\n", err)
+
+			msg := &types.EbsMessage{
+				Type: types.EbsMessageType(event.Event),
+			}
+
+			switch msg.Type {
+			case types.EbsDispenseRequest:
+				l.Printf("got dispense request from ebs")
+				err := json.Unmarshal(event.Data, &msg.DispenseRequest)
+				if err != nil {
+					l.Printf("error unmarshalling dispense request from ebs: %s", err)
+					continue
+				}
+			case types.EbsCollectionRequest:
+				l.Printf("got collection request from ebs")
+				err := json.Unmarshal(event.Data, &msg.CollectionRequest)
+				if err != nil {
+					l.Printf("error unmarshalling collection request from ebs: %s", err)
+					continue
+				}
+			case types.EbsGoToRequest:
+				l.Printf("got goto request from ebs")
+				err := json.Unmarshal(event.Data, &msg.GoToRequest)
+				if err != nil {
+					l.Printf("error unmarshalling goto request from ebs: %s", err)
+					continue
+				}
+			default:
+				l.Printf("unrecognised ebs message type '%s'", msg.Type)
 				continue
 			}
 
-			voteDetails := &types.VoteDetails{}
-			err = json.Unmarshal(vote.Data, voteDetails)
-			if err != nil {
-				l.Printf("failed to unmarshal voteDetails: %v\n", err)
-				continue
-			}
-
-			if err := validateVote(voteDetails); err != nil {
-				l.Printf("invalid vote: %v\n", err)
-				continue
-			}
-
-			e.distributeVote(&types.Vote{
-				Data:          *voteDetails,
-				OpaqueUserID:  vote.OpaqueUserID,
-				IsBroadcaster: vote.IsBroadcaster,
-			})
+			e.distributeMessage(msg)
 		}
 	}()
 
@@ -113,28 +113,5 @@ func (e *ExtensionSession) connect() error {
 		close(ch)
 	}()
 
-	return nil
-}
-
-func validateVote(d *types.VoteDetails) error {
-	if d == nil {
-		return fmt.Errorf("nil vote")
-	}
-	if d.VoteType == types.VoteTypeCollection && d.CollectionVote == nil {
-		return fmt.Errorf("nil collection vote")
-	}
-	if d.VoteType == types.VoteTypeLocation && d.LocationVote == nil {
-		return fmt.Errorf("nil location vote")
-	}
-
-	if d.VoteType == types.VoteTypeLocation {
-		v := d.LocationVote
-		if v.X < -1 || v.X > 1 {
-			return fmt.Errorf("x out of range -1 - 1")
-		}
-		if v.Y < -1 || v.Y > 1 {
-			return fmt.Errorf("y out of range -1 - 1")
-		}
-	}
 	return nil
 }

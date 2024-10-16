@@ -1,11 +1,7 @@
 package twitchapi
 
 import (
-	"fmt"
-
 	"github.com/gempir/go-twitch-irc/v4"
-	"github.com/gkstretton/dark/services/goo/types"
-	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
 type Message struct {
@@ -48,35 +44,4 @@ func (api *TwitchApi) setupHandlers() {
 		}
 		api.lock.Unlock()
 	})
-}
-
-func (api *TwitchApi) SubscribeChatVotes(voteType types.VoteType) (voteCh chan *types.Vote, unsubscribe func()) {
-	_, vialPosToName := vialprofiles.GetVialOptionsAndMap()
-
-	msgCh := api.SubscribeChat()
-
-	voteCh = make(chan *types.Vote)
-	go func() {
-		for {
-			msg, ok := <-msgCh
-			if !ok {
-				close(voteCh)
-				return
-			}
-			vote, err := api.twitchMessageToVote(voteType, msg, vialPosToName)
-			if err != nil {
-				fmt.Printf("failed to parse vote from %s: %s\n", msg.Message, err)
-				api.Reply(msg.ID, err.Error())
-				continue
-			}
-			if vote == nil {
-				continue
-			}
-			voteCh <- vote
-		}
-	}()
-
-	return voteCh, func() {
-		api.UnsubscribeChat(msgCh)
-	}
 }

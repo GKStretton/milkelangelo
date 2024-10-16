@@ -22,7 +22,7 @@ func getBroadcastToken(dur time.Duration) (string, error) {
 			"send": []string{"broadcast"},
 		},
 	})
-	secret, err := getSharedSecret()
+	secret, err := getSharedTwitchSecret()
 	if err != nil {
 		return "", err
 	}
@@ -44,7 +44,7 @@ func getEBSListeningToken(dur time.Duration) (string, error) {
 		Issuer:    "depth/goo",
 		Subject:   "depth/goo",
 	})
-	secret, err := getSharedSecret()
+	secret, err := getInternalSecret()
 	if err != nil {
 		return "", err
 	}
@@ -55,7 +55,7 @@ func getEBSListeningToken(dur time.Duration) (string, error) {
 	return signedToken, nil
 }
 
-func getSharedSecret() (string, error) {
+func getSharedTwitchSecret() (string, error) {
 	secret := keyvalue.Get("TWITCH_EXTENSION_SECRET")
 	if secret == nil {
 		return "", errors.New("no value for TWITCH_EXTENSION_SECRET in kv")
@@ -63,6 +63,18 @@ func getSharedSecret() (string, error) {
 	decodedBytes, err := base64.StdEncoding.DecodeString(string(secret))
 	if err != nil {
 		return "", fmt.Errorf("failed to decode shared secret: %v", err)
+	}
+	return string(decodedBytes), nil
+}
+
+func getInternalSecret() (string, error) {
+	secret := keyvalue.Get("EBS_INTERNAL_SECRET")
+	if secret == nil {
+		return "", errors.New("no value for EBS_INTERNAL_SECRET in kv")
+	}
+	decodedBytes, err := base64.StdEncoding.DecodeString(string(secret))
+	if err != nil {
+		return "", fmt.Errorf("failed to decode internal secret: %v", err)
 	}
 	return string(decodedBytes), nil
 }

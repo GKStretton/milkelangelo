@@ -7,6 +7,8 @@ import (
 	"os"
 	"sync"
 	"time"
+
+	"github.com/gkstretton/dark/services/goo/types"
 )
 
 var l = log.New(os.Stdout, "[EBS Interface] ", log.Flags())
@@ -17,7 +19,7 @@ var (
 	useLocalEBS = flag.Bool("useLocalEBS", true, "if true, use local ebs rather than hosted one")
 )
 
-type ExtensionSession struct {
+type extensionSession struct {
 	broadcastToken    string
 	ebsListeningToken string
 	cleanUpDone       bool
@@ -27,9 +29,19 @@ type ExtensionSession struct {
 	exitCh             chan struct{}
 	triggerBroadcast   chan struct{}
 	broadcastDataCache *broadcastData
+
+	subs     []chan *types.EbsMessage
+	subsLock sync.Mutex
+
+	ebsAddress string
 }
 
-func NewExtensionSession(dur time.Duration) (*ExtensionSession, error) {
+type EbsApi interface {
+	SubscribeMessages() <-chan *types.EbsMessage
+	UnsubscribeMessages(c <-chan *types.EbsMessage)
+}
+
+func NewExtensionSession(ebsAddress string, dur time.Duration) (*extensionSession, error) {
 	bt, err := getBroadcastToken(dur)
 	if err != nil {
 		return nil, err
@@ -39,12 +51,14 @@ func NewExtensionSession(dur time.Duration) (*ExtensionSession, error) {
 		return nil, err
 	}
 
-	es := &ExtensionSession{
+	es := &extensionSession{
 		broadcastToken:     bt,
 		ebsListeningToken:  elt,
 		exitCh:             make(chan struct{}),
 		triggerBroadcast:   make(chan struct{}),
 		broadcastDataCache: &broadcastData{},
+		subs:               []chan *types.EbsMessage{},
+		ebsAddress:         ebsAddress,
 	}
 
 	err = es.launch()
@@ -71,7 +85,7 @@ func NewExtensionSession(dur time.Duration) (*ExtensionSession, error) {
 }
 
 // trigger running of the EBS on fly.io
-func (e *ExtensionSession) launch() error {
+func (e *extensionSession) launch() error {
 	if *useLocalEBS {
 		return nil
 	}
@@ -81,7 +95,7 @@ func (e *ExtensionSession) launch() error {
 
 // CleanUp will be automatically called after duration specified on creation.
 // If exiting early, call manually.
-func (e *ExtensionSession) CleanUp() {
+func (e *extensionSession) CleanUp() {
 	e.lock.Lock()
 	defer e.lock.Unlock()
 	if e.cleanUpDone {

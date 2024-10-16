@@ -10,46 +10,30 @@ import (
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/keyvalue"
-	"github.com/gkstretton/dark/services/goo/types"
 )
 
-// consists of latest state report and current vote status
+// consists of latest state report
 type broadcastData struct {
-	CurrentVoteStatus  *types.VoteStatus
-	PreviousVoteResult *types.VoteStatus
-	RobotStatus        *robotStatus
+	RobotStatus *robotStatus
 }
 
 // ManualTriggerBroadcast sends early, used after a significant update to
 // improve responsiveness
-func (e *ExtensionSession) ManualTriggerBroadcast() {
+func (e *extensionSession) ManualTriggerBroadcast() {
 	if e.cleanUpDone {
 		return
 	}
 	e.triggerBroadcast <- struct{}{}
 }
 
-func (e *ExtensionSession) UpdatePreviousVoteResult(data *types.VoteStatus) {
-	e.lock.Lock()
-	defer e.lock.Unlock()
-	e.broadcastDataCache.PreviousVoteResult = data
-}
-
-func (e *ExtensionSession) UpdateCurrentVoteStatus(data *types.VoteStatus) {
-	e.lock.Lock()
-	defer e.lock.Unlock()
-
-	e.broadcastDataCache.CurrentVoteStatus = data
-}
-
-func (e *ExtensionSession) updateRobotStatus(data *robotStatus) {
+func (e *extensionSession) updateRobotStatus(data *robotStatus) {
 	e.lock.Lock()
 	defer e.lock.Unlock()
 	e.broadcastDataCache.RobotStatus = data
 }
 
 // broadcasts the BroadcastData cache once per second
-func (e *ExtensionSession) regularBroadcast() {
+func (e *extensionSession) regularBroadcast() {
 	// get marshaled data, protected by lock
 	d := func() ([]byte, error) {
 		e.lock.Lock()
@@ -96,7 +80,7 @@ func (e *ExtensionSession) regularBroadcast() {
 // 1 regen per second with pool of 100.
 // https://github.com/twitchdev/issues/issues/612
 // So we stick to 1 per second, 60 per minute.
-func (e *ExtensionSession) broadcastData(jsonData []byte) error {
+func (e *extensionSession) broadcastData(jsonData []byte) error {
 	type payload struct {
 		Message       string   `json:"message"`
 		BroadcasterID string   `json:"broadcaster_id"`

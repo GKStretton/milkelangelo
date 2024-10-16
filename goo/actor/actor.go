@@ -10,7 +10,6 @@ import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor/decider"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
-	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
@@ -55,15 +54,9 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, see
 
 	fmt.Printf("Launching actor with seed: %d\n", seed)
 
-	// ebs, err := ebsinterface.NewExtensionSession(time.Hour * 2)
-	// if err != nil {
-	// 	fmt.Printf("failed to create ebs interface in LaunchActor: %v\n", err)
-	// }
-
-	// d := decider.NewTwitchDecider(ebs, twitchApi, time.Second*5, decider.NewMockDecider())
 	d := decider.NewAutoDecider(actorTimeout, seed, testing)
 
-	awaitDecision := decide(d, events.GetLatestStateReportCopy(), nil)
+	awaitDecision := decide(d, events.GetLatestStateReportCopy())
 	decision := <-awaitDecision
 
 	for {
@@ -82,7 +75,7 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, see
 		awaitCompletion, predictedCompletionState := executor.RunExecutorNonBlocking(decision.e)
 
 		// get next action while the action is being performed
-		awaitDecision = decide(d, predictedCompletionState, nil)
+		awaitDecision = decide(d, predictedCompletionState)
 
 		<-awaitCompletion // ensure last action finished
 		decision = <-awaitDecision
@@ -91,7 +84,7 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, see
 	return nil
 }
 
-func decide(decider decider.Decider, predictedState *machinepb.StateReport, ebs *ebsinterface.ExtensionSession) chan decision {
+func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan decision {
 	c := make(chan decision)
 
 	if predictedState == nil {

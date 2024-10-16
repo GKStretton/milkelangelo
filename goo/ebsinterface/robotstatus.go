@@ -6,7 +6,7 @@ type robotStatus struct {
 	Status string
 }
 
-func (e *ExtensionSession) regularRobotStatusUpdate() {
+func (e *extensionSession) regularRobotStatusUpdate() {
 	c := events.Subscribe()
 	for {
 		select {
@@ -14,6 +14,10 @@ func (e *ExtensionSession) regularRobotStatusUpdate() {
 			l.Println("exiting regular robot status update loop")
 			return
 		case sr := <-c:
+			if sr == nil {
+				e.updateRobotStatus(nil)
+				continue
+			}
 			e.updateRobotStatus(&robotStatus{
 				Status: sr.Status.String(),
 			})
