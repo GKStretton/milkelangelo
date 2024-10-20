@@ -19,11 +19,10 @@ type autoDecider struct {
 	emulsifierUsed bool
 }
 
-func NewAutoDecider(timeout time.Duration, seed int64, testing bool) Decider {
-	t := time.Now().Add(timeout)
+func NewAutoDecider(endTime time.Time, seed int64, testing bool) Decider {
 	seededRand := rand.New(rand.NewSource(seed))
 	return &autoDecider{
-		endTime: t,
+		endTime: endTime,
 		rand:    seededRand,
 		testing: testing,
 	}

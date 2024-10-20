@@ -61,7 +61,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 				&SessionDescriptor{
 					streamPreStartMinutes:  0,
 					actorDurationMinutes:   actorDurationMins,
-					sessionDurationMinutes: 45,
+					sessionDurationMinutes: defaultSessionDurationMinutes,
 					runActor:               true,
 				},
 				sm, twitchApi,
@@ -78,7 +78,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 				&SessionDescriptor{
 					streamPreStartMinutes:  0,
 					actorDurationMinutes:   actorDurationMins,
-					sessionDurationMinutes: 45,
+					sessionDurationMinutes: defaultSessionDurationMinutes,
 					runActor:               false,
 				},
 				sm, twitchApi,

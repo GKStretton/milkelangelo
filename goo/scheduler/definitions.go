@@ -13,9 +13,10 @@ import (
 
 const (
 	//ml of milk
-	milkVolume            = 200
-	waterVolume           = 300
-	streamPreStartMinutes = 10
+	milkVolume                    = 200
+	waterVolume                   = 300
+	streamPreStartMinutes         = 10
+	defaultSessionDurationMinutes = 50
 )
 
 // time the session will begin UTC
@@ -81,7 +82,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 				&SessionDescriptor{
 					streamPreStartMinutes:  streamPreStartMinutes,
 					actorDurationMinutes:   actorDurationMins,
-					sessionDurationMinutes: 45,
+					sessionDurationMinutes: defaultSessionDurationMinutes,
 					runActor:               !s.disableActor,
 				},
 				sm, twitchApi,

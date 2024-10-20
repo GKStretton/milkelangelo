@@ -54,7 +54,8 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, see
 
 	fmt.Printf("Launching actor with seed: %d\n", seed)
 
-	d := decider.NewAutoDecider(actorTimeout, seed, testing)
+	endTime := time.Now().Add(actorTimeout)
+	d := decider.NewAutoDecider(endTime, seed, testing)
 
 	awaitDecision := decide(d, events.GetLatestStateReportCopy())
 	decision := <-awaitDecision
@@ -96,6 +97,7 @@ func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan
 		return c
 	}
 
+	// todo: support single user twitch control. Make new decider that falls back to the autoDecider?
 	go func() {
 		l.Printf("making next decision...\n")
 		e, err := decider.DecideNextAction(predictedState)
