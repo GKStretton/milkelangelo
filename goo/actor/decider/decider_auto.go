@@ -84,7 +84,7 @@ func (d *autoDecider) DecideNextAction(predictedState *machinepb.StateReport) (e
 	if predictedState.PipetteState.Spent {
 		// only end after the dispense is done
 		if time.Now().After(d.endTime) {
-			l.Println("endTime reached on auto decider, deciding nil.")
+			l.Println("endTime reached on decider, deciding nil.")
 			return nil, nil
 		}
 

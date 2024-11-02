@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/topics_backend"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
@@ -29,7 +30,7 @@ var mainSessionStartTime = RecurringTime{
 
 // defineSchedule works by launching go routines watching for the specified
 // time, to trigger the stated action.
-func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
+func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi) {
 	go scheduleWatcher(&Schedule{
 		name:    "REMINDER",
 		enabled: true,
@@ -85,7 +86,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) 
 					sessionDurationMinutes: defaultSessionDurationMinutes,
 					runActor:               !s.disableActor,
 				},
-				sm, twitchApi,
+				sm, twitchApi, ebsApi,
 			)
 			if err != nil {
 				fmt.Println(err)

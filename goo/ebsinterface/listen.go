@@ -10,7 +10,7 @@ import (
 	"github.com/r3labs/sse"
 )
 
-func (e *extensionSession) SubscribeVotes() <-chan *types.EbsMessage {
+func (e *extensionSession) SubscribeMessages() <-chan *types.EbsMessage {
 	e.subsLock.Lock()
 	defer e.subsLock.Unlock()
 
@@ -19,7 +19,7 @@ func (e *extensionSession) SubscribeVotes() <-chan *types.EbsMessage {
 	return c
 }
 
-func (e *extensionSession) UnsubscribeVotes(c <-chan *types.EbsMessage) {
+func (e *extensionSession) UnsubscribeMessages(c <-chan *types.EbsMessage) {
 	e.subsLock.Lock()
 	defer e.subsLock.Unlock()
 

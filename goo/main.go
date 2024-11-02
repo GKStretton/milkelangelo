@@ -7,6 +7,7 @@ import (
 
 	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/contentscheduler"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/filesystem"
@@ -25,6 +26,7 @@ import (
 var (
 	test                      = flag.Bool("test", false, "if true, just run test code")
 	refreshYoutubeCredentials = flag.Bool("yt", false, "if true, refresh youtube credentials")
+	useEbs                    = flag.Bool("useEbs", false, "if true, listen to ebs for commands during actor sessions")
 )
 
 func main() {
@@ -50,12 +52,17 @@ func main() {
 	sm := session.NewSessionManager(false)
 	twitchApi := twitchapi.Start()
 
+	var ebsApi ebsinterface.EbsApi
+	if *useEbs {
+		ebsApi = ebsinterface.NewEbsApi()
+	}
+
 	actor.Setup(sm)
 	events.Start(sm)
 	livecapture.Start(sm)
 	obs.Start(sm)
 	vialprofiles.Start(sm)
-	scheduler.Start(sm, twitchApi)
+	scheduler.Start(sm, twitchApi, ebsApi)
 	contentscheduler.Start(sm)
 
 	// Block to prevent early quit

@@ -41,8 +41,13 @@ func testActor() {
 	sm := session.NewSessionManager(false)
 	events.Start(sm)
 	twitchApi := twitchapi.Start()
+	dur := 3 * time.Minute
+	ebsApi, err := ebsinterface.NewExtensionSession("localhost:80", dur)
+	if err != nil {
+		panic(err)
+	}
 
-	actor.LaunchActor(twitchApi, 3*time.Minute, 1, true)
+	actor.LaunchActor(twitchApi, ebsApi, dur, 1, true)
 }
 
 // subscribes to ebs and twitch chat votes and prints the received votes
@@ -57,8 +62,8 @@ func testEBS() {
 	}
 	defer ebs.CleanUp()
 
-	ebsCh := ebs.SubscribeVotes()
-	defer ebs.UnsubscribeVotes(ebsCh)
+	ebsCh := ebs.SubscribeMessages()
+	defer ebs.UnsubscribeMessages(ebsCh)
 
 	for message := range ebsCh {
 		fmt.Printf("got ebs message '%s':\n\t%+v\n\t%+v\n\t%+v\n\n", message.Type, message.DispenseRequest, message.CollectionRequest, message.GoToRequest)

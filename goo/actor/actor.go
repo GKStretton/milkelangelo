@@ -10,6 +10,7 @@ import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor/decider"
 	"github.com/gkstretton/dark/services/goo/actor/executor"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
@@ -42,7 +43,7 @@ func Setup(sm *session.SessionManager) {
 
 // LaunchActor is launched to control a session after the canvas is prepared.
 // It should effect art.
-func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, seed int64, testing bool) error {
+func LaunchActor(twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi, actorTimeout time.Duration, seed int64, testing bool) error {
 	if lock.Get() {
 		return fmt.Errorf("actor already running")
 	}
@@ -55,7 +56,12 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, actorTimeout time.Duration, see
 	fmt.Printf("Launching actor with seed: %d\n", seed)
 
 	endTime := time.Now().Add(actorTimeout)
-	d := decider.NewAutoDecider(endTime, seed, testing)
+	var d decider.Decider
+	if ebsApi == nil {
+		d = decider.NewAutoDecider(endTime, seed, testing)
+	} else {
+		d = decider.NewEbsDecider(endTime, ebsApi)
+	}
 
 	awaitDecision := decide(d, events.GetLatestStateReportCopy())
 	decision := <-awaitDecision

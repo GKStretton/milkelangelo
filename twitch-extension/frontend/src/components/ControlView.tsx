@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { goToRequest } from "../ebs/api";
 import { createLocationVote } from "../ebs/helpers";
 
 export default function ControlView({ auth }: { auth: Twitch.ext.Authorized }) {
@@ -14,15 +15,7 @@ export default function ControlView({ auth }: { auth: Twitch.ext.Authorized }) {
 		const yMod = y / 100.0;
 
 		if (!auth) return;
-		console.log("voting location ", xMod, yMod);
-		fetch("http://localhost:8080/vote", {
-			method: "POST",
-			body: JSON.stringify(createLocationVote(xMod, yMod)),
-			headers: {
-				Authorization: `Bearer ${auth.token}`,
-				"X-Twitch-Extension-Client-Id": auth.clientId,
-			},
-		}).catch((e) => console.error(e));
+		goToRequest(auth, xMod, yMod);
 	};
 
 	return (

@@ -12,6 +12,7 @@ import (
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
 	"github.com/gkstretton/dark/services/goo/actor"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/obs"
@@ -33,7 +34,7 @@ var lock *AutomationLock = &AutomationLock{}
 
 const actorDurationMins = 11
 
-func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
+func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi) {
 	mqtt.Subscribe("asol/debug/runStartSequence", func(topic string, payload []byte) {
 		go func() {
 			fmt.Println(runStartSequence(0, false))
@@ -64,7 +65,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 					sessionDurationMinutes: defaultSessionDurationMinutes,
 					runActor:               true,
 				},
-				sm, twitchApi,
+				sm, twitchApi, ebsApi,
 			)
 			if err != nil {
 				fmt.Println(err)
@@ -81,7 +82,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 					sessionDurationMinutes: defaultSessionDurationMinutes,
 					runActor:               false,
 				},
-				sm, twitchApi,
+				sm, twitchApi, ebsApi,
 			)
 			if err != nil {
 				fmt.Println(err)
@@ -99,6 +100,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 			err = RunTestSession(
 				sm,
 				time.Duration(n)*time.Minute,
+				ebsApi,
 			)
 			if err != nil {
 				fmt.Println(err)
@@ -107,7 +109,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 	})
 }
 
-func RunTestSession(sm *session.SessionManager, d time.Duration) error {
+func RunTestSession(sm *session.SessionManager, d time.Duration, ebsApi ebsinterface.EbsApi) error {
 	if lock.Get() {
 		return fmt.Errorf("automation already running")
 	}
@@ -143,7 +145,7 @@ func RunTestSession(sm *session.SessionManager, d time.Duration) error {
 	}
 
 	sl.Println("launching actor")
-	err = actor.LaunchActor(nil, d, seed, true)
+	err = actor.LaunchActor(nil, ebsApi, d, seed, true)
 	if err != nil {
 		sl.Printf("actor error: %v\n", err)
 	}
@@ -162,6 +164,7 @@ func RunSession(
 	d *SessionDescriptor,
 	sm *session.SessionManager,
 	twitchApi *twitchapi.TwitchApi,
+	ebsApi ebsinterface.EbsApi,
 ) error {
 	if lock.Get() {
 		return fmt.Errorf("automation already running")
@@ -194,7 +197,7 @@ func RunSession(
 		}
 
 		sl.Println("launching actor")
-		err = actor.LaunchActor(twitchApi, time.Duration(d.actorDurationMinutes)*time.Minute, seed, false)
+		err = actor.LaunchActor(twitchApi, ebsApi, time.Duration(d.actorDurationMinutes)*time.Minute, seed, false)
 		if err != nil {
 			sl.Println("actor error, erroring")
 			mqtt.Publish(topics_backend.TOPIC_SESSION_PAUSE, "")

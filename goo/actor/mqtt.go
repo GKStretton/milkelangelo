@@ -44,7 +44,7 @@ func subscribeToBrokerTopics(sm *session.SessionManager) {
 				l.Printf("failed to set seed: %v\n", err)
 			}
 
-			err = LaunchActor(nil, time.Duration(minutes)*time.Minute, actorSeed, false)
+			err = LaunchActor(nil, nil, time.Duration(minutes)*time.Minute, actorSeed, false)
 			if err != nil {
 				l.Printf("error when running actor (mqtt trigger): %v\n", err)
 			}

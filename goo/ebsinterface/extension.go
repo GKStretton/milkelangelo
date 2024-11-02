@@ -37,6 +37,10 @@ type EbsApi interface {
 	UnsubscribeMessages(c <-chan *types.EbsMessage)
 }
 
+func NewEbsApi() EbsApi {
+	panic("NewEbsApi not implemented, only NewExtensionSession(duration) currently")
+}
+
 func NewExtensionSession(ebsAddress string, dur time.Duration) (*extensionSession, error) {
 	elt, err := getEBSListeningToken(dur)
 	if err != nil {
