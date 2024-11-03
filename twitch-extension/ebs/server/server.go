@@ -44,7 +44,7 @@ func NewServer(addr string, sharedSecretPath string, goo gooapi.GooApi) (*server
 
 	s.r.Use(corsMiddleware)
 	// todo: s.r.Use(rateLimiterMiddleware)
-	// todo: s.r.Use(authMiddleware)
+	s.r.Use(s.authMiddleware)
 
 	openapi.RegisterHandlers(r, s)
 

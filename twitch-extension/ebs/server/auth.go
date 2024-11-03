@@ -1,13 +1,12 @@
 package server
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -21,23 +20,35 @@ type twitchClaims struct {
 	jwt.StandardClaims
 }
 
-// The verifyUserRequest function can now use verifyTokenString internally.
-func (s *server) verifyUserRequest(r *http.Request) (*twitchClaims, error) {
-	if r.Header.Get("X-Twitch-Extension-Client-Id") != "ihiyqlxtem517wq76f4hn8pvo9is30" {
-		return nil, fmt.Errorf("invalid extension client id")
+const extensionClientID = "ihiyqlxtem517wq76f4hn8pvo9is30"
+
+func (s *server) authMiddleware(c *gin.Context) {
+	if c.GetHeader("X-Twitch-Extension-Client-Id") != extensionClientID {
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid extension client id"))
+		return
 	}
 
-	authHeader := r.Header.Get("Authorization")
+	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
-		return nil, errors.New("authorization header is missing")
+		c.AbortWithError(http.StatusUnauthorized, errors.New("authorization header is missing"))
+		return
 	}
 
 	if !strings.HasPrefix(authHeader, "Bearer ") {
-		return nil, errors.New("invalid token format")
+		c.AbortWithError(http.StatusUnauthorized, errors.New("invalid token format, no bearer prefix"))
+		return
 	}
 
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-	return s.verifyTwitchTokenString(tokenString)
+	claims, err := s.verifyTwitchTokenString(tokenString)
+	if err != nil {
+		c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("token verification failed: %v", err))
+		return
+	}
+
+	l.Debugf("verified user request raddr %s, uid %s, ouid %s", c.Request.RemoteAddr, claims.UserID, claims.OpaqueUserID)
+
+	c.Next()
 }
 
 func (s *server) verifyTwitchTokenString(tokenString string) (*twitchClaims, error) {
@@ -57,16 +68,4 @@ func (s *server) verifyTwitchTokenString(tokenString string) (*twitchClaims, err
 	} else {
 		return nil, errors.New("invalid token")
 	}
-}
-
-func getSharedSecret(path string) (string, error) {
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-	decodedBytes, err := base64.StdEncoding.DecodeString(string(b))
-	if err != nil {
-		return "", fmt.Errorf("failed to decode shared secret: %v", err)
-	}
-	return string(decodedBytes), nil
 }
