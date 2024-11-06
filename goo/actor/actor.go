@@ -103,7 +103,6 @@ func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan
 		return c
 	}
 
-	// todo: support single user twitch control. Make new decider that falls back to the autoDecider?
 	go func() {
 		l.Printf("making next decision...\n")
 		e, err := decider.DecideNextAction(predictedState)

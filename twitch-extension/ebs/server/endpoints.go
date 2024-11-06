@@ -33,9 +33,23 @@ func (s *server) CollectFromVial(c *gin.Context) {
 }
 
 func (s *server) Dispense(c *gin.Context) {
-	l.Info("received dispense request")
+	var dispenseRequest *openapi.DispenseJSONRequestBody
+	err := c.Bind(&dispenseRequest)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("could not bind: %w", err))
+		return
+	}
 
-	err := s.goo.Dispense()
+	if dispenseRequest == nil || dispenseRequest.X == nil || dispenseRequest.Y == nil {
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("could not get x and y fields from request"))
+		return
+	}
+
+	x, y := *dispenseRequest.X, *dispenseRequest.Y
+
+	l.Infof("received dispense request x: %f, y: %f", x, y)
+
+	err = s.goo.Dispense(x, y)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

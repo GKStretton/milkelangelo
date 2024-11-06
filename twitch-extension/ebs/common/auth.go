@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func GetSecret(path string) ([]byte, error) {
@@ -11,7 +12,8 @@ func GetSecret(path string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	decodedBytes, err := base64.StdEncoding.DecodeString(string(b))
+	trimmed := strings.TrimSpace(string(b))
+	decodedBytes, err := base64.StdEncoding.DecodeString(trimmed)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode secret: %v", err)
 	}

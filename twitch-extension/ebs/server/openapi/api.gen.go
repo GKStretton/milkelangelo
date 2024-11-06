@@ -22,6 +22,15 @@ type CollectFromVialJSONBody struct {
 	Id *int `json:"id,omitempty"`
 }
 
+// DispenseJSONBody defines parameters for Dispense.
+type DispenseJSONBody struct {
+	// X The x-coordinate to move to
+	X *float32 `json:"x,omitempty"`
+
+	// Y The y-coordinate to move to
+	Y *float32 `json:"y,omitempty"`
+}
+
 // GoToPositionJSONBody defines parameters for GoToPosition.
 type GoToPositionJSONBody struct {
 	// X The x-coordinate to move to
@@ -33,6 +42,9 @@ type GoToPositionJSONBody struct {
 
 // CollectFromVialJSONRequestBody defines body for CollectFromVial for application/json ContentType.
 type CollectFromVialJSONRequestBody CollectFromVialJSONBody
+
+// DispenseJSONRequestBody defines body for Dispense for application/json ContentType.
+type DispenseJSONRequestBody DispenseJSONBody
 
 // GoToPositionJSONRequestBody defines body for GoToPosition for application/json ContentType.
 type GoToPositionJSONRequestBody GoToPositionJSONBody

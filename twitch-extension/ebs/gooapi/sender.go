@@ -17,7 +17,10 @@ const (
 	goToRequestType       messageType = "goto"
 )
 
-type dispenseRequest struct{}
+type dispenseRequest struct {
+	X float32
+	Y float32
+}
 
 type collectionRequest struct {
 	Id int

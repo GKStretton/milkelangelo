@@ -15,7 +15,10 @@ type EbsMessage struct {
 	GoToRequest       *goToRequest
 }
 
-type dispenseRequest struct{}
+type dispenseRequest struct {
+	X float32
+	Y float32
+}
 
 type collectionRequest struct {
 	Id int

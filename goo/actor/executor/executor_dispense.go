@@ -25,11 +25,6 @@ func NewDispenseExecutor(d *types.DispenseDecision) *dispenseExecutor {
 }
 
 func (e *dispenseExecutor) Preempt() {
-	if !goToLock.TryLock() {
-		l.Println("preemptive goTo blocked")
-		return
-	}
-	defer goToLock.Unlock()
 	goTo(e.X, e.Y)
 }
 
@@ -50,13 +45,11 @@ func (e *dispenseExecutor) PredictOutcome(state *machinepb.StateReport) *machine
 }
 
 func (e *dispenseExecutor) Execute() {
-	goToLock.Lock()
-	defer goToLock.Unlock()
-
 	l.Printf("Going to %f, %f\n", e.X, e.Y)
 	goTo(e.X, e.Y)
 
-	time.Sleep(time.Second * 1)
+	// reducing to 100ms to make it more snappy
+	time.Sleep(time.Millisecond * 100)
 
 	<-events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
 		return sr.Status == machinepb.Status_WAITING_FOR_DISPENSE
@@ -78,8 +71,6 @@ func dispenseBlocking() {
 	})
 	time.Sleep(time.Millisecond * 250)
 
-	//! sometimes this doesn't get through...
-	//! I've increased the mqtt timeout and added a single retry to help with this
 	err := dispense()
 	if err != nil {
 		l.Printf("dispense error: %v\n", err)

@@ -72,6 +72,21 @@ paths:
     post:
       summary: Dispense from pipette
       operationId: dispense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                x:
+                  type: number
+                  format: float
+                  description: The x-coordinate to move to
+                y:
+                  type: number
+                  format: float
+                  description: The y-coordinate to move to
       responses:
         202:
           description: Dispense request accepted

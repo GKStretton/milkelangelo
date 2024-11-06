@@ -1,20 +1,21 @@
 import _ from "lodash";
-import React from "react";
 import { collectRequest, dispenseRequest } from "../ebs/api";
-import { createCollectionVote } from "../ebs/helpers";
+import { Coords } from "../types";
 
 export default function ControlPanel({
 	auth,
-}: { auth: Twitch.ext.Authorized }) {
+	coords,
+}: { auth: Twitch.ext.Authorized; coords: Coords }) {
 	const collectionHandler =
 		(auth: Twitch.ext.Authorized, vialPos: number) => () => {
 			if (!auth) return;
 			collectRequest(auth, vialPos);
 		};
-	const dispenseHandler = (auth: Twitch.ext.Authorized) => () => {
-		if (!auth) return;
-		dispenseRequest(auth);
-	};
+	const dispenseHandler =
+		(auth: Twitch.ext.Authorized, x: number, y: number) => () => {
+			if (!auth) return;
+			dispenseRequest(auth, x, y);
+		};
 	return (
 		<div id="color-vote-area">
 			{_.times(5, (i) => {
@@ -31,8 +32,8 @@ export default function ControlPanel({
 			})}
 			<div
 				className="dispense-button"
-				onClick={dispenseHandler(auth)}
-				onKeyDown={dispenseHandler(auth)}
+				onClick={dispenseHandler(auth, coords.x, coords.y)}
+				onKeyDown={dispenseHandler(auth, coords.x, coords.y)}
 			>
 				Dispense
 			</div>

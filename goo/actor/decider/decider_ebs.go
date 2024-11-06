@@ -70,7 +70,7 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 			l.Printf("timeout in decideDispense, returning nil")
 			return nil
 		case msg := <-c:
-			if msg.Type != types.EbsDispenseRequest {
+			if msg.Type != types.EbsDispenseRequest && msg.Type != types.EbsGoToRequest {
 				l.Printf("cannot make use of message type %s in dispense decider", msg.Type)
 				continue
 			}
@@ -78,8 +78,8 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 			if msg.DispenseRequest != nil {
 				l.Println("got dispense request in dispenseDecider")
 				return &types.DispenseDecision{
-					X: preemptor.X,
-					Y: preemptor.Y,
+					X: msg.DispenseRequest.X,
+					Y: msg.DispenseRequest.Y,
 				}
 			}
 
@@ -108,9 +108,17 @@ func (d *ebsDecider) DecideNextAction(predictedState *machinepb.StateReport) (ex
 
 		l.Println("collection is next, launching decider...")
 		decision := d.decideCollection(predictedState)
+		if decision == nil {
+			l.Println("got nil from decideCollection, returning nil")
+			return nil, nil
+		}
 		return executor.NewCollectionExecutor(decision), nil
 	}
 	l.Println("dispense is next, launching decider...")
 	decision := d.decideDispense(predictedState)
+	if decision == nil {
+		l.Println("got nil from decideDispense, returning nil")
+		return nil, nil
+	}
 	return executor.NewDispenseExecutor(decision), nil
 }

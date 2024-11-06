@@ -3,6 +3,11 @@ interface GoToBody {
 	y: number;
 }
 
+interface DispenseBody {
+	x: number;
+	y: number;
+}
+
 interface CollectionBody {
 	id: number;
 }
@@ -39,12 +44,18 @@ export function goToRequest(auth: Twitch.ext.Authorized, x: number, y: number) {
 	}).catch((e) => console.error(e));
 }
 
-export function dispenseRequest(auth: Twitch.ext.Authorized) {
-	console.log("dispense");
+export function dispenseRequest(
+	auth: Twitch.ext.Authorized,
+	x: number,
+	y: number,
+) {
+	console.log(`dispense (${x}, ${y})`);
+
+	const body: DispenseBody = { x: x, y: y };
 
 	fetch("http://localhost:8789/dispense", {
 		method: "POST",
-		body: JSON.stringify({}),
+		body: JSON.stringify(body),
 		headers: {
 			"Content-Type": "application/json",
 			Authorization: `Bearer ${auth.token}`,

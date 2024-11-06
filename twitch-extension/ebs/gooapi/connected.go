@@ -53,8 +53,11 @@ func (g *connectedGooApi) CollectFromVial(vial int) error {
 	})
 }
 
-func (g *connectedGooApi) Dispense() error {
-	m := dispenseRequest{}
+func (g *connectedGooApi) Dispense(x, y float32) error {
+	m := dispenseRequest{
+		X: x,
+		Y: y,
+	}
 
 	return g.sendMessage(&message{
 		MessageType: dispenseRequestType,

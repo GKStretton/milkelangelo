@@ -55,12 +55,17 @@ func testEBS() {
 	mqtt.Start()
 	sm := session.NewSessionManager(false)
 	events.Start(sm)
+	twitchApi := twitchapi.Start()
+	dur := 1 * time.Minute
 
-	ebs, err := ebsinterface.NewExtensionSession("http://localhost:8788", time.Hour*2)
+	ebs, err := ebsinterface.NewExtensionSession("http://localhost:8788", dur)
 	if err != nil {
 		panic(err)
 	}
 	defer ebs.CleanUp()
+
+	actor.LaunchActor(twitchApi, ebs, dur, 1, true)
+	return
 
 	ebsCh := ebs.SubscribeMessages()
 	defer ebs.UnsubscribeMessages(ebsCh)
