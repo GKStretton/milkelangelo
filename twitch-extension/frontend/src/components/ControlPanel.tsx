@@ -5,15 +5,13 @@ import { Coords } from "../types";
 export default function ControlPanel({
 	auth,
 	coords,
-}: { auth: Twitch.ext.Authorized; coords: Coords }) {
+}: { auth: Twitch.ext.Authorized | undefined; coords: Coords }) {
 	const collectionHandler =
-		(auth: Twitch.ext.Authorized, vialPos: number) => () => {
-			if (!auth) return;
+		(auth: Twitch.ext.Authorized | undefined, vialPos: number) => () => {
 			collectRequest(auth, vialPos);
 		};
 	const dispenseHandler =
-		(auth: Twitch.ext.Authorized, x: number, y: number) => () => {
-			if (!auth) return;
+		(auth: Twitch.ext.Authorized | undefined, x: number, y: number) => () => {
 			dispenseRequest(auth, x, y);
 		};
 	return (

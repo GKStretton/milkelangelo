@@ -8,7 +8,7 @@ export default function ControlView({
 	coords,
 	setCoords,
 }: {
-	auth: Twitch.ext.Authorized;
+	auth: Twitch.ext.Authorized | undefined;
 	coords: Coords;
 	setCoords: (coords: Coords) => void;
 }) {
@@ -25,7 +25,6 @@ export default function ControlView({
 
 		setCoords({ x: xMod, y: yMod });
 
-		if (!auth) return;
 		goToRequest(auth, xMod, yMod);
 	};
 

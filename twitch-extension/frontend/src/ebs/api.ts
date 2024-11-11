@@ -12,7 +12,10 @@ interface CollectionBody {
 	id: number;
 }
 
-export function collectRequest(auth: Twitch.ext.Authorized, vialPos: number) {
+export function collectRequest(
+	auth: Twitch.ext.Authorized | undefined,
+	vialPos: number,
+) {
 	console.log(`collect (${vialPos})`);
 
 	const body: CollectionBody = { id: vialPos };
@@ -20,15 +23,15 @@ export function collectRequest(auth: Twitch.ext.Authorized, vialPos: number) {
 	fetch("http://localhost:8789/collect", {
 		method: "POST",
 		body: JSON.stringify(body),
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${auth.token}`,
-			"X-Twitch-Extension-Client-Id": auth.clientId,
-		},
+		headers: getHeaders(auth),
 	}).catch((e) => console.error(e));
 }
 
-export function goToRequest(auth: Twitch.ext.Authorized, x: number, y: number) {
+export function goToRequest(
+	auth: Twitch.ext.Authorized | undefined,
+	x: number,
+	y: number,
+) {
 	console.log(`goTo (${x}, ${y})`);
 
 	const body: GoToBody = { x: x, y: y };
@@ -36,16 +39,12 @@ export function goToRequest(auth: Twitch.ext.Authorized, x: number, y: number) {
 	fetch("http://localhost:8789/goto", {
 		method: "PUT",
 		body: JSON.stringify(body),
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${auth.token}`,
-			"X-Twitch-Extension-Client-Id": auth.clientId,
-		},
+		headers: getHeaders(auth),
 	}).catch((e) => console.error(e));
 }
 
 export function dispenseRequest(
-	auth: Twitch.ext.Authorized,
+	auth: Twitch.ext.Authorized | undefined,
 	x: number,
 	y: number,
 ) {
@@ -56,10 +55,12 @@ export function dispenseRequest(
 	fetch("http://localhost:8789/dispense", {
 		method: "POST",
 		body: JSON.stringify(body),
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${auth.token}`,
-			"X-Twitch-Extension-Client-Id": auth.clientId,
-		},
+		headers: getHeaders(auth),
 	}).catch((e) => console.error(e));
 }
+
+const getHeaders = (auth: Twitch.ext.Authorized | undefined) => ({
+	"Content-Type": "application/json",
+	Authorization: `Bearer ${auth?.token}`,
+	"X-Twitch-Extension-Client-Id": auth?.clientId ?? "",
+});
