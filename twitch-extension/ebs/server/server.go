@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gkstretton/study-of-light/twitch-ebs/app"
 	"github.com/gkstretton/study-of-light/twitch-ebs/common"
 	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
 	"github.com/gkstretton/study-of-light/twitch-ebs/server/openapi"
@@ -16,6 +17,7 @@ var l = logging.MustGetLogger("server")
 type server struct {
 	r   *gin.Engine
 	goo gooapi.GooApi
+	app *app.App
 
 	// address to listen on
 	addr         string
@@ -27,7 +29,7 @@ func (s *server) Run() {
 	s.r.Run(s.addr)
 }
 
-func NewServer(addr string, sharedSecretPath string, goo gooapi.GooApi) (*server, error) {
+func NewServer(addr string, sharedSecretPath string, goo gooapi.GooApi, app *app.App) (*server, error) {
 	r := gin.Default()
 
 	sharedSecret, err := common.GetSecret(sharedSecretPath)
@@ -38,6 +40,7 @@ func NewServer(addr string, sharedSecretPath string, goo gooapi.GooApi) (*server
 	s := &server{
 		r:            r,
 		goo:          goo,
+		app:          app,
 		addr:         addr,
 		sharedSecret: sharedSecret,
 	}

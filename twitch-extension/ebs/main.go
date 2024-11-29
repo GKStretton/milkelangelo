@@ -40,7 +40,7 @@ func main() {
 	app := app.NewApp(goo, twitchAPI)
 	go app.Start()
 
-	s, err := server.NewServer(*addr, *sharedSecretPath, goo)
+	s, err := server.NewServer(*addr, *sharedSecretPath, goo, app)
 	if err != nil {
 		l.Fatalf("failed to create server: %w\n", err)
 	}
