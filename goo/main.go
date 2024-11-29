@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/actor"
+	"github.com/gkstretton/dark/services/goo/app"
 	"github.com/gkstretton/dark/services/goo/contentscheduler"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
@@ -15,7 +16,6 @@ import (
 	"github.com/gkstretton/dark/services/goo/livecapture"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/obs"
-	"github.com/gkstretton/dark/services/goo/scheduler"
 	"github.com/gkstretton/dark/services/goo/server"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/socialmedia"
@@ -62,8 +62,9 @@ func main() {
 	livecapture.Start(sm)
 	obs.Start(sm)
 	vialprofiles.Start(sm)
-	scheduler.Start(sm, twitchApi, ebsApi)
 	contentscheduler.Start(sm)
+
+	app.Start(sm, twitchApi, ebsApi)
 
 	// Block to prevent early quit
 	fmt.Println("finished init, main loop sleeping.")
