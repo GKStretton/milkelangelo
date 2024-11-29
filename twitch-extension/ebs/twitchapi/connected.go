@@ -48,16 +48,7 @@ func NewConnectedTwitchAPI(sharedSecretPath, channelID, extensionClientID string
 // 1 regen per second with pool of 100.
 // https://github.com/twitchdev/issues/issues/612
 // So we should stick to 1 per second, 60 per minute.
-func (t *connectedTwitchAPI) BroadcastExtensionData(d *BroadcastData) error {
-	b, err := json.Marshal(d)
-	if err != nil {
-		return fmt.Errorf("failed to marshall broadcast data: %w", err)
-	}
-
-	return t.broadcastData(b)
-}
-
-func (t *connectedTwitchAPI) broadcastData(jsonData []byte) error {
+func (t *connectedTwitchAPI) BroadcastExtensionData(jsonData []byte) error {
 	type payload struct {
 		Message       string   `json:"message"`
 		BroadcasterID string   `json:"broadcaster_id"`

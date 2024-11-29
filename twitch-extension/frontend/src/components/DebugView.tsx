@@ -1,16 +1,17 @@
 import React, { useMemo, useState } from "react";
+import { useGlobalState } from "../helpers/State";
 
 export default function DebugView({ robotState }: { robotState: undefined }) {
-	const [show, setShow] = useState(true);
-
 	const stateText = useMemo(
 		() => JSON.stringify(robotState, null, " "),
 		[robotState],
 	);
 
+	const gs = useGlobalState();
+
 	return (
 		<>
-			{show ? (
+			{gs.isDebugMode ? (
 				<>
 					<textarea
 						readOnly={true}
@@ -25,10 +26,10 @@ export default function DebugView({ robotState }: { robotState: undefined }) {
 			<div
 				className="debug-toggle"
 				style={{
-					left: show ? "0vw" : "0vw",
+					left: gs.isDebugMode ? "0vw" : "0vw",
 				}}
 				onClick={() => {
-					setShow(!show);
+					gs.setDebugMode(!gs.isDebugMode);
 				}}
 			>
 				Dbg

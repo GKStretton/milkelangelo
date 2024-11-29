@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { goToRequest } from "../ebs/api";
 import { createLocationVote } from "../ebs/helpers";
+import { useGlobalState } from "../helpers/State";
 import { Coords } from "../types";
+import "./ControlView.css";
 
 export default function ControlView({
 	auth,
@@ -28,9 +30,11 @@ export default function ControlView({
 		goToRequest(auth, xMod, yMod);
 	};
 
+	const gs = useGlobalState();
+
 	return (
 		<div
-			className="canvas"
+			className={`canvas ${gs.isDebugMode ? "debug" : ""}`}
 			onClick={locationVoteHandler}
 			onKeyDown={() => {
 				console.log("key down not supported on canvas yet");

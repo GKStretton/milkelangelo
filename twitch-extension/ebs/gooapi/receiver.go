@@ -1,16 +1,33 @@
 package gooapi
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+)
 
+type Status = string
+
+const (
+	StatusUnknown Status = "unknown"
+)
+
+type GooStateUpdate struct {
+	Status Status
+	X      float32
+	Y      float32
+}
+
+// updateHandler handles incoming state updates from goo
 func (g *connectedGooApi) updateHandler(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
-	w.Header().Set("Content-Type", "text/event-stream")
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Header().Set("Connection", "keep-alive")
-	w.Header().Set("Transfer-Encoding", "chunked")
-
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
+		return
+	}
+	defer r.Body.Close()
+
+	if g.stateUpdateCallback == nil {
+		httpErr(&w, http.StatusInternalServerError, "state update callback not set")
 		return
 	}
 
@@ -20,8 +37,16 @@ func (g *connectedGooApi) updateHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// todo: unmarshal data
+	// unmarshal data
+	var state GooStateUpdate
+	err = json.NewDecoder(r.Body).Decode(&state)
+	if err != nil {
+		httpErr(&w, http.StatusBadRequest, "failed to unmarshal state update: %v", err)
+		return
+	}
 
-	w.WriteHeader(http.StatusNotImplemented)
-	w.(http.Flusher).Flush()
+	g.stateUpdateCallback(state)
+	l.Debugf("received state update, sent to callback: %+v", state)
+
+	w.WriteHeader(http.StatusOK)
 }

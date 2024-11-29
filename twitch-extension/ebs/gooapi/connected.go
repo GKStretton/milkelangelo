@@ -14,6 +14,8 @@ type connectedGooApi struct {
 
 	subs     []chan *message
 	subsLock sync.Mutex
+
+	stateUpdateCallback func(state GooStateUpdate)
 }
 
 func NewConnectedGooApi(internalSecretPath string, listenAddr string) (*connectedGooApi, error) {
@@ -30,7 +32,7 @@ func NewConnectedGooApi(internalSecretPath string, listenAddr string) (*connecte
 	}
 
 	http.HandleFunc("/listen", g.listenHandler)
-	http.HandleFunc("/send-update", g.updateHandler)
+	http.HandleFunc("/update-state", g.updateHandler)
 
 	return g, nil
 }
@@ -40,6 +42,10 @@ func (g *connectedGooApi) Start() {
 	if err != nil {
 		l.Fatalf("error in listen and server for goo requests", err)
 	}
+}
+
+func (g *connectedGooApi) SetStateUpdateCallback(callback func(state GooStateUpdate)) {
+	g.stateUpdateCallback = callback
 }
 
 func (g *connectedGooApi) CollectFromVial(vial int) error {

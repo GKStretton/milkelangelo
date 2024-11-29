@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 
+	"github.com/gkstretton/study-of-light/twitch-ebs/app"
 	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
 	"github.com/gkstretton/study-of-light/twitch-ebs/server"
 	"github.com/gkstretton/study-of-light/twitch-ebs/twitchapi"
@@ -28,20 +29,21 @@ func main() {
 		l.Fatalf("failed to create goo api: %w\n", err)
 	}
 
-	twitchapi, err := twitchapi.NewConnectedTwitchAPI(*sharedSecretPath, *channelID, *extensionClientID)
+	twitchAPI, err := twitchapi.NewConnectedTwitchAPI(*sharedSecretPath, *channelID, *extensionClientID)
 	if err != nil {
 		l.Fatalf("failed to create twitch api: %w\n", err)
-	}
-	_ = twitchapi
-
-	s, err := server.NewServer(*addr, *sharedSecretPath, goo)
-
-	if err != nil {
-		l.Fatalf("failed to create server: %w\n", err)
 	}
 
 	// listen for internal (goo) connections
 	go goo.Start()
+
+	app := app.NewApp(goo, twitchAPI)
+	go app.Start()
+
+	s, err := server.NewServer(*addr, *sharedSecretPath, goo)
+	if err != nil {
+		l.Fatalf("failed to create server: %w\n", err)
+	}
 
 	// listen to twitch clients
 	s.Run()

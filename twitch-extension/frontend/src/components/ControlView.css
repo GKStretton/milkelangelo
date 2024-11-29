@@ -1,0 +1,23 @@
+
+.canvas {
+	position: absolute;
+	top: 11.8vh;
+	left: 0.95vw;
+	border-radius: 100%;
+	right: 53.6vw;
+	bottom: 9vh;
+
+	&.debug {
+		border: 2px solid white;
+	}
+}
+
+.cursor {
+	position: absolute;
+	width: 2vh;
+	height: 2vh;
+	border-radius: 100%;
+	border: 2px solid rgb(234, 21, 195);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
