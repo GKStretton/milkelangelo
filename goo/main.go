@@ -49,19 +49,19 @@ func main() {
 	email.Start()
 	server.Start()
 
+	var ebsApi ebsinterface.EbsApi
+	if *useEbs {
+		ebsApi = ebsinterface.NewEbsApi("http://localhost:8788")
+	}
+
 	sm := session.NewSessionManager(false)
 	twitchApi := twitchapi.Start()
 
-	var ebsApi ebsinterface.EbsApi
-	if *useEbs {
-		ebsApi = ebsinterface.NewEbsApi()
-	}
-
 	actor.Setup(sm)
-	events.Start(sm)
+	events.Start(sm, ebsApi)
 	livecapture.Start(sm)
 	obs.Start(sm)
-	vialprofiles.Start(sm)
+	vialprofiles.Start(sm, ebsApi)
 	contentscheduler.Start(sm)
 
 	app.Start(sm, twitchApi, ebsApi)

@@ -47,7 +47,7 @@ func (e *extensionSession) distributeMessage(msg *types.EbsMessage) {
 func (e *extensionSession) connect() error {
 	result, err := url.JoinPath(e.ebsAddress, "/listen")
 	if err != nil {
-		return fmt.Errorf("error forming ebs listen url: %w", err)
+		return fmt.Errorf("error forming ebs listen url: %s", err)
 	}
 	client := sse.NewClient(result)
 	client.Headers["Authorization"] = "Bearer " + e.ebsListeningToken

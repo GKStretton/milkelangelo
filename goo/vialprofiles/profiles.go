@@ -9,14 +9,16 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
+	"github.com/gkstretton/dark/services/goo/types"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-func Start(sm *session.SessionManager) {
+func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 	// debug topic, session number as payload
 	mqtt.Subscribe("asol/testing/save-profile-snapshot", func(topic string, payload []byte) {
 		id, err := strconv.Atoi(string(payload))
@@ -35,8 +37,29 @@ func Start(sm *session.SessionManager) {
 				// save system vial configuration snapshot for this session
 				saveSnapshot(uint64(e.SessionID))
 			}
+
+			// update ebs copy of profiles on any session change
+			updateEBSProfiles(ebsApi)
 		}
 	}()
+
+	// update ebs copy of profiles on startup
+	updateEBSProfiles(ebsApi)
+}
+
+func updateEBSProfiles(ebsApi ebsinterface.EbsApi) {
+	snapshot := GetSystemVialConfigurationSnapshot()
+	ebsApi.UpdateState(func(state *types.GooState) {
+		profiles := map[int]*types.VialProfile{}
+		for pos, profile := range snapshot.Profiles {
+			profiles[int(pos)] = &types.VialProfile{
+				ID:     int(profile.Id),
+				Name:   profile.Name,
+				Colour: profile.Colour,
+			}
+		}
+		state.VialProfiles = profiles
+	})
 }
 
 func saveSnapshot(sessionId uint64) {

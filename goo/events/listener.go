@@ -10,10 +10,12 @@ import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
+	"github.com/gkstretton/dark/services/goo/types"
 	"github.com/gkstretton/dark/services/goo/util/protoyaml"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -26,7 +28,7 @@ var subs = []chan *machinepb.StateReport{}
 
 var subsLock sync.Mutex
 
-func Start(sm *session.SessionManager) {
+func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 	mqtt.Subscribe(topics_firmware.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
 		t := time.Now().UnixMicro()
 
@@ -52,7 +54,13 @@ func Start(sm *session.SessionManager) {
 		latest_state_report = sr
 		publishStateReport(sr)
 
-		// Abort unless session is active or paused
+		ebsApi.UpdateState(func(state *types.GooState) {
+			state.X = sr.MovementDetails.TargetXUnit
+			state.Y = sr.MovementDetails.TargetXUnit
+			state.Status = types.GooStatusUnknown
+		})
+
+		// only save state reports for ongoing sessions
 		if session != nil && !session.Complete {
 			saveSessionStateReport(session, sr)
 		}

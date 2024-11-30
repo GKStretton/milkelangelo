@@ -42,7 +42,7 @@ func testActor() {
 	events.Start(sm)
 	twitchApi := twitchapi.Start()
 	dur := 3 * time.Minute
-	ebsApi, err := ebsinterface.NewExtensionSession("localhost:80", dur)
+	ebsApi, err := ebsinterface.NewExtensionSession("localhost:80")
 	if err != nil {
 		panic(err)
 	}
@@ -58,11 +58,10 @@ func testEBS() {
 	twitchApi := twitchapi.Start()
 	dur := 1 * time.Minute
 
-	ebs, err := ebsinterface.NewExtensionSession("http://localhost:8788", dur)
+	ebs, err := ebsinterface.NewExtensionSession("http://localhost:8788")
 	if err != nil {
 		panic(err)
 	}
-	defer ebs.CleanUp()
 
 	actor.LaunchActor(twitchApi, ebs, dur, 1, true)
 	return

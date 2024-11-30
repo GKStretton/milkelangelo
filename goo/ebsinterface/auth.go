@@ -12,10 +12,11 @@ import (
 )
 
 // returns custom token for listening from the EBS
-func getEBSListeningToken(dur time.Duration) (string, error) {
+func getEBSListeningToken() (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		IssuedAt:  time.Now().UTC().Unix(),
-		ExpiresAt: time.Now().Add(dur).UTC().Unix(),
+		IssuedAt: time.Now().UTC().Unix(),
+		// todo: make token expire after a certain time
+		ExpiresAt: time.Now().Add(time.Hour * 24 * 365 * 100).UTC().Unix(),
 		NotBefore: time.Now().Add(-time.Minute).UTC().Unix(),
 		Audience:  "StudyOfLightTwitchEBS",
 		Id:        uuid.New().String(),
