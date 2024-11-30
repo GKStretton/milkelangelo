@@ -58,6 +58,26 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 			state.X = sr.MovementDetails.TargetXUnit
 			state.Y = sr.MovementDetails.TargetXUnit
 			state.Status = types.GooStatusUnknown
+
+			if sr.CollectionRequest == nil {
+				state.CollectionState = nil
+			} else {
+				state.CollectionState = &types.CollectionState{
+					VialNumber: int(sr.CollectionRequest.VialNumber),
+					VolumeUl:   sr.CollectionRequest.VolumeUl,
+					Completed:  sr.CollectionRequest.Completed,
+				}
+			}
+
+			if sr.PipetteState == nil {
+				state.DispenseState = nil
+			} else {
+				state.DispenseState = &types.DispenseState{
+					VialNumber:        int(sr.PipetteState.VialHeld),
+					VolumeRemainingUl: sr.PipetteState.VolumeTargetUl,
+					Completed:         sr.PipetteState.Spent,
+				}
+			}
 		})
 
 		// only save state reports for ongoing sessions

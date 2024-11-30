@@ -39,7 +39,7 @@ func printProfiles() {
 func testActor() {
 	mqtt.Start()
 	sm := session.NewSessionManager(false)
-	events.Start(sm)
+	events.Start(sm, nil)
 	twitchApi := twitchapi.Start()
 	dur := 3 * time.Minute
 	ebsApi, err := ebsinterface.NewExtensionSession("localhost:80")
@@ -54,7 +54,6 @@ func testActor() {
 func testEBS() {
 	mqtt.Start()
 	sm := session.NewSessionManager(false)
-	events.Start(sm)
 	twitchApi := twitchapi.Start()
 	dur := 1 * time.Minute
 
@@ -62,6 +61,7 @@ func testEBS() {
 	if err != nil {
 		panic(err)
 	}
+	events.Start(sm, ebs)
 
 	actor.LaunchActor(twitchApi, ebs, dur, 1, true)
 	return

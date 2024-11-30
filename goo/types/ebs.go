@@ -11,12 +11,28 @@ type GooState struct {
 	X            float32
 	Y            float32
 	VialProfiles map[int]*VialProfile
+
+	CollectionState *CollectionState
+	DispenseState   *DispenseState
+}
+
+type CollectionState struct {
+	VialNumber int
+	VolumeUl   float32
+	Completed  bool
+}
+
+type DispenseState struct {
+	VialNumber        int
+	VolumeRemainingUl float32
+	Completed         bool
 }
 
 type VialProfile struct {
-	ID     int
-	Name   string
-	Colour string
+	ID           int
+	Name         string
+	Colour       string
+	DropVolumeUl float32
 }
 
 type EbsMessageType string

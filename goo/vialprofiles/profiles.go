@@ -53,9 +53,10 @@ func updateEBSProfiles(ebsApi ebsinterface.EbsApi) {
 		profiles := map[int]*types.VialProfile{}
 		for pos, profile := range snapshot.Profiles {
 			profiles[int(pos)] = &types.VialProfile{
-				ID:     int(profile.Id),
-				Name:   profile.Name,
-				Colour: profile.Colour,
+				ID:           int(profile.Id),
+				Name:         profile.Name,
+				Colour:       profile.Colour,
+				DropVolumeUl: profile.DispenseVolumeUl,
 			}
 		}
 		state.VialProfiles = profiles
