@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -13,10 +14,16 @@ import (
 	"github.com/gkstretton/dark/services/goo/mqtt"
 )
 
+var (
+	host = flag.String("host", "DEPTH", "the hostname of the mqtt broker")
+)
+
 func main() {
+	flag.Parse()
+
 	fmt.Println("Launching runner")
 
-	mqtt.Start()
+	mqtt.Start(*host)
 	mqtt.Subscribe(topics_backend.TOPIC_GENERATE_CONTENT, func(topic string, payload []byte) {
 		n, err := strconv.Atoi(string(payload))
 		if err != nil {
