@@ -62,6 +62,9 @@ func testEBS() {
 		panic(err)
 	}
 	events.Start(sm, ebs)
+	vialprofiles.Start(sm, ebs)
+
+	time.Sleep(time.Second * 2)
 
 	actor.LaunchActor(twitchApi, ebs, dur, 1, true)
 	return

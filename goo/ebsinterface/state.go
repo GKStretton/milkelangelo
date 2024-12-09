@@ -21,9 +21,6 @@ func (e *extensionSession) UpdateState(f func(state *types.GooState)) {
 
 // SendState sends the current state to the EBS
 func (e *extensionSession) sendState() {
-	e.gooStateLock.Lock()
-	defer e.gooStateLock.Unlock()
-
 	result, err := url.JoinPath(e.ebsAddress, "/update-state")
 	if err != nil {
 		l.Printf("error forming ebs update state url: %s", err)
@@ -45,6 +42,7 @@ func (e *extensionSession) sendState() {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+e.ebsToken)
 
 	// send request
 	resp, err := http.DefaultClient.Do(req)

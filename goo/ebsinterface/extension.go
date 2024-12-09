@@ -13,7 +13,7 @@ import (
 var l = log.New(os.Stdout, "[EBS Interface] ", log.Flags())
 
 type extensionSession struct {
-	ebsListeningToken string
+	ebsToken string
 
 	// used to disconnect from ebs
 	exitCh chan struct{}
@@ -46,10 +46,10 @@ func NewExtensionSession(ebsAddress string) (*extensionSession, error) {
 	}
 
 	es := &extensionSession{
-		ebsListeningToken: elt,
-		exitCh:            make(chan struct{}),
-		subs:              []chan *types.EbsMessage{},
-		ebsAddress:        ebsAddress,
+		ebsToken:   elt,
+		exitCh:     make(chan struct{}),
+		subs:       []chan *types.EbsMessage{},
+		ebsAddress: ebsAddress,
 	}
 
 	l.Println("connecting to ebs...")

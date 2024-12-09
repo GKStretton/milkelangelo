@@ -96,16 +96,16 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi, act
 func decide(decider decider.Decider, predictedState *machinepb.StateReport) chan decision {
 	c := make(chan decision)
 
-	if predictedState == nil {
-		c <- decision{
-			e:   nil,
-			err: fmt.Errorf("predictatedState nil"),
-		}
-		close(c)
-		return c
-	}
-
 	go func() {
+		if predictedState == nil {
+			c <- decision{
+				e:   nil,
+				err: fmt.Errorf("predictedState nil"),
+			}
+			close(c)
+			return
+		}
+
 		l.Printf("making next decision...\n")
 		e, err := decider.DecideNextAction(predictedState)
 		if *waitForUser {

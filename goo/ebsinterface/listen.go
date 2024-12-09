@@ -14,6 +14,8 @@ func (e *extensionSession) SubscribeMessages() <-chan *types.EbsMessage {
 	e.subsLock.Lock()
 	defer e.subsLock.Unlock()
 
+	l.Printf("subscribing to ebs messages")
+
 	c := make(chan *types.EbsMessage)
 	e.subs = append(e.subs, c)
 	return c
@@ -22,6 +24,8 @@ func (e *extensionSession) SubscribeMessages() <-chan *types.EbsMessage {
 func (e *extensionSession) UnsubscribeMessages(c <-chan *types.EbsMessage) {
 	e.subsLock.Lock()
 	defer e.subsLock.Unlock()
+
+	l.Printf("unsubscribing from ebs messages")
 
 	for i, sub := range e.subs {
 		if sub == c {
@@ -50,7 +54,7 @@ func (e *extensionSession) connect() error {
 		return fmt.Errorf("error forming ebs listen url: %s", err)
 	}
 	client := sse.NewClient(result)
-	client.Headers["Authorization"] = "Bearer " + e.ebsListeningToken
+	client.Headers["Authorization"] = "Bearer " + e.ebsToken
 	// client.ReconnectStrategy = &backoff.StopBackOff{}
 	client.ReconnectNotify = func(err error, d time.Duration) {
 		l.Println(err)
