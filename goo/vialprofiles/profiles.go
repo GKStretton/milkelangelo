@@ -48,6 +48,10 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 }
 
 func updateEBSProfiles(ebsApi ebsinterface.EbsApi) {
+	if ebsApi == nil {
+		return
+	}
+
 	snapshot := GetSystemVialConfigurationSnapshot()
 	ebsApi.UpdateState(func(state *types.GooState) {
 		profiles := map[int]*types.VialProfile{}
