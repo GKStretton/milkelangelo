@@ -26,7 +26,6 @@ import (
 var (
 	test                      = flag.Bool("test", false, "if true, just run test code")
 	refreshYoutubeCredentials = flag.Bool("yt", false, "if true, refresh youtube credentials")
-	useEbs                    = flag.Bool("useEbs", false, "if true, listen to ebs for commands during actor sessions")
 )
 
 func main() {
@@ -50,7 +49,8 @@ func main() {
 	server.Start()
 
 	var ebsApi ebsinterface.EbsApi
-	if *useEbs {
+
+	if keyvalue.GetBool("USE_EBS") {
 		ebsApi = ebsinterface.NewEbsApi("http://localhost:8788")
 	}
 
