@@ -51,7 +51,11 @@ func main() {
 	var ebsApi ebsinterface.EbsApi
 
 	if keyvalue.GetBool("USE_EBS") {
-		ebsApi = ebsinterface.NewEbsApi("http://localhost:8788")
+		var err error
+		ebsApi, err = ebsinterface.NewExtensionSession("http://localhost:8788")
+		if err != nil {
+			panic("failed to init ebs: " + err.Error())
+		}
 	}
 
 	sm := session.NewSessionManager(false)

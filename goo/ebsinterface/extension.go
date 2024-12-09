@@ -33,10 +33,6 @@ type EbsApi interface {
 	UpdateState(func(state *types.GooState))
 }
 
-func NewEbsApi(ebsAddress string) *extensionSession {
-	panic("NewEbsApi not implemented, only NewExtensionSession(duration) currently")
-}
-
 func NewExtensionSession(ebsAddress string) (*extensionSession, error) {
 	http.DefaultClient.Timeout = 5 * time.Second
 
