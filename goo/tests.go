@@ -37,7 +37,7 @@ func printProfiles() {
 }
 
 func testActor() {
-	mqtt.Start()
+	mqtt.Start(*host)
 	sm := session.NewSessionManager(false)
 	events.Start(sm, nil)
 	twitchApi := twitchapi.Start()
@@ -52,7 +52,7 @@ func testActor() {
 
 // subscribes to ebs and twitch chat votes and prints the received votes
 func testEBS() {
-	mqtt.Start()
+	mqtt.Start(*host)
 	sm := session.NewSessionManager(false)
 	twitchApi := twitchapi.Start()
 	dur := 1 * time.Minute

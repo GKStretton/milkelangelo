@@ -1,16 +1,11 @@
 package mqtt
 
 import (
-	"flag"
 	"fmt"
 	"sync"
 	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
-)
-
-var (
-	host = flag.String("host", "DEPTH", "the hostname of the mqtt broker")
 )
 
 const QOS = 1
@@ -26,10 +21,10 @@ var subs = subscriptions{}
 
 const timeout = time.Second * time.Duration(5)
 
-func Start() {
+func Start(host string) {
 	_ = paho.CRITICAL
 	client = paho.NewClient(paho.NewClientOptions().
-		AddBroker(fmt.Sprintf("%s:1883", *host)).
+		AddBroker(fmt.Sprintf("%s:1883", host)).
 		SetOnConnectHandler(on_connect).
 		SetAutoReconnect(true).
 		SetConnectionLostHandler(on_disconnect),

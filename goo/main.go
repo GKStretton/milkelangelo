@@ -24,6 +24,7 @@ import (
 )
 
 var (
+	host                      = flag.String("host", "DEPTH", "the hostname of the mqtt broker")
 	test                      = flag.Bool("test", false, "if true, just run test code")
 	refreshYoutubeCredentials = flag.Bool("yt", false, "if true, refresh youtube credentials")
 )
@@ -43,7 +44,7 @@ func main() {
 
 	filesystem.AssertBasePaths()
 
-	mqtt.Start()
+	mqtt.Start(*host)
 	keyvalue.Start()
 	email.Start()
 	server.Start()
@@ -51,8 +52,13 @@ func main() {
 	var ebsApi ebsinterface.EbsApi
 
 	if keyvalue.GetBool("USE_EBS") {
+		host := keyvalue.GetString("EBS_HOST")
+		if host == "" {
+			panic("EBS_HOST not set")
+		}
+
 		var err error
-		ebsApi, err = ebsinterface.NewExtensionSession("http://localhost:8788")
+		ebsApi, err = ebsinterface.NewExtensionSession("http://" + host + ":8788")
 		if err != nil {
 			panic("failed to init ebs: " + err.Error())
 		}
