@@ -17,11 +17,12 @@ var (
 	stopRecording   chan bool = make(chan bool)
 	mutex           sync.Mutex
 	captureInterval = flag.Int("captureInterval", 30, "The interval in seconds between captures")
+	host            = flag.String("host", "DEPTH", "the hostname of the mqtt broker")
 )
 
 func main() {
 	flag.Parse()
-	mqtt.Start()
+	mqtt.Start(*host)
 
 	mqtt.Subscribe(topics_backend.TOPIC_SESSION_STATUS_RESP_RAW, func(topic string, payload []byte) {
 		status := &machinepb.SessionStatus{}
