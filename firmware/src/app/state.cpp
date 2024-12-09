@@ -58,6 +58,8 @@ void State::ClearState() {
 	this->overrideCalibrationBlock = false;
 	this->rinseStatus = machine_RinseStatus_RINSE_COMPLETE;
 
+	this->coverOpened = false;
+
 	StateReport_SetMode(machine_Mode_UNDEFINED_MODE);
 	StateReport_Update(this);
 }
@@ -98,6 +100,7 @@ State CreateStateObject() {
 		ik_target_z: String(IK_Z_LEVEL_MM).toFloat(),
 		startup_counter: 0,
 		overrideCalibrationBlock: false,
-		rinseStatus: machine_RinseStatus_RINSE_COMPLETE
+		rinseStatus: machine_RinseStatus_RINSE_COMPLETE,
+		coverOpened: false
 	};
 }

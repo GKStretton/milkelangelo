@@ -96,6 +96,8 @@ struct State {
 	bool overrideCalibrationBlock;
 
 	machine_RinseStatus rinseStatus;
+
+	bool coverOpened;
 };
 
 State CreateStateObject();

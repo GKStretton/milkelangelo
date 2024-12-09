@@ -297,6 +297,9 @@ void topicHandler(String topic, String payload)
 		float target_y = values[1].toFloat();
 		Logger::Info("recieved req for target_x, target_y to " + String(target_x) + ", " + String(target_y));
 
+		boundXYToCircle(&target_x, &target_y, IK_TARGET_RADIUS_FRAC);
+		Logger::Info("constrained target_x, target_y to " + String(target_x) + ", " + String(target_y));
+
 		float ring, yaw;
 		int code = getRingAndYawFromXY(target_x, target_y,
 						s.ringStepper.PositionToUnit(s.ringStepper.currentPosition()),
