@@ -26,12 +26,12 @@ func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *ty
 	c := d.ebsApi.SubscribeMessages()
 	defer d.ebsApi.UnsubscribeMessages(c)
 
-	timeout := time.After(
+	actorTimeout := time.After(
 		time.Until(d.endTime),
 	)
 	for {
 		select {
-		case <-timeout:
+		case <-actorTimeout:
 			l.Printf("timeout in decideCollection, returning nil")
 			return nil
 		case msg := <-c:
@@ -61,12 +61,12 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 	// store target coordinates in here
 	preemptor := executor.NewDispenseExecutor(&types.DispenseDecision{})
 
-	timeout := time.After(
+	actorTimeout := time.After(
 		time.Until(d.endTime),
 	)
 	for {
 		select {
-		case <-timeout:
+		case <-actorTimeout:
 			l.Printf("timeout in decideDispense, returning nil")
 			return nil
 		case msg := <-c:
