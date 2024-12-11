@@ -20,7 +20,9 @@ import (
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/socialmedia"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
+	"github.com/gkstretton/dark/services/goo/util"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -31,6 +33,8 @@ var (
 
 func main() {
 	flag.Parse()
+
+	godotenv.Load()
 
 	if *refreshYoutubeCredentials {
 		socialmedia.RefreshYoutubeCreds()
@@ -51,7 +55,7 @@ func main() {
 
 	var ebsApi ebsinterface.EbsApi
 
-	if keyvalue.GetBool("USE_EBS") {
+	if util.EnvBool("ENABLE_EBS") {
 		host := keyvalue.GetString("EBS_HOST")
 		if host == "" {
 			panic("EBS_HOST not set")

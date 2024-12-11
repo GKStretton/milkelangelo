@@ -47,7 +47,7 @@ services:
       - /dev:/dev
     user: "1000:1000"
     enviornment:
-      USE_EBS: ${USE_EBS:-false}
+      ENABLE_EBS: ${ENABLE_EBS:-false}
   dslrcapture:
     build:
       context: .
