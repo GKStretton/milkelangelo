@@ -46,7 +46,7 @@ services:
       - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}:${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
       - /dev:/dev
     user: "1000:1000"
-    enviornment:
+    environment:
       ENABLE_EBS: ${ENABLE_EBS:-false}
   dslrcapture:
     build:
