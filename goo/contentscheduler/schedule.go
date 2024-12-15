@@ -45,21 +45,23 @@ func Start(sm *session.SessionManager) {
 		}
 	})
 
-	next := time.After(time.Second)
-	for {
-		<-next
-		next = time.After(time.Minute * 10)
-		if !keyvalue.GetBool("ENABLE_CONTENT_SCHEDULER_LOOP") {
-			fmt.Println("content scheduler loop not enabled")
-			next = time.After(time.Hour)
-			continue
-		}
+	go func() {
+		next := time.After(time.Second)
+		for {
+			<-next
+			next = time.After(time.Minute * 10)
+			if !keyvalue.GetBool("ENABLE_CONTENT_SCHEDULER_LOOP") {
+				fmt.Println("content scheduler loop not enabled")
+				next = time.After(time.Hour)
+				continue
+			}
 
-		err := m.processLatestProductionSession(sm)
-		if err != nil {
-			fmt.Println(err)
+			err := m.processLatestProductionSession(sm)
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
-	}
+	}()
 }
 
 func Test(sm *session.SessionManager) {
