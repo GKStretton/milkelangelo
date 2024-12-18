@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { useGlobalState } from "../helpers/State";
 
-export default function DebugView({ robotState }: { robotState: undefined }) {
+export default function DebugView({
+	ebsState: robotState,
+}: { ebsState: undefined }) {
 	const stateText = useMemo(
 		() => JSON.stringify(robotState, null, " "),
 		[robotState],

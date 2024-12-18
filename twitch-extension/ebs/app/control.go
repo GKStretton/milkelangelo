@@ -39,9 +39,9 @@ func (a *App) GoToPosition(ctx context.Context, x, y float32) error {
 }
 
 func (a *App) CanUserControl(ctx context.Context) error {
-	user, ok := ctx.Value("user").(*entities.User)
-	if !ok {
-		return fmt.Errorf("user not found in context")
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return err
 	}
 
 	a.lock.Lock()
@@ -64,9 +64,9 @@ func (a *App) CanUserControl(ctx context.Context) error {
 
 // ClaimControl initally claims control or renews control for a user.
 func (a *App) ClaimControl(ctx context.Context) error {
-	user, ok := ctx.Value("user").(*entities.User)
-	if !ok {
-		return fmt.Errorf("user not found in context")
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return err
 	}
 
 	a.lock.Lock()
@@ -88,4 +88,18 @@ func (a *App) ClaimControl(ctx context.Context) error {
 	go a.reportEbsState()
 
 	return nil
+}
+
+func getUserFromContext(ctx context.Context) (*entities.User, error) {
+	u := ctx.Value(entities.ContextKeyUser)
+	if u == nil {
+		return nil, fmt.Errorf("user key not found in context")
+	}
+
+	user, ok := u.(*entities.User)
+	if !ok {
+		return nil, fmt.Errorf("user value not of type *entities.User")
+	}
+
+	return user, nil
 }

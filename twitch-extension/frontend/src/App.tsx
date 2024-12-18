@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
+import ConnectionManager from "./components/ConnectionManager";
 import ControlPanel from "./components/ControlPanel";
 import ControlView from "./components/ControlView";
 import DebugView from "./components/DebugView";
@@ -10,13 +11,20 @@ function App() {
 	const ext = window?.Twitch?.ext;
 	const [auth, setAuth] = useState<Twitch.ext.Authorized>();
 	const [authDisabled, setAuthDisabled] = useState(false);
-	const [robotState, setRobotState] = useState();
+	const [ebsState, setEbsState] = useState();
 	const [coords, setCoords] = useState<Coords>({ x: 0, y: 0 });
 
 	useEffect(() => {
 		if (ext.viewer.id === null) {
 			console.log("disabling auth");
 			setAuthDisabled(true);
+			setAuth({
+				userId: "local",
+				channelId: "local",
+				clientId: "local",
+				token: "local",
+				helixToken: "local",
+			});
 			return;
 		}
 
@@ -30,7 +38,7 @@ function App() {
 		});
 		ext.listen("broadcast", (target, contentType, message) => {
 			console.log("got broadcast: ", target, contentType, message);
-			setRobotState(JSON.parse(message));
+			setEbsState(JSON.parse(message));
 		});
 	}, [ext]);
 
@@ -38,7 +46,8 @@ function App() {
 		<div className="App">
 			{ext && (auth || authDisabled) ? (
 				<>
-					<DebugView robotState={robotState} />
+					<DebugView ebsState={ebsState} />
+					<ConnectionManager auth={auth} ebsState={ebsState} />
 					<ControlView auth={auth} coords={coords} setCoords={setCoords} />
 					<ControlPanel auth={auth} coords={coords} />
 				</>

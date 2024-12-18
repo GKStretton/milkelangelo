@@ -23,7 +23,7 @@ func (s *server) CollectFromVial(c *gin.Context) {
 
 	l.Infof("received collection request from vial %d", *collectionRequest.Id)
 
-	err = s.goo.CollectFromVial(*collectionRequest.Id)
+	err = s.app.CollectFromVial(c, *collectionRequest.Id)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -49,7 +49,7 @@ func (s *server) Dispense(c *gin.Context) {
 
 	l.Infof("received dispense request x: %f, y: %f", x, y)
 
-	err = s.goo.Dispense(x, y)
+	err = s.app.Dispense(c, x, y)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -75,7 +75,7 @@ func (s *server) GoToPosition(c *gin.Context) {
 
 	l.Infof("received goTo request x: %f, y: %f", x, y)
 
-	err = s.goo.GoToPosition(x, y)
+	err = s.app.GoToPosition(c, x, y)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

@@ -59,6 +59,15 @@ export function dispenseRequest(
 	}).catch((e) => console.error(e));
 }
 
+export function claimRequest(auth: Twitch.ext.Authorized | undefined) {
+	console.log("claim");
+
+	fetch("http://localhost:8789/claim-control", {
+		method: "PUT",
+		headers: getHeaders(auth),
+	}).catch((e) => console.error(e));
+}
+
 const getHeaders = (auth: Twitch.ext.Authorized | undefined) => ({
 	"Content-Type": "application/json",
 	Authorization: `Bearer ${auth?.token}`,

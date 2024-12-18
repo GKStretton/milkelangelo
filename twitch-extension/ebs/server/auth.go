@@ -26,11 +26,11 @@ const extensionClientID = "ihiyqlxtem517wq76f4hn8pvo9is30"
 
 func (s *server) localAuthMiddleware(c *gin.Context) {
 	// add user object to context
-	ctx := c.Request.Context()
-	ctx = context.WithValue(ctx, "user", &entities.User{
+	c.Set(entities.ContextKeyUser, &entities.User{
 		OUID: "local",
 	})
-	c.Request.WithContext(ctx)
+
+	l.Debug("added local user to context")
 
 	c.Next()
 }
@@ -66,7 +66,7 @@ func (s *server) twitchAuthMiddleware(c *gin.Context) {
 	ctx = context.WithValue(ctx, "user", &entities.User{
 		OUID: claims.OpaqueUserID,
 	})
-	c.Request.WithContext(ctx)
+	c.Request = c.Request.WithContext(ctx)
 
 	c.Next()
 }
