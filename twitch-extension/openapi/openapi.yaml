@@ -26,6 +26,34 @@ security:
   - bearerAuth: []
 
 paths:
+  /claim-control:
+    put:
+      summary: Claim control of the robot
+      description: |
+        This endpoint is used to claim control of the robot. Only one user can control the robot at a time.
+        This should be called periodically to renew the claim.
+      operationId: claimControl
+      responses:
+        202:
+          description: Control claimed
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        429:
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /collect:
     post:
       summary: Collect from a vial

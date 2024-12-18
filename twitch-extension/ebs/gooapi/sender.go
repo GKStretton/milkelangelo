@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/gkstretton/study-of-light/twitch-ebs/entities"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -15,6 +17,7 @@ const (
 	dispenseRequestType   messageType = "dispense"
 	collectionRequestType messageType = "collection"
 	goToRequestType       messageType = "goto"
+	stateReportType       messageType = "state"
 )
 
 type dispenseRequest struct {
@@ -29,6 +32,11 @@ type collectionRequest struct {
 type goToRequest struct {
 	X float32
 	Y float32
+}
+
+type EbsStateReport struct {
+	ConnectedUser          *entities.User
+	ConnectedUserTimestamp time.Time
 }
 
 type message struct {

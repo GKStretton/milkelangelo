@@ -82,3 +82,10 @@ func (g *connectedGooApi) GoToPosition(x, y float32) error {
 		Data:        m,
 	})
 }
+
+func (g *connectedGooApi) ReportEbsState(state EbsStateReport) error {
+	return g.sendMessage(&message{
+		MessageType: stateReportType,
+		Data:        state,
+	})
+}

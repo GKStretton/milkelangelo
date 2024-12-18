@@ -7,7 +7,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gkstretton/study-of-light/twitch-ebs/entities"
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/net/context"
 )
 
 type twitchClaims struct {
@@ -22,7 +24,18 @@ type twitchClaims struct {
 
 const extensionClientID = "ihiyqlxtem517wq76f4hn8pvo9is30"
 
-func (s *server) authMiddleware(c *gin.Context) {
+func (s *server) localAuthMiddleware(c *gin.Context) {
+	// add user object to context
+	ctx := c.Request.Context()
+	ctx = context.WithValue(ctx, "user", &entities.User{
+		OUID: "local",
+	})
+	c.Request.WithContext(ctx)
+
+	c.Next()
+}
+
+func (s *server) twitchAuthMiddleware(c *gin.Context) {
 	if c.GetHeader("X-Twitch-Extension-Client-Id") != extensionClientID {
 		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid extension client id"))
 		return
@@ -47,6 +60,13 @@ func (s *server) authMiddleware(c *gin.Context) {
 	}
 
 	l.Debugf("verified user request raddr %s, uid %s, ouid %s", c.Request.RemoteAddr, claims.UserID, claims.OpaqueUserID)
+
+	// add user object to context
+	ctx := c.Request.Context()
+	ctx = context.WithValue(ctx, "user", &entities.User{
+		OUID: claims.OpaqueUserID,
+	})
+	c.Request.WithContext(ctx)
 
 	c.Next()
 }

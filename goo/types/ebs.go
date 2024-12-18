@@ -1,5 +1,7 @@
 package types
 
+import "time"
+
 type GooStatus = string
 
 const (
@@ -67,5 +69,10 @@ type goToRequest struct {
 }
 
 type EbsStateReport struct {
-	UserConnected bool // true if a controlling user is connected
+	ConnectedUser          *EbsUser
+	ConnectedUserTimestamp time.Time
+}
+
+type EbsUser struct {
+	OUID string
 }

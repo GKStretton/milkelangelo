@@ -3,6 +3,9 @@ package app
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/gkstretton/study-of-light/twitch-ebs/entities"
+	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
 )
 
 // broadcasts the BroadcastData cache once per second
@@ -12,7 +15,17 @@ func (a *App) regularBroadcast() {
 		a.lock.Lock()
 		defer a.lock.Unlock()
 
-		jsonData, err := json.Marshal(a.state)
+		state := struct {
+			GooState               *gooapi.GooStateUpdate
+			ConnectedUser          *entities.User
+			ConnectedUserTimestamp time.Time
+		}{
+			GooState:               a.GooState,
+			ConnectedUser:          a.ConnectedUser,
+			ConnectedUserTimestamp: a.ConnectedUserTimestamp,
+		}
+
+		jsonData, err := json.Marshal(state)
 		if err != nil {
 			return nil, err
 		}

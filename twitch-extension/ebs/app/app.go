@@ -2,7 +2,9 @@ package app
 
 import (
 	"sync"
+	"time"
 
+	"github.com/gkstretton/study-of-light/twitch-ebs/entities"
 	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
 	"github.com/op/go-logging"
 )
@@ -13,8 +15,11 @@ type App struct {
 	goo       gooapi.GooApi
 	twitchAPI TwitchAPI
 
-	lock  sync.Mutex
-	state EBSState
+	lock     sync.Mutex
+	GooState *gooapi.GooStateUpdate
+
+	ConnectedUser          *entities.User
+	ConnectedUserTimestamp time.Time
 }
 
 func NewApp(goo gooapi.GooApi, twitchAPI TwitchAPI) *App {
@@ -24,18 +29,15 @@ func NewApp(goo gooapi.GooApi, twitchAPI TwitchAPI) *App {
 	}
 }
 
-type EBSState struct {
-	GooState *gooapi.GooStateUpdate
-}
-
 func (a *App) Start() {
 	a.goo.SetStateUpdateCallback(a.gooStateCallback)
 
-	a.regularBroadcast()
+	go a.regularBroadcast()
+	go a.regularStateUpdate()
 }
 
 func (a *App) gooStateCallback(state gooapi.GooStateUpdate) {
-	a.state.GooState = &state
+	a.GooState = &state
 
 	l.Debugf("callback received state update: %+v", state)
 }

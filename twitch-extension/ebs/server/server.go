@@ -29,7 +29,7 @@ func (s *server) Run() {
 	s.r.Run(s.addr)
 }
 
-func NewServer(addr string, sharedSecretPath string, goo gooapi.GooApi, app *app.App) (*server, error) {
+func NewServer(addr string, sharedSecretPath string, goo gooapi.GooApi, app *app.App, disableAuthentication bool) (*server, error) {
 	r := gin.Default()
 
 	sharedSecret, err := common.GetSecret(sharedSecretPath)
@@ -47,7 +47,11 @@ func NewServer(addr string, sharedSecretPath string, goo gooapi.GooApi, app *app
 
 	s.r.Use(corsMiddleware)
 	// todo: s.r.Use(rateLimiterMiddleware)
-	s.r.Use(s.authMiddleware)
+	if disableAuthentication {
+		s.r.Use(s.localAuthMiddleware)
+	} else {
+		s.r.Use(s.twitchAuthMiddleware)
+	}
 
 	openapi.RegisterHandlers(r, s)
 

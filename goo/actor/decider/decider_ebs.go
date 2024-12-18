@@ -28,7 +28,7 @@ func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *ty
 	c := d.ebsApi.SubscribeMessages()
 	defer d.ebsApi.UnsubscribeMessages(c)
 
-	if state := d.ebsApi.GetEbsState(); state == nil || !state.UserConnected {
+	if state := d.ebsApi.GetEbsState(); state == nil || state.ConnectedUser == nil {
 		// if user is not connected, return auto fallback
 		l.Printf("ebs user not connected, using fallback decider")
 		return d.fallback.decideCollection(predictedState)
@@ -45,7 +45,7 @@ func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *ty
 		case msg := <-c:
 			if msg.Type == types.EbsStateReportType {
 				// if user is not connected, return auto fallback
-				if !msg.StateReport.UserConnected {
+				if msg.StateReport.ConnectedUser == nil {
 					l.Printf("ebs user not connected, using fallback decider")
 					return d.fallback.decideCollection(predictedState)
 				}
@@ -73,7 +73,7 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 	c := d.ebsApi.SubscribeMessages()
 	defer d.ebsApi.UnsubscribeMessages(c)
 
-	if state := d.ebsApi.GetEbsState(); state == nil || !state.UserConnected {
+	if state := d.ebsApi.GetEbsState(); state == nil || state.ConnectedUser == nil {
 		// if user is not connected, return auto fallback
 		l.Printf("ebs user not connected, using fallback decider")
 		return d.fallback.decideDispense(predictedState)
@@ -93,7 +93,7 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 		case msg := <-c:
 			if msg.Type == types.EbsStateReportType {
 				// if user is not connected, return auto fallback
-				if !msg.StateReport.UserConnected {
+				if msg.StateReport.ConnectedUser == nil {
 					l.Printf("ebs user not connected, using fallback decider")
 					return d.fallback.decideDispense(predictedState)
 				}

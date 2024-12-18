@@ -51,6 +51,9 @@ type GoToPositionJSONRequestBody GoToPositionJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Claim control of the robot
+	// (PUT /claim-control)
+	ClaimControl(c *gin.Context)
 	// Collect from a vial
 	// (POST /collect)
 	CollectFromVial(c *gin.Context)
@@ -70,6 +73,21 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(c *gin.Context)
+
+// ClaimControl operation middleware
+func (siw *ServerInterfaceWrapper) ClaimControl(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.ClaimControl(c)
+}
 
 // CollectFromVial operation middleware
 func (siw *ServerInterfaceWrapper) CollectFromVial(c *gin.Context) {
@@ -143,6 +161,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
+	router.PUT(options.BaseURL+"/claim-control", wrapper.ClaimControl)
 	router.POST(options.BaseURL+"/collect", wrapper.CollectFromVial)
 	router.POST(options.BaseURL+"/dispense", wrapper.Dispense)
 	router.PUT(options.BaseURL+"/goto", wrapper.GoToPosition)
