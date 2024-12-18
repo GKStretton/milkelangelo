@@ -11,20 +11,28 @@ import (
 )
 
 type ebsDecider struct {
-	endTime time.Time
-	ebsApi  ebsinterface.EbsApi
+	endTime  time.Time
+	ebsApi   ebsinterface.EbsApi
+	fallback Decider
 }
 
-func NewEbsDecider(endTime time.Time, ebsApi ebsinterface.EbsApi) Decider {
+func NewEbsDecider(endTime time.Time, ebsApi ebsinterface.EbsApi, fallback Decider) Decider {
 	return &ebsDecider{
-		endTime: endTime,
-		ebsApi:  ebsApi,
+		endTime:  endTime,
+		ebsApi:   ebsApi,
+		fallback: fallback,
 	}
 }
 
 func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *types.CollectionDecision {
 	c := d.ebsApi.SubscribeMessages()
 	defer d.ebsApi.UnsubscribeMessages(c)
+
+	if state := d.ebsApi.GetEbsState(); state == nil || !state.UserConnected {
+		// if user is not connected, return auto fallback
+		l.Printf("ebs user not connected, using fallback decider")
+		return d.fallback.decideCollection(predictedState)
+	}
 
 	actorTimeout := time.After(
 		time.Until(d.endTime),
@@ -35,6 +43,13 @@ func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *ty
 			l.Printf("timeout in decideCollection, returning nil")
 			return nil
 		case msg := <-c:
+			if msg.Type == types.EbsStateReportType {
+				// if user is not connected, return auto fallback
+				if !msg.StateReport.UserConnected {
+					l.Printf("ebs user not connected, using fallback decider")
+					return d.fallback.decideCollection(predictedState)
+				}
+			}
 			if msg.Type != types.EbsCollectionRequest {
 				l.Printf("cannot make use of message type %s in collection decider", msg.Type)
 				continue
@@ -58,6 +73,12 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 	c := d.ebsApi.SubscribeMessages()
 	defer d.ebsApi.UnsubscribeMessages(c)
 
+	if state := d.ebsApi.GetEbsState(); state == nil || !state.UserConnected {
+		// if user is not connected, return auto fallback
+		l.Printf("ebs user not connected, using fallback decider")
+		return d.fallback.decideDispense(predictedState)
+	}
+
 	// store target coordinates in here
 	preemptor := executor.NewDispenseExecutor(&types.DispenseDecision{})
 
@@ -70,6 +91,13 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 			l.Printf("timeout in decideDispense, returning nil")
 			return nil
 		case msg := <-c:
+			if msg.Type == types.EbsStateReportType {
+				// if user is not connected, return auto fallback
+				if !msg.StateReport.UserConnected {
+					l.Printf("ebs user not connected, using fallback decider")
+					return d.fallback.decideDispense(predictedState)
+				}
+			}
 			if msg.Type != types.EbsDispenseRequest && msg.Type != types.EbsGoToRequest {
 				l.Printf("cannot make use of message type %s in dispense decider", msg.Type)
 				continue

@@ -16,7 +16,7 @@ func (e *extensionSession) SubscribeMessages() <-chan *types.EbsMessage {
 
 	l.Printf("subscribing to ebs messages")
 
-	c := make(chan *types.EbsMessage)
+	c := make(chan *types.EbsMessage, 1)
 	e.subs = append(e.subs, c)
 	return c
 }
@@ -102,6 +102,16 @@ func (e *extensionSession) connect() error {
 					l.Printf("error unmarshalling goto request from ebs: %s", err)
 					continue
 				}
+			case types.EbsStateReportType:
+				l.Printf("got state message from ebs")
+				err := json.Unmarshal(event.Data, &msg.StateReport)
+				if err != nil {
+					l.Printf("error unmarshalling state request from ebs: %s", err)
+					continue
+				}
+				e.ebsStateLock.Lock()
+				e.ebsState = msg.StateReport
+				e.ebsStateLock.Unlock()
 			default:
 				l.Printf("unrecognised ebs message type '%s'", msg.Type)
 				continue

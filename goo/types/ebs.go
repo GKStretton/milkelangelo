@@ -41,6 +41,7 @@ const (
 	EbsDispenseRequest   EbsMessageType = "dispense"
 	EbsCollectionRequest EbsMessageType = "collection"
 	EbsGoToRequest       EbsMessageType = "goto"
+	EbsStateReportType   EbsMessageType = "state"
 )
 
 type EbsMessage struct {
@@ -48,6 +49,7 @@ type EbsMessage struct {
 	DispenseRequest   *dispenseRequest
 	CollectionRequest *collectionRequest
 	GoToRequest       *goToRequest
+	StateReport       *EbsStateReport
 }
 
 type dispenseRequest struct {
@@ -62,4 +64,8 @@ type collectionRequest struct {
 type goToRequest struct {
 	X float32
 	Y float32
+}
+
+type EbsStateReport struct {
+	UserConnected bool // true if a controlling user is connected
 }

@@ -25,12 +25,16 @@ type extensionSession struct {
 
 	gooStateLock sync.Mutex
 	gooState     types.GooState
+
+	ebsStateLock sync.Mutex
+	ebsState     *types.EbsStateReport
 }
 
 type EbsApi interface {
 	SubscribeMessages() <-chan *types.EbsMessage
 	UnsubscribeMessages(c <-chan *types.EbsMessage)
 	UpdateState(func(state *types.GooState))
+	GetEbsState() *types.EbsStateReport
 }
 
 func NewExtensionSession(ebsAddress string) (*extensionSession, error) {

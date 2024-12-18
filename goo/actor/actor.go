@@ -62,7 +62,7 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi, act
 		d = decider.NewAutoDecider(endTime, seed, testing)
 	} else {
 		l.Println("using ebs decider")
-		d = decider.NewEbsDecider(endTime, ebsApi)
+		d = decider.NewEbsDecider(endTime, ebsApi, decider.NewAutoDecider(endTime, seed, false))
 	}
 
 	awaitDecision := decide(d, events.GetLatestStateReportCopy())
