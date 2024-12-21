@@ -1,15 +1,14 @@
 import React, { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useGlobalState } from "../helpers/State";
 
-export default function DebugView({
-	ebsState: robotState,
-}: { ebsState: undefined }) {
-	const stateText = useMemo(
-		() => JSON.stringify(robotState, null, " "),
-		[robotState],
-	);
-
+export default function DebugView() {
 	const gs = useGlobalState();
+
+	const stateText = useMemo(
+		() => JSON.stringify(gs.ebsState, null, " "),
+		[gs.ebsState],
+	);
 
 	return (
 		<>
@@ -27,11 +26,9 @@ export default function DebugView({
 			{/* biome-ignore lint/a11y/useKeyWithClickEvents: debug */}
 			<div
 				className="debug-toggle"
-				style={{
-					left: gs.isDebugMode ? "0vw" : "0vw",
-				}}
 				onClick={() => {
 					gs.setDebugMode(!gs.isDebugMode);
+					toast.info(`Debug mode ${gs.isDebugMode ? "off" : "on"}`);
 				}}
 			>
 				Dbg

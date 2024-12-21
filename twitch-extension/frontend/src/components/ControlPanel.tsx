@@ -1,19 +1,27 @@
 import _ from "lodash";
-import { collectRequest, dispenseRequest } from "../ebs/api";
-import { Coords } from "../types";
+import { toast } from "sonner";
+import { useCollect, useDispense } from "../ebs/api";
+import { useGlobalState } from "../helpers/State";
 
-export default function ControlPanel({
-	auth,
-	coords,
-}: { auth: Twitch.ext.Authorized | undefined; coords: Coords }) {
+export default function ControlPanel() {
+	const gs = useGlobalState();
+
+	const gooState = gs.ebsState?.GooState;
+
+	const { mutate: collect, isPending: collectPending } = useCollect();
+	const { mutate: dispense, isPending: dispensePending } = useDispense();
+
 	const collectionHandler =
 		(auth: Twitch.ext.Authorized | undefined, vialPos: number) => () => {
-			collectRequest(auth, vialPos);
+			collect(vialPos);
 		};
-	const dispenseHandler =
-		(auth: Twitch.ext.Authorized | undefined, x: number, y: number) => () => {
-			dispenseRequest(auth, x, y);
-		};
+	const dispenseHandler = () => {
+		if (gooState) {
+			dispense({ x: gooState.X, y: gooState.Y });
+		} else {
+			toast.error("No goo state available");
+		}
+	};
 	return (
 		<div id="color-vote-area">
 			{_.times(5, (i) => {
@@ -21,8 +29,8 @@ export default function ControlPanel({
 				return (
 					<div
 						className="color-option"
-						onClick={collectionHandler(auth, vialPos)}
-						onKeyDown={collectionHandler(auth, vialPos)}
+						onClick={collectionHandler(gs.auth, vialPos)}
+						onKeyDown={collectionHandler(gs.auth, vialPos)}
 					>
 						{vialPos}
 					</div>
@@ -30,8 +38,8 @@ export default function ControlPanel({
 			})}
 			<div
 				className="dispense-button"
-				onClick={dispenseHandler(auth, coords.x, coords.y)}
-				onKeyDown={dispenseHandler(auth, coords.x, coords.y)}
+				onClick={dispenseHandler}
+				onKeyDown={dispenseHandler}
 			>
 				Dispense
 			</div>

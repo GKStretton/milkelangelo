@@ -1,20 +1,14 @@
-import React, { useContext, useState } from "react";
-import { goToRequest } from "../ebs/api";
-import { createLocationVote } from "../ebs/helpers";
+import React, { useState } from "react";
+import { useGoTo } from "../ebs/api";
 import { useGlobalState } from "../helpers/State";
-import { Coords } from "../types";
 import "./ControlView.css";
 
-export default function ControlView({
-	auth,
-	coords,
-	setCoords,
-}: {
-	auth: Twitch.ext.Authorized | undefined;
-	coords: Coords;
-	setCoords: (coords: Coords) => void;
-}) {
+export default function ControlView() {
+	const gs = useGlobalState();
+
 	const [{ x, y }, setRawCoords] = useState({ x: 0, y: 0 });
+
+	const { mutate: goTo, isPending: isGoingTo } = useGoTo();
 
 	const locationVoteHandler = (e: React.MouseEvent<HTMLElement>) => {
 		const target = e.target as HTMLElement;
@@ -25,12 +19,8 @@ export default function ControlView({
 		const xMod = x / 400.0;
 		const yMod = y / 400.0;
 
-		setCoords({ x: xMod, y: yMod });
-
-		goToRequest(auth, xMod, yMod);
+		goTo({ x: xMod, y: yMod });
 	};
-
-	const gs = useGlobalState();
 
 	return (
 		<div

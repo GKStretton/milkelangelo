@@ -1,9 +1,15 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
+import { Coords, EbsState } from "../types";
 
 // 1. Define the shape of the global state
 interface GlobalStateType {
+	auth: Twitch.ext.Authorized | undefined;
+	ebsState: EbsState | null;
 	isDebugMode: boolean;
 	isLocalMode: boolean;
+
+	setAuth: (value: Twitch.ext.Authorized) => void;
+	setEbsState: (value: EbsState) => void;
 	setDebugMode: (value: boolean) => void;
 	setLocalMode: (value: boolean) => void;
 }
@@ -17,14 +23,23 @@ interface StateProviderProps {
 }
 
 export const StateProvider: React.FC<StateProviderProps> = ({ children }) => {
-	const [isDebugMode, setDebugMode] = useState<boolean>(
-		process.env.NODE_ENV === "development",
-	);
+	const [isDebugMode, setDebugMode] = useState<boolean>(false);
 	const [isLocalMode, setLocalMode] = useState<boolean>(false);
+	const [auth, setAuth] = useState<Twitch.ext.Authorized>();
+	const [ebsState, setEbsState] = useState<EbsState | null>(null);
 
 	return (
 		<StateContext.Provider
-			value={{ isDebugMode, isLocalMode, setDebugMode, setLocalMode }}
+			value={{
+				auth,
+				ebsState,
+				isDebugMode,
+				isLocalMode,
+				setAuth,
+				setEbsState,
+				setDebugMode,
+				setLocalMode,
+			}}
 		>
 			{children}
 		</StateContext.Provider>

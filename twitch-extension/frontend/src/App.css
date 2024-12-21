@@ -1,7 +1,7 @@
 .App {
 	text-align: center;
 	display: block;
-	/* background-image: url("../public/stream_example.png"); */
+	background-image: url("../public/stream_example.png");
 	/* background-color: black; */
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -34,7 +34,8 @@
 	flex-direction: column;
 }
 
-.color-option,.dispense-button {
+.color-option,
+.dispense-button {
 	width: 6vh;
 	height: 6vh;
 	border-radius: 100%;
@@ -52,7 +53,7 @@
 	background-color: #00000050;
 	position: absolute;
 	top: 0vh;
-	left: 0vw;
+	right: 0vw;
 	width: 30vw;
 	height: 90vh;
 }
@@ -80,7 +81,8 @@
 
 .debug-toggle {
 	position: absolute;
-	top: 10vh;
+	bottom: 0;
+	right: 0;
 	background-color: white;
 	color: black;
 }

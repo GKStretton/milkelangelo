@@ -1,24 +1,46 @@
+import {
+	QueryClient,
+	QueryClientProvider,
+	useQuery,
+} from "@tanstack/react-query";
 import _ from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
+import { Toaster, toast } from "sonner";
 import "./App.css";
 import ConnectionManager from "./components/ConnectionManager";
 import ControlPanel from "./components/ControlPanel";
 import ControlView from "./components/ControlView";
 import DebugView from "./components/DebugView";
-import { Coords } from "./types";
+import { setupApiAuth, useDirectEbsState } from "./ebs/api";
+import { useGlobalState } from "./helpers/State";
 
 function App() {
 	const ext = window?.Twitch?.ext;
-	const [auth, setAuth] = useState<Twitch.ext.Authorized>();
-	const [authDisabled, setAuthDisabled] = useState(false);
-	const [ebsState, setEbsState] = useState();
-	const [coords, setCoords] = useState<Coords>({ x: 0, y: 0 });
+	const gs = useGlobalState();
+
+	// only when testing
+	const { data: directEbsState, error } = useDirectEbsState(gs.isLocalMode);
+
+	useEffect(() => {
+		if (gs.isLocalMode) {
+			// use direct ebs state getter
+			if (directEbsState) {
+				gs.setEbsState(directEbsState);
+			}
+		}
+	}, [gs.isLocalMode, directEbsState, gs.setEbsState]);
+
+	useEffect(() => {
+		if (error) {
+			toast.error(`Failed to directly get EBS state: ${error.message}`);
+		}
+	}, [error]);
 
 	useEffect(() => {
 		if (ext.viewer.id === null) {
-			console.log("disabling auth");
-			setAuthDisabled(true);
-			setAuth({
+			toast.message("using local mode");
+			gs.setLocalMode(true);
+			gs.setAuth({
 				userId: "local",
 				channelId: "local",
 				clientId: "local",
@@ -28,34 +50,30 @@ function App() {
 			return;
 		}
 
-		if (!ext) {
-			console.error("ext not defined, not running on twitch?");
-			return;
-		}
 		ext.onAuthorized((auth) => {
 			console.log("got auth: ", auth);
-			setAuth(auth);
+			gs.setAuth(auth);
 		});
+		// todo: migrate from pubsub to eventsub?
 		ext.listen("broadcast", (target, contentType, message) => {
 			console.log("got broadcast: ", target, contentType, message);
-			setEbsState(JSON.parse(message));
+			gs.setEbsState(JSON.parse(message));
 		});
-	}, [ext]);
+	}, [ext, gs.setAuth, gs.setEbsState, gs.setLocalMode]);
+
+	useEffect(() => {
+		if (gs.auth) {
+			setupApiAuth(gs.auth);
+		}
+	}, [gs.auth]);
 
 	return (
 		<div className="App">
-			{ext && (auth || authDisabled) ? (
-				<>
-					<DebugView ebsState={ebsState} />
-					<ConnectionManager auth={auth} ebsState={ebsState} />
-					<ControlView auth={auth} coords={coords} setCoords={setCoords} />
-					<ControlPanel auth={auth} coords={coords} />
-				</>
-			) : (
-				<p style={{ color: "#ff00ff" }}>
-					Error: could not get auth from twitch!
-				</p>
-			)}
+			<Toaster richColors position="bottom-center" />
+			<DebugView />
+			<ConnectionManager />
+			<ControlView />
+			<ControlPanel />
 		</div>
 	);
 }
