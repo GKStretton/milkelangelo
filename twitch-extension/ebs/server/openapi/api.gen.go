@@ -57,6 +57,9 @@ type ServerInterface interface {
 	// Collect from a vial
 	// (POST /collect)
 	CollectFromVial(c *gin.Context)
+	// Bypass pubsub to get EBS state directly
+	// (GET /direct-state)
+	GetDirectState(c *gin.Context)
 	// Dispense from pipette
 	// (POST /dispense)
 	Dispense(c *gin.Context)
@@ -102,6 +105,21 @@ func (siw *ServerInterfaceWrapper) CollectFromVial(c *gin.Context) {
 	}
 
 	siw.Handler.CollectFromVial(c)
+}
+
+// GetDirectState operation middleware
+func (siw *ServerInterfaceWrapper) GetDirectState(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetDirectState(c)
 }
 
 // Dispense operation middleware
@@ -163,6 +181,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.PUT(options.BaseURL+"/claim-control", wrapper.ClaimControl)
 	router.POST(options.BaseURL+"/collect", wrapper.CollectFromVial)
+	router.GET(options.BaseURL+"/direct-state", wrapper.GetDirectState)
 	router.POST(options.BaseURL+"/dispense", wrapper.Dispense)
 	router.PUT(options.BaseURL+"/goto", wrapper.GoToPosition)
 }

@@ -92,3 +92,13 @@ func (s *server) ClaimControl(c *gin.Context) {
 	}
 	c.Status(http.StatusAccepted)
 }
+
+func (s *server) GetDirectState(c *gin.Context) {
+	state, err := s.app.GetState(c)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, state)
+}

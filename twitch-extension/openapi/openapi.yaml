@@ -26,6 +26,29 @@ security:
   - bearerAuth: []
 
 paths:
+  /direct-state:
+    get:
+      summary: Bypass pubsub to get EBS state directly
+      operationId: getDirectState
+      responses:
+        200:
+          description: State retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /claim-control:
     put:
       summary: Claim control of the robot

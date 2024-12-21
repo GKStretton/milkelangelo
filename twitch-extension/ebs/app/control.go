@@ -90,6 +90,10 @@ func (a *App) ClaimControl(ctx context.Context) error {
 	return nil
 }
 
+func (a *App) GetState(ctx context.Context) (ebsState, error) {
+	return a.buildStateResponse(), nil
+}
+
 func getUserFromContext(ctx context.Context) (*entities.User, error) {
 	u := ctx.Value(entities.ContextKeyUser)
 	if u == nil {
