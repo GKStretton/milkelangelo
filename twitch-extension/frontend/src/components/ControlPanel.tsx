@@ -2,6 +2,7 @@ import _ from "lodash";
 import { toast } from "sonner";
 import { useCollect, useDispense } from "../ebs/api";
 import { useGlobalState } from "../helpers/State";
+import "./ControlPanel.css";
 
 export default function ControlPanel() {
 	const gs = useGlobalState();
@@ -31,8 +32,21 @@ export default function ControlPanel() {
 						className="color-option"
 						onClick={collectionHandler(gs.auth, vialPos)}
 						onKeyDown={collectionHandler(gs.auth, vialPos)}
+						style={
+							gs.ebsState?.GooState.VialProfiles[vialPos]?.Colour
+								? {
+										backgroundColor:
+											gs.ebsState.GooState.VialProfiles[vialPos].Colour,
+										color:
+											gs.ebsState.GooState.VialProfiles[vialPos].Colour ===
+											"#0000ff"
+												? "#ffffff"
+												: "#000000",
+								  }
+								: {}
+						}
 					>
-						{vialPos}
+						{gs.ebsState?.GooState.VialProfiles[vialPos]?.Name ?? vialPos}
 					</div>
 				);
 			})}

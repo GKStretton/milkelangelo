@@ -5,6 +5,8 @@ import { useGlobalState } from "../helpers/State";
 export default function ConnectionManager() {
 	const gs = useGlobalState();
 
+	const haveGooState: boolean = !!gs.ebsState?.GooState;
+
 	const connectedUser: string | undefined = gs.ebsState?.ConnectedUser?.OUID;
 
 	const { mutate: claim, isPending: isClaiming } = useClaim();
@@ -33,6 +35,11 @@ export default function ConnectionManager() {
 
 	return (
 		<div id="connection-area">
+			{haveGooState ? (
+				<div className="connection-status green">Goo State available</div>
+			) : (
+				<div className="connection-status red">Goo State unavailable</div>
+			)}
 			{isThisUserConnected ? (
 				<>
 					<div className="connection-status green">You are connected</div>

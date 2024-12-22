@@ -34,20 +34,6 @@
 	flex-direction: column;
 }
 
-.color-option,
-.dispense-button {
-	width: 6vh;
-	height: 6vh;
-	border-radius: 100%;
-	background-color: #ff00ff85;
-	margin: 1vw 0;
-	border: 2px solid #00000000;
-
-	&:hover {
-		border: 2px solid white;
-	}
-}
-
 .debug-text {
 	z-index: 10;
 	font-size: 1em;
