@@ -1,8 +1,6 @@
 package gooapi
 
 import (
-	"time"
-
 	"github.com/gkstretton/study-of-light/twitch-ebs/entities"
 )
 
@@ -28,6 +26,5 @@ type goToRequest struct {
 }
 
 type EbsStateReport struct {
-	ConnectedUser          *entities.User
-	ConnectedUserTimestamp time.Time
+	ConnectedUser *entities.User
 }

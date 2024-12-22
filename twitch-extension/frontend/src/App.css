@@ -95,3 +95,13 @@
 .connection-status {
 	color: white;
 }
+
+.green {
+	color: green;
+}
+.amber {
+	color: orange;
+}
+.red {
+	color: red;
+}

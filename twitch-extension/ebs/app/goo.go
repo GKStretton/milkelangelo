@@ -21,8 +21,7 @@ func (a *App) reportEbsState() {
 	defer a.lock.Unlock()
 
 	err := a.goo.ReportEbsState(gooapi.EbsStateReport{
-		ConnectedUser:          a.ConnectedUser,
-		ConnectedUserTimestamp: a.ConnectedUserExpiryTimestamp,
+		ConnectedUser: a.ConnectedUser,
 	})
 	if err != nil {
 		l.Errorf("failed to report ebs state to goo: %v", err)
