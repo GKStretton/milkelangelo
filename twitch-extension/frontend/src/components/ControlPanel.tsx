@@ -33,7 +33,7 @@ export default function ControlPanel() {
 						onClick={collectionHandler(gs.auth, vialPos)}
 						onKeyDown={collectionHandler(gs.auth, vialPos)}
 						style={
-							gs.ebsState?.GooState.VialProfiles[vialPos]?.Colour
+							gs.ebsState?.GooState?.VialProfiles[vialPos]?.Colour
 								? {
 										backgroundColor:
 											gs.ebsState.GooState.VialProfiles[vialPos].Colour,
@@ -46,7 +46,7 @@ export default function ControlPanel() {
 								: {}
 						}
 					>
-						{gs.ebsState?.GooState.VialProfiles[vialPos]?.Name ?? vialPos}
+						{gs.ebsState?.GooState?.VialProfiles[vialPos]?.Name ?? vialPos}
 					</div>
 				);
 			})}
