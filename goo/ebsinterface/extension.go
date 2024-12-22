@@ -25,6 +25,7 @@ type extensionSession struct {
 
 	gooStateLock sync.Mutex
 	gooState     types.GooState
+	gooStateChan chan struct{}
 
 	ebsStateLock sync.Mutex
 	ebsState     *types.EbsStateReport
@@ -46,10 +47,11 @@ func NewExtensionSession(ebsAddress string) (*extensionSession, error) {
 	}
 
 	es := &extensionSession{
-		ebsToken:   elt,
-		exitCh:     make(chan struct{}),
-		subs:       []chan *types.EbsMessage{},
-		ebsAddress: ebsAddress,
+		ebsToken:     elt,
+		exitCh:       make(chan struct{}),
+		subs:         []chan *types.EbsMessage{},
+		ebsAddress:   ebsAddress,
+		gooStateChan: make(chan struct{}, 1),
 	}
 
 	l.Println("connecting to ebs...")
@@ -57,7 +59,9 @@ func NewExtensionSession(ebsAddress string) (*extensionSession, error) {
 	if err != nil {
 		return nil, err
 	}
-	l.Println("connected to ebs.")
+
+	// send goo state update to ebs whenever there's a change
+	go es.stateSender()
 
 	return es, nil
 }

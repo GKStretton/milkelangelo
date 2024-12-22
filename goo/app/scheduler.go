@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
-	"github.com/gkstretton/dark/services/goo/keyvalue"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
+	"github.com/gkstretton/dark/services/goo/util"
 )
 
 type RecurringTime struct {
@@ -86,7 +86,7 @@ func scheduleWatcher(s *Schedule) {
 		fmt.Printf("[schedule] scheduling %s for %s (%s)\n", s.name, nextRun, timeUntil)
 		<-time.After(timeUntil)
 
-		if !s.enabled || !keyvalue.GetBool("ENABLE_SCHEDULER") {
+		if !s.enabled || !util.EnvBool("ENABLE_SCHEDULER") {
 			fmt.Printf("[schedule] skipping %s, not enabled\n", s.name)
 			continue
 		}
@@ -98,7 +98,7 @@ func scheduleWatcher(s *Schedule) {
 }
 
 func Start(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi) {
-	fmt.Printf("Starting scheduler\n")
+	fmt.Printf("Starting scheduler. Enabled: %t\n", util.EnvBool("ENABLE_SCHEDULER"))
 	registerHandlers(sm, twitchApi, ebsApi)
 	defineSchedule(sm, twitchApi, ebsApi)
 }

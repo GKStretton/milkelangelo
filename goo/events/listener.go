@@ -2,6 +2,7 @@ package events
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -21,6 +22,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+var l = log.New(os.Stdout, "[events] ", log.Flags())
 var latest_state_report *machinepb.StateReport
 var srLock sync.Mutex
 
@@ -30,12 +32,13 @@ var subsLock sync.Mutex
 
 func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 	mqtt.Subscribe(topics_firmware.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
+		l.Println("GOT STATE REPORT")
 		t := time.Now().UnixMicro()
 
 		sr := &machinepb.StateReport{}
 		err := proto.Unmarshal(payload, sr)
 		if err != nil {
-			fmt.Printf("error unmarshalling state report: %v\n", err)
+			l.Printf("error unmarshalling state report: %v\n", err)
 			return
 		}
 		sr.TimestampUnixMicros = uint64(t)
@@ -94,7 +97,7 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 			defer srLock.Unlock()
 
 			if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
-				fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
+				l.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
 				return
 			}
 
@@ -115,7 +118,7 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 			defer srLock.Unlock()
 
 			if latest_state_report.PipetteState.DispenseRequestNumber < 1 {
-				fmt.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
+				l.Println("cannot mark dispense with number < 1, it means nothing's dispensed yet...")
 				return
 			}
 
@@ -143,10 +146,10 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 				Recipient: machinepb.EmailRecipient_EMAIL_RECIPIENT_MAINTENANCE,
 			})
 			if err != nil {
-				fmt.Printf("error sending email for critial firmware error (%s): %s\n", critErr, err)
+				l.Printf("error sending email for critial firmware error (%s): %s\n", critErr, err)
 				return
 			}
-			fmt.Printf("Emailed maintainer about critial error: %s\n", critErr)
+			l.Printf("Emailed maintainer about critial error: %s\n", critErr)
 		}()
 	})
 
@@ -202,13 +205,13 @@ func publishStateReport(sr *machinepb.StateReport) {
 	}
 	b, err := m.Marshal(sr)
 	if err != nil {
-		fmt.Printf("error marshalling state report: %v\n", err)
+		l.Printf("error marshalling state report: %v\n", err)
 		return
 	}
 	go func() {
 		err = mqtt.Publish(topics_backend.TOPIC_STATE_REPORT_JSON, string(b))
 		if err != nil {
-			fmt.Printf("error publishing json state report: %v\n", err)
+			l.Printf("error publishing json state report: %v\n", err)
 			return
 		}
 	}()
@@ -222,7 +225,7 @@ func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
 	}
 	output, err := protoyaml.Marshal(list)
 	if err != nil {
-		fmt.Printf("error marshalling state report to yaml: %v\n", err)
+		l.Printf("error marshalling state report to yaml: %v\n", err)
 	}
 
 	p := filesystem.GetStateReportPath(uint64(s.Id))
@@ -235,7 +238,7 @@ func saveSessionStateReport(s *session.Session, sr *machinepb.StateReport) {
 
 	f, err := os.OpenFile(p, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Printf("error opening file for state report storage: %v\n", err)
+		l.Printf("error opening file for state report storage: %v\n", err)
 	}
 	defer f.Close()
 	f.Write([]byte(result))
@@ -248,14 +251,14 @@ func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
 
 	data, err := os.ReadFile(p)
 	if err != nil && !os.IsNotExist(err) {
-		fmt.Printf("Error reading failed dispenses file: %v\n", err)
+		l.Printf("Error reading failed dispenses file: %v\n", err)
 		return
 	}
 
 	if len(data) > 0 {
 		err = protoyaml.Unmarshal(data, meta)
 		if err != nil {
-			fmt.Printf("Error unmarshalling failed dispenses: %v\n", err)
+			l.Printf("Error unmarshalling failed dispenses: %v\n", err)
 			return
 		}
 	}
@@ -278,17 +281,17 @@ func appendFailedDispense(sessionId, startupCounter, dispenseNumber uint64) {
 
 	data, err = protoyaml.Marshal(meta)
 	if err != nil {
-		fmt.Printf("Error marshalling failed dispenses: %v\n", err)
+		l.Printf("Error marshalling failed dispenses: %v\n", err)
 		return
 	}
 
 	err = os.WriteFile(p, data, 0644)
 	if err != nil {
-		fmt.Printf("Error writing failed dispenses file: %v\n", err)
+		l.Printf("Error writing failed dispenses file: %v\n", err)
 		return
 	}
 
-	fmt.Printf("wrote failed dispense to file (session %d, startup %d, dispense %d)\n", sessionId, startupCounter, dispenseNumber)
+	l.Printf("wrote failed dispense to file (session %d, startup %d, dispense %d)\n", sessionId, startupCounter, dispenseNumber)
 }
 
 func appendDelayedDispense(sessionId, startupCounter, dispenseNumber, delayMs uint64) {
@@ -298,14 +301,14 @@ func appendDelayedDispense(sessionId, startupCounter, dispenseNumber, delayMs ui
 
 	data, err := os.ReadFile(p)
 	if err != nil && !os.IsNotExist(err) {
-		fmt.Printf("Error reading failed dispenses file: %v\n", err)
+		l.Printf("Error reading failed dispenses file: %v\n", err)
 		return
 	}
 
 	if len(data) > 0 {
 		err = protoyaml.Unmarshal(data, meta)
 		if err != nil {
-			fmt.Printf("Error unmarshalling failed dispenses: %v\n", err)
+			l.Printf("Error unmarshalling failed dispenses: %v\n", err)
 			return
 		}
 	}
@@ -328,17 +331,17 @@ func appendDelayedDispense(sessionId, startupCounter, dispenseNumber, delayMs ui
 
 	data, err = protoyaml.Marshal(meta)
 	if err != nil {
-		fmt.Printf("Error marshalling delayed dispenses: %v\n", err)
+		l.Printf("Error marshalling delayed dispenses: %v\n", err)
 		return
 	}
 
 	err = os.WriteFile(p, data, 0644)
 	if err != nil {
-		fmt.Printf("Error writing delayed dispenses file: %v\n", err)
+		l.Printf("Error writing delayed dispenses file: %v\n", err)
 		return
 	}
 
-	fmt.Printf("wrote delayed dispense to file (session %d, startup %d, dispense %d)\n", sessionId, startupCounter, dispenseNumber)
+	l.Printf("wrote delayed dispense to file (session %d, startup %d, dispense %d)\n", sessionId, startupCounter, dispenseNumber)
 }
 
 func GetLatestStateReportCopy() *machinepb.StateReport {
@@ -351,6 +354,6 @@ func GetLatestStateReportCopy() *machinepb.StateReport {
 func RequestStateReport() {
 	err := mqtt.Publish(topics_firmware.TOPIC_STATE_REPORT_REQUEST, "")
 	if err != nil {
-		fmt.Printf("failed to request state report from firmware: %v\n", err)
+		l.Printf("failed to request state report from firmware: %v\n", err)
 	}
 }

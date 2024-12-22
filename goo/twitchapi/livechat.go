@@ -63,17 +63,19 @@ func Start() *TwitchApi {
 	})
 
 	// will trigger auth refresh
-	_, err = helixClient.SendChatAnnouncement(&helix.SendChatAnnouncementParams{
-		BroadcasterID: channelId,
-		ModeratorID:   channelId,
-		Message:       "A Study of Light backend is now running",
-		// value must be one of "", "primary", "purple", "blue", "green", "orange"
-		Color: "primary",
-	})
-	if err != nil {
-		fmt.Printf("failed to send initial helix broadcast: %v\n", err)
-	}
-	fmt.Println("sent twitch startup announcement.")
+	go func() {
+		_, err = helixClient.SendChatAnnouncement(&helix.SendChatAnnouncementParams{
+			BroadcasterID: channelId,
+			ModeratorID:   channelId,
+			Message:       "A Study of Light backend is now running",
+			// value must be one of "", "primary", "purple", "blue", "green", "orange"
+			Color: "primary",
+		})
+		if err != nil {
+			fmt.Printf("failed to send initial helix broadcast: %v\n", err)
+		}
+		fmt.Println("sent twitch startup announcement.")
+	}()
 
 	api := &TwitchApi{
 		helixClient: helixClient,

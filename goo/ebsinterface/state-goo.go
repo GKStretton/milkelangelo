@@ -16,11 +16,22 @@ func (e *extensionSession) UpdateState(f func(state *types.GooState)) {
 
 	f(&e.gooState)
 
-	e.sendState()
+	select {
+	case e.gooStateChan <- struct{}{}:
+	default:
+	}
+}
+
+func (e *extensionSession) stateSender() {
+	for {
+		<-e.gooStateChan
+		e.sendState()
+	}
 }
 
 // SendState sends the current state to the EBS
 func (e *extensionSession) sendState() {
+	l.Printf("sending state to EBS...")
 	result, err := url.JoinPath(e.ebsAddress, "/update-state")
 	if err != nil {
 		l.Printf("error forming ebs update state url: %s", err)

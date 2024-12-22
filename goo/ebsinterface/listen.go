@@ -64,11 +64,13 @@ func (e *extensionSession) connect() error {
 	client.OnDisconnect(func(c *sse.Client) {
 		l.Printf("disconnected: %v\n", c)
 	})
-	err = client.SubscribeChan("", ch)
-	if err != nil {
-		return fmt.Errorf("failed to subscribe to twitch ebs sse: %v", err)
-	}
+
 	go func() {
+		err = client.SubscribeChan("", ch)
+		if err != nil {
+			l.Printf("failed to subscribe to twitch ebs sse: %v", err)
+			return
+		}
 		for {
 			event, ok := <-ch
 			if !ok {

@@ -48,6 +48,7 @@ services:
     user: "1000:1000"
     environment:
       ENABLE_EBS: ${ENABLE_EBS:-false}
+      ENABLE_SCHEDULER: ${ENABLE_SCHEDULER:-true}
   dslrcapture:
     build:
       context: .
