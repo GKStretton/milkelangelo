@@ -55,15 +55,15 @@ func (a *App) CanUserControl(ctx context.Context) error {
 		return fmt.Errorf("user not connected")
 	}
 
-	if time.Since(a.ConnectedUserTimestamp) > controlClaimTimeout {
+	if time.Now().After(a.ConnectedUserExpiryTimestamp) {
 		return fmt.Errorf("control claim expired")
 	}
 
 	return nil
 }
 
-// ClaimControl initally claims control or renews control for a user.
-func (a *App) ClaimControl(ctx context.Context) error {
+// Claim initally claims control or renews control for a user.
+func (a *App) Claim(ctx context.Context) error {
 	user, err := getUserFromContext(ctx)
 	if err != nil {
 		return err
@@ -72,21 +72,40 @@ func (a *App) ClaimControl(ctx context.Context) error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
-	if time.Since(a.ConnectedUserTimestamp) > controlClaimTimeout {
-		a.ConnectedUser = nil
-	}
-
 	if a.ConnectedUser != nil && a.ConnectedUser.OUID != user.OUID {
 		return fmt.Errorf("another user has already claimed control")
 	}
 
-	l.Debugf("user %s claimed / renewed control", user.OUID)
+	l.Debugf("user %s made / renewed claim", user.OUID)
 
 	a.ConnectedUser = user
-	a.ConnectedUserTimestamp = time.Now()
+	a.ConnectedUserExpiryTimestamp = time.Now().Add(controlClaimTimeout)
 
 	go a.reportEbsState()
 
+	return nil
+}
+
+func (a *App) Unclaim(ctx context.Context) error {
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	a.lock.Lock()
+	defer a.lock.Unlock()
+
+	if a.ConnectedUser == nil {
+		return fmt.Errorf("no user connected")
+	}
+
+	if a.ConnectedUser.OUID != user.OUID {
+		return fmt.Errorf("user not connected")
+	}
+
+	l.Debugf("user %s released claim", user.OUID)
+
+	a.ConnectedUser = nil
 	return nil
 }
 

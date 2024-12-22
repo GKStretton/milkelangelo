@@ -49,6 +49,8 @@
 }
 
 .debug-text {
+	z-index: 10;
+	font-size: 1em;
 	color: #ffffffaa;
 	background-color: #00000050;
 	position: absolute;
@@ -59,6 +61,7 @@
 }
 
 .safe-area {
+	z-index: 0;
 	position: absolute;
 	right: 0;
 	top: 0;
@@ -71,6 +74,8 @@
 }
 
 .border-area {
+	pointer-events: none;
+	z-index: 0;
 	position: absolute;
 	right: 0;
 	top: 0;

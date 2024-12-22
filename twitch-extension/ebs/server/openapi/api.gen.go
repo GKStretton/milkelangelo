@@ -52,8 +52,8 @@ type GoToPositionJSONRequestBody GoToPositionJSONBody
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Claim control of the robot
-	// (PUT /claim-control)
-	ClaimControl(c *gin.Context)
+	// (PUT /claim)
+	Claim(c *gin.Context)
 	// Collect from a vial
 	// (POST /collect)
 	CollectFromVial(c *gin.Context)
@@ -66,6 +66,9 @@ type ServerInterface interface {
 	// Move the pipette tip to a specific position
 	// (PUT /goto)
 	GoToPosition(c *gin.Context)
+	// Unclaim control of the robot
+	// (PUT /unclaim)
+	Unclaim(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -77,8 +80,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// ClaimControl operation middleware
-func (siw *ServerInterfaceWrapper) ClaimControl(c *gin.Context) {
+// Claim operation middleware
+func (siw *ServerInterfaceWrapper) Claim(c *gin.Context) {
 
 	c.Set(BearerAuthScopes, []string{})
 
@@ -89,7 +92,7 @@ func (siw *ServerInterfaceWrapper) ClaimControl(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.ClaimControl(c)
+	siw.Handler.Claim(c)
 }
 
 // CollectFromVial operation middleware
@@ -152,6 +155,21 @@ func (siw *ServerInterfaceWrapper) GoToPosition(c *gin.Context) {
 	siw.Handler.GoToPosition(c)
 }
 
+// Unclaim operation middleware
+func (siw *ServerInterfaceWrapper) Unclaim(c *gin.Context) {
+
+	c.Set(BearerAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.Unclaim(c)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -179,9 +197,10 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.PUT(options.BaseURL+"/claim-control", wrapper.ClaimControl)
+	router.PUT(options.BaseURL+"/claim", wrapper.Claim)
 	router.POST(options.BaseURL+"/collect", wrapper.CollectFromVial)
 	router.GET(options.BaseURL+"/direct-state", wrapper.GetDirectState)
 	router.POST(options.BaseURL+"/dispense", wrapper.Dispense)
 	router.PUT(options.BaseURL+"/goto", wrapper.GoToPosition)
+	router.PUT(options.BaseURL+"/unclaim", wrapper.Unclaim)
 }

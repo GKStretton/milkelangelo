@@ -84,8 +84,17 @@ func (s *server) GoToPosition(c *gin.Context) {
 	c.Status(http.StatusAccepted)
 }
 
-func (s *server) ClaimControl(c *gin.Context) {
-	err := s.app.ClaimControl(c)
+func (s *server) Claim(c *gin.Context) {
+	err := s.app.Claim(c)
+	if err != nil {
+		c.AbortWithError(http.StatusForbidden, err)
+		return
+	}
+	c.Status(http.StatusAccepted)
+}
+
+func (s *server) Unclaim(c *gin.Context) {
+	err := s.app.Unclaim(c)
 	if err != nil {
 		c.AbortWithError(http.StatusForbidden, err)
 		return

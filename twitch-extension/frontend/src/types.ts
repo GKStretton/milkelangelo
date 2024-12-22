@@ -6,7 +6,7 @@ export interface Coords {
 export interface EbsState {
 	GooState: GooState;
 	ConnectedUser: User;
-	ConnectedUserTimestamp: string;
+	ConnectedUserExpiryTimestamp: string;
 }
 
 export interface GooState {

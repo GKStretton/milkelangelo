@@ -22,7 +22,7 @@ func (a *App) reportEbsState() {
 
 	err := a.goo.ReportEbsState(gooapi.EbsStateReport{
 		ConnectedUser:          a.ConnectedUser,
-		ConnectedUserTimestamp: a.ConnectedUserTimestamp,
+		ConnectedUserTimestamp: a.ConnectedUserExpiryTimestamp,
 	})
 	if err != nil {
 		l.Errorf("failed to report ebs state to goo: %v", err)

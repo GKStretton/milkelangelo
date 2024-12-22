@@ -62,9 +62,17 @@ export function useDispense() {
 
 export function useClaim() {
 	return useMutation({
-		mutationFn: () => api.put("/claim-control"),
+		mutationFn: () => api.put("/claim"),
 		onSuccess: () => toast.success("Control claimed successfully"),
 		onError: (error) => toast.error(`Claim failed: ${error.message}`),
+	});
+}
+
+export function useUnclaim() {
+	return useMutation({
+		mutationFn: () => api.put("/unclaim"),
+		onSuccess: () => toast.success("Control unclaimed successfully"),
+		onError: (error) => toast.error(`Unclaim failed: ${error.message}`),
 	});
 }
 

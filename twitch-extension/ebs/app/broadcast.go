@@ -9,16 +9,16 @@ import (
 )
 
 type ebsState struct {
-	GooState               *gooapi.GooStateUpdate
-	ConnectedUser          *entities.User
-	ConnectedUserTimestamp time.Time
+	GooState                     *gooapi.GooStateUpdate
+	ConnectedUser                *entities.User
+	ConnectedUserExpiryTimestamp time.Time
 }
 
 func (a *App) buildStateResponse() ebsState {
 	return ebsState{
-		GooState:               a.GooState,
-		ConnectedUser:          a.ConnectedUser,
-		ConnectedUserTimestamp: a.ConnectedUserTimestamp,
+		GooState:                     a.GooState,
+		ConnectedUser:                a.ConnectedUser,
+		ConnectedUserExpiryTimestamp: a.ConnectedUserExpiryTimestamp,
 	}
 }
 

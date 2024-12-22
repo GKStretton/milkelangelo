@@ -18,8 +18,8 @@ type App struct {
 	lock     sync.Mutex
 	GooState *gooapi.GooStateUpdate
 
-	ConnectedUser          *entities.User
-	ConnectedUserTimestamp time.Time
+	ConnectedUser                *entities.User
+	ConnectedUserExpiryTimestamp time.Time
 }
 
 func NewApp(goo gooapi.GooApi, twitchAPI TwitchAPI) *App {

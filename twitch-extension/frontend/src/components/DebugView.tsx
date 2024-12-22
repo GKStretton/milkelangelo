@@ -14,13 +14,13 @@ export default function DebugView() {
 		<>
 			{gs.isDebugMode ? (
 				<>
+					<div className="border-area" />
+					<div className="safe-area" />
 					<textarea
 						readOnly={true}
 						className="debug-text"
 						value={`State text: ${stateText}`}
 					/>
-					<div className="border-area" />
-					<div className="safe-area" />
 				</>
 			) : null}
 			{/* biome-ignore lint/a11y/useKeyWithClickEvents: debug */}

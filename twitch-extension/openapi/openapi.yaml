@@ -49,13 +49,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /claim-control:
+  /unclaim:
+    put:
+      summary: Unclaim control of the robot
+      description: |
+        This endpoint is used to release claim on the robot
+      operationId: unclaim
+      responses:
+        202:
+          description: Control unclaimed
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        429:
+          description: Too many requests
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /claim:
     put:
       summary: Claim control of the robot
       description: |
         This endpoint is used to claim control of the robot. Only one user can control the robot at a time.
         This should be called periodically to renew the claim.
-      operationId: claimControl
+      operationId: claim
       responses:
         202:
           description: Control claimed
