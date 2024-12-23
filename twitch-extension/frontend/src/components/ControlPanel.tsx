@@ -9,6 +9,9 @@ export default function ControlPanel() {
 
 	const gooState = gs.ebsState?.GooState;
 
+	const enableCollectionButtons = true;
+	const enableDispenseButton = true;
+
 	const { mutate: collect, isPending: collectPending } = useCollect();
 	const { mutate: dispense, isPending: dispensePending } = useDispense();
 
@@ -24,24 +27,21 @@ export default function ControlPanel() {
 		}
 	};
 	return (
-		<div id="color-vote-area">
+		<div className="color-vote-area">
 			{_.times(5, (i) => {
 				const vialPos = i + 2;
 				return (
 					<div
-						className="color-option"
+						className={`color-option ${
+							!enableCollectionButtons ? "disabled" : ""
+						}`}
 						onClick={collectionHandler(gs.auth, vialPos)}
 						onKeyDown={collectionHandler(gs.auth, vialPos)}
 						style={
+							enableCollectionButtons &&
 							gs.ebsState?.GooState?.VialProfiles[vialPos]?.Colour
 								? {
-										backgroundColor:
-											gs.ebsState.GooState.VialProfiles[vialPos].Colour,
-										color:
-											gs.ebsState.GooState.VialProfiles[vialPos].Colour ===
-											"#0000ff"
-												? "#ffffff"
-												: "#000000",
+										color: gs.ebsState.GooState.VialProfiles[vialPos].Colour,
 								  }
 								: {}
 						}
@@ -51,7 +51,7 @@ export default function ControlPanel() {
 				);
 			})}
 			<div
-				className="dispense-button"
+				className={`dispense-button ${!enableDispenseButton ? "disabled" : ""}`}
 				onClick={dispenseHandler}
 				onKeyDown={dispenseHandler}
 			>

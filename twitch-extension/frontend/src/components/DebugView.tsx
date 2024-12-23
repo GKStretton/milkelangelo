@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useGlobalState } from "../helpers/State";
+import "./DebugView.css";
 
 export default function DebugView() {
 	const gs = useGlobalState();

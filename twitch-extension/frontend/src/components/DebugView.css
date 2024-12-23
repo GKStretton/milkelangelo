@@ -1,0 +1,43 @@
+.debug-text {
+	z-index: 10;
+	font-size: 1em;
+	color: #ffffffaa;
+	background-color: #00000050;
+	position: absolute;
+	top: 0vh;
+	right: 0vw;
+	width: 30vw;
+	height: 90vh;
+}
+
+.safe-area {
+	z-index: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	margin-top: 5rem;
+	margin-bottom: 5rem;
+	margin-right: 7rem;
+	border: 1px dotted white;
+}
+
+.border-area {
+	pointer-events: none;
+	z-index: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	border: 1px solid white;
+}
+
+.debug-toggle {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	background-color: white;
+	color: black;
+}

@@ -36,9 +36,9 @@ export default function ConnectionManager() {
 	return (
 		<div id="connection-area">
 			{haveGooState ? (
-				<div className="connection-status green">Goo State available</div>
+				<div className="connection-status green">Robot available</div>
 			) : (
-				<div className="connection-status red">Goo State unavailable</div>
+				<div className="connection-status red">Robot unavailable</div>
 			)}
 			{isThisUserConnected ? (
 				<>

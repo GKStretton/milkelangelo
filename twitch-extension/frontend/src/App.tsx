@@ -68,7 +68,7 @@ function App() {
 	}, [gs.auth]);
 
 	return (
-		<div className="App">
+		<div className={`App ${gs.isLocalMode ? "mock-stream" : ""}`}>
 			<Toaster richColors position="bottom-center" />
 			<DebugView />
 			<ConnectionManager />

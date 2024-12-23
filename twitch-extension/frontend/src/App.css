@@ -1,14 +1,15 @@
 .App {
 	text-align: center;
 	display: block;
-	background-image: url("../public/stream_example.png");
-	/* background-color: black; */
-	background-size: contain;
-	background-repeat: no-repeat;
-	/* overflow: hidden; */
 	width: 100%;
 	height: 100%;
 	aspect-ratio: 16/9;
+}
+
+.mock-stream {
+	background-image: url("../public/stream_example.png");
+	background-size: contain;
+	background-repeat: no-repeat;
 }
 
 .App-logo {
@@ -26,59 +27,8 @@
 	color: #61dafb;
 }
 
-#color-vote-area {
-	position: absolute;
-	top: 26vh;
-	left: 49.0vw;
-	display: flex;
-	flex-direction: column;
-}
-
-.debug-text {
-	z-index: 10;
-	font-size: 1em;
-	color: #ffffffaa;
-	background-color: #00000050;
-	position: absolute;
-	top: 0vh;
-	right: 0vw;
-	width: 30vw;
-	height: 90vh;
-}
-
-.safe-area {
-	z-index: 0;
-	position: absolute;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	margin-top: 5rem;
-	margin-bottom: 5rem;
-	margin-right: 7rem;
-	border: 1px dotted white;
-}
-
-.border-area {
-	pointer-events: none;
-	z-index: 0;
-	position: absolute;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	border: 1px solid white;
-}
-
-.debug-toggle {
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	background-color: white;
-	color: black;
-}
-
 .connection-status {
+	font-size: 2.5vh;
 	color: white;
 }
 
