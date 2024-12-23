@@ -113,7 +113,9 @@ func (e *extensionSession) connect() error {
 				}
 				e.ebsStateLock.Lock()
 				e.ebsState = msg.StateReport
+				l.Printf("ebs state updated. ConnectedUser: %+v", e.ebsState.ConnectedUser)
 				e.ebsStateLock.Unlock()
+
 			default:
 				l.Printf("unrecognised ebs message type '%s'", msg.Type)
 				continue

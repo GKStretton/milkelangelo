@@ -37,8 +37,8 @@ func shouldExit() bool {
 	}
 }
 
-func Setup(sm *session.SessionManager) {
-	subscribeToBrokerTopics(sm)
+func Setup(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
+	subscribeToBrokerTopics(sm, ebsApi)
 }
 
 // LaunchActor is launched to control a session after the canvas is prepared.

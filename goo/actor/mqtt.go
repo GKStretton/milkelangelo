@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/topics_backend"
+	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/session"
 )
 
-func subscribeToBrokerTopics(sm *session.SessionManager) {
+func subscribeToBrokerTopics(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 	l.Println("subscribed to topics")
 	mqtt.Subscribe(topics_backend.TOPIC_ACTOR_START, func(topic string, payload []byte) {
 		l.Println("mqtt start request")
@@ -53,7 +54,7 @@ func subscribeToBrokerTopics(sm *session.SessionManager) {
 				l.Printf("failed to set seed: %v\n", err)
 			}
 
-			err = LaunchActor(nil, nil, time.Duration(minutes)*time.Minute, actorSeed, testing)
+			err = LaunchActor(nil, ebsApi, time.Duration(minutes)*time.Minute, actorSeed, testing)
 			if err != nil {
 				l.Printf("error when running actor (mqtt trigger): %v\n", err)
 			}

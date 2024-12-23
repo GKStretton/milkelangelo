@@ -1,7 +1,5 @@
 package types
 
-import "time"
-
 type GooStatus = string
 
 const (
@@ -69,8 +67,7 @@ type goToRequest struct {
 }
 
 type EbsStateReport struct {
-	ConnectedUser          *EbsUser
-	ConnectedUserTimestamp time.Time
+	ConnectedUser *EbsUser
 }
 
 type EbsUser struct {

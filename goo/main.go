@@ -71,7 +71,7 @@ func main() {
 	sm := session.NewSessionManager(false)
 	twitchApi := twitchapi.Start()
 
-	actor.Setup(sm)
+	actor.Setup(sm, ebsApi)
 	events.Start(sm, ebsApi)
 	livecapture.Start(sm)
 	obs.Start(sm)
