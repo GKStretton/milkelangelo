@@ -72,8 +72,12 @@ function App() {
 			<Toaster richColors position="bottom-center" />
 			<DebugView />
 			<ConnectionManager />
-			<ControlView />
-			<ControlPanel />
+			{gs.ebsState?.ConnectedUser && (
+				<>
+					<ControlView />
+					<ControlPanel />
+				</>
+			)}
 		</div>
 	);
 }

@@ -24,7 +24,11 @@ export interface User {
 	OUID: string;
 }
 
-export type Status = string;
+export enum Status {
+	StatusUnknown = "unknown",
+	StatusDecidingCollection = "deciding-collection",
+	StatusDecidingDispense = "deciding-dispense",
+}
 
 export interface CollectionState {
 	VialNumber: number;

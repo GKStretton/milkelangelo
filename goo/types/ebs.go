@@ -3,7 +3,9 @@ package types
 type GooStatus = string
 
 const (
-	GooStatusUnknown GooStatus = "unknown"
+	GooStatusUnknown            GooStatus = "unknown"
+	GooStatusDecidingCollection GooStatus = "deciding-collection"
+	GooStatusDecidingDispense   GooStatus = "deciding-dispense"
 )
 
 type GooState struct {

@@ -105,7 +105,6 @@ func (e *extensionSession) connect() error {
 					continue
 				}
 			case types.EbsStateReportType:
-				l.Printf("got state message from ebs")
 				err := json.Unmarshal(event.Data, &msg.StateReport)
 				if err != nil {
 					l.Printf("error unmarshalling state request from ebs: %s", err)
@@ -113,7 +112,6 @@ func (e *extensionSession) connect() error {
 				}
 				e.ebsStateLock.Lock()
 				e.ebsState = msg.StateReport
-				l.Printf("ebs state updated. ConnectedUser: %+v", e.ebsState.ConnectedUser)
 				e.ebsStateLock.Unlock()
 
 			default:

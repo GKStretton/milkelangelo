@@ -60,7 +60,7 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 		if ebsApi != nil {
 			ebsApi.UpdateState(func(state *types.GooState) {
 				state.X = sr.MovementDetails.TargetXUnit
-				state.Y = sr.MovementDetails.TargetXUnit
+				state.Y = sr.MovementDetails.TargetYUnit
 				state.Status = types.GooStatusUnknown
 
 				if sr.CollectionRequest == nil {

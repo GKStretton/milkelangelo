@@ -10,6 +10,10 @@
 	&.debug {
 		border: 2px solid white;
 	}
+
+	&.disable {
+		cursor: not-allowed;
+	}
 }
 
 .cursor {

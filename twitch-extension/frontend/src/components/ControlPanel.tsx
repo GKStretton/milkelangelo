@@ -2,6 +2,7 @@ import _ from "lodash";
 import { toast } from "sonner";
 import { useCollect, useDispense } from "../ebs/api";
 import { useGlobalState } from "../helpers/State";
+import { Status } from "../types";
 import "./ControlPanel.css";
 
 export default function ControlPanel() {
@@ -9,17 +10,28 @@ export default function ControlPanel() {
 
 	const gooState = gs.ebsState?.GooState;
 
-	const enableCollectionButtons = true;
-	const enableDispenseButton = true;
+	const enableCollectionButtons =
+		gooState?.Status === Status.StatusDecidingCollection;
+	const enableDispenseButton =
+		gooState?.Status === Status.StatusDecidingDispense;
+	// const enableCollectionButtons = gooState?.DispenseState?.Completed === true; // finished placing
+	// const enableDispenseButton = gooState?.DispenseState?.Completed === false;
 
 	const { mutate: collect, isPending: collectPending } = useCollect();
 	const { mutate: dispense, isPending: dispensePending } = useDispense();
 
 	const collectionHandler =
 		(auth: Twitch.ext.Authorized | undefined, vialPos: number) => () => {
+			if (!enableCollectionButtons) {
+				return;
+			}
 			collect(vialPos);
 		};
 	const dispenseHandler = () => {
+		if (!enableDispenseButton) {
+			return;
+		}
+
 		if (gooState) {
 			dispense({ x: gooState.X, y: gooState.Y });
 		} else {

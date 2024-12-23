@@ -5,42 +5,6 @@ import (
 	"net/http"
 )
 
-type Status = string
-
-const (
-	StatusUnknown Status = "unknown"
-)
-
-type GooStateUpdate struct {
-	Status Status
-	X      float32
-	Y      float32
-
-	VialProfiles map[int]*VialProfile
-
-	CollectionState *CollectionState
-	DispenseState   *DispenseState
-}
-
-type CollectionState struct {
-	VialNumber int
-	VolumeUl   float32
-	Completed  bool
-}
-
-type DispenseState struct {
-	VialNumber        int
-	VolumeRemainingUl float32
-	Completed         bool
-}
-
-type VialProfile struct {
-	ID           int
-	Name         string
-	Colour       string
-	DropVolumeUl float32
-}
-
 // updateHandler handles incoming state updates from goo
 func (g *connectedGooApi) updateHandler(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)

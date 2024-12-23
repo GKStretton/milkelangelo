@@ -28,6 +28,10 @@ func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *ty
 	c := d.ebsApi.SubscribeMessages()
 	defer d.ebsApi.UnsubscribeMessages(c)
 
+	d.ebsApi.UpdateState(func(state *types.GooState) {
+		state.Status = types.GooStatusDecidingCollection
+	})
+
 	if state := d.ebsApi.GetEbsState(); state == nil || state.ConnectedUser == nil {
 		if d.fallback != nil {
 			// if user is not connected, return auto fallback
@@ -74,6 +78,10 @@ func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *ty
 func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *types.DispenseDecision {
 	c := d.ebsApi.SubscribeMessages()
 	defer d.ebsApi.UnsubscribeMessages(c)
+
+	d.ebsApi.UpdateState(func(state *types.GooState) {
+		state.Status = types.GooStatusDecidingDispense
+	})
 
 	if state := d.ebsApi.GetEbsState(); state == nil || state.ConnectedUser == nil {
 		if d.fallback != nil {
