@@ -17,7 +17,7 @@
 	width: 2vh;
 	height: 2vh;
 	border-radius: 100%;
-	border: 0.4vh solid #000;
+	border: 0.4vh solid #444;
 	transform: translate(-50%, -50%);
 	pointer-events: none;
 }

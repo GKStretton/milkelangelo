@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gkstretton/study-of-light/twitch-ebs/entities"
 	"github.com/golang-jwt/jwt"
-	"golang.org/x/net/context"
 )
 
 type twitchClaims struct {
@@ -62,11 +61,9 @@ func (s *server) twitchAuthMiddleware(c *gin.Context) {
 	l.Debugf("verified user request raddr %s, uid %s, ouid %s", c.Request.RemoteAddr, claims.UserID, claims.OpaqueUserID)
 
 	// add user object to context
-	ctx := c.Request.Context()
-	ctx = context.WithValue(ctx, "user", &entities.User{
+	c.Set(entities.ContextKeyUser, &entities.User{
 		OUID: claims.OpaqueUserID,
 	})
-	c.Request = c.Request.WithContext(ctx)
 
 	c.Next()
 }

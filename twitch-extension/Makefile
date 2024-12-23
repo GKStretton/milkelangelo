@@ -9,8 +9,3 @@ deps:
 openapi:
 	mkdir -p ./ebs/server/openapi
 	oapi-codegen -generate gin,models -package openapi ./openapi/openapi.yaml > ./ebs/server/openapi/api.gen.go
-
-ebs:
-	@trap 'kill 0' INT TERM; \
-	cd frontend && npm start & \
-	cd ebs && go run . -disableAuthentication
