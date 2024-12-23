@@ -53,7 +53,7 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi, act
 	// clear exit flag
 	_ = shouldExit()
 
-	l.Printf("Launching actor with seed: %d\n", seed)
+	l.Printf("Launching actor with seed: %d; testing: %t\n", seed, testing)
 
 	endTime := time.Now().Add(actorTimeout)
 	var d decider.Decider
@@ -62,7 +62,8 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi, act
 		d = decider.NewAutoDecider(endTime, seed, testing)
 	} else {
 		l.Println("using ebs decider")
-		d = decider.NewEbsDecider(endTime, ebsApi, decider.NewAutoDecider(endTime, seed, false))
+		var fallback = decider.NewAutoDecider(endTime, seed, testing)
+		d = decider.NewEbsDecider(endTime, ebsApi, fallback)
 	}
 
 	awaitDecision := decide(d, events.GetLatestStateReportCopy())

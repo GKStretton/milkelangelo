@@ -39,12 +39,21 @@ func subscribeToBrokerTopics(sm *session.SessionManager) {
 				actorSeed = rand.Int63()
 			}
 
+			var testing bool
+			if len(args) == 3 {
+				testing, err = strconv.ParseBool(args[2])
+				if err != nil {
+					l.Printf("invalid testing bool for actor, defaulting to false: %v\n", err)
+					testing = false
+				}
+			}
+
 			err = sm.SetCurrentSessionSeed(actorSeed)
 			if err != nil {
 				l.Printf("failed to set seed: %v\n", err)
 			}
 
-			err = LaunchActor(nil, nil, time.Duration(minutes)*time.Minute, actorSeed, false)
+			err = LaunchActor(nil, nil, time.Duration(minutes)*time.Minute, actorSeed, testing)
 			if err != nil {
 				l.Printf("error when running actor (mqtt trigger): %v\n", err)
 			}

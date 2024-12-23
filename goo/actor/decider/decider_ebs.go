@@ -29,9 +29,11 @@ func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *ty
 	defer d.ebsApi.UnsubscribeMessages(c)
 
 	if state := d.ebsApi.GetEbsState(); state == nil || state.ConnectedUser == nil {
-		// if user is not connected, return auto fallback
-		l.Printf("ebs user not connected, using fallback decider")
-		return d.fallback.decideCollection(predictedState)
+		if d.fallback != nil {
+			// if user is not connected, return auto fallback
+			l.Printf("ebs user not connected, using fallback decider")
+			return d.fallback.decideCollection(predictedState)
+		}
 	}
 
 	actorTimeout := time.After(
@@ -45,7 +47,7 @@ func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *ty
 		case msg := <-c:
 			if msg.Type == types.EbsStateReportType {
 				// if user is not connected, return auto fallback
-				if msg.StateReport.ConnectedUser == nil {
+				if msg.StateReport.ConnectedUser == nil && d.fallback != nil {
 					l.Printf("ebs user not connected, using fallback decider")
 					return d.fallback.decideCollection(predictedState)
 				}
@@ -74,9 +76,11 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 	defer d.ebsApi.UnsubscribeMessages(c)
 
 	if state := d.ebsApi.GetEbsState(); state == nil || state.ConnectedUser == nil {
-		// if user is not connected, return auto fallback
-		l.Printf("ebs user not connected, using fallback decider")
-		return d.fallback.decideDispense(predictedState)
+		if d.fallback != nil {
+			// if user is not connected, return auto fallback
+			l.Printf("ebs user not connected, using fallback decider")
+			return d.fallback.decideDispense(predictedState)
+		}
 	}
 
 	// store target coordinates in here
@@ -93,7 +97,7 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 		case msg := <-c:
 			if msg.Type == types.EbsStateReportType {
 				// if user is not connected, return auto fallback
-				if msg.StateReport.ConnectedUser == nil {
+				if msg.StateReport.ConnectedUser == nil && d.fallback != nil {
 					l.Printf("ebs user not connected, using fallback decider")
 					return d.fallback.decideDispense(predictedState)
 				}
