@@ -8,11 +8,11 @@ import "./ControlView.css";
 export default function ControlView() {
 	const gs = useGlobalState();
 
-	const isGoToEnabled =
-		gs.ebsState?.GooState?.Status === Status.StatusDecidingDispense;
 	// const isGoToEnabled =
-	// 	gs.ebsState?.GooState?.DispenseState?.Completed === false || // placement in progress
-	// 	gs.ebsState?.GooState?.CollectionState?.Completed === false; // collection in progress
+	// 	gs.ebsState?.GooState?.Status === Status.StatusDecidingDispense;
+	const isGoToEnabled =
+		gs.ebsState?.GooState?.DispenseState?.Completed === false || // placement in progress
+		gs.ebsState?.GooState?.CollectionState?.Completed === false; // collection in progress
 
 	// get x and y from state
 	const x = gs.ebsState?.GooState?.X ?? 0;
