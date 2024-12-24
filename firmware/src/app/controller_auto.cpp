@@ -65,9 +65,9 @@ void Controller::autoUpdate(State *s) {
 		s->pipetteStepper.setSpeed(0);
 		s->postCalibrationHandlerCalled = true;
 		Logger::Debug("Set all motors to speed 0 after calibration");
-	}
+	// }
 
-	if (!s->coverOpened) {
+	// if (!s->coverOpened) {
 		// blocking call to open servo
 		CoverServo_Open();
 
@@ -85,7 +85,7 @@ void Controller::autoUpdate(State *s) {
 			}
 		}
 
-		s->coverOpened = true;
+		// s->coverOpened = true;
 	}
 
 	s->ringStepper.moveTo(s->ringStepper.UnitToPosition(s->target_ring));
