@@ -18,6 +18,10 @@ export interface GooState {
 
 	CollectionState: CollectionState | null;
 	DispenseState: DispenseState | null;
+
+	WaitingForCollection: boolean;
+	WaitingForDispense: boolean;
+	ActorRunning: boolean;
 }
 
 export interface User {
@@ -26,8 +30,6 @@ export interface User {
 
 export enum Status {
 	StatusUnknown = "unknown",
-	StatusDecidingCollection = "deciding-collection",
-	StatusDecidingDispense = "deciding-dispense",
 }
 
 export interface CollectionState {

@@ -154,6 +154,24 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 	})
 
 	RequestStateReport()
+
+	listenForEbsConnect(ebsApi)
+}
+
+func listenForEbsConnect(ebsApi ebsinterface.EbsApi) {
+	if ebsApi == nil {
+		return
+	}
+
+	c := ebsApi.SubscribeMessages()
+	defer ebsApi.UnsubscribeMessages(c)
+
+	for {
+		msg := <-c
+		if msg.Type == types.EbsConnectedEvent {
+			RequestStateReport()
+		}
+	}
 }
 
 func Subscribe() chan *machinepb.StateReport {

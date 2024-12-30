@@ -29,6 +29,18 @@ func (e *extensionSession) stateSender() {
 	}
 }
 
+// buildStateResponse constructs the state to be sent to the EBS
+func (e *extensionSession) buildStateResponse() ([]byte, error) {
+	e.gooStateLock.RLock()
+	defer e.gooStateLock.RUnlock()
+
+	stateData, err := json.Marshal(e.gooState)
+	if err != nil {
+		return nil, err
+	}
+	return stateData, nil
+}
+
 // SendState sends the current state to the EBS
 func (e *extensionSession) sendState() {
 	l.Printf("sending state to EBS...")
@@ -39,7 +51,7 @@ func (e *extensionSession) sendState() {
 	}
 
 	// Marshal state data
-	stateData, err := json.Marshal(e.gooState)
+	stateData, err := e.buildStateResponse()
 	if err != nil {
 		l.Printf("error marshalling state data: %s", err)
 		return

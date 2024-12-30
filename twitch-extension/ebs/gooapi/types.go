@@ -4,11 +4,19 @@ import (
 	"github.com/gkstretton/study-of-light/twitch-ebs/entities"
 )
 
+type message struct {
+	MessageType messageType
+	Data        interface{}
+}
+
+type messageType string
+
 const (
 	dispenseRequestType   messageType = "dispense"
 	collectionRequestType messageType = "collection"
 	goToRequestType       messageType = "goto"
 	stateReportType       messageType = "state"
+	connectedEventType    messageType = "connected"
 )
 
 type dispenseRequest struct {
@@ -32,9 +40,7 @@ type EbsStateReport struct {
 type Status = string
 
 const (
-	StatusUnknown               Status = "unknown"
-	GooStatusDecidingCollection Status = "deciding-collection"
-	GooStatusDecidingDispense   Status = "deciding-dispense"
+	StatusUnknown Status = "unknown"
 )
 
 type GooStateUpdate struct {
@@ -46,6 +52,10 @@ type GooStateUpdate struct {
 
 	CollectionState *CollectionState
 	DispenseState   *DispenseState
+
+	WaitingForCollection bool
+	WaitingForDispense   bool
+	ActorRunning         bool
 }
 
 type CollectionState struct {

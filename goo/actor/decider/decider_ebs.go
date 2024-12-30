@@ -29,7 +29,10 @@ func (d *ebsDecider) decideCollection(predictedState *machinepb.StateReport) *ty
 	defer d.ebsApi.UnsubscribeMessages(c)
 
 	d.ebsApi.UpdateState(func(state *types.GooState) {
-		state.Status = types.GooStatusDecidingCollection
+		state.WaitingForCollection = true
+	})
+	defer d.ebsApi.UpdateState(func(state *types.GooState) {
+		state.WaitingForCollection = false
 	})
 
 	if state := d.ebsApi.GetEbsState(); state == nil || state.ConnectedUser == nil {
@@ -80,7 +83,10 @@ func (d *ebsDecider) decideDispense(predictedState *machinepb.StateReport) *type
 	defer d.ebsApi.UnsubscribeMessages(c)
 
 	d.ebsApi.UpdateState(func(state *types.GooState) {
-		state.Status = types.GooStatusDecidingDispense
+		state.WaitingForDispense = true
+	})
+	defer d.ebsApi.UpdateState(func(state *types.GooState) {
+		state.WaitingForDispense = false
 	})
 
 	if state := d.ebsApi.GetEbsState(); state == nil || state.ConnectedUser == nil {

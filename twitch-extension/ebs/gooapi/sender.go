@@ -9,13 +9,6 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-type messageType string
-
-type message struct {
-	MessageType messageType
-	Data        interface{}
-}
-
 func (g *connectedGooApi) registerMessageListener(c chan *message) {
 	g.subsLock.Lock()
 	defer g.subsLock.Unlock()
@@ -82,11 +75,17 @@ func (g *connectedGooApi) listenHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusOK)
 	w.(http.Flusher).Flush()
 
-	// 1 buffer
 	c := make(chan *message, 1)
 	// c subscribes to message stream from any twitch clients
 	g.registerMessageListener(c)
 	defer g.removeMessageListener(c)
+
+	err = g.sendMessage(&message{
+		MessageType: connectedEventType,
+	})
+	if err != nil {
+		fmt.Println("failed to send connected message to goo instance")
+	}
 
 	// do the listening and returning
 	for {

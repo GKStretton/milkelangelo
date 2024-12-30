@@ -10,12 +10,8 @@ export default function ControlPanel() {
 
 	const gooState = gs.ebsState?.GooState;
 
-	// const enableCollectionButtons =
-	// 	gooState?.Status === Status.StatusDecidingCollection;
-	// const enableDispenseButton =
-	// 	gooState?.Status === Status.StatusDecidingDispense;
-	const enableCollectionButtons = gooState?.DispenseState?.Completed === true; // finished placing
-	const enableDispenseButton = gooState?.DispenseState?.Completed === false;
+	const enableCollectionButtons = gooState?.WaitingForCollection === true;
+	const enableDispenseButton = gooState?.WaitingForDispense === true;
 
 	const { mutate: collect, isPending: collectPending } = useCollect();
 	const { mutate: dispense, isPending: dispensePending } = useDispense();

@@ -57,12 +57,12 @@ func (e *extensionSession) connect() error {
 	client.Headers["Authorization"] = "Bearer " + e.ebsToken
 	// client.ReconnectStrategy = &backoff.StopBackOff{}
 	client.ReconnectNotify = func(err error, d time.Duration) {
-		l.Println(err)
+		l.Println("connection error:", err)
 	}
 
 	ch := make(chan *sse.Event)
 	client.OnDisconnect(func(c *sse.Client) {
-		l.Printf("disconnected: %v\n", c)
+		l.Println("disconnected")
 	})
 
 	go func() {
@@ -113,7 +113,8 @@ func (e *extensionSession) connect() error {
 				e.ebsStateLock.Lock()
 				e.ebsState = msg.StateReport
 				e.ebsStateLock.Unlock()
-
+			case types.EbsConnectedEvent:
+				l.Println("got connected event from ebs")
 			default:
 				l.Printf("unrecognised ebs message type '%s'", msg.Type)
 				continue

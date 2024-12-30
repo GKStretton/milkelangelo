@@ -3,9 +3,7 @@ package types
 type GooStatus = string
 
 const (
-	GooStatusUnknown            GooStatus = "unknown"
-	GooStatusDecidingCollection GooStatus = "deciding-collection"
-	GooStatusDecidingDispense   GooStatus = "deciding-dispense"
+	GooStatusUnknown GooStatus = "unknown"
 )
 
 type GooState struct {
@@ -16,6 +14,10 @@ type GooState struct {
 
 	CollectionState *CollectionState
 	DispenseState   *DispenseState
+
+	WaitingForCollection bool
+	WaitingForDispense   bool
+	ActorRunning         bool
 }
 
 type CollectionState struct {
@@ -44,6 +46,7 @@ const (
 	EbsCollectionRequest EbsMessageType = "collection"
 	EbsGoToRequest       EbsMessageType = "goto"
 	EbsStateReportType   EbsMessageType = "state"
+	EbsConnectedEvent    EbsMessageType = "connected"
 )
 
 type EbsMessage struct {

@@ -47,8 +47,8 @@ func LaunchActor(twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi, act
 	if lock.Get() {
 		return fmt.Errorf("actor already running")
 	}
-	lock.Set(true)
-	defer lock.Set(false)
+	lock.Set(ebsApi, true)
+	defer lock.Set(ebsApi, false)
 
 	// clear exit flag
 	_ = shouldExit()

@@ -23,7 +23,7 @@ type extensionSession struct {
 
 	ebsAddress string
 
-	gooStateLock sync.Mutex
+	gooStateLock sync.RWMutex
 	gooState     types.GooState
 	gooStateChan chan struct{}
 
