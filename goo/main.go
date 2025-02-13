@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	host                      = flag.String("host", "DEPTH", "the hostname of the mqtt broker")
+	brokerHost                = flag.String("brokerHost", "depthcharge", "the hostname of the mqtt broker")
 	test                      = flag.Bool("test", false, "if true, just run test code")
 	refreshYoutubeCredentials = flag.Bool("yt", false, "if true, refresh youtube credentials")
 )
@@ -48,7 +48,7 @@ func main() {
 
 	filesystem.AssertBasePaths()
 
-	mqtt.Start(*host)
+	mqtt.Start(*brokerHost)
 	keyvalue.Start()
 	email.Start()
 	server.Start()

@@ -29,7 +29,7 @@ services:
     build:
       context: .
       dockerfile: goo/Dockerfile
-    command: -basePath ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
+    command: -brokerHost 127.0.0.1
     restart: always
     network_mode: host
     volumes:
