@@ -28,7 +28,6 @@
 // temporarily using relays
 #define TOP_LIGHT_TOGGLE 41//29
 #define TOP_LIGHT_MODE 39//31
-#define TOP_LIGHT_RGB 33
 #define LIGHT_BUTTON_WAIT_MS 100
 
 #define FRONT_LIGHT_TOGGLE 23
@@ -98,6 +97,7 @@
 // controls relay that enables grounding for the TOF sensor
 #define TOF_POWER_PIN 31
 
+// Now controls the internal white power strip
 #define EXTRA_RELAY_CONTROL_PIN 33
 
 #define ENSURE_COVER_OPEN false

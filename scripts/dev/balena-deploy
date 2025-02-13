@@ -1,0 +1,2 @@
+balena build -f gh_gkstretton/milkelangelo
+balena deploy gh_gkstretton/milkelangelo

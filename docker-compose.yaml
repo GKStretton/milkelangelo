@@ -1,0 +1,39 @@
+version: "2.4"
+
+volumes:
+  light-stores:
+  mqtt:
+
+services:
+  pygateway:
+    build: pygateway
+    devices:
+      - /dev/ttyACM0
+    tty: true
+    restart: always
+    network_mode: host
+    environment:
+      BROKER_HOST: ${BROKER_HOST:-127.0.0.1}
+      DEBUG_PYGATEWAY: ${DEBUG_PYGATEWAY:-false}
+    privileged: true
+  mqtt:
+    build: mqtt
+    ports:
+      - 1883:1883
+    volumes:
+      - mqtt:/mosquitto/data
+    tmpfs:
+      - /mosquitto/log
+    network_mode: host
+  goo:
+    build:
+      context: .
+      dockerfile: goo/Dockerfile
+    command: -basePath ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
+    restart: always
+    network_mode: host
+    volumes:
+      - light-stores:/mnt/md0/light-stores/
+    environment:
+      ENABLE_EBS: ${ENABLE_EBS:-false}
+      ENABLE_SCHEDULER: ${ENABLE_SCHEDULER:-false}
