@@ -28,6 +28,7 @@ services:
     devices:
       - ${TOP_CAM:-/dev/video2}:/dev/top-cam
       - ${FRONT_CAM:-/dev/video0}:/dev/front-cam
+    privileged: true
   pygateway:
     build: pygateway
     devices:
