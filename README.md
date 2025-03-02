@@ -19,6 +19,10 @@ This is the monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLigh
 	- [x] Automated social media posting
 	- [x] Automated session control
 
+## Installation
+
+- Ubuntu 
+
 ## Dependencies
 
 Some parts of the project are not representing by source code:

@@ -1,5 +1,8 @@
 version: "3.7"
 
+volumes:
+  mqtt:
+
 services:
   runner:
     build:
@@ -39,7 +42,7 @@ services:
     build:
       context: .
       dockerfile: goo/Dockerfile
-    command: -basePath ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
+    command: -basePath ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/} -brokerHost localhost
     restart: always
     network_mode: host
     volumes:
@@ -48,7 +51,7 @@ services:
     user: "1000:1000"
     environment:
       ENABLE_EBS: ${ENABLE_EBS:-false}
-      ENABLE_SCHEDULER: ${ENABLE_SCHEDULER:-true}
+      ENABLE_SCHEDULER: ${ENABLE_SCHEDULER:-false}
   dslrcapture:
     build:
       context: .
@@ -69,3 +72,12 @@ services:
     restart: always
     ports:
       - "5000:80"
+  mqtt:
+    build: mqtt
+    ports:
+      - 1883:1883
+    volumes:
+      - mqtt:/mosquitto/data
+    tmpfs:
+      - /mosquitto/log
+    network_mode: host
