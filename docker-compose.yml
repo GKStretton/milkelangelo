@@ -38,6 +38,7 @@ services:
     environment:
       BROKER_HOST: ${BROKER_HOST:-localhost}
       DEBUG_PYGATEWAY: ${DEBUG_PYGATEWAY:-false}
+    privileged: true
   goo:
     build:
       context: .

@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.21.3
 
 RUN apk add avrdude
 RUN apk add python3
