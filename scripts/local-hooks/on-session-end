@@ -4,5 +4,5 @@
 cd ~/asol/software/asol-backend
 ./scripts/dev/mount-md0
 urxvt -e bash -ic "./scripts/interactive/feh-dslr-selection-utility $1"
-mosquitto_pub -h DEPTH -t "asol/stills-generated" -m "$1"
+mosquitto_pub -h milkelangelo -t "asol/stills-generated" -m "$1"
 

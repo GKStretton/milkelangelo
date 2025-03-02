@@ -7,7 +7,7 @@ This is the monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLigh
 - serial-mqtt bridge
 - protos and constants
 - Backend Systems
-	- [x] Serial-MQTT bridge supporting an event driven architecture
+	- [x] Serial-MQTT bridge
 	- [x] RTSP streaming for multiple consumers of webcam feeds
 	- [x] Remote firmware update
 	- [x] Remote camera crop configuration
@@ -19,22 +19,19 @@ This is the monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLigh
 	- [x] Automated social media posting
 	- [x] Automated session control
 
-## Installation
+## Usage
 
-- Ubuntu 
+### Installation
 
-## Dependencies
-
-Some parts of the project are not representing by source code:
-- DEPTH, the pc the backend stack runs on, is a debian installation
-- relies on `depth-srv` docker-compose repo being run on same machine (mosquitto)
-- OBS
-  - Used compositing the live stream
+- Install Ubuntu on a machine
+- [Install docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository). ** NOT "docker desktop" ** as it doesn't work nicely with /dev/ devices (serial and webcam)
+- Clone repo
+- Make .env file
+- `sudo docker compose up -d`
+- Install OBS
   - Installed with flatpak, specifically the 2023-12-11 version. WARNING: newer versions break the gstreamer plugin currently (08/10/2024)
   - require gstreamer plugin
   - profile and scene collections are in `resources/obs`
-
-## Instructions
 
 ### scripts
 
