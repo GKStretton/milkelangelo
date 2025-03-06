@@ -98,7 +98,7 @@
 #define TOF_POWER_PIN 31
 
 // Now controls the internal white power strip
-#define EXTRA_RELAY_CONTROL_PIN 33
+#define POWER_STRIP_CONTROL_PIN 33
 
 #define ENSURE_COVER_OPEN false
 

@@ -97,7 +97,7 @@ void setup()
 
 	// init extra 2-bank relay to HIGH (HIGH = off)
 	InitPin(TOF_POWER_PIN, HIGH);
-	InitPin(EXTRA_RELAY_CONTROL_PIN, HIGH);
+	InitPin(POWER_STRIP_CONTROL_PIN, HIGH);
 
 	// make steppers sleep on start
 	InitPin(STEPPER_SLEEP, LOW);

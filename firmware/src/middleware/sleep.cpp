@@ -43,13 +43,13 @@ namespace Sleep {
 
 			delay(500);
 
-			SetDualRelay(V5_RELAY_PIN, false);
+			// turn off power with smart switch
+			SetDualRelay(POWER_STRIP_CONTROL_PIN, false);
+			Logger::Info("Power strip off req sent.");
 
 			delay(500);
 
-			// turn off power with smart switch
-			SerialMQTT::Publish(TOPIC_SMART_SWITCH, PAYLOAD_SMART_SWITCH_OFF);
-			Logger::Info("External power off req sent.");
+			SetDualRelay(V5_RELAY_PIN, false);
 
 			if (eStopActive()) {
 				StateReport_SetStatus(machine_Status_E_STOP_ACTIVE);
@@ -63,10 +63,15 @@ namespace Sleep {
 			StateReport_SetStatus(machine_Status_WAKING_UP);
 			StateReport_ForceSend();
 
-			Logger::Info("Waking up, powering up");
-			SerialMQTT::Publish(TOPIC_SMART_SWITCH, PAYLOAD_SMART_SWITCH_ON);
-			delay(2000);
 			SetDualRelay(V5_RELAY_PIN, true);
+
+			delay(500);
+
+			Logger::Info("Waking up, powering up");
+			SetDualRelay(POWER_STRIP_CONTROL_PIN, true);
+
+			delay(1500);
+
 			SetDualRelay(V12_RELAY_PIN1, true);
 			SetDualRelay(V12_RELAY_PIN2, true);
 			delay(1000);
