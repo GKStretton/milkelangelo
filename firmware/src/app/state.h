@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ContinuousStepper.h>
 #include "../app/node.h"
 #include "../drivers/UnitStepper.h"
 
@@ -68,6 +69,7 @@ struct State {
 	UnitStepper zStepper;
 	UnitStepper ringStepper;
 	UnitStepper pipetteStepper;
+	ContinuousStepper<StepperDriver> bowlStepper;
 
 	float target_x;
 	float target_y;

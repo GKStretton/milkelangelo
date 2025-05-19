@@ -52,6 +52,8 @@ void State::ClearState() {
 	this->ringStepper.MarkAsNotCalibrated();
 	this->pipetteStepper.MarkAsNotCalibrated();
 
+	this->bowlStepper.stop();
+
 	this->ik_target_z = String(IK_Z_LEVEL_MM).toFloat();
 
 	this->fluidRequest = {FLUID_UNDEFINED, false, 0, 0, true};
@@ -84,6 +86,7 @@ State CreateStateObject() {
 		zStepper: UnitStepper(Z_STEPPER_STEP, Z_STEPPER_DIR, 4, 0.04078, 1, 73),
 		ringStepper: UnitStepper(RING_STEPPER_STEP, RING_STEPPER_DIR, 32, 0.4, RING_ZERO_OFFSET, 195),
 		pipetteStepper: UnitStepper(PIPETTE_STEPPER_STEP, PIPETTE_STEPPER_DIR, 2, 0.9, 0, 1000),
+		bowlStepper: ContinuousStepper<StepperDriver>(),
 		target_x: 0.0,
 		target_y: 0.0,
 		target_ring: RING_ZERO_OFFSET,

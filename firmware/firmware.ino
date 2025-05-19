@@ -1,4 +1,3 @@
-#include <AccelStepper.h>
 #include <Wire.h>
 #include "src/common/ik_algorithm.h"
 #include "src/drivers/fs-i6.h"
@@ -170,6 +169,8 @@ void initSteppers() {
 	s.pipetteStepper.setAcceleration(800 * SPEED_MULT);
 	s.pipetteStepper.setPinsInverted(true);
 	s.pipetteStepper.SetLimitSwitchPin(PIPETTE_LIMIT_SWITCH);
+
+	s.bowlStepper.begin(BOWL_STEPPER_STEP, BOWL_STEPPER_DIR);
 }
 
 void requestRinse() {
@@ -321,6 +322,21 @@ void topicHandler(String topic, String payload)
 		s.target_ring = ring;
 		s.target_yaw = yaw;
 	}
+	else if (topic == TOPIC_SET_BOWL_STEPS_PER_SEC)
+	{
+		String values[] = {"", ""};
+		SerialMQTT::UnpackCommaSeparatedValues(payload, values, 2);
+		float speed = values[0].toFloat();
+		float accel = values[1].toFloat();
+		Logger::Info("recieved req for bowl speed, accel of " + String(speed) + ", " + String(accel));
+
+		s.bowlStepper.setAcceleration(accel);
+		if (speed > -1 && speed < 1) {
+			s.bowlStepper.stop();
+		} else {
+			s.bowlStepper.spin(speed);
+		}
+	}
 	else if (topic == TOPIC_TOGGLE_MANUAL)
 	{
 		s.manualRequested = !s.manualRequested;
@@ -409,12 +425,12 @@ void dataUpdate()
 	// SerialMQTT::Publish("mega/d/PP_POS", String(s.pipetteStepper.currentPosition()));
 
 	// stepper units
-	SerialMQTT::Publish("mega/d/R_UNIT", String(s.ringStepper.PositionToUnit(s.ringStepper.currentPosition())));
-	SerialMQTT::Publish("mega/d/Z_UNIT", String(s.zStepper.PositionToUnit(s.zStepper.currentPosition())));
+	// SerialMQTT::Publish("mega/d/R_UNIT", String(s.ringStepper.PositionToUnit(s.ringStepper.currentPosition())));
+	// SerialMQTT::Publish("mega/d/Z_UNIT", String(s.zStepper.PositionToUnit(s.zStepper.currentPosition())));
 	// SerialMQTT::Publish("mega/d/Z_LAST", String(s.zStepper.GetPositionWasSetLast()));
-	SerialMQTT::Publish("mega/d/Y_UNIT", String(s.yawStepper.PositionToUnit(s.yawStepper.currentPosition())));
+	// SerialMQTT::Publish("mega/d/Y_UNIT", String(s.yawStepper.PositionToUnit(s.yawStepper.currentPosition())));
 	// SerialMQTT::Publish("mega/d/Y_LAST", String(s.yawStepper.GetPositionWasSetLast()));
-	SerialMQTT::Publish("mega/d/P_UNIT", String(s.pitchStepper.PositionToUnit(s.pitchStepper.currentPosition())));
+	// SerialMQTT::Publish("mega/d/P_UNIT", String(s.pitchStepper.PositionToUnit(s.pitchStepper.currentPosition())));
 	// SerialMQTT::Publish("mega/d/P_LAST", String(s.pipetteStepper.GetPositionWasSetLast()));
 	// SerialMQTT::Publish("mega/d/PP_UNIT", String(s.pipetteStepper.PositionToUnit(s.pipetteStepper.currentPosition())));
 
@@ -430,13 +446,16 @@ void dataUpdate()
 
 void runSteppers(State *s)
 {
-	// digitalWrite(STEP_INDICATOR_PIN, HIGH);
+	digitalWrite(STEP_INDICATOR_PIN, HIGH);
 	s->ringStepper.Update();
 	s->pitchStepper.Update();
 	s->yawStepper.Update();
 	s->zStepper.Update();
 	s->pipetteStepper.Update();
-	// digitalWrite(STEP_INDICATOR_PIN, LOW);
+
+	// using accelstepper directly for bowl because there's no min/max or limit switch.
+	s->bowlStepper.loop();
+	digitalWrite(STEP_INDICATOR_PIN, LOW);
 }
 
 void loop()

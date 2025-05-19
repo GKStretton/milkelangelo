@@ -20,6 +20,7 @@ TOPIC_MARK_SAFE_TO_CALIBRATE: Literal["mega/req/safe-to-calibrate"] = "mega/req/
 TOPIC_PIN_OFF: Literal["mega/req/pin-off"] = "mega/req/pin-off"
 TOPIC_PIN_ON: Literal["mega/req/pin-on"] = "mega/req/pin-on"
 TOPIC_RINSE: Literal["mega/req/rinse"] = "mega/req/rinse"
+TOPIC_SET_BOWL_STEPS_PER_SEC: Literal["mega/req/set-bowl-steps-per-sec"] = "mega/req/set-bowl-steps-per-sec"
 TOPIC_SET_COVER_CLOSE: Literal["mega/req/cover-close"] = "mega/req/cover-close"
 TOPIC_SET_COVER_OPEN: Literal["mega/req/cover-open"] = "mega/req/cover-open"
 TOPIC_SET_COVER_SERVO_US: Literal["mega/req/cover-servo-us"] = "mega/req/cover-servo-us"
