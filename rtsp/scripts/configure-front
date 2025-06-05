@@ -16,9 +16,9 @@ sharpness=128,\
 backlight_compensation=1\
 
 v4l2-ctl --device $path --set-ctrl \
-focus_auto=0,\
-exposure_auto=1,\
-white_balance_temperature_auto=0,\
+focus_automatic_continuous=0,\
+auto_exposure=1,\
+white_balance_automatic=0,\
 power_line_frequency=1
 
 # have to set focus twice because it doesn't engage if you set it to the
@@ -31,7 +31,7 @@ white_balance_temperature=5000
 v4l2-ctl --device $path --set-ctrl \
 gain=1,\
 zoom_absolute=100,\
-exposure_absolute=300
+exposure_time_absolute=300
 
 
 # wait so focus set happens while camera is up (streamcam bug?)
