@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	brokerHost                = flag.String("brokerHost", "depthcharge", "the hostname of the mqtt broker")
+	brokerHost                = flag.String("brokerHost", "milkelangelo", "the hostname of the mqtt broker")
 	test                      = flag.Bool("test", false, "if true, just run test code")
 	refreshYoutubeCredentials = flag.Bool("yt", false, "if true, refresh youtube credentials")
 )

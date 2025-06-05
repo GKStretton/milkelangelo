@@ -14,7 +14,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, rende
 
   useEffect(() => {
     const receiver = new WebRTCReceiver(url, name);
-  }, []);
+  }, [url, name]);
 
   useEffect(() => {
     const videoElement = document.getElementById(name) as HTMLVideoElement;

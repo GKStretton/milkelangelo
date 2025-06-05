@@ -1,4 +1,4 @@
 #!/bin/bash
 # This mounts the remote multidisk filesystem from depth, locally.
 
-sshfs -o allow_other greg@depth:/mnt/md0 /mnt/md0
+sshfs -o allow_other milkelangelo@milkelangelo:/home/milkelangelo/milk-stores /mnt/md0

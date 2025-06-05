@@ -14,6 +14,9 @@ const nav = (
     <NavLink color="inherit" to="/content" style={{marginRight:"1rem"}}>
       <Typography display="inline" variant="h6">Content</Typography>
     </NavLink>
+    <NavLink color="inherit" to="/config" style={{marginRight:"1rem"}}>
+      <Typography display="inline" variant="h6">Config</Typography>
+    </NavLink>
   </div>
 );
 

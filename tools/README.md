@@ -1,3 +1,10 @@
+# Usage
+
+Create a venv and install requirements.txt with
+
+`python3 -m pip install -r requirements.txt`
+
+## 
 
 ## Content Generation System
 
