@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ssh milkelangelo@milkelangelo -t "~/update-milkelangelo"

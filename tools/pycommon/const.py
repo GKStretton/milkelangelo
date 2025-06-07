@@ -1,1 +1,1 @@
-HOST = "DEPTH"
+HOST = "localhost"

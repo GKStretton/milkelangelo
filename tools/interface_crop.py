@@ -7,7 +7,7 @@ import pycommon.image as image
 import numpy as np
 from pycommon.config_manager_client import *
 
-HOST = "DEPTH"
+HOST = "localhost"
 
 # location to load dslr image from if doing that crop
 # note, this uses the mount-md0 script to mount remote filesystem

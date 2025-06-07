@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	host = flag.String("host", "DEPTH", "the hostname of the mqtt broker")
+	host = flag.String("host", "localhost", "the hostname of the mqtt broker")
 )
 
 func main() {

@@ -4,7 +4,7 @@ import yaml
 import topics_backend.topics_backend as tb
 
 CLIENT_ID="pythoninterfaces"
-HOST="DEPTH"
+HOST="localhost"
 
 def write_remote_crop_config(name, cfg):
     yml = yaml.dump(cfg)
