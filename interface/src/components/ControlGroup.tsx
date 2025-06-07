@@ -51,6 +51,7 @@ import {
 	TOPIC_MAINTENANCE,
 	TOPIC_MARK_SAFE_TO_CALIBRATE,
 	TOPIC_RINSE,
+	TOPIC_SET_BOWL_STEPS_PER_SEC,
 	TOPIC_SET_COVER_CLOSE,
 	TOPIC_SET_COVER_OPEN,
 	TOPIC_SET_IK_Z,
@@ -89,6 +90,8 @@ export default function ControlGroup() {
 	const [collectionVolume, setCollectionVolume] = useState(30.0);
 	const [bulkFluidRequestVolume, setBulkFluidRequestVolume] = useState(200.0);
 	const [zLevel, setZLevel] = useState(parseInt(IK_Z_LEVEL_MM));
+	const [bowlSpeed, setBowlSpeed] = useState(0);
+	const [bowlAcceleration, setBowlAcceleration] = useState(150); // Steps per second acceleration
 
 	useEffect(() => {
 		c?.publish(TOPIC_SET_IK_Z, zLevel.toString());
@@ -103,6 +106,13 @@ export default function ControlGroup() {
 	});
 	const zMarks = Array.from({ length: 21 }, (_, i) => {
 		return { value: i * 5, label: `${i * 5}mm` };
+	});
+	const bowlSpeedMarks = Array.from({ length: 9 }, (_, i) => {
+		i = i - 4; // Adjust to have negative and positive values
+		return { value: i * 250, label: `${i *250}` };
+	});
+	const bowlAccelMarks = Array.from({ length: 6 }, (_, i) => {
+		return { value: i * 100, label: `${i * 100}` };
 	});
 
 	const isAwake: boolean =
@@ -447,6 +457,64 @@ export default function ControlGroup() {
 					</ButtonGroup>
 
 					<CollectDispense />
+
+					<Typography variant="h6">Bowl Speed</Typography>
+					<Slider
+						value={bowlSpeed}
+						onChange={(e, value) =>
+							typeof value === "number" ? setBowlSpeed(value) : null
+						}
+						min={-1000}
+						max={1000} // Adjust the max value according to your requirements
+						step={50}
+						marks={bowlSpeedMarks}
+						valueLabelDisplay="auto"
+						valueLabelFormat={(value) => `${value}steps/s`}
+						aria-label="Bowl speed"
+						sx={{ margin: 2, width: "50%" }}
+					/>
+
+					<Typography variant="h6">Bowl Acceleration</Typography>
+					<Slider
+						value={bowlAcceleration}
+						onChange={(e, value) =>
+							typeof value === "number" ? setBowlAcceleration(value) : null
+						}
+						min={0}
+						max={500}
+						step={10}
+						marks={bowlAccelMarks}
+						valueLabelDisplay="auto"
+						valueLabelFormat={(value) => `${value}steps/s²`}
+						aria-label="Bowl acceleration"
+						sx={{ margin: 2, width: "50%" }}
+					/>
+
+					<ButtonGroup
+						size="small"
+						variant="outlined"
+						aria-label="bowl control buttons"
+						sx={{ margin: 2 }}
+					>
+						<Button
+							disabled={!isAwake}
+							onClick={() => {
+								c?.publish(TOPIC_SET_BOWL_STEPS_PER_SEC, `${bowlSpeed}, ${bowlAcceleration}`);
+							}}
+						>
+							Send
+						</Button>
+						<Button
+							disabled={!isAwake}
+							onClick={() => {
+								setBowlSpeed(0);
+								c?.publish(TOPIC_SET_BOWL_STEPS_PER_SEC, `0, ${bowlAcceleration}`);
+							}}
+						>
+							Reset
+						</Button>
+					</ButtonGroup>
+					<br />
 
 					<Typography variant="h6">Z-Level</Typography>
 					<Slider
