@@ -44,11 +44,11 @@ func sendReminder(skip bool) {
 		body = "Session is being skipped"
 	} else {
 		subject = fmt.Sprintf(
-			"Reminder: A Study of Light @ %s today",
+			"Reminder: Milkelangelo @ %s today",
 			mainSessionStartTime.fmtLocal(),
 		)
 		body = fmt.Sprintf(
-			"A Study of Light session will begin at %s today.",
+			"Milkelangelo session will begin at %s today.",
 			mainSessionStartTime.fmtLocal(),
 		)
 

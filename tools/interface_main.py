@@ -80,7 +80,7 @@ class Interface(Window):
         if STREAM:
             # tcp is default
             # top-cam-crop not working with ffmpeg pipelines for some reason. And gstreamer isn't installed
-            self.stream = cv2.VideoCapture("rtsp://DEPTH:8554/top-cam")  # , cv2.CAP_FFMPEG)
+            self.stream = cv2.VideoCapture("rtsp://milkelangelo:8554/top-cam")  # , cv2.CAP_FFMPEG)
             self.stream.set(cv2.CAP_PROP_BUFFERSIZE, 2)
             if not self.stream.isOpened():
                 print("Error loading webcam stream, aborting.")

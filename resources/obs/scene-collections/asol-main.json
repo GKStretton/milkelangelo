@@ -806,7 +806,7 @@
             "id": "gstreamer-source",
             "versioned_id": "gstreamer-source",
             "settings": {
-                "pipeline": "rtspsrc protocols=tcp location=\"rtsp://DEPTH:8554/front-cam\" latency=0 name=src src. ! queue ! decodebin ! videoconvert ! video.",
+                "pipeline": "rtspsrc protocols=tcp location=\"rtsp://localhost:8554/front-cam\" latency=0 name=src src. ! queue ! decodebin ! videoconvert ! video.",
                 "use_timestamps_video": false,
                 "use_timestamps_audio": false,
                 "sync_appsink_video": true,
@@ -1613,7 +1613,7 @@
             "id": "gstreamer-source",
             "versioned_id": "gstreamer-source",
             "settings": {
-                "pipeline": "rtspsrc protocols=tcp location=\"rtsp://DEPTH:8554/top-cam\" latency=0 name=src src. ! queue ! decodebin ! videoconvert ! video.",
+                "pipeline": "rtspsrc protocols=tcp location=\"rtsp://localhost:8554/top-cam\" latency=0 name=src src. ! queue ! decodebin ! videoconvert ! video.",
                 "use_timestamps_video": false,
                 "use_timestamps_audio": false,
                 "sync_appsink_video": true,

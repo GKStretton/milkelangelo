@@ -20,8 +20,8 @@ func getEBSListeningToken() (string, error) {
 		NotBefore: time.Now().Add(-time.Minute).UTC().Unix(),
 		Audience:  "StudyOfLightTwitchEBS",
 		Id:        uuid.New().String(),
-		Issuer:    "depth/goo",
-		Subject:   "depth/goo",
+		Issuer:    "milkelangelo/goo",
+		Subject:   "milkelangelo/goo",
 	})
 	secret, err := getInternalSecret()
 	if err != nil {

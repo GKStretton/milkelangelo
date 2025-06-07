@@ -1,5 +1,5 @@
 """
-This is an automated system for editing the video content of A Study of Light
+This is an automated system for editing the video content of Milkelangelo
 if this becomes too slow, try using nvenc as moviepy ffmpeg codec
 alternately, at using direct [ffmpeg bindings](https://github.com/kkroening/ffmpeg-python)
 """

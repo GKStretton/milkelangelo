@@ -1,4 +1,4 @@
-# Interface for A Study of Light backend
+# Interface for Milkelangelo backend
 
 This is the new local control interface for the project. Functionality will be
 gradually migrated here. This is also a test ground for developing the components

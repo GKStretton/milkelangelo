@@ -67,7 +67,7 @@ func Start() *TwitchApi {
 		_, err = helixClient.SendChatAnnouncement(&helix.SendChatAnnouncementParams{
 			BroadcasterID: channelId,
 			ModeratorID:   channelId,
-			Message:       "A Study of Light backend is now running",
+			Message:       "Milkelangelo backend is now running",
 			// value must be one of "", "primary", "purple", "blue", "green", "orange"
 			Color: "primary",
 		})

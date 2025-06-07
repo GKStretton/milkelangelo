@@ -1,18 +1,17 @@
-# A Study of Light
+# Milkelangelo
 
-This is the monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLight).
+_Previously "A Study of Light"_
+
+This is the monorepo for [Milkelangelo](https://www.youtube.com/@StudyOfLight).
 
 - 3d files
 - Firmware
-- serial-mqtt bridge
+- serial-mqtt bridge with remote firmware updates
 - protos and constants
 - Backend Systems
-	- [x] Serial-MQTT bridge
 	- [x] RTSP streaming for multiple consumers of webcam feeds
-	- [x] Remote firmware update
-	- [x] Remote camera crop configuration
-	- [x] Control interface for system
-	- [x] Session management system
+	- [x] Web control interface for system
+	- [x] "Session" management
 	- [x] OBS integration for live streaming
 	- [x] Automated video, photo, and state report capture
 	- [x] Automated post-processing of photos and short- & long-form video content.
@@ -42,9 +41,9 @@ gsettings set org.gnome.desktop.media-handling automount-open false
 
 ### scripts
 
-- `./scripts/dev/mount-md0` - mount DEPTH's filesystem locally, /mnt/md0/light-stores
+- `./scripts/dev/mount-md0` - mount milkelangelo's filesystem locally, /mnt/md0/light-stores
 - `./scripts/dev/extras-update` - render protos and xlangconsts, copying to everywhere necessary.
-- `./scripts/dev/update-depth` - update depth with latest version of the backend systems
+- `./scripts/dev/update-machine` - update milkelangelo minipc with latest version of the backend systems
 - `./scripts/dev/cloud-certs` - update webrtc.gregstretton.org certs for when the webcam stream fails on the cloud system
 - `./scripts/dev/cloud-update` - update asol.gregstretton.org interface with latest build from github action
 

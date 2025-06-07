@@ -3,5 +3,5 @@
 
 cd ~/asol/software/asol-backend
 urxvt -e bash -ic "./scripts/generation/generate-videos $1"
-mosquitto_pub -h DEPTH -t "asol/videos-generated" -m "$1"
+mosquitto_pub -h milkelangelo -t "asol/videos-generated" -m "$1"
 

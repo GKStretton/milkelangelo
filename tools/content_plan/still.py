@@ -6,7 +6,7 @@ def buildStill(n_str: str) -> pb.ContentTypeStatus:
     ct = pb.ContentType.CONTENT_TYPE_STILL
 
     s = pb.ContentTypeStatus(
-        raw_title=f"Piece {n_str} - A Study of Light",
+        raw_title=f"Piece {n_str} - Milkelangelo",
         raw_description="",
         # caption=get_caption(ct),
     )

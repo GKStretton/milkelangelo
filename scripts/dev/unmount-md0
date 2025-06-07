@@ -1,4 +1,4 @@
 #!/bin/bash
-# force unmount of depth's disk
+# force unmount of remote disk
 
 fusermount -u /mnt/md0

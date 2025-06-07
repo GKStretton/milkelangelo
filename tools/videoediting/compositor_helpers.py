@@ -15,9 +15,9 @@ from videoediting.loaders import get_selected_dslr_image_path
 def build_title(pos: typing.Tuple[int, int], duration: float, font_size=115) -> typing.List[TextClip]:
     shadow_offset = 3
     text_size = (1080, 200)
-    text_clip = TextClip("A Study of Light", size=text_size, font_size=font_size,
+    text_clip = TextClip("Milkelangelo", size=text_size, font_size=font_size,
                          color='white', font=MAIN_FONT)
-    shadow_clip = TextClip("A Study of Light", size=text_size, font_size=font_size,
+    shadow_clip = TextClip("Milkelangelo", size=text_size, font_size=font_size,
                            color='black', font=MAIN_FONT)
 
     x = pos[0] if isinstance(pos[0], str) else pos[0] - text_size[0] // 2

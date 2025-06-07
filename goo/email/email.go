@@ -69,7 +69,7 @@ func SendEmail(email *machinepb.Email) error {
 		{
 			From: &mailjet.RecipientV31{
 				Email: "ops@study-of-light.com",
-				Name:  "Study of Light Operations",
+				Name:  "Milkelangelo Operations",
 			},
 			To:       (*mailjet.RecipientsV31)(&recipients),
 			Subject:  email.Subject,

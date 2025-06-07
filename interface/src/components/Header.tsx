@@ -34,7 +34,7 @@ export default function Header() {
     <AppBar position="relative">
       <Toolbar>
         <PrecisionManufacturing />
-        <Typography variant="h6">A Study of Light</Typography>
+        <Typography variant="h6">Milkelangelo</Typography>
 
         <div style={{ margin: "20px" }}></div>
 

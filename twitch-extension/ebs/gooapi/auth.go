@@ -26,7 +26,7 @@ func (g *connectedGooApi) verifyInternalRequest(r *http.Request) (*jwt.StandardC
 	}
 
 	// ensure it comes from goo, not twitch
-	if claims.Issuer != "depth/goo" {
+	if claims.Issuer != "milkelangelo/goo" {
 		return nil, fmt.Errorf("invalid token issuer: %s", claims.Issuer)
 	}
 	if claims.Audience != "StudyOfLightTwitchEBS" {

@@ -63,7 +63,7 @@ if __name__ == "__main__":
     align_x, align_y = -1080, -350
 
     title = TextClip(
-        "A Study of Light",
+        "Milkelangelo",
         size=(1180, 300),
         font_size=120,
         color='white',
