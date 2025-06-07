@@ -381,6 +381,15 @@ function ConfigPage() {
               name={`crop-${selectedCamera}`}
               handleClick={handleVideoClick}
               renderOverlay={renderCropOverlay}
+              onVideoLoad={(videoElement: HTMLVideoElement) => {
+                // Set video dimensions when video loads
+                if (videoElement.videoWidth && videoElement.videoHeight) {
+                  setVideoDimensions({
+                    width: videoElement.videoWidth,
+                    height: videoElement.videoHeight
+                  });
+                }
+              }}
             />
           )}
         </div>

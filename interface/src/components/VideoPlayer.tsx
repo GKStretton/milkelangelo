@@ -7,9 +7,10 @@ interface VideoPlayerProps {
   name: string;
   handleClick?: (e: React.MouseEvent<HTMLVideoElement>) => void;
   renderOverlay?: (videoDimensions: { width: number; height: number }) => React.ReactNode;
+  onVideoLoad?: (videoElement: HTMLVideoElement) => void;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, renderOverlay }: VideoPlayerProps) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, renderOverlay, onVideoLoad }: VideoPlayerProps) => {
   const [displayDimensions, setDisplayDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -29,6 +30,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, rende
       }
     };
 
+    const handleVideoLoad = () => {
+      if (videoElement && onVideoLoad) {
+        onVideoLoad(videoElement);
+      }
+    };
+
     const resizeObserver = new ResizeObserver(() => {
       updateDisplayDimensions();
     });
@@ -36,14 +43,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, rende
     if (videoElement) {
       updateDisplayDimensions();
       resizeObserver.observe(videoElement);
+      
+      // Add event listeners for video loading
+      videoElement.addEventListener('loadedmetadata', handleVideoLoad);
+      videoElement.addEventListener('loadeddata', handleVideoLoad);
     }
 
     return () => {
       if (videoElement) {
         resizeObserver.unobserve(videoElement);
+        videoElement.removeEventListener('loadedmetadata', handleVideoLoad);
+        videoElement.removeEventListener('loadeddata', handleVideoLoad);
       }
     };
-  }, [name]);
+  }, [name, onVideoLoad]);
 
 
   return (
