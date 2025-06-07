@@ -76,6 +76,17 @@ func Start() {
 
 			io.Copy(w, fileReader)
 		})
+		http.HandleFunc("/get-dslr-preview", func(w http.ResponseWriter, r *http.Request) {
+			cors(w)
+
+			fileReader, err := getPreviewDSLRImage()
+			if err != nil {
+				httpErr(w, err)
+				return
+			}
+
+			io.Copy(w, fileReader)
+		})
 		http.HandleFunc("/select-dslr-post", func(w http.ResponseWriter, r *http.Request) {
 			cors(w)
 			sessionId := r.URL.Query().Get("session_id")
@@ -131,6 +142,15 @@ func listSessionDSLRImages(sessionNo int) ([]string, error) {
 func getSessionDSLRImage(sessionNo int, name string) (io.Reader, error) {
 	p := filesystem.GetPostDslrDir(uint64(sessionNo))
 	filename := filepath.Join(p, name)
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+func getPreviewDSLRImage() (io.Reader, error) {
+	filename := filesystem.GetDslrPreviewFile()
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err

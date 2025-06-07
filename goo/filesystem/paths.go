@@ -182,6 +182,10 @@ func GetPostVideosDir(sessionId uint64) string {
 	)
 }
 
+func GetDslrPreviewFile() string {
+	return filepath.Join(*basePath, "dslr-preview.jpg")
+}
+
 // GetPostStillFile returns the filename of the first .jpg file in the specified directory
 func GetPostStillFile(sessionId uint64) (string, error) {
 	searchDir := filepath.Join(

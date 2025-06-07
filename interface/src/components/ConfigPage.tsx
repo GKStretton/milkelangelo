@@ -89,7 +89,10 @@ function ConfigPage() {
     if (dslrMessage) {
       const response = dslrMessage.toString();
       if (response === 'success') {
-        setDslrImageUrl(`/mnt/md0/light-stores/dslr-preview.jpg?t=${Date.now()}`);
+        // Wait 5 seconds before fetching the image to allow processing
+        setTimeout(() => {
+          setDslrImageUrl(`http://milkelangelo:8089/get-dslr-preview?t=${Date.now()}`);
+        }, 5000);
       }
     }
   }, [messages]);
