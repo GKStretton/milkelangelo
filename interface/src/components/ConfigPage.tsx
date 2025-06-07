@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useCallback } from 'react';
+import { useContext, useState, useEffect, useCallback, useRef } from 'react';
 import './ConfigPage.css';
 import MqttContext from '../util/mqttContext';
 import { Typography, Button, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, Paper } from '@mui/material';
@@ -31,8 +31,10 @@ function ConfigPage() {
   });
   const [showOverlay, setShowOverlay] = useState(true);
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
-  const [dslrImageUrl, setDslrImageUrl] = useState<string>('');
+  const [dslrImageUrl, setDslrImageUrl] = useState<string>(`http://milkelangelo:8089/get-dslr-preview?t=${Date.now()}`);
   const [saveStatus, setSaveStatus] = useState<string>('');
+  const [dslrDisplayDimensions, setDslrDisplayDimensions] = useState({ width: 0, height: 0 });
+  const dslrImageRef = useRef<HTMLImageElement>(null);
 
   // Subscribe to response topics
   useEffect(() => {
@@ -96,6 +98,33 @@ function ConfigPage() {
       }
     }
   }, [messages]);
+
+  // Track DSLR image display dimensions
+  useEffect(() => {
+    const updateDslrDisplayDimensions = () => {
+      if (dslrImageRef.current) {
+        setDslrDisplayDimensions({
+          width: dslrImageRef.current.clientWidth,
+          height: dslrImageRef.current.clientHeight
+        });
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateDslrDisplayDimensions();
+    });
+
+    if (dslrImageRef.current) {
+      updateDslrDisplayDimensions();
+      resizeObserver.observe(dslrImageRef.current);
+    }
+
+    return () => {
+      if (dslrImageRef.current) {
+        resizeObserver.unobserve(dslrImageRef.current);
+      }
+    };
+  }, [dslrImageUrl, selectedCamera]);
 
   // Handle DSLR capture
   const triggerDslrCapture = useCallback(() => {
@@ -324,11 +353,14 @@ function ConfigPage() {
             dslrImageUrl ? (
               <div style={{ position: 'relative' }}>
                 <img
+                  ref={dslrImageRef}
                   className="crop-image"
                   src={dslrImageUrl}
                   alt="DSLR Preview"
-                  style={{ 
-                    transform: 'rotate(180deg)'
+                  style={{
+                    transform: 'rotate(180deg)',
+                    maxWidth: '100%',
+                    height: 'auto'
                   }}
                   onClick={handleImageClick}
                   onLoad={(e) => {
@@ -336,7 +368,7 @@ function ConfigPage() {
                     setVideoDimensions({ width: img.naturalWidth, height: img.naturalHeight });
                   }}
                 />
-                {renderCropOverlay(videoDimensions)}
+                {renderCropOverlay(dslrDisplayDimensions)}
               </div>
             ) : (
               <div className="dslr-placeholder">

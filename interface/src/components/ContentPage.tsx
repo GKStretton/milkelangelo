@@ -20,7 +20,7 @@ function ContentPage() {
     if (!sessionStatus?.id) return;
 
     setErr("");
-    fetch(`http://depth:8089/list-dslr-post?session_id=${sessionStatus?.id}`)
+    fetch(`http://milkelangelo:8089/list-dslr-post?session_id=${sessionStatus?.id}`)
     .then((resp) => {
       console.log("got resp", resp)
       if (!resp.ok) {
@@ -56,7 +56,7 @@ function ContentPage() {
 
     setErr("");
 
-    fetch(`http://depth:8089/select-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`)
+    fetch(`http://milkelangelo:8089/select-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`)
     .catch(r => {
       console.error(r);
       setErr(r);
@@ -95,7 +95,7 @@ function ContentPage() {
         <img
           alt={imageNames[selectedImgIndex]}
           width={600}
-          src={`http://depth:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`}
+          src={`http://milkelangelo:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`}
         />
         <br/>
         <div>{imageNames[selectedImgIndex]}</div>
@@ -122,7 +122,7 @@ function ContentPage() {
           <img
             alt="selected.jpg"
             width={600}
-            src={`http://depth:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=selected.jpg`}
+            src={`http://milkelangelo:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=selected.jpg`}
           />
         </>
         : null}
