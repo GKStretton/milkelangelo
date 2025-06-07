@@ -74,7 +74,7 @@ func main() {
 	actor.Setup(sm, ebsApi)
 	events.Start(sm, ebsApi)
 	livecapture.Start(sm)
-	obs.Start(sm)
+	obs.Start(*brokerHost, sm)
 	vialprofiles.Start(sm, ebsApi)
 	contentscheduler.Start(sm)
 
