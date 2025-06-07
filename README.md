@@ -24,14 +24,21 @@ This is the monorepo for [A Study of Light](https://www.youtube.com/@StudyOfLigh
 ### Installation
 
 - Install Ubuntu on a machine
+- Disable automounting in gnome:
+
+```bash
+gsettings set org.gnome.desktop.media-handling automount false
+gsettings set org.gnome.desktop.media-handling automount-open false
+```
+
 - [Install docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository). ** NOT "docker desktop" ** as it doesn't work nicely with /dev/ devices (serial and webcam)
 - Clone repo
-- Make .env file
+- Make .env file (see below for settings)
 - `sudo docker compose up -d`
 - Install OBS
-  - Installed with flatpak, specifically the 2023-12-11 version. WARNING: newer versions break the gstreamer plugin currently (08/10/2024)
-  - require gstreamer plugin
+  - install gstreamer plugin
   - profile and scene collections are in `resources/obs`
+  - enable websocket server
 
 ### scripts
 

@@ -10,7 +10,7 @@ interface VideoPlayerProps {
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, renderOverlay }: VideoPlayerProps) => {
-  const [videoDimensions, setVideoDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [displayDimensions, setDisplayDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   useEffect(() => {
     const receiver = new WebRTCReceiver(url, name);
@@ -19,18 +19,22 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, rende
   useEffect(() => {
     const videoElement = document.getElementById(name) as HTMLVideoElement;
 
-    const updateVideoDimensions = () => {
+    const updateDisplayDimensions = () => {
       if (videoElement) {
-        setVideoDimensions({ width: videoElement.clientWidth, height: videoElement.clientHeight });
+        // Use display dimensions for overlay positioning
+        setDisplayDimensions({
+          width: videoElement.clientWidth,
+          height: videoElement.clientHeight
+        });
       }
     };
 
     const resizeObserver = new ResizeObserver(() => {
-      updateVideoDimensions();
+      updateDisplayDimensions();
     });
 
     if (videoElement) {
-      updateVideoDimensions();
+      updateDisplayDimensions();
       resizeObserver.observe(videoElement);
     }
 
@@ -58,10 +62,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, rende
             border: '1px solid black',
           }}
         ></video>
-        {renderOverlay && renderOverlay(videoDimensions)}
+        {renderOverlay && renderOverlay(displayDimensions)}
       </div>
       <Box display="flex" flexDirection="row" alignItems="center">
-        {/* <Typography>{JSON.stringify(videoDimensions)}</Typography> */}
+        {/* <Typography>{JSON.stringify(displayDimensions)}</Typography> */}
       </Box>
     </Box>
   );

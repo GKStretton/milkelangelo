@@ -131,14 +131,18 @@ function ConfigPage() {
         newBottom = cropConfig.top_abs + mag;
       }
 
-      // Ensure dimensions are even for x264 compatibility
+      // Constrain to bounds first
+      newRight = Math.min(videoDimensions.width, Math.max(cropConfig.left_abs + 2, newRight));
+      newBottom = Math.min(videoDimensions.height, Math.max(cropConfig.top_abs + 2, newBottom));
+
+      // Then ensure dimensions are even for x264 compatibility
       if ((newRight - cropConfig.left_abs) % 2 === 1) newRight -= 1;
       if ((newBottom - cropConfig.top_abs) % 2 === 1) newBottom -= 1;
 
       setCropConfig(prev => ({
         ...prev,
-        right_abs: Math.min(videoDimensions.width, Math.max(prev.left_abs + 2, newRight)),
-        bottom_abs: Math.min(videoDimensions.height, Math.max(prev.top_abs + 2, newBottom))
+        right_abs: newRight,
+        bottom_abs: newBottom
       }));
     } else {
       // Set top-left corner
@@ -153,27 +157,43 @@ function ConfigPage() {
         newBottom = newTop + mag;
       }
 
-      // Ensure dimensions are even for x264 compatibility
+      // Constrain to bounds first
+      newLeft = Math.max(0, Math.min(newLeft, cropConfig.right_abs - 2));
+      newTop = Math.max(0, Math.min(newTop, cropConfig.bottom_abs - 2));
+      newRight = Math.min(videoDimensions.width, Math.max(newLeft + 2, newRight));
+      newBottom = Math.min(videoDimensions.height, Math.max(newTop + 2, newBottom));
+
+      // Then ensure dimensions are even for x264 compatibility
       if ((newRight - newLeft) % 2 === 1) newRight -= 1;
       if ((newBottom - newTop) % 2 === 1) newBottom -= 1;
 
       setCropConfig(prev => ({
         ...prev,
-        left_abs: Math.max(0, Math.min(newLeft, prev.right_abs - 2)),
-        top_abs: Math.max(0, Math.min(newTop, prev.bottom_abs - 2)),
-        right_abs: Math.min(videoDimensions.width, Math.max(newLeft + 2, newRight)),
-        bottom_abs: Math.min(videoDimensions.height, Math.max(newTop + 2, newBottom))
+        left_abs: newLeft,
+        top_abs: newTop,
+        right_abs: newRight,
+        bottom_abs: newBottom
       }));
     }
   }, [videoDimensions, cropConfig, selectedCamera]);
 
   // Handle mouse events for crop selection
   const handleVideoClick = useCallback((e: React.MouseEvent<HTMLVideoElement>) => {
-    if (!videoDimensions.width || !videoDimensions.height) return;
+    // Get actual video dimensions from the video element
+    const videoElement = e.currentTarget;
+    const actualWidth = videoElement.videoWidth || videoElement.clientWidth;
+    const actualHeight = videoElement.videoHeight || videoElement.clientHeight;
+    
+    // Update videoDimensions if not set or different
+    if (videoDimensions.width !== actualWidth || videoDimensions.height !== actualHeight) {
+      setVideoDimensions({ width: actualWidth, height: actualHeight });
+    }
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = Math.round((e.clientX - rect.left) * (videoDimensions.width / rect.width));
-    const y = Math.round((e.clientY - rect.top) * (videoDimensions.height / rect.height));
+    if (!actualWidth || !actualHeight) return;
+
+    const rect = videoElement.getBoundingClientRect();
+    const x = Math.round((e.clientX - rect.left) * (actualWidth / rect.width));
+    const y = Math.round((e.clientY - rect.top) * (actualHeight / rect.height));
 
     updateCropConfig(x, y, e.shiftKey);
   }, [videoDimensions, updateCropConfig]);
@@ -203,13 +223,12 @@ function ConfigPage() {
   }, [cropConfig.left_abs, cropConfig.right_abs, cropConfig.top_abs, cropConfig.bottom_abs, videoDimensions]);
 
   // Render crop overlay
-  const renderCropOverlay = useCallback((dimensions: { width: number; height: number }) => {
-    setVideoDimensions(dimensions);
-    
-    if (!showOverlay || !dimensions.width || !dimensions.height) return null;
+  const renderCropOverlay = useCallback((displayDimensions: { width: number; height: number }) => {
+    if (!showOverlay || !displayDimensions.width || !displayDimensions.height || !videoDimensions.width || !videoDimensions.height) return null;
 
-    const scaleX = dimensions.width / videoDimensions.width || 1;
-    const scaleY = dimensions.height / videoDimensions.height || 1;
+    // Scale from actual video coordinates to display coordinates
+    const scaleX = displayDimensions.width / videoDimensions.width;
+    const scaleY = displayDimensions.height / videoDimensions.height;
 
     return (
       <div className="crop-overlay">
@@ -314,7 +333,7 @@ function ConfigPage() {
                     setVideoDimensions({ width: img.naturalWidth, height: img.naturalHeight });
                   }}
                 />
-                {renderCropOverlay({ width: 800, height: 600 })}
+                {renderCropOverlay(videoDimensions)}
               </div>
             ) : (
               <div className="dslr-placeholder">
