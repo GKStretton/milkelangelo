@@ -1,9 +1,6 @@
-import { setUncaughtExceptionCaptureCallback } from "process";
-import React, { useState } from "react";
-import { useGoTo } from "../ebs/api";
-import { useGlobalState } from "../helpers/State";
-import { Status } from "../types";
+import { useGlobalState } from "~/helpers/State";
 import "./ControlView.css";
+import { useGoTo } from "~/ebs/api";
 
 export default function ControlView() {
 	const gs = useGlobalState();
@@ -43,6 +40,8 @@ export default function ControlView() {
 	return (
 		<>
 			<div
+				role="button"
+				tabIndex={0}
 				className={`canvas ${gs.isDebugMode ? "debug" : ""} ${
 					isGoToEnabled ? "" : "disable"
 				}`}

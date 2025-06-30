@@ -1,18 +1,14 @@
-import {
-	QueryClient,
-	QueryClientProvider,
-	useQuery,
-} from "@tanstack/react-query";
-import _ from "lodash";
 import { useEffect } from "react";
 import { Toaster, toast } from "sonner";
-import "./App.css";
-import ConnectionManager from "./components/ConnectionManager";
-import ControlPanel from "./components/ControlPanel";
-import ControlView from "./components/ControlView";
-import DebugView from "./components/DebugView";
-import { setupApiAuth, useDirectEbsState } from "./ebs/api";
-import { useGlobalState } from "./helpers/State";
+import render from "~/app/render";
+import ConnectionManager from "~/components/ConnectionManager";
+import ControlPanel from "~/components/ControlPanel";
+import ControlView from "~/components/ControlView";
+import DebugView from "~/components/DebugView";
+import { setupApiAuth, useDirectEbsState } from "~/ebs/api";
+import { useGlobalState } from "~/helpers/State";
+
+import "./video_overlay.css";
 
 function App() {
 	const ext = window?.Twitch?.ext;
@@ -82,4 +78,4 @@ function App() {
 	);
 }
 
-export default App;
+render(<App />);
