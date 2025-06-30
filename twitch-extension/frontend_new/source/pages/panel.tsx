@@ -1,19 +1,10 @@
-import render from "~app/render";
-
-import {Box} from "@mui/material";
-
-import {useFollowingStatus} from "~/hooks/twitch";
+import render from "~/app/render";
+import { useFollowingStatus } from "~/hooks/twitch";
 
 const App = () => {
-  const {followingStatus} = useFollowingStatus();
+	const { followingStatus } = useFollowingStatus();
 
-  return (
-    <Box alignItems={"center"} display={"flex"} height={"100%"} justifyContent={"center"}>
-      Panel {followingStatus}
-    </Box>
-  );
+	return <>Panel {followingStatus}</>;
 };
 
-render(
-  <App/>,
-);
+render(<App />);

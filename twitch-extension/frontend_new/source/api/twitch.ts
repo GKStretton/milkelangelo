@@ -1,36 +1,32 @@
-import axios, {AxiosRequestConfig} from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
 const client = axios.create({
-  baseURL: "https://api.twitch.tv/helix",
+	baseURL: "https://api.twitch.tv/helix",
 });
 
 const setAuthorization = (helixToken: string, clientId: string) => {
-  client.defaults.headers.common["Authorization"] = `Extension ${helixToken}`;
-  client.defaults.headers.common["client-id"] = clientId;
+	client.defaults.headers.common["Authorization"] = `Extension ${helixToken}`;
+	client.defaults.headers.common["client-id"] = clientId;
 };
 
 interface UsersFollowsRequest {
-  toId: string;
-  fromId: string;
-  options?: AxiosRequestConfig;
+	toId: string;
+	fromId: string;
+	options?: AxiosRequestConfig;
 }
 
 const getUsersFollows = async (request: UsersFollowsRequest) => {
-  const {data} = await client.get("users/follows", {
-    ...request.options,
-    params: {
-      to_id: request.toId,
-      from_id: request.fromId,
-    },
-  });
+	const { data } = await client.get("users/follows", {
+		...request.options,
+		params: {
+			to_id: request.toId,
+			from_id: request.fromId,
+		},
+	});
 
-  return data;
+	return data;
 };
 
-export {
-  setAuthorization,
-};
+export { setAuthorization };
 
-export {
-  getUsersFollows,
-};
+export { getUsersFollows };

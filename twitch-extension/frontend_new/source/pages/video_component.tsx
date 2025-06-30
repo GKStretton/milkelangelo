@@ -4,7 +4,7 @@ import { useFollowingStatus } from "~/hooks/twitch";
 const App = () => {
 	const { followingStatus } = useFollowingStatus();
 
-	return <>Mobile {followingStatus}</>;
+	return <>Video Component {followingStatus}</>;
 };
 
 render(<App />);
