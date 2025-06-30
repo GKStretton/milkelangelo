@@ -9,7 +9,7 @@ import (
 
 const cleaningBody = `Please perform the cleaning routine:
 
-http://192.168.0.37:5000/cleaning (Must be on home wifi)
+http://192.168.0.37/cleaning (Must be on home wifi)
 `
 
 func requestCleaning(session *Session) {
@@ -25,7 +25,7 @@ func requestCleaning(session *Session) {
 
 const choosePieceBody = `Please choose the image that will be used for the latest session.
 
-- Go to http://192.168.0.37:5000/content (Must be on home wifi).
+- Go to http://192.168.0.37/content (Must be on home wifi).
 `
 
 func requestPieceSelection(session *Session) {
