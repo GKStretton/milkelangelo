@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf8">
+	<link rel="icon" type="image/svg+xml" href="/vite.svg" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+	<title>Study of Light - Twitch Extension</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			max-width: 800px;
+			margin: 0 auto;
+			padding: 20px;
+			text-align: center;
+		}
+
+		h1 {
+			color: #6441A4;
+		}
+
+		.nav-container {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			margin-top: 30px;
+		}
+
+		.nav-button {
+			padding: 12px 20px;
+			background-color: #6441A4;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			font-size: 16px;
+			cursor: pointer;
+			transition: background-color 0.2s;
+		}
+
+		.nav-button:hover {
+			background-color: #7D5BBE;
+		}
+
+		hr {
+			width: 100%;
+			margin: 15px 0;
+			border: 0;
+			height: 1px;
+			background-color: #ddd;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="app">
+		<h1>Milkelangelo - Twitch Extension</h1>
+		<h2>(development home)</h2>
+		<p>Select a page to navigate to:</p>
+
+		<div class="nav-container">
+			<a href="video_overlay.html"><button class="nav-button">Video Overlay</button></a>
+			<a href="panel.html"><button class="nav-button">Panel Page</button></a>
+			<hr />
+			<a href="config.html"><button class="nav-button">Configuration Page</button></a>
+			<a href="mobile.html"><button class="nav-button">Mobile Page</button></a>
+			<a href="video_component.html"><button class="nav-button">Video Component</button></a>
+		</div>
+	</div>
+	<script type="module" src="pages/index.tsx"></script>
+</body>
+
+</html>

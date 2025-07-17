@@ -15,6 +15,7 @@ export default defineConfig({
 		emptyOutDir: true,
 		rollupOptions: {
 			input: {
+				index: path.join(cwd, "source/index.html"),
 				config: path.join(cwd, "source/config.html"),
 				panel: path.join(cwd, "source/panel.html"),
 				mobile: path.join(cwd, "source/mobile.html"),
