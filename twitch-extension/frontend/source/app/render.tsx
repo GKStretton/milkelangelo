@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./render.css";
+import TwitchProvider from "~/context/twitch";
 import { StateProvider } from "~/helpers/State";
 
 const queryClient = new QueryClient();
@@ -11,11 +12,11 @@ const render = (node: React.ReactNode) => {
 
 	return ReactDOM.createRoot(app).render(
 		<React.StrictMode>
-			<StateProvider>
-				{/* <TwitchProvider> */}
-				<QueryClientProvider client={queryClient}>{node}</QueryClientProvider>
-				{/* </TwitchProvider> */}
-			</StateProvider>
+			<TwitchProvider>
+				<StateProvider>
+					<QueryClientProvider client={queryClient}>{node}</QueryClientProvider>
+				</StateProvider>
+			</TwitchProvider>
 		</React.StrictMode>,
 	);
 };

@@ -13,6 +13,7 @@ const TwitchProvider = (props: React.PropsWithChildren) => {
 		React.useState<Twitch.ext.Authorized | null>(null);
 
 	React.useEffect(() => {
+		Twitch.ext.viewer.id;
 		Twitch.ext.onAuthorized((authorized) => {
 			setAuthorization(authorized.helixToken, authorized.clientId);
 			setAuthorized(authorized);
@@ -22,10 +23,6 @@ const TwitchProvider = (props: React.PropsWithChildren) => {
 	const context: TwitchContext = {
 		authorized,
 	};
-
-	if (!authorized) {
-		return "Loading twitch context...";
-	}
 
 	return (
 		<twitchContext.Provider value={context}>

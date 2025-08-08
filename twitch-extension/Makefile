@@ -1,4 +1,4 @@
-.PHONY: openapi deps ebs
+.PHONY: openapi deps dfe debs
 
 # Installs all dependencies for the project.
 deps:
@@ -9,3 +9,5 @@ deps:
 openapi:
 	mkdir -p ./ebs/server/openapi
 	oapi-codegen -generate gin,models -package openapi ./openapi/openapi.yaml > ./ebs/server/openapi/api.gen.go
+
+# debug commands are in the project root Makefile

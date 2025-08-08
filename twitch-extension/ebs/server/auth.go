@@ -36,7 +36,7 @@ func (s *server) localAuthMiddleware(c *gin.Context) {
 
 func (s *server) twitchAuthMiddleware(c *gin.Context) {
 	if c.GetHeader("X-Twitch-Extension-Client-Id") != extensionClientID {
-		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid extension client id"))
+		c.AbortWithError(http.StatusBadRequest, fmt.Errorf("invalid extension client id: %s, expected: %s", c.GetHeader("X-Twitch-Extension-Client-Id"), extensionClientID))
 		return
 	}
 
