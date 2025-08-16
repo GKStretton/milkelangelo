@@ -8,10 +8,10 @@ interface:
 
 ebs_local:
 	@trap 'kill 0' INT TERM; \
-	cd twitch-extension/frontend && npm start & \
+	cd twitch-extension/frontend && npm run dev & \
 	cd twitch-extension/ebs && go run . -disableAuthentication
 
 ebs_twitch:
 	@trap 'kill 0' INT TERM; \
-	cd twitch-extension/frontend && npm start & \
+	cd twitch-extension/frontend && npm run dev & \
 	cd twitch-extension/ebs && go run .

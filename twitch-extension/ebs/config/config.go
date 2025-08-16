@@ -7,21 +7,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Currently config is a mess combination of envvar, flags, and keyvalue store.
-// We can standardise on this pattern.
-
-// requirements
-// 1. typed configuration via this package, so everything is got via here. flat structure probably
-// 2. support for default values per environment - local, and deployed
-// 3. support for overriding values.
-// 4. validation and documentation is a bonus
-
 type Config struct {
-	EbsHost string `env:"EBS_HOST"`
+	Test string `env:"TEST"`
 }
 
 var defaults = &Config{
-	EbsHost: "localhost",
+	Test: "Banana",
 }
 
 func setDefaults(v *viper.Viper, defaults interface{}) {
