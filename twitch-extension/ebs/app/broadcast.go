@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/gkstretton/study-of-light/twitch-ebs/config"
 	"github.com/gkstretton/study-of-light/twitch-ebs/entities"
 	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
 )
@@ -21,11 +22,16 @@ func (a *App) buildStateResponse() ebsState {
 }
 
 // broadcasts the BroadcastData cache once per second
-func (a *App) regularBroadcast() {
+func (a *App) regularTwitchStateBroadcast() {
 	next := time.After(0)
 	for {
 		<-next
 		next = time.After(time.Millisecond * 1000)
+
+		if !config.BroadcastStateToTwitch() {
+			return
+		}
+
 		a.broadcast()
 	}
 }

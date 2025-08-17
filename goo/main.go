@@ -7,6 +7,7 @@ import (
 
 	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/app"
+	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/contentscheduler"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
@@ -26,7 +27,6 @@ import (
 )
 
 var (
-	brokerHost                = flag.String("brokerHost", "milkelangelo", "the hostname of the mqtt broker")
 	test                      = flag.Bool("test", false, "if true, just run test code")
 	refreshYoutubeCredentials = flag.Bool("yt", false, "if true, refresh youtube credentials")
 )
@@ -48,7 +48,7 @@ func main() {
 
 	filesystem.AssertBasePaths()
 
-	mqtt.Start(*brokerHost)
+	mqtt.Start(config.BrokerHost())
 	keyvalue.Start()
 	email.Start()
 	server.Start()
@@ -74,7 +74,7 @@ func main() {
 	actor.Setup(sm, ebsApi)
 	events.Start(sm, ebsApi)
 	livecapture.Start(sm)
-	obs.Start(*brokerHost, sm)
+	obs.Start(config.BrokerHost(), sm)
 	vialprofiles.Start(sm, ebsApi)
 	contentscheduler.Start(sm)
 

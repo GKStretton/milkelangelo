@@ -8,8 +8,6 @@ import (
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/gkstretton/study-of-light/twitch-ebs/common"
 )
 
 type connectedTwitchAPI struct {
@@ -20,14 +18,9 @@ type connectedTwitchAPI struct {
 	broadcastToken string
 }
 
-func NewConnectedTwitchAPI(sharedSecretPath, channelID, extensionClientID string) (*connectedTwitchAPI, error) {
-	sharedSecret, err := common.GetSecret(sharedSecretPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get shared secret: %w", err)
-	}
-
+func NewConnectedTwitchAPI(sharedSecret, channelID, extensionClientID string) (*connectedTwitchAPI, error) {
 	t := &connectedTwitchAPI{
-		sharedSecret:      sharedSecret,
+		sharedSecret:      []byte(sharedSecret),
 		channelID:         channelID,
 		extensionClientID: extensionClientID,
 	}

@@ -1,12 +1,10 @@
 package ebsinterface
 
 import (
-	"encoding/base64"
 	"errors"
-	"fmt"
 	"time"
 
-	"github.com/gkstretton/dark/services/goo/keyvalue"
+	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 )
@@ -35,13 +33,9 @@ func getEBSListeningToken() (string, error) {
 }
 
 func getInternalSecret() (string, error) {
-	secret := keyvalue.Get("EBS_INTERNAL_SECRET")
-	if secret == nil {
-		return "", errors.New("no value for EBS_INTERNAL_SECRET in kv")
+	s := config.SharedSecretEbs()
+	if s == "" {
+		return "", errors.New("ebs shared secret not set")
 	}
-	decodedBytes, err := base64.StdEncoding.DecodeString(string(secret))
-	if err != nil {
-		return "", fmt.Errorf("failed to decode internal secret: %v", err)
-	}
-	return string(decodedBytes), nil
+	return s, nil
 }

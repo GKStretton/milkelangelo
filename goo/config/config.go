@@ -1,49 +1,39 @@
 package config
 
 import (
-	"reflect"
-	"strings"
-
 	"github.com/spf13/viper"
 )
 
-// Currently config is a mess combination of envvar, flags, and keyvalue store.
-// We can standardise on this pattern.
-
-// requirements
-// 1. typed configuration via this package, so everything is got via here. flat structure probably
-// 2. support for default values per environment - local, and deployed
-// 3. support for overriding values.
-// 4. validation and documentation is a bonus
-
-type Config struct {
-	EbsHost string `env:"EBS_HOST"`
+var defaults = map[string]any{
+	"LIGHT_STORES_DIR":  "/mnt/md0/light-stores/",
+	"BROKER_HOST":       "milkelangelo",
+	"EBS_HOST":          "localhost",
+	"SHARED_SECRET_EBS": "local_secret",
 }
 
-var defaults = &Config{
-	EbsHost: "localhost",
+func init() {
+	viper.AutomaticEnv()
+	setDefaults(defaults)
 }
 
-func setDefaults(v *viper.Viper, defaults interface{}) {
-	val := reflect.ValueOf(defaults).Elem()
-	typ := val.Type()
-
-	for i := 0; i < val.NumField(); i++ {
-		field := typ.Field(i)
-		value := val.Field(i)
-
-		key := strings.ToLower(field.Name)
-		v.SetDefault(key, value.Interface())
+func setDefaults(defaults map[string]any) {
+	for key, value := range defaults {
+		viper.SetDefault(key, value)
 	}
 }
 
-func GetConfig() *Config {
-	v := viper.NewWithOptions(viper.ExperimentalBindStruct())
-	v.AutomaticEnv()
-	setDefaults(v, defaults)
+func GetLightStores() string {
+	return viper.GetString("LIGHT_STORES_DIR")
+}
 
-	c := &Config{}
-	v.Unmarshal(&c)
+func BrokerHost() string {
+	return viper.GetString("BROKER_HOST")
+}
 
-	return c
+func EbsHost() string {
+	return viper.GetString("EBS_HOST")
+}
+
+func SharedSecretEbs() string {
+	return viper.GetString("SHARED_SECRET_EBS")
 }

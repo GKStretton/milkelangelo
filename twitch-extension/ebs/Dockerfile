@@ -1,23 +1,22 @@
 # Build stage
 FROM golang:1.21 AS builder
+
 WORKDIR /src
-COPY ./goo/go.mod ./go.mod
-COPY ./goo/go.sum ./go.sum
-COPY ./asol-protos ../asol-protos
-COPY ./resources ../resources
+COPY ./ebs/go.mod ./go.mod
+COPY ./ebs/go.sum ./go.sum
 RUN go mod download
-COPY ./goo .
+COPY ./ebs .
 ENV CGO_ENABLED=0
 ENV GOOS=linux
 RUN go build -a -ldflags '-extldflags "-static"'
 
+
 # Runtime stage
 FROM debian:bullseye-slim
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    gphoto2
+RUN apt-get update && apt-get install -y
 WORKDIR /app
-COPY --from=builder /src/goo .
+
+COPY --from=builder /src/ebs .
 COPY --from=builder /src/run.sh .
-COPY ./scripts ./scripts
+
 CMD ["./run.sh"]

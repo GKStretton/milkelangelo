@@ -42,7 +42,6 @@ services:
     build:
       context: .
       dockerfile: goo/Dockerfile
-    command: -basePath ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/} -brokerHost localhost
     restart: always
     network_mode: host
     volumes:
@@ -50,8 +49,10 @@ services:
       - /dev:/dev
     user: "1000:1000"
     environment:
-      ENABLE_EBS: ${ENABLE_EBS:-false}
       ENABLE_SCHEDULER: ${ENABLE_SCHEDULER:-false}
+      ENABLE_EBS: ${ENABLE_EBS:-false}
+      EBS_HOST: ${EBS_HOST}
+      SHARED_SECRET_EBS: ${SHARED_SECRET_EBS}
   dslrcapture:
     build:
       context: .

@@ -6,7 +6,7 @@ import (
 	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
 )
 
-func (a *App) regularStateUpdate() {
+func (a *App) regularGooStateUpdate() {
 	next := time.After(time.Second)
 	for {
 		<-next

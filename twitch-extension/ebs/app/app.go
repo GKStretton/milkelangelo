@@ -32,8 +32,8 @@ func NewApp(goo gooapi.GooApi, twitchAPI TwitchAPI) *App {
 func (a *App) Start() {
 	a.goo.SetStateUpdateCallback(a.gooStateCallback)
 
-	go a.regularBroadcast()
-	go a.regularStateUpdate()
+	go a.regularTwitchStateBroadcast()
+	go a.regularGooStateUpdate()
 }
 
 func (a *App) gooStateCallback(state gooapi.GooStateUpdate) {

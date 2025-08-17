@@ -1,12 +1,11 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gkstretton/study-of-light/twitch-ebs/app"
-	"github.com/gkstretton/study-of-light/twitch-ebs/common"
+	"github.com/gkstretton/study-of-light/twitch-ebs/config"
 	"github.com/gkstretton/study-of-light/twitch-ebs/gooapi"
 	"github.com/gkstretton/study-of-light/twitch-ebs/server/openapi"
 	"github.com/op/go-logging"
@@ -29,28 +28,23 @@ func (s *server) Run() {
 	s.r.Run(s.addr)
 }
 
-func NewServer(addr string, sharedSecretPath string, goo gooapi.GooApi, app *app.App, disableAuthentication bool) (*server, error) {
+func NewServer(addr string, sharedSecret string, goo gooapi.GooApi, app *app.App) (*server, error) {
 	r := gin.Default()
-
-	sharedSecret, err := common.GetSecret(sharedSecretPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get shared secret: %w", err)
-	}
 
 	s := &server{
 		r:            r,
 		goo:          goo,
 		app:          app,
 		addr:         addr,
-		sharedSecret: sharedSecret,
+		sharedSecret: []byte(sharedSecret),
 	}
 
 	s.r.Use(corsMiddleware)
 	// todo: s.r.Use(rateLimiterMiddleware)
-	if disableAuthentication {
-		s.r.Use(s.localAuthMiddleware)
-	} else {
+	if config.EnableServerAuthentication() {
 		s.r.Use(s.twitchAuthMiddleware)
+	} else {
+		s.r.Use(s.localAuthMiddleware)
 	}
 
 	openapi.RegisterHandlers(r, s)

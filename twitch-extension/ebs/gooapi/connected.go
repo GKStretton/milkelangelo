@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
-
-	"github.com/gkstretton/study-of-light/twitch-ebs/common"
 )
 
 type connectedGooApi struct {
@@ -18,14 +16,12 @@ type connectedGooApi struct {
 	stateUpdateCallback func(state GooStateUpdate)
 }
 
-func NewConnectedGooApi(internalSecretPath string, listenAddr string) (*connectedGooApi, error) {
-	internalSecret, err := common.GetSecret(internalSecretPath)
-	if err != nil {
-		return nil, fmt.Errorf("could not load internal shared secret: %w", err)
+func NewConnectedGooApi(sharedSecret string, listenAddr string) (*connectedGooApi, error) {
+	if sharedSecret == "" {
+		return nil, fmt.Errorf("shared secret not set for goo")
 	}
-
 	g := &connectedGooApi{
-		internalSecret: internalSecret,
+		internalSecret: []byte(sharedSecret),
 		listenAddr:     listenAddr,
 		subs:           []chan *message{},
 		subsLock:       sync.Mutex{},

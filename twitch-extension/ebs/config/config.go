@@ -1,40 +1,39 @@
 package config
 
 import (
-	"reflect"
-	"strings"
-
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-	Test string `env:"TEST"`
+var defaults = map[string]any{
+	"SHARED_SECRET_GOO":            "local_secret",
+	"SHARED_SECRET_TWITCH":         "",
+	"BROADCAST_STATE_TO_TWITCH":    false,
+	"ENABLE_SERVER_AUTHENTICATION": false,
 }
 
-var defaults = &Config{
-	Test: "Banana",
+func init() {
+	viper.AutomaticEnv()
+	setDefaults(defaults)
 }
 
-func setDefaults(v *viper.Viper, defaults interface{}) {
-	val := reflect.ValueOf(defaults).Elem()
-	typ := val.Type()
-
-	for i := 0; i < val.NumField(); i++ {
-		field := typ.Field(i)
-		value := val.Field(i)
-
-		key := strings.ToLower(field.Name)
-		v.SetDefault(key, value.Interface())
+func setDefaults(defaults map[string]any) {
+	for key, value := range defaults {
+		viper.SetDefault(key, value)
 	}
 }
 
-func GetConfig() *Config {
-	v := viper.NewWithOptions(viper.ExperimentalBindStruct())
-	v.AutomaticEnv()
-	setDefaults(v, defaults)
+func SharedSecretGoo() string {
+	return viper.GetString("SHARED_SECRET_GOO")
+}
 
-	c := &Config{}
-	v.Unmarshal(&c)
+func SharedSecretTwitch() string {
+	return viper.GetString("SHARED_SECRET_TWITCH")
+}
 
-	return c
+func BroadcastStateToTwitch() bool {
+	return viper.GetBool("BROADCAST_STATE_TO_TWITCH")
+}
+
+func EnableServerAuthentication() bool {
+	return viper.GetBool("ENABLE_SERVER_AUTHENTICATION")
 }
