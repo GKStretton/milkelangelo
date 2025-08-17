@@ -21,7 +21,6 @@ import (
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/socialmedia"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
-	"github.com/gkstretton/dark/services/goo/util"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 	"github.com/joho/godotenv"
 )
@@ -55,8 +54,8 @@ func main() {
 
 	var ebsApi ebsinterface.EbsApi
 
-	if util.EnvBool("ENABLE_EBS") {
-		host := keyvalue.GetString("EBS_HOST")
+	if config.EnableEBS() {
+		host := config.EbsHost()
 		if host == "" {
 			panic("EBS_HOST not set")
 		}

@@ -7,6 +7,7 @@ import (
 var defaults = map[string]any{
 	"LIGHT_STORES_DIR":  "/mnt/md0/light-stores/",
 	"BROKER_HOST":       "milkelangelo",
+	"ENABLE_EBS":        true,
 	"EBS_HOST":          "localhost",
 	"SHARED_SECRET_EBS": "local_secret",
 }
@@ -22,12 +23,16 @@ func setDefaults(defaults map[string]any) {
 	}
 }
 
-func GetLightStores() string {
+func LightStores() string {
 	return viper.GetString("LIGHT_STORES_DIR")
 }
 
 func BrokerHost() string {
 	return viper.GetString("BROKER_HOST")
+}
+
+func EnableEBS() bool {
+	return viper.GetBool("ENABLE_EBS")
 }
 
 func EbsHost() string {

@@ -1,4 +1,4 @@
 #!/bin/bash
 # force unmount of remote disk
 
-fusermount -u /mnt/md0
+fusermount -u /mnt/md0/light-stores

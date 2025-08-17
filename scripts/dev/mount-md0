@@ -1,4 +1,5 @@
 #!/bin/bash
 # This mounts the remote multidisk filesystem, locally.
 
-sshfs -o allow_other milkelangelo@milkelangelo:/home/milkelangelo/milk-stores /mnt/md0
+mkdir -p /mnt/md0/light-stores/
+sshfs -o allow_other milkelangelo@milkelangelo:/home/milkelangelo/milk-stores /mnt/md0/light-stores/

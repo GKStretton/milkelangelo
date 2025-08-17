@@ -6,6 +6,7 @@ import (
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/actor"
+	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
@@ -37,7 +38,7 @@ func printProfiles() {
 }
 
 func testActor() {
-	mqtt.Start(*brokerHost)
+	mqtt.Start(config.BrokerHost())
 	sm := session.NewSessionManager(false)
 	events.Start(sm, nil)
 	twitchApi := twitchapi.Start()
@@ -52,7 +53,7 @@ func testActor() {
 
 // subscribes to ebs and twitch chat votes and prints the received votes
 func testEBS() {
-	mqtt.Start(*brokerHost)
+	mqtt.Start(config.BrokerHost())
 	sm := session.NewSessionManager(false)
 	twitchApi := twitchapi.Start()
 	dur := 1 * time.Minute
