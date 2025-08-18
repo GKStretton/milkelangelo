@@ -47,14 +47,14 @@ export default function ControlPanel() {
 						onKeyDown={collectionHandler(gs.auth, vialPos)}
 						style={
 							enableCollectionButtons &&
-							gs.ebsState?.GooState?.VialProfiles[vialPos]?.Colour
+							gs.ebsState?.GooState?.VialProfiles?.[vialPos]?.Colour
 								? {
 										color: gs.ebsState.GooState.VialProfiles[vialPos].Colour,
 								  }
 								: {}
 						}
 					>
-						{gs.ebsState?.GooState?.VialProfiles[vialPos]?.Name ?? vialPos}
+						{gs.ebsState?.GooState?.VialProfiles?.[vialPos]?.Name ?? vialPos}
 					</div>
 				);
 			})}

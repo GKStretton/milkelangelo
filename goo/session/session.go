@@ -36,6 +36,10 @@ func (s *Session) copy() *Session {
 }
 
 func (s *Session) ToProto() *machinepb.SessionStatus {
+	if s == nil {
+		return nil
+	}
+
 	return &machinepb.SessionStatus{
 		Id:           uint64(s.Id),
 		Paused:       s.Paused,
