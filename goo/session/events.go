@@ -84,6 +84,9 @@ func (sm *SessionManager) publishToBroker(e *SessionEvent) {
 
 func (sm *SessionManager) publishSessionStatus() {
 	session, _ := sm.GetLatestSession()
+	if session == nil {
+		return
+	}
 	s := session.ToProto()
 
 	// protobuf
