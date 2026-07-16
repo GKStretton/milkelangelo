@@ -67,7 +67,7 @@ const MqttProvider: React.FC<MqttProviderProps> = ({ url, children }) => {
 
   const contextValue: MqttContextValue = { client, messages };
 
-  return <MqttContext.Provider value={contextValue}>{client ? children : <div>Loading...</div>}</MqttContext.Provider>;
+  return <MqttContext.Provider value={contextValue}>{client ? children : <div>Connecting to mqtt ws... (is mqtt running?)</div>}</MqttContext.Provider>;
 };
 
 export default MqttProvider;
