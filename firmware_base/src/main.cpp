@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <ContinuousStepper.h>
+#include <Preferences.h>
 #include <WebServer.h>
 #include <WiFi.h>
 
@@ -19,6 +20,8 @@ const float ACCELERATION_STEPS_PER_SEC2 = 800.0;
 // HTTP requests can never stall or jitter the step pulses.
 ContinuousStepper<StepperDriver> stepper;
 WebServer server(80);
+Preferences preferences;
+uint32_t startupCount;
 
 void handleSetSpeed() {
   if (!server.hasArg("value")) {
@@ -35,6 +38,7 @@ void handleStatus() {
   String body;
   body += "speed: " + String(stepper.speed()) + " steps/sec\n";
   body += "estop: " + String(digitalRead(ESTOP_PIN)) + "\n";
+  body += "startups: " + String(startupCount) + "\n";
   server.send(200, "text/plain", body);
 }
 
@@ -47,6 +51,13 @@ void webServerTask(void *) {
 
 void setup() {
   Serial.begin(9600);
+
+  preferences.begin("driver", false);
+  startupCount = preferences.getUInt("startups", 0) + 1;
+  preferences.putUInt("startups", startupCount);
+  preferences.end();
+  Serial.print("startup count: ");
+  Serial.println(startupCount);
 
   pinMode(ESTOP_PIN, INPUT);
   pinMode(SLEEP_PIN, OUTPUT);
