@@ -9,7 +9,7 @@ AccelStepper yawStepper(AccelStepper::DRIVER, YAW_STEPPER_STEP, YAW_STEPPER_DIR)
 AccelStepper pitchStepper(AccelStepper::DRIVER, PITCH_STEPPER_STEP, PITCH_STEPPER_DIR);
 AccelStepper pipetteStepper(AccelStepper::DRIVER, PIPETTE_STEPPER_STEP, PIPETTE_STEPPER_DIR);
 
-const float SPIN_SPEED = 100.0; // steps/sec
+const float SPIN_SPEED = 20.0; // steps/sec
 const unsigned long DIRECTION_FLIP_INTERVAL_MS = 5000;
 
 unsigned long lastDirectionFlip = 0;
@@ -18,7 +18,6 @@ int spinDirection = 1;
 
 void setSpinDirection(int direction) {
   ringStepper.setSpeed(SPIN_SPEED * direction);
-  ringStepper.setAcceleration(100);
   zStepper.setSpeed(SPIN_SPEED * direction);
   yawStepper.setSpeed(SPIN_SPEED * direction);
   pitchStepper.setSpeed(SPIN_SPEED * direction);
@@ -35,6 +34,12 @@ void setup() {
 
   pinMode(STEPPER_SLEEP, OUTPUT);
   digitalWrite(STEPPER_SLEEP, HIGH);
+
+  ringStepper.setMaxSpeed(SPIN_SPEED);
+  zStepper.setMaxSpeed(SPIN_SPEED);
+  yawStepper.setMaxSpeed(SPIN_SPEED);
+  pitchStepper.setMaxSpeed(SPIN_SPEED);
+  pipetteStepper.setMaxSpeed(SPIN_SPEED);
 
   setSpinDirection(spinDirection);
 }
@@ -54,6 +59,7 @@ void loop() {
   pitchStepper.runSpeed();
   pipetteStepper.runSpeed();
 
+  /*
   if (now - lastLimitPrint >= 2000) {
     lastLimitPrint = now;
 
@@ -69,4 +75,5 @@ void loop() {
     Serial.println(ringLimitTriggered ? "Ring limit switch: TRIGGERED" : "Ring limit switch: clear");
     Serial.println(pipetteLimitTriggered ? "Pipette limit switch: TRIGGERED" : "Pipette limit switch: clear");
   }
+  */
 }
