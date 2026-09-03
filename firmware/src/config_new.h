@@ -1,6 +1,6 @@
 #pragma once
 
-#define E_STOP_PIN 27
+#define E_STOP_PIN 14
 
 #define STEPS_PER_STEPPER_REVOLUTION 200
 #define STEPPER_SLEEP 23

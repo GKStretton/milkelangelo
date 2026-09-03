@@ -32,6 +32,7 @@ void setup() {
   pinMode(RING_LIMIT_SWITCH, INPUT);
   pinMode(PIPETTE_LIMIT_SWITCH, INPUT);
 
+  pinMode(E_STOP_PIN, INPUT);
   pinMode(STEPPER_SLEEP, OUTPUT);
   digitalWrite(STEPPER_SLEEP, HIGH);
 
@@ -53,11 +54,13 @@ void loop() {
     setSpinDirection(spinDirection);
   }
 
-  ringStepper.runSpeed();
-  zStepper.runSpeed();
-  yawStepper.runSpeed();
-  pitchStepper.runSpeed();
-  pipetteStepper.runSpeed();
+  if (digitalRead(E_STOP_PIN) == HIGH) {
+    ringStepper.runSpeed();
+    zStepper.runSpeed();
+    yawStepper.runSpeed();
+    pitchStepper.runSpeed();
+    pipetteStepper.runSpeed();
+  }
 
   /*
   if (now - lastLimitPrint >= 2000) {

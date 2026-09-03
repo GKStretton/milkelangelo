@@ -7,7 +7,7 @@
 #define STEP_PIN 2
 #define DIR_PIN 0
 #define SLEEP_PIN 19
-#define ESTOP_PIN 5
+#define E_STOP_PIN 27
 
 const char *AP_SSID = "milkelangelo-driver";
 const char *AP_PASSWORD = "driver123";  // WPA2 requires >= 8 chars
@@ -37,7 +37,7 @@ void handleSetSpeed() {
 void handleStatus() {
   String body;
   body += "speed: " + String(stepper.speed()) + " steps/sec\n";
-  body += "estop: " + String(digitalRead(ESTOP_PIN)) + "\n";
+  body += "estop: " + String(digitalRead(E_STOP_PIN)) + "\n";
   body += "startups: " + String(startupCount) + "\n";
   server.send(200, "text/plain", body);
 }
@@ -59,7 +59,7 @@ void setup() {
   Serial.print("startup count: ");
   Serial.println(startupCount);
 
-  pinMode(ESTOP_PIN, INPUT);
+  pinMode(E_STOP_PIN, INPUT);
   pinMode(SLEEP_PIN, OUTPUT);
   digitalWrite(SLEEP_PIN, HIGH);  // active-low SLEEP: keep the driver awake permanently
 
@@ -79,7 +79,7 @@ void setup() {
 }
 
 void loop() {
-  // if (digitalRead(ESTOP_PIN) == HIGH) {
-  stepper.loop();
-  // }
+  if (digitalRead(E_STOP_PIN) == HIGH) {
+    stepper.loop();
+  }
 }
