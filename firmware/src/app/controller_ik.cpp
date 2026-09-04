@@ -1,5 +1,4 @@
 #include "controller.h"
-#include "../app/navigation.h"
 #include "../middleware/logger.h"
 #include "../calibration.h"
 #include "../common/ik_algorithm.h"

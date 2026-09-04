@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ContinuousStepper.h>
 #include "../app/node.h"
 #include "../drivers/UnitStepper.h"
 
@@ -23,22 +22,6 @@ struct PipetteState {
 	int dispenseRequestNumber;
 };
 
-enum FluidType {
-	FLUID_UNDEFINED = 0,
-	DRAIN = 1,
-	WATER = 2,
-	MILK = 3,
-};
-
-struct FluidRequest {
-	FluidType fluidType;
-	bool open_drain;
-	float volume_ml;
-	unsigned long startTime;
-	bool complete;
-};
-
-
 struct State {
 	// returns true if pitch, yaw and z are calibrated
 	bool IsArmCalibrated();
@@ -57,11 +40,10 @@ struct State {
 	machine_Node localTargetNode;
 	// The final goal node in a potentially multi-hop movement
 	machine_Node globalTargetNode;
-	// If true, respect the fs-i6 controller
+	// If true, respect manual mode (mqtt jog control) instead of the auto controller
 	bool manualRequested;
 	// Timing
 	unsigned long lastControlUpdate;
-	unsigned long lastDataUpdate;
 
 	// Steppers
 	UnitStepper pitchStepper;
@@ -69,7 +51,6 @@ struct State {
 	UnitStepper zStepper;
 	UnitStepper ringStepper;
 	UnitStepper pipetteStepper;
-	ContinuousStepper<StepperDriver> bowlStepper;
 
 	float target_x;
 	float target_y;
@@ -89,17 +70,11 @@ struct State {
 	bool forceIdleLocation;
 	bool requestDispenseZAdjustment;
 
-	FluidRequest fluidRequest;
-
 	float ik_target_z;
 
 	uint8_t startup_counter;
 
 	bool overrideCalibrationBlock;
-
-	machine_RinseStatus rinseStatus;
-
-	bool coverOpened;
 };
 
 State CreateStateObject();

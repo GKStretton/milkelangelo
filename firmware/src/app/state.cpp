@@ -3,7 +3,6 @@
 #include "../app/navigation.h"
 #include "../app/state_report.h"
 #include "../drivers/UnitStepper.h"
-#include "../calibration.h"
 #include "../config.h"
 #include "../extras/topics_firmware/topics_firmware.h"
 
@@ -52,15 +51,9 @@ void State::ClearState() {
 	this->ringStepper.MarkAsNotCalibrated();
 	this->pipetteStepper.MarkAsNotCalibrated();
 
-	this->bowlStepper.stop();
-
 	this->ik_target_z = String(IK_Z_LEVEL_MM).toFloat();
 
-	this->fluidRequest = {FLUID_UNDEFINED, false, 0, 0, true};
 	this->overrideCalibrationBlock = false;
-	this->rinseStatus = machine_RinseStatus_RINSE_COMPLETE;
-
-	this->coverOpened = false;
 
 	StateReport_SetMode(machine_Mode_UNDEFINED_MODE);
 	StateReport_Update(this);
@@ -80,13 +73,11 @@ State CreateStateObject() {
 		globalTargetNode: machine_Node_HOME,
 		manualRequested: false,
 		lastControlUpdate: 0,
-		lastDataUpdate: 0,
 		pitchStepper: UnitStepper(PITCH_STEPPER_STEP, PITCH_STEPPER_DIR, 16, 0.44, -2.5, 90),
 		yawStepper: UnitStepper(YAW_STEPPER_STEP, YAW_STEPPER_DIR, 8, 0.36, YAW_ZERO_OFFSET, 198),
 		zStepper: UnitStepper(Z_STEPPER_STEP, Z_STEPPER_DIR, 4, 0.04078, 1, 73),
 		ringStepper: UnitStepper(RING_STEPPER_STEP, RING_STEPPER_DIR, 32, 0.4, RING_ZERO_OFFSET, 195),
 		pipetteStepper: UnitStepper(PIPETTE_STEPPER_STEP, PIPETTE_STEPPER_DIR, 2, 0.9, 0, 1000),
-		bowlStepper: ContinuousStepper<StepperDriver>(),
 		target_x: 0.0,
 		target_y: 0.0,
 		target_ring: RING_ZERO_OFFSET,
@@ -99,11 +90,8 @@ State CreateStateObject() {
 		postCalibrationHandlerCalled: false,
 		forceIdleLocation: true,
 		requestDispenseZAdjustment: false,
-		fluidRequest: {FluidType::FLUID_UNDEFINED, false, 0, 0, true},
 		ik_target_z: String(IK_Z_LEVEL_MM).toFloat(),
 		startup_counter: 0,
 		overrideCalibrationBlock: false,
-		rinseStatus: machine_RinseStatus_RINSE_COMPLETE,
-		coverOpened: false
 	};
 }

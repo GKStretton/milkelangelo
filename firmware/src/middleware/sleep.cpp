@@ -1,17 +1,16 @@
 #include "sleep.h"
 #include <Arduino.h>
-#include "../common/util.h"
+#include <Preferences.h>
 #include "../config.h"
-#include "../middleware/serialmqtt.h"
 #include "../middleware/logger.h"
-#include "../drivers/ringlight.h"
-#include "../drivers/i2c_eeprom.h"
 #include "../app/state_report.h"
-#include "../config.h"
-#include "../extras/topics_backend/topics_backend.h"
+#include "../extras/topics_firmware/topics_firmware.h"
 
 namespace Sleep {
 	namespace {
+		const char *PREFERENCES_NAMESPACE = "outer";
+		const char *SAFE_SHUTDOWN_KEY = "safeShutdown";
+
 		unsigned long lastNod = millis();
 		unsigned long lastPrint = millis() - SLEEP_PRINT_INTERVAL;
 		bool sleeping = true;
@@ -27,29 +26,15 @@ namespace Sleep {
 		void onSleep(SleepStatus status) {
 			Logger::Info("Going to sleep with status " + String(status));
 
-			// write eeprom flag
-			I2C_EEPROM::WriteByte(SAFE_SHUTDOWN_EEPROM_FLAG_ADDR, (int) status);
+			Preferences preferences;
+			preferences.begin(PREFERENCES_NAMESPACE, false);
+			preferences.putUChar(SAFE_SHUTDOWN_KEY, (uint8_t) status);
+			preferences.end();
 
 			if (externalSleepHandler != NULL) {
 				Logger::Info("Calling externalSleepHandler");
 				externalSleepHandler(status);
 			}
-
-			delay(500);
-
-			Logger::Info("Powering down.");
-			SetDualRelay(V12_RELAY_PIN1, false);
-			SetDualRelay(V12_RELAY_PIN2, false);
-
-			delay(500);
-
-			// turn off power with smart switch
-			SetDualRelay(POWER_STRIP_CONTROL_PIN, false);
-			Logger::Info("Power strip off req sent.");
-
-			delay(500);
-
-			SetDualRelay(V5_RELAY_PIN, false);
 
 			if (eStopActive()) {
 				StateReport_SetStatus(machine_Status_E_STOP_ACTIVE);
@@ -63,24 +48,16 @@ namespace Sleep {
 			StateReport_SetStatus(machine_Status_WAKING_UP);
 			StateReport_ForceSend();
 
-			SetDualRelay(V5_RELAY_PIN, true);
+			Logger::Info("Waking up");
 
-			delay(500);
-
-			Logger::Info("Waking up, powering up");
-			SetDualRelay(POWER_STRIP_CONTROL_PIN, true);
-
-			delay(1500);
-
-			SetDualRelay(V12_RELAY_PIN1, true);
-			SetDualRelay(V12_RELAY_PIN2, true);
-			delay(1000);
-
-			uint8_t data = I2C_EEPROM::ReadByte(SAFE_SHUTDOWN_EEPROM_FLAG_ADDR);
+			Preferences preferences;
+			preferences.begin(PREFERENCES_NAMESPACE, false);
+			uint8_t data = preferences.getUChar(SAFE_SHUTDOWN_KEY, (uint8_t) UNKNOWN);
 			lastSleepStatus = (SleepStatus) data;
-			Logger::Info("read lastSleepStatus as " + String(lastSleepStatus));
 			// write back to unknown in case of sudden shutdown
-			I2C_EEPROM::WriteByte(SAFE_SHUTDOWN_EEPROM_FLAG_ADDR, (int) UNKNOWN);
+			preferences.putUChar(SAFE_SHUTDOWN_KEY, (uint8_t) UNKNOWN);
+			preferences.end();
+			Logger::Info("read lastSleepStatus as " + String(lastSleepStatus));
 
 			if (externalWakeHandler != NULL) {
 				Logger::Info("Calling externalWakeHandler");
@@ -94,15 +71,11 @@ namespace Sleep {
 			if (eStopActive()) {
 				return true;
 			}
-			
-			if (digitalRead(BUTTON_A)) {
-				return false;
-			}
 
 			if (SLEEP_TIME_MINUTES > 0 && (millis() - lastNod) / 1000 / 60 >= SLEEP_TIME_MINUTES) {
 				return true;
 			}
-			
+
 			// persist current state by default
 			return sleeping;
 		}
@@ -119,7 +92,7 @@ namespace Sleep {
 		} else {
 			Wake();
 		}
-		
+
 		if (millis() - lastPrint > SLEEP_PRINT_INTERVAL) {
 			lastPrint = millis();
 			if (eStopActive()) {

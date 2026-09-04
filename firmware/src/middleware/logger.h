@@ -21,6 +21,4 @@ namespace Logger {
 	void Warn(String str);
 	void Info(String str);
 	void Debug(String str);
-
-	void TestLogger();
 };

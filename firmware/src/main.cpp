@@ -1,179 +1,350 @@
-// todo: esp32 outer firmware
 #include <Arduino.h>
-#include <AccelStepper.h>
-#include <PubSubClient.h>
-#include <WiFi.h>
-#include "config_new.h"
+#include <Preferences.h>
+#include "config.h"
+#include "calibration.h"
+#include "common/util.h"
+#include "common/mathutil.h"
+#include "common/ik_algorithm.h"
+#include "middleware/logger.h"
+#include "middleware/sleep.h"
+#include "middleware/mqtt.h"
+#include "app/state.h"
+#include "app/navigation.h"
+#include "app/controller.h"
+#include "app/state_report.h"
+#include "extras/topics_firmware/topics_firmware.h"
 
-const char *WIFI_SSID = "TP-Link_8A2C";
-const char *WIFI_PASSWORD = "85118010";
+// Manual-jog axis speed topics. Not yet part of the shared asol-protos
+// topics_firmware contract (see extras/topics_firmware/topics_firmware.h),
+// so they're kept local here rather than hand-edited into that generated
+// file. Follow the same "mega/req/..." legacy namespace so they're covered
+// by the mega/req/# subscription in middleware/mqtt.cpp.
+const char *TOPIC_MANUAL_RING_SPEED_SET = "mega/req/manual/ring-speed";
+const char *TOPIC_MANUAL_Z_SPEED_SET = "mega/req/manual/z-speed";
+const char *TOPIC_MANUAL_YAW_SPEED_SET = "mega/req/manual/yaw-speed";
+const char *TOPIC_MANUAL_PITCH_SPEED_SET = "mega/req/manual/pitch-speed";
+const char *TOPIC_MANUAL_PIPETTE_SPEED_SET = "mega/req/manual/pipette-speed";
 
-const char *MQTT_BROKER = "192.168.1.102";
-const int MQTT_PORT = 1883;
-const char *MQTT_CLIENT_ID = "milkelangelo-outer";
-const char *TOPIC_STATUS = "milkelangelo/outer/status";              // publish
-const char *TOPIC_SPIN_SPEED_SET = "milkelangelo/outer/spin-speed/set";  // subscribe: steps/sec, unsigned
+State s = CreateStateObject();
 
-const uint32_t STATUS_PUBLISH_INTERVAL_MS = 1000;
+Controller controller;
 
-AccelStepper ringStepper(AccelStepper::DRIVER, RING_STEPPER_STEP, RING_STEPPER_DIR);
-AccelStepper zStepper(AccelStepper::DRIVER, Z_STEPPER_STEP, Z_STEPPER_DIR);
-AccelStepper yawStepper(AccelStepper::DRIVER, YAW_STEPPER_STEP, YAW_STEPPER_DIR);
-AccelStepper pitchStepper(AccelStepper::DRIVER, PITCH_STEPPER_STEP, PITCH_STEPPER_DIR);
-AccelStepper pipetteStepper(AccelStepper::DRIVER, PIPETTE_STEPPER_STEP, PIPETTE_STEPPER_DIR);
+int updatesInLastSecond;
+unsigned long lastUpdatesPerSecondTime = millis();
 
-// Bit-banged from loop() on this core (the default Arduino task, pinned to
-// core 1). The MQTT client runs in its own task pinned to core 0 so handling
-// network traffic can never stall or jitter the step pulses.
-WiFiClient wifiClient;
-PubSubClient mqttClient(wifiClient);
+void initSteppers();
+void runSteppers(State *s);
+void topicHandler(String topic, String payload);
 
-float spinSpeed = 20.0; // steps/sec
-const unsigned long DIRECTION_FLIP_INTERVAL_MS = 5000;
-
-unsigned long lastDirectionFlip = 0;
-unsigned long lastLimitPrint = 0;
-int spinDirection = 1;
-
-void setSpinDirection(int direction) {
-  ringStepper.setSpeed(spinSpeed * direction);
-  zStepper.setSpeed(spinSpeed * direction);
-  yawStepper.setSpeed(spinSpeed * direction);
-  pitchStepper.setSpeed(spinSpeed * direction);
-  pipetteStepper.setSpeed(spinSpeed * direction);
+// incrementStartupCounter reads the startup counter from NVS, increments it,
+// writes and prints it.
+void incrementStartupCounter() {
+	Preferences preferences;
+	preferences.begin("outer", false);
+	uint32_t counter = preferences.getUInt("startups", 0) + 1;
+	preferences.putUInt("startups", counter);
+	preferences.end();
+	Logger::Info("Startup counter incremented to " + String(counter));
+	s.startup_counter = counter;
 }
 
-void setSpinSpeed(float speed) {
-  spinSpeed = speed;
+void sleepHandler(Sleep::SleepStatus sleepStatus) {
+	digitalWrite(STEPPER_SLEEP, LOW);
 
-  ringStepper.setMaxSpeed(spinSpeed);
-  zStepper.setMaxSpeed(spinSpeed);
-  yawStepper.setMaxSpeed(spinSpeed);
-  pitchStepper.setMaxSpeed(spinSpeed);
-  pipetteStepper.setMaxSpeed(spinSpeed);
-
-  setSpinDirection(spinDirection);
-  Serial.println("set spin speed to " + String(spinSpeed) + " steps/sec");
+	if (Sleep::IsEStopActive()) {
+		StateReport_SetStatus(machine_Status_E_STOP_ACTIVE);
+		StateReport_Update(&s);
+	}
 }
 
-void mqttCallback(char *topic, byte *payload, unsigned int length) {
-  if (strcmp(topic, TOPIC_SPIN_SPEED_SET) != 0) {
-    return;
-  }
-  String value((char *)payload, length);
-  setSpinSpeed(value.toFloat());
+void wakeHandler(Sleep::SleepStatus lastSleepStatus) {
+	s.ClearState();
+	incrementStartupCounter();
 }
 
-void publishStatus() {
-  String body;
-  body += "spinSpeed: " + String(spinSpeed) + " steps/sec\n";
-  body += "spinDirection: " + String(spinDirection) + "\n";
-  body += "estop: " + String(digitalRead(E_STOP_PIN)) + "\n";
-  mqttClient.publish(TOPIC_STATUS, body.c_str());
+void setup()
+{
+	Serial.begin(9600);
+
+	pinMode(E_STOP_PIN, INPUT);
+
+	pinMode(PITCH_LIMIT_SWITCH, INPUT);
+	pinMode(YAW_LIMIT_SWITCH, INPUT);
+	pinMode(Z_LIMIT_SWITCH, INPUT);
+	pinMode(RING_LIMIT_SWITCH, INPUT);
+	pinMode(PIPETTE_LIMIT_SWITCH, INPUT);
+
+	// make steppers sleep on start
+	InitPin(STEPPER_SLEEP, LOW);
+
+	initSteppers();
+
+	// register callback, then connect. Logger/StateReport publish through
+	// Mqtt, so nothing below this may call them until Mqtt::Init() has run.
+	Mqtt::SetTopicHandler(topicHandler);
+	Mqtt::Init();
+
+	Logger::SetLevel(Logger::DEBUG);
+	Logger::Info("setup start");
+
+	Sleep::SetOnWakeHandler(wakeHandler);
+	Sleep::SetOnSleepHandler(sleepHandler);
+
+	// disabling so it doesn't always start after flash / reconnect
+	// Sleep::Wake();
+
+	controller.Init(&s);
+
+	Logger::Info("Sending first state report");
+	StateReport_SetStatus(machine_Status_SLEEPING);
+	StateReport_Update(&s);
+	Logger::Info("setup complete");
 }
 
-void mqttReconnect() {
-  while (!mqttClient.connected()) {
-    Serial.print("connecting to MQTT broker...");
-    if (mqttClient.connect(MQTT_CLIENT_ID)) {
-      Serial.println("connected");
-      mqttClient.subscribe(TOPIC_SPIN_SPEED_SET);
-    } else {
-      Serial.println("failed, rc=" + String(mqttClient.state()) + ", retrying in 2s");
-      delay(2000);
-    }
-  }
+void initSteppers() {
+	s.pitchStepper.setMaxSpeed(1250 * SPEED_MULT);
+	s.pitchStepper.setAcceleration(1600 * SPEED_MULT);
+	s.pitchStepper.setPinsInverted(true);
+	s.pitchStepper.SetLimitSwitchPin(PITCH_LIMIT_SWITCH);
+	s.pitchStepper.SetAtTargetUnitThreshold(0);
+
+	s.yawStepper.setMaxSpeed(1250 * SPEED_MULT);
+	s.yawStepper.setAcceleration(1600 * SPEED_MULT);
+	s.yawStepper.setPinsInverted(true);
+	s.yawStepper.SetLimitSwitchPin(YAW_LIMIT_SWITCH);
+	s.yawStepper.SetAtTargetUnitThreshold(0);
+
+	s.zStepper.setMaxSpeed(1250 * SPEED_MULT);
+	s.zStepper.setAcceleration(800 * SPEED_MULT);
+	s.zStepper.SetLimitSwitchPin(Z_LIMIT_SWITCH);
+	s.zStepper.SetAtTargetUnitThreshold(0);
+
+	s.ringStepper.setPinsInverted(true);
+	s.ringStepper.setMaxSpeed(1250 * SPEED_MULT);
+	s.ringStepper.setAcceleration(800 * SPEED_MULT);
+	s.ringStepper.SetLimitSwitchPin(RING_LIMIT_SWITCH);
+
+	s.pipetteStepper.setMaxSpeed(1250 * SPEED_MULT);
+	s.pipetteStepper.setAcceleration(800 * SPEED_MULT);
+	s.pipetteStepper.setPinsInverted(true);
+	s.pipetteStepper.SetLimitSwitchPin(PIPETTE_LIMIT_SWITCH);
 }
 
-void mqttTask(void *) {
-  uint32_t lastStatusPublish = 0;
-  for (;;) {
-    if (!mqttClient.connected()) {
-      mqttReconnect();
-    }
-    mqttClient.loop();
+// unpackCommaSeparatedValues splits payload on ',' into up to n values.
+void unpackCommaSeparatedValues(String payload, String values[], int n) {
+	int value_index = 0;
+	for (unsigned int i = 0; i < payload.length(); i++) {
+		if (value_index >= n) return;
 
-    uint32_t now = millis();
-    if (now - lastStatusPublish >= STATUS_PUBLISH_INTERVAL_MS) {
-      lastStatusPublish = now;
-      publishStatus();
-    }
-    vTaskDelay(1);  // yield so WiFi/idle tasks on this core get scheduled
-  }
+		if (payload[i] == ',') {
+			values[++value_index] = "";
+			continue;
+		}
+		values[value_index] += payload[i];
+	}
 }
 
-void setup() {
-  Serial.begin(9600);
-  pinMode(PITCH_LIMIT_SWITCH, INPUT);
-  pinMode(YAW_LIMIT_SWITCH, INPUT);
-  pinMode(Z_LIMIT_SWITCH, INPUT);
-  pinMode(RING_LIMIT_SWITCH, INPUT);
-  pinMode(PIPETTE_LIMIT_SWITCH, INPUT);
+void topicHandler(String topic, String payload)
+{
+	if (topic == TOPIC_WAKE)
+	{
+		Sleep::Wake();
+		return;
+	}
+	else if (topic == TOPIC_STATE_REPORT_REQUEST)
+	{
+		StateReport_ForceSend();
+	}
+	if (Sleep::IsSleeping())
+	{
+		// if asleep, only listen for wake and state report
+		return;
+	}
 
-  pinMode(E_STOP_PIN, INPUT);
-  pinMode(STEPPER_SLEEP, OUTPUT);
-  digitalWrite(STEPPER_SLEEP, HIGH);
+	if (topic == TOPIC_SLEEP)
+	{
+		Sleep::Sleep(Sleep::UNKNOWN);
+	}
+	else if (topic == TOPIC_SHUTDOWN)
+	{
+		s.shutdownRequested = true;
+	}
+	else if (topic == TOPIC_UNCALIBRATE)
+	{
+		s.pitchStepper.MarkAsNotCalibrated();
+		s.yawStepper.MarkAsNotCalibrated();
+		s.zStepper.MarkAsNotCalibrated();
+		s.ringStepper.MarkAsNotCalibrated();
+		s.pipetteStepper.MarkAsNotCalibrated();
+		s.calibrationCleared = true;
+	}
+	else if (topic == TOPIC_COLLECT) {
+		String values[] = {"", ""};
+		unpackCommaSeparatedValues(payload, values, 2);
+		int vial = values[0].toInt();
+		float ul = values[1].toFloat();
 
-  ringStepper.setMaxSpeed(spinSpeed);
-  zStepper.setMaxSpeed(spinSpeed);
-  yawStepper.setMaxSpeed(spinSpeed);
-  pitchStepper.setMaxSpeed(spinSpeed);
-  pipetteStepper.setMaxSpeed(spinSpeed);
+		if (!s.collectionRequest.requestCompleted) {
+			Logger::Info("cannot collect because collection request " + String(s.collectionRequest.requestNumber) + " is still in progress");
+		} else {
+			s.collectionRequest.requestNumber++;
+			s.collectionRequest.requestCompleted = false;
+			s.collectionRequest.vialNumber = vial;
+			s.collectionRequest.ulVolume = ul;
+			Logger::Info("created collection request " + String(s.collectionRequest.requestNumber) + " for " + String(ul) + "ul of vial " + String(vial));
+		}
+	}
+	else if (topic == TOPIC_DISPENSE) {
+		String values[] = {""};
+		unpackCommaSeparatedValues(payload, values, 1);
+		float ul = values[0].toFloat();
+		if (!s.pipetteState.spent) {
+			s.pipetteState.dispenseRequested = true;
+			s.pipetteState.ulVolumeHeldTarget -= ul;
+			s.pipetteState.dispenseRequestNumber++;
+			if (s.pipetteState.ulVolumeHeldTarget <= 0) {
+				s.pipetteState.ulVolumeHeldTarget = 0;
+			}
+			Logger::Info("dispensed " + String(ul) + ", ulVolumeHeldTarget is now " + String(s.pipetteState.ulVolumeHeldTarget));
+		} else {
+			Logger::Info("Cannot dispense because already spent");
+		}
+	}
+	else if (topic == TOPIC_GOTO_NODE)
+	{
+		long num = payload.toInt();
+		s.forceIdleLocation = num == machine_Node_IDLE_LOCATION;
+		s.SetGlobalNavigationTarget((machine_Node)num);
+		Logger::Debug("Set globalTargetNode to " + String(num));
+	}
+	else if (topic == TOPIC_GOTO_XY) {
+		String values[] = {"", ""};
+		unpackCommaSeparatedValues(payload, values, 2);
+		float target_x = values[0].toFloat();
+		float target_y = values[1].toFloat();
+		Logger::Info("recieved req for target_x, target_y to " + String(target_x) + ", " + String(target_y));
 
-  setSpinDirection(spinDirection);
+		boundXYToCircle(&target_x, &target_y, IK_TARGET_RADIUS_FRAC);
+		Logger::Info("constrained target_x, target_y to " + String(target_x) + ", " + String(target_y));
 
-  WiFi.mode(WIFI_STA);
-  WiFi.setHostname("milkelangelo-outer");
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("connecting to " + String(WIFI_SSID));
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println();
-  Serial.print("connected, IP address: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("MAC address: ");
-  Serial.println(WiFi.macAddress());
+		float ring, yaw;
+		int code = getRingAndYawFromXY(target_x, target_y,
+						s.ringStepper.PositionToUnit(s.ringStepper.currentPosition()),
+						&ring, &yaw,
+						s.ringStepper.GetMinUnit(), s.ringStepper.GetMaxUnit());
 
-  mqttClient.setServer(MQTT_BROKER, MQTT_PORT);
-  mqttClient.setCallback(mqttCallback);
+		if (code != 0) {
+			Logger::Error("error code fromgetRingAndYawFromXY, aborting");
+			return;
+		}
 
-  xTaskCreatePinnedToCore(mqttTask, "mqtt", 4096, nullptr, 1, nullptr, 0);
+		if (ring < s.ringStepper.GetMinUnit() || ring > s.ringStepper.GetMaxUnit()) {
+			Logger::Error("Unexpected ring value " + String(ring) + " detected, aborting ik!");
+			return;
+		}
+		boundToSignedMaximum(&yaw, MAX_BOWL_YAW);
+		Logger::Info("Setting x,y, and target_ring=" + String(ring) + " and target_yaw=" + String(yaw));
+		s.target_x = target_x;
+		s.target_y = target_y;
+		s.target_ring = ring;
+		s.target_yaw = yaw;
+	}
+	else if (topic == TOPIC_TOGGLE_MANUAL)
+	{
+		s.manualRequested = !s.manualRequested;
+		Logger::Info("Toggled manualRequested mode to " + String(s.manualRequested));
+	}
+	else if (topic == TOPIC_SET_IK_Z) {
+		float z = payload.toFloat();
+		if (z < MIN_BOWL_Z || z > s.zStepper.GetMaxUnit()) {
+			Logger::Error("z level " + payload + " out of range.");
+			return;
+		}
+		s.ik_target_z = z;
+	}
+	else if (topic == TOPIC_MARK_SAFE_TO_CALIBRATE) {
+		s.overrideCalibrationBlock = true;
+		Logger::Info("Set overrideCalibrationBlock true per mqtt request");
+	}
+	else if (topic == TOPIC_MAINTENANCE) {
+		s.target_ring = MAINTENANCE_RING_ANGLE;
+		s.forceIdleLocation = false;
+		Navigation::SetGlobalNavigationTarget(&s, machine_Node_OUTER_HANDOVER);
+	}
+	else if (topic == TOPIC_GOTO_RING_IDLE_POS) {
+		s.target_ring = IDLE_RING_ANGLE;
+	}
+	else if (topic == TOPIC_MANUAL_RING_SPEED_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual ring speed, not in manual mode");
+			return;
+		}
+		s.ringStepper.setSpeed(payload.toFloat());
+	}
+	else if (topic == TOPIC_MANUAL_Z_SPEED_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual z speed, not in manual mode");
+			return;
+		}
+		s.zStepper.setSpeed(payload.toFloat());
+	}
+	else if (topic == TOPIC_MANUAL_YAW_SPEED_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual yaw speed, not in manual mode");
+			return;
+		}
+		s.yawStepper.setSpeed(payload.toFloat());
+	}
+	else if (topic == TOPIC_MANUAL_PITCH_SPEED_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual pitch speed, not in manual mode");
+			return;
+		}
+		s.pitchStepper.setSpeed(payload.toFloat());
+	}
+	else if (topic == TOPIC_MANUAL_PIPETTE_SPEED_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual pipette speed, not in manual mode");
+			return;
+		}
+		s.pipetteStepper.setSpeed(payload.toFloat());
+	}
+	else
+	{
+		Logger::Debug("no handler for " + topic + " (payload = " + payload + ")");
+	}
 }
 
-void loop() {
-  unsigned long now = millis();
+void runSteppers(State *s)
+{
+	s->ringStepper.Update();
+	s->pitchStepper.Update();
+	s->yawStepper.Update();
+	s->zStepper.Update();
+	s->pipetteStepper.Update();
+}
 
-  if (now - lastDirectionFlip >= DIRECTION_FLIP_INTERVAL_MS) {
-    lastDirectionFlip = now;
-    spinDirection = -spinDirection;
-    setSpinDirection(spinDirection);
-  }
+void loop()
+{
+	Mqtt::Update();
 
-  if (digitalRead(E_STOP_PIN) == HIGH) {
-    ringStepper.runSpeed();
-    zStepper.runSpeed();
-    yawStepper.runSpeed();
-    pitchStepper.runSpeed();
-    pipetteStepper.runSpeed();
-  }
+	Sleep::Update();
+	if (Sleep::IsSleeping())
+	{
+		StateReport_Update(&s);
+		delay(200);
+		return;
+	}
 
-  /*
-  if (now - lastLimitPrint >= 2000) {
-    lastLimitPrint = now;
+	controller.Update(&s);
 
-    bool pitchLimitTriggered = digitalRead(PITCH_LIMIT_SWITCH);
-    bool yawLimitTriggered = digitalRead(YAW_LIMIT_SWITCH);
-    bool zLimitTriggered = digitalRead(Z_LIMIT_SWITCH);
-    bool ringLimitTriggered = digitalRead(RING_LIMIT_SWITCH);
-    bool pipetteLimitTriggered = digitalRead(PIPETTE_LIMIT_SWITCH);
+	runSteppers(&s);
 
-    Serial.println(pitchLimitTriggered ? "Pitch limit switch: TRIGGERED" : "Pitch limit switch: clear");
-    Serial.println(yawLimitTriggered ? "Yaw limit switch: TRIGGERED" : "Yaw limit switch: clear");
-    Serial.println(zLimitTriggered ? "Z limit switch: TRIGGERED" : "Z limit switch: clear");
-    Serial.println(ringLimitTriggered ? "Ring limit switch: TRIGGERED" : "Ring limit switch: clear");
-    Serial.println(pipetteLimitTriggered ? "Pipette limit switch: TRIGGERED" : "Pipette limit switch: clear");
-  }
-  */
+	updatesInLastSecond++;
+	if (millis() - lastUpdatesPerSecondTime > 1000)
+	{
+		s.updatesPerSecond = updatesInLastSecond;
+		updatesInLastSecond = 0;
+		lastUpdatesPerSecondTime = millis();
+	}
 }

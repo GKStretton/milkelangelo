@@ -3,13 +3,10 @@
 #include "../config.h"
 #include "../middleware/logger.h"
 #include "../middleware/sleep.h"
-#include "../drivers/i2c_eeprom.h"
-#include "../drivers/cover_servo.h"
-#include "../common/util.h"
 #include "state_report.h"
 
 // this structure is like a pseudo behavior tree. Every update, the program
-// steps through here to decide what to do next. sub-functions return 
+// steps through here to decide what to do next. sub-functions return
 // RUNNING / SUCCESS / FAILURE to indicate what happened. Higher priority
 // tasks are at the start of the function, often returning early if they
 // are running.
@@ -32,7 +29,6 @@ void Controller::autoUpdate(State *s) {
 			s->shutdownRequested = false;
 			return;
 		} else {
-			CoverServo_Close();
 			// success, safe shutdown
 			Sleep::Sleep(Sleep::SAFE);
 			s->shutdownRequested = false;
@@ -49,7 +45,7 @@ void Controller::autoUpdate(State *s) {
 			StateReport_SetMode(machine_Mode_AUTONOMOUS);
 			return;
 		} else if (status == FAILURE) {
-			manualUpdate(s, true);
+			manualUpdate(s);
 			return;
 		}
 		// if success, just continue (success never called though)
@@ -65,40 +61,9 @@ void Controller::autoUpdate(State *s) {
 		s->pipetteStepper.setSpeed(0);
 		s->postCalibrationHandlerCalled = true;
 		Logger::Debug("Set all motors to speed 0 after calibration");
-	// }
-
-	// if (!s->coverOpened) {
-		// blocking call to open servo
-		CoverServo_Open();
-
-		if (ENSURE_COVER_OPEN) {
-			if (!CoverServo_IsOpen()) {
-				// retry
-				CoverServo_Open();
-
-				if (!CoverServo_IsOpen()) {
-					// Logger::Crit("failed 2 attempts to open cover, shutting down.");
-					// s->shutdownRequested = true;
-
-					Logger::Warn("failed 2 attempts to read open cover, proceeding anyway. (pls no breakage)");
-				}
-			}
-		}
-
-		// s->coverOpened = true;
 	}
 
 	s->ringStepper.moveTo(s->ringStepper.UnitToPosition(s->target_ring));
-
-	if (s->rinseStatus != machine_RinseStatus_RINSE_COMPLETE) {
-		Logger::Debug("Rinse in progress...");
-		StateReport_SetStatus(machine_Status_RINSING_PIPETTE);
-
-		Status status = evaluateRinse(s);
-		if (status != SUCCESS) {
-			return;
-		}
-	}
 
 	// No dye
 	if (DO_DYE_COLLECTION && (s->pipetteState.spent || s->collectionInProgress)) {

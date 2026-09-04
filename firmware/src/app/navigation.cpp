@@ -1,9 +1,7 @@
 #include "navigation.h"
 #include "../app/state.h"
 #include "../middleware/logger.h"
-#include "../middleware/sleep.h"
 #include "../calibration.h"
-#include "../extras/topics_firmware/topics_firmware.h"
 
 // atTarget checks if z, pitch, and yaw steppers are approximately at their local (next) target node
 bool atLocalTargetNode(State *s) {

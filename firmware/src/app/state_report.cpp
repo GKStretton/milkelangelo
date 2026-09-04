@@ -1,9 +1,6 @@
 #include "state_report.h"
 #include <Arduino.h>
-#include "../extras/nanopb/pb_encode.h"
-#include "../middleware/serialmqtt.h"
-#include "../middleware/logger.h"
-#include "../middleware/fluid_levels.h"
+#include "../middleware/mqtt.h"
 #include "../extras/topics_firmware/topics_firmware.h"
 
 static machine_StateReport stateReport = machine_StateReport_init_default;
@@ -84,42 +81,6 @@ static void updateStateReport(State *s) {
 		stateReport.movement_details.target_yaw_deg = s->target_yaw;
 		hasChanged = true;
 	}
-
-	/*
-		fluid_request
-	*/
-	stateReport.has_fluid_request = true;
-	if (stateReport.fluid_request.fluidType != s->fluidRequest.fluidType) {
-		stateReport.fluid_request.fluidType = (_machine_FluidType) s->fluidRequest.fluidType;
-		hasChanged = true;
-	}
-	if (stateReport.fluid_request.open_drain != s->fluidRequest.open_drain) {
-		stateReport.fluid_request.open_drain = s->fluidRequest.open_drain;
-		hasChanged = true;
-	}
-	if (stateReport.fluid_request.volume_ml != s->fluidRequest.volume_ml) {
-		stateReport.fluid_request.volume_ml = s->fluidRequest.volume_ml;
-		hasChanged = true;
-	}
-	if (stateReport.fluid_request.complete != s->fluidRequest.complete) {
-		stateReport.fluid_request.complete = s->fluidRequest.complete;
-		hasChanged = true;
-	}
-
-	/*
-		fluid_details
-	*/
-	stateReport.has_fluid_details = true;
-	float bowlLevel = FluidLevels_ReadBowlLevel();
-	if (stateReport.fluid_details.bowl_fluid_level_ml != bowlLevel) {
-		stateReport.fluid_details.bowl_fluid_level_ml = bowlLevel;
-		hasChanged = true;
-	}
-
-	if (stateReport.rinse_status != s->rinseStatus) {
-		stateReport.rinse_status = s->rinseStatus;
-		hasChanged = true;
-	}
 }
 
 void StateReport_Update(State *s) {
@@ -130,7 +91,7 @@ void StateReport_Update(State *s) {
 }
 
 void StateReport_ForceSend() {
-	SerialMQTT::PublishProto(TOPIC_STATE_REPORT_RAW, machine_StateReport_fields, &stateReport);
+	Mqtt::PublishProto(TOPIC_STATE_REPORT_RAW, machine_StateReport_fields, &stateReport);
 	hasChanged = false;
 }
 
