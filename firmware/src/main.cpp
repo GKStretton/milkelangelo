@@ -104,18 +104,19 @@ void setup()
 void initSteppers() {
 	s.pitchStepper.setMaxSpeed(1250 * SPEED_MULT);
 	s.pitchStepper.setAcceleration(1600 * SPEED_MULT);
-	s.pitchStepper.setPinsInverted(true);
+	s.pitchStepper.setPinsInverted(false);
 	s.pitchStepper.SetLimitSwitchPin(PITCH_LIMIT_SWITCH);
 	s.pitchStepper.SetAtTargetUnitThreshold(0);
 
 	s.yawStepper.setMaxSpeed(1250 * SPEED_MULT);
 	s.yawStepper.setAcceleration(1600 * SPEED_MULT);
-	s.yawStepper.setPinsInverted(true);
+	s.yawStepper.setPinsInverted(false);
 	s.yawStepper.SetLimitSwitchPin(YAW_LIMIT_SWITCH);
 	s.yawStepper.SetAtTargetUnitThreshold(0);
 
 	s.zStepper.setMaxSpeed(1250 * SPEED_MULT);
 	s.zStepper.setAcceleration(800 * SPEED_MULT);
+	s.zStepper.setPinsInverted(true);
 	s.zStepper.SetLimitSwitchPin(Z_LIMIT_SWITCH);
 	s.zStepper.SetAtTargetUnitThreshold(0);
 
@@ -126,7 +127,7 @@ void initSteppers() {
 
 	s.pipetteStepper.setMaxSpeed(1250 * SPEED_MULT);
 	s.pipetteStepper.setAcceleration(800 * SPEED_MULT);
-	s.pipetteStepper.setPinsInverted(true);
+	s.pipetteStepper.setPinsInverted(false);
 	s.pipetteStepper.SetLimitSwitchPin(PIPETTE_LIMIT_SWITCH);
 }
 
