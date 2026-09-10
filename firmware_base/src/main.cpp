@@ -15,8 +15,8 @@ const char *WIFI_PASSWORD = "85118010";
 const char *MQTT_BROKER = "192.168.1.102";
 const int MQTT_PORT = 1883;
 const char *MQTT_CLIENT_ID = "milkelangelo-base";
-const char *TOPIC_SPEED_SET = "milkelangelo/base/speed/set";  // subscribe: steps/sec, signed
-const char *TOPIC_STATUS = "milkelangelo/base/status";        // publish
+const char *TOPIC_SET_BOWL_STEPS_PER_SEC = "mega/req/set-bowl-steps-per-sec";  // subscribe: "speed,accel" steps/sec, signed
+const char *TOPIC_STATUS = "milkelangelo/base/status";                        // publish
 
 const float ACCELERATION_STEPS_PER_SEC2 = 800.0;
 const uint32_t STATUS_PUBLISH_INTERVAL_MS = 1000;
@@ -31,17 +31,42 @@ Preferences preferences;
 uint32_t startupCount;
 
 void setSpeed(float speed) {
-  digitalWrite(SLEEP_PIN, speed == 0 ? LOW : HIGH);  // active-low SLEEP: sleep when stopped
-  stepper.spin(speed);
+  bool stopped = speed > -1 && speed < 1;
+  digitalWrite(SLEEP_PIN, stopped ? LOW : HIGH);  // active-low SLEEP: sleep when stopped
+  if (stopped) {
+    stepper.stop();
+  } else {
+    stepper.spin(speed);
+  }
   Serial.println("set speed to " + String(speed) + " steps/sec");
 }
 
+// unpackCommaSeparatedValues splits payload on ',' into up to n values.
+void unpackCommaSeparatedValues(String payload, String values[], int n) {
+  int valueIndex = 0;
+  for (unsigned int i = 0; i < payload.length(); i++) {
+    if (valueIndex >= n) return;
+
+    if (payload[i] == ',') {
+      values[++valueIndex] = "";
+      continue;
+    }
+    values[valueIndex] += payload[i];
+  }
+}
+
 void mqttCallback(char *topic, byte *payload, unsigned int length) {
-  if (strcmp(topic, TOPIC_SPEED_SET) != 0) {
+  if (strcmp(topic, TOPIC_SET_BOWL_STEPS_PER_SEC) != 0) {
     return;
   }
-  String value((char *)payload, length);
-  setSpeed(value.toFloat());
+  String values[] = {"", ""};
+  unpackCommaSeparatedValues(String((char *)payload, length), values, 2);
+  float speed = values[0].toFloat();
+  float accel = values[1].toFloat();
+  Serial.println("received req for bowl speed, accel of " + String(speed) + ", " + String(accel));
+
+  stepper.setAcceleration(accel);
+  setSpeed(speed);
 }
 
 void publishStatus() {
@@ -57,7 +82,7 @@ void mqttReconnect() {
     Serial.print("connecting to MQTT broker...");
     if (mqttClient.connect(MQTT_CLIENT_ID)) {
       Serial.println("connected");
-      mqttClient.subscribe(TOPIC_SPEED_SET);
+      mqttClient.subscribe(TOPIC_SET_BOWL_STEPS_PER_SEC);
     } else {
       Serial.println("failed, rc=" + String(mqttClient.state()) + ", retrying in 2s");
       delay(2000);
