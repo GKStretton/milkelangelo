@@ -67,6 +67,7 @@ import {
 	useSessionStatus,
 	useStateReport,
 	useStreamStatus,
+	useSystemVialProfiles,
 } from "../util/hooks";
 import MqttContext from "../util/mqttContext";
 import CollectDispense from "./CollectDispense";
@@ -84,6 +85,7 @@ export default function ControlGroup() {
 	const stateReport: StateReport | null = useStateReport();
 	const sessionStatus: SessionStatus | null = useSessionStatus();
 	const streamStatus: StreamStatus | null = useStreamStatus();
+	const [systemVialProfiles] = useSystemVialProfiles();
 
 	const [testMins, setTestMins] = useState(5.0);
 	const [dispenseVolume, setDispenseVolume] = useState(10.0);
@@ -120,8 +122,9 @@ export default function ControlGroup() {
 		stateReport?.status !== Status.SLEEPING &&
 		stateReport?.status !== Status.E_STOP_ACTIVE;
 
-	const noVials = 6;
-	const vials = new Array(noVials).fill(0).map((_, i) => noVials - i);
+	const vials = (systemVialProfiles ? Object.keys(systemVialProfiles.vials).map(Number) : []).sort(
+		(a, b) => b - a,
+	);
 
 	const collecting: boolean =
 		!!stateReport && stateReport?.collectionRequest?.completed === false;

@@ -95,7 +95,7 @@ export function useVialProfiles(): [VialProfileCollection | null, (collection: V
       console.error("cannot publish vial profile collection because mqtt client is null");
       return;
     }
-    const json = JSON.stringify(collection, null, 2);
+    const json = JSON.stringify(VialProfileCollection.toJSON(collection), null, 2);
     c.publish(TOPIC_KV_SET + KV_KEY_ALL_VIAL_PROFILES, json);
   };
 
@@ -130,7 +130,7 @@ export function useSystemVialProfiles(): [
       console.error("cannot publish system vial profile collection because mqtt client is null");
       return;
     }
-    const json = JSON.stringify(collection, null, 2);
+    const json = JSON.stringify(SystemVialConfiguration.toJSON(collection), null, 2);
     c.publish(TOPIC_KV_SET + KV_KEY_SYSTEM_VIAL_PROFILES, json);
   };
 

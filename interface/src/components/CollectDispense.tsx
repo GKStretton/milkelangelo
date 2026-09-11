@@ -16,14 +16,16 @@ import { useError } from "./ErrorManager";
 import { prettyFormat } from "@testing-library/react";
 
 export default function CollectDispense() {
-  const noVials = 6;
-  const vials = new Array(noVials - 1).fill(0).map((_, i) => noVials - i);
-
   const error = useError();
   const { client: c, messages } = useContext(MqttContext);
   const stateReport: StateReport | null = useStateReport();
   const [vialProfiles, setVialProfiles] = useVialProfiles();
   const [systemVialProfiles, setSystemVialProfiles] = useSystemVialProfiles();
+
+  const vialNumbers = systemVialProfiles ? Object.keys(systemVialProfiles.vials).map(Number) : [];
+  const noVials = vialNumbers.length ? Math.max(...vialNumbers) : 0;
+  // Vial 1 is excluded from collection (see vialDisabled).
+  const vials = vialNumbers.filter((v) => v > 1).sort((a, b) => b - a);
 
   const [dropNumber, setDropNumber] = useState(3);
 
