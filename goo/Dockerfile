@@ -12,7 +12,7 @@ ENV GOOS=linux
 RUN go build -a -ldflags '-extldflags "-static"'
 
 # Runtime stage
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     gphoto2

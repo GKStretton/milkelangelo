@@ -1,4 +1,4 @@
-FROM golang:1.21.5
+FROM golang:1.21.5-bookworm
 
 RUN apt update
 RUN apt install -y python3 python3-setuptools python3-pip python3-venv
