@@ -5,6 +5,8 @@ export class WebRTCReceiver {
   private pc: RTCPeerConnection | null;
   private restartTimeout: number | null;
   private restartPause: number = 2000;
+  private disconnectedTimeout: number | null;
+  private disconnectedGracePeriod: number = 5000;
   private name: string;
 
   constructor(url: string, name: string) {
@@ -13,6 +15,7 @@ export class WebRTCReceiver {
     this.ws = null;
     this.pc = null;
     this.restartTimeout = null;
+    this.disconnectedTimeout = null;
     this.start(`${url}ws`);
   }
 
@@ -64,7 +67,23 @@ export class WebRTCReceiver {
 
       switch (this.pc.iceConnectionState) {
         case 'disconnected':
+          // 'disconnected' is often transient (a missed keepalive) and can
+          // recover on its own, so give it a grace period before tearing
+          // down and renegotiating the whole connection.
+          if (this.disconnectedTimeout === null) {
+            this.disconnectedTimeout = window.setTimeout(() => {
+              this.disconnectedTimeout = null;
+              this.scheduleRestart(url);
+            }, this.disconnectedGracePeriod);
+          }
+          break;
+        case 'failed':
+        case 'closed':
+          this.clearDisconnectedTimeout();
           this.scheduleRestart(url);
+          break;
+        default:
+          this.clearDisconnectedTimeout();
       }
     };
 
@@ -126,10 +145,19 @@ export class WebRTCReceiver {
     this.pc.addIceCandidate(JSON.parse(msg.data));
   }
 
+  clearDisconnectedTimeout() {
+    if (this.disconnectedTimeout !== null) {
+      window.clearTimeout(this.disconnectedTimeout);
+      this.disconnectedTimeout = null;
+    }
+  }
+
   scheduleRestart(url: string) {
     if (this.terminated) {
       return;
     }
+
+    this.clearDisconnectedTimeout();
 
     if (this.ws !== null) {
       this.ws.close();
