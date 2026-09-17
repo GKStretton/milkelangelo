@@ -8,10 +8,12 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/gkstretton/dark/services/goo/config"
 )
 
 var (
-	basePath                    = flag.String("basePath", "/mnt/md0/light-stores/", "base path for storage data")
+	basePath                    = flag.String("basePath", config.LightStores(), "base path for storage data")
 	contentPath                 = flag.String("sessionPath", "session_content", "path for session content")
 	metadataPath                = flag.String("metadataPath", "session_metadata", "path for session metadata")
 	rawVideoPath                = flag.String("rawVideoPath", "video/raw", "path within session, of raw video")
