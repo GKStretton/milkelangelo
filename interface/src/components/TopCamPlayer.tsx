@@ -31,15 +31,37 @@ const TopCamPlayer = ({ url }: TopCamProps) => {
     <div
       style={{
         position: 'absolute',
-        border: '5px solid red',
-        borderRadius: '50%',
-        width: '20px',
-        height: '20px',
+        width: '24px',
+        height: '24px',
         left: `${(circlePos.x + 1) * 0.5 * videoDimensions.width}px`,
         top: `${(-circlePos.y + 1) * 0.5 * videoDimensions.height}px`,
         transform: 'translate(-50%, -50%)',
+        pointerEvents: 'none',
       }}
-    ></div>
+    >
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: 0,
+          width: '100%',
+          height: '2px',
+          background: 'red',
+          transform: 'translateY(-50%)',
+        }}
+      ></div>
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: 0,
+          height: '100%',
+          width: '2px',
+          background: 'red',
+          transform: 'translateX(-50%)',
+        }}
+      ></div>
+    </div>
     <img
       src="/mask_alpha.png"
       alt="alpha mask"
@@ -63,6 +85,7 @@ const TopCamPlayer = ({ url }: TopCamProps) => {
           name="top"
           handleClick={handleClick}
           renderOverlay={renderOverlay}
+          aspectRatio="1 / 1"
         />
       </div>
     </>

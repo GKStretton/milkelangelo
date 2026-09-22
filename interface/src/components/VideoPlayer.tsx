@@ -8,9 +8,10 @@ interface VideoPlayerProps {
   handleClick?: (e: React.MouseEvent<HTMLVideoElement>) => void;
   renderOverlay?: (videoDimensions: { width: number; height: number }) => React.ReactNode;
   onVideoLoad?: (videoElement: HTMLVideoElement) => void;
+  aspectRatio?: string;
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, renderOverlay, onVideoLoad }: VideoPlayerProps) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, renderOverlay, onVideoLoad, aspectRatio }: VideoPlayerProps) => {
   const [displayDimensions, setDisplayDimensions] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -72,6 +73,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ url, name, handleClick, rende
           style={{
             width: '100%',
             height: '100%',
+            aspectRatio: aspectRatio,
             border: '1px solid black',
           }}
         ></video>
