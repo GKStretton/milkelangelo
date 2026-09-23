@@ -2,6 +2,7 @@
 #include "../app/navigation.h"
 #include "../calibration.h"
 #include "../config.h"
+#include "../common/mathutil.h"
 #include "../middleware/logger.h"
 
 Status Controller::evaluateShutdown(State *s) {
@@ -9,14 +10,15 @@ Status Controller::evaluateShutdown(State *s) {
 	bool somethingRunning = false;
 	bool failureMarked = false;
 
-	// Ring shutdown behaviour, go to min
+	// Ring shutdown behaviour, go to nearest equivalent of zero offset
 	if (s->ringStepper.IsCalibrated()) {
-		s->ringStepper.moveTo(s->ringStepper.UnitToPosition(
-			s->ringStepper.GetMinUnit()
-		));
+		s->ringStepper.moveTo(s->ringStepper.UnitToPosition(nearestEquivalentAngle(
+			RING_ZERO_OFFSET,
+			s->ringStepper.PositionToUnit(s->ringStepper.currentPosition())
+		)));
 		if (!s->ringStepper.AtTarget()) {
 			somethingRunning = true;
-			// go to ring 0 before arm action, to prevent cable hitting limit switch
+			// go to ring 0 before arm action
 			return RUNNING;
 		}
 	}

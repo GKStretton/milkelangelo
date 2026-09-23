@@ -15,7 +15,9 @@ UnitStepper::UnitStepper(
 	microStepFactor_(microStepFactor),
 	unitsPerFullStep_(unitsPerFullStep),
 	minUnit_(minUnit),
-	maxUnit_(maxUnit)
+	maxUnit_(maxUnit),
+	continuous_(false),
+	homed_(false)
 {
 }
 
@@ -35,6 +37,10 @@ void UnitStepper::updateLimitSwitch() {
 		// No switch
 		return;
 	}
+	if (continuous_ && homed_) {
+		// switch is passed every revolution, ignore it once homed
+		return;
+	}
 	if (digitalRead(limitSwitchPin_)) {
 		float oldSpeed = speed();
 		setCurrentPosition(UnitToPosition(GetMinUnit()-CALIBRATION_GAP_SIZE));
@@ -43,12 +49,14 @@ void UnitStepper::updateLimitSwitch() {
 			setSpeed(oldSpeed);
 		}
 		MarkAsCalibrated();
+	} else if (continuous_ && limitSwitchContacted_) {
+		homed_ = true;
 	}
 }
 
 void UnitStepper::enforceStepperLimits() {
-	if (!IsCalibrated()) {
-		// Limits are meaningless without known position
+	if (!IsCalibrated() || continuous_) {
+		// Limits are meaningless without known position, or on continuous axes
 		return;
 	}
 
@@ -72,6 +80,10 @@ void UnitStepper::enforceStepperLimits() {
 
 void UnitStepper::SetLimitSwitchPin(uint8_t pin) {
 	limitSwitchPin_ = pin;
+}
+
+void UnitStepper::SetContinuous(bool continuous) {
+	continuous_ = continuous;
 }
 
 void UnitStepper::moveTo(long p) {
@@ -112,6 +124,7 @@ float UnitStepper::UnitToPosition(float unit) {
 
 void UnitStepper::MarkAsNotCalibrated() {
 	limitSwitchContacted_ = false;
+	homed_ = false;
 }
 
 void UnitStepper::MarkAsCalibrated() {
@@ -119,6 +132,7 @@ void UnitStepper::MarkAsCalibrated() {
 }
 
 bool UnitStepper::IsCalibrated() {
+	if (continuous_) return homed_;
 	return limitSwitchContacted_ && !digitalRead(limitSwitchPin_);
 }
 
@@ -134,7 +148,7 @@ bool UnitStepper::AtTarget() {
 }
 
 bool UnitStepper::unitInRange(float a) {
-	return a >= GetMinUnit() && a <= GetMaxUnit();
+	return continuous_ || (a >= GetMinUnit() && a <= GetMaxUnit());
 }
 
 void UnitStepper::SetAtTargetUnitThreshold(float t) {

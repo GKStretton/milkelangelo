@@ -3,7 +3,7 @@
 #include "../common/mathutil.h"
 #include "../calibration.h"
 
-int getRingAndYawFromXY(float x, float y, float lastRing, float *ring, float *yaw, float minRingUnit, float maxRingUnit)
+int getRingAndYawFromXY(float x, float y, float lastRing, float *ring, float *yaw)
 {
 	boundXYToCircle(&x, &y, IK_TARGET_RADIUS_FRAC);
 	// No solutions at centre so just do ring = last, yawOffset = 0
@@ -42,41 +42,12 @@ int getRingAndYawFromXY(float x, float y, float lastRing, float *ring, float *ya
 
 	Logger::Debug("angle=" + String(angle) + " angle_prime=" + String(angle_prime));
 
-	// Now we work out which solution to use
-	bool use_i_prime = false;
-	// if they're both valid, choose the one that requires least movement
-	if (numInRange(angle, minRingUnit, maxRingUnit) && numInRange(angle_prime, minRingUnit, maxRingUnit))
-	{
-		// move to whichever is closest to previous position
-		if (abs(angle - lastRing) < abs(angle_prime - lastRing))
-		{
-			*ring = angle;
-		}
-		else
-		{
-			use_i_prime = true;
-			*ring = angle_prime;
-		}
-	}
-	// otherwise, select the only valid one
-	else if (numInRange(angle, minRingUnit, maxRingUnit))
-	{
-		*ring = angle;
-	}
-	// otherwise, select the only valid one
-	else if (numInRange(angle_prime, minRingUnit, maxRingUnit))
-	{
-		use_i_prime = true;
-		*ring = angle_prime;
-	}
-	else
-	{
-		// *ring = (float)5.0;
-		Logger::Warn("Both intersection angles (" +
-					 String(angle) + ", " + String(angle_prime) +
-					 ") are out of ring angle bounds. Aborting");
-		return 1;
-	};
+	// The ring is continuous, so both solutions are valid. Choose the one that
+	// requires least movement, taking the shortest way round.
+	angle = nearestEquivalentAngle(angle, lastRing);
+	angle_prime = nearestEquivalentAngle(angle_prime, lastRing);
+	bool use_i_prime = abs(angle_prime - lastRing) < abs(angle - lastRing);
+	*ring = use_i_prime ? angle_prime : angle;
 
 	Logger::Debug(use_i_prime ? "Chose angle_prime" : "Chose angle");
 

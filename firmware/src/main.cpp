@@ -113,6 +113,7 @@ void initSteppers() {
 	s.ringStepper.setMaxSpeed(1250 * SPEED_MULT);
 	s.ringStepper.setAcceleration(800 * SPEED_MULT);
 	s.ringStepper.SetLimitSwitchPin(RING_LIMIT_SWITCH);
+	s.ringStepper.SetContinuous(true);
 
 	s.pipetteStepper.setMaxSpeed(1250 * SPEED_MULT);
 	s.pipetteStepper.setAcceleration(800 * SPEED_MULT);
@@ -220,18 +221,13 @@ void topicHandler(String topic, String payload)
 		float ring, yaw;
 		int code = getRingAndYawFromXY(target_x, target_y,
 						s.ringStepper.PositionToUnit(s.ringStepper.currentPosition()),
-						&ring, &yaw,
-						s.ringStepper.GetMinUnit(), s.ringStepper.GetMaxUnit());
+						&ring, &yaw);
 
 		if (code != 0) {
 			Logger::Error("error code fromgetRingAndYawFromXY, aborting");
 			return;
 		}
 
-		if (ring < s.ringStepper.GetMinUnit() || ring > s.ringStepper.GetMaxUnit()) {
-			Logger::Error("Unexpected ring value " + String(ring) + " detected, aborting ik!");
-			return;
-		}
 		boundToSignedMaximum(&yaw, MAX_BOWL_YAW);
 		Logger::Info("Setting x,y, and target_ring=" + String(ring) + " and target_yaw=" + String(yaw));
 		s.target_x = target_x;
@@ -257,12 +253,12 @@ void topicHandler(String topic, String payload)
 		Logger::Info("Set overrideCalibrationBlock true per mqtt request");
 	}
 	else if (topic == TOPIC_MAINTENANCE) {
-		s.target_ring = MAINTENANCE_RING_ANGLE;
+		s.target_ring = nearestEquivalentAngle(MAINTENANCE_RING_ANGLE, s.target_ring);
 		s.forceIdleLocation = false;
 		Navigation::SetGlobalNavigationTarget(&s, machine_Node_OUTER_HANDOVER);
 	}
 	else if (topic == TOPIC_GOTO_RING_IDLE_POS) {
-		s.target_ring = IDLE_RING_ANGLE;
+		s.target_ring = nearestEquivalentAngle(IDLE_RING_ANGLE, s.target_ring);
 	}
 	else if (topic == TOPIC_MANUAL_RING_SPEED_SET) {
 		if (!s.manualRequested) {

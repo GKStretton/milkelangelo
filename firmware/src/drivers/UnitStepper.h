@@ -42,6 +42,10 @@ public:
 	// Returns true if limit switch has been pressed and released for this motor
 	bool IsCalibrated();
 	void SetLimitSwitchPin(uint8_t pin);
+	// Continuous axes (e.g. slip ring) have no min/max limits. The limit switch
+	// is only used to home once, since it is passed on every revolution. The
+	// min unit is still the unit assigned at the switch.
+	void SetContinuous(bool continuous);
 	// Returns true if limit switch has been pressed for this motor
 	bool HasLimitSwitchBeenPressed();
 
@@ -67,5 +71,8 @@ private:
 	// true if we last called moveTo, false if setSpeed was last called
 	bool positionWasSetLast_;
 	uint8_t limitSwitchPin_;
+	bool continuous_;
+	// continuous only: true once the switch has been pressed and released
+	bool homed_;
 	float atTargetUnitThreshold_;
 };

@@ -28,3 +28,10 @@ void boundToSignedMaximum(float *n, float range) {
 bool numInRange(float num, float min, float max) {
 	return num >= min && num <= max;
 }
+
+float nearestEquivalentAngle(float target, float current) {
+	float d = fmodf(target - current, 360.0f);
+	if (d > 180.0f) d -= 360.0f;
+	else if (d < -180.0f) d += 360.0f;
+	return current + d;
+}

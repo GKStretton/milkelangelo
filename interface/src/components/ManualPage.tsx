@@ -35,9 +35,12 @@ const MAX_SPEED = 1250;
 interface Axis {
 	name: string;
 	unit: string;
-	// Mirrors UnitStepper min/max units in firmware app/state.cpp
+	// Mirrors UnitStepper min/max units in firmware app/state.cpp. For
+	// continuous axes these are only the slider range, positions are unbounded.
 	min: number;
 	max: number;
+	// Slip ring axis with no position limits (UnitStepper::SetContinuous)
+	continuous?: boolean;
 	speedTopic: string;
 	positionTopic: string;
 }
@@ -46,8 +49,9 @@ const AXES: Axis[] = [
 	{
 		name: "Ring",
 		unit: "°",
-		min: 4.8,
-		max: 195,
+		min: 0,
+		max: 360,
+		continuous: true,
 		speedTopic: TOPIC_MANUAL_RING_SPEED_SET,
 		positionTopic: TOPIC_MANUAL_RING_POSITION_SET,
 	},
@@ -136,7 +140,9 @@ function AxisControl({
 		</Button>
 	);
 
-	const positionValid = position >= axis.min && position <= axis.max;
+	const positionValid =
+		!isNaN(position) &&
+		(!!axis.continuous || (position >= axis.min && position <= axis.max));
 
 	return (
 		<Card variant="outlined" sx={{ width: 380 }}>
@@ -144,7 +150,7 @@ function AxisControl({
 				<Typography variant="h6">
 					{axis.name}{" "}
 					<Typography component="span" variant="caption">
-						({axis.min}–{axis.max} {axis.unit})
+						({axis.continuous ? "continuous" : `${axis.min}–${axis.max} ${axis.unit}`})
 					</Typography>
 				</Typography>
 
@@ -188,7 +194,7 @@ function AxisControl({
 				</Typography>
 				<Slider
 					disabled={!enabled}
-					value={position}
+					value={isNaN(position) ? axis.min : position}
 					min={axis.min}
 					max={axis.max}
 					step={0.1}
@@ -201,8 +207,12 @@ function AxisControl({
 						type="number"
 						disabled={!enabled}
 						error={!positionValid}
-						value={position}
-						inputProps={{ min: axis.min, max: axis.max, step: 0.1 }}
+						value={isNaN(position) ? "" : position}
+						inputProps={
+							axis.continuous
+								? { step: 0.1 }
+								: { min: axis.min, max: axis.max, step: 0.1 }
+						}
 						onChange={(e) => setPosition(parseFloat(e.target.value))}
 						sx={{ width: 120 }}
 					/>

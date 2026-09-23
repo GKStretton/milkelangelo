@@ -30,3 +30,7 @@ void boundXYToCircle(float *x, float *y, float radius);
 void boundToSignedMaximum(float *n, float range);
 
 bool numInRange(float num, float min, float max);
+
+// nearestEquivalentAngle returns the angle equivalent to target (mod 360) that
+// is closest to current, in degrees. Used for continuous (slip ring) axes.
+float nearestEquivalentAngle(float target, float current);
