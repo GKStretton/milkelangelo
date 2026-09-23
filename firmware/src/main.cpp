@@ -14,17 +14,6 @@
 #include "app/state_report.h"
 #include "extras/topics_firmware/topics_firmware.h"
 
-// Manual-jog axis speed topics. Not yet part of the shared asol-protos
-// topics_firmware contract (see extras/topics_firmware/topics_firmware.h),
-// so they're kept local here rather than hand-edited into that generated
-// file. Follow the same "mega/req/..." legacy namespace so they're covered
-// by the mega/req/# subscription in middleware/mqtt.cpp.
-const char *TOPIC_MANUAL_RING_SPEED_SET = "mega/req/manual/ring-speed";
-const char *TOPIC_MANUAL_Z_SPEED_SET = "mega/req/manual/z-speed";
-const char *TOPIC_MANUAL_YAW_SPEED_SET = "mega/req/manual/yaw-speed";
-const char *TOPIC_MANUAL_PITCH_SPEED_SET = "mega/req/manual/pitch-speed";
-const char *TOPIC_MANUAL_PIPETTE_SPEED_SET = "mega/req/manual/pipette-speed";
-
 State s = CreateStateObject();
 
 Controller controller;
@@ -309,6 +298,66 @@ void topicHandler(String topic, String payload)
 			return;
 		}
 		s.pipetteStepper.setSpeed(payload.toFloat());
+	}
+	else if (topic == TOPIC_MANUAL_RING_POSITION_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual ring position, not in manual mode");
+			return;
+		}
+		float unit = payload.toFloat();
+		if (!s.ringStepper.unitInRange(unit)) {
+			Logger::Error("ring position " + payload + " out of range.");
+			return;
+		}
+		s.ringStepper.moveTo(s.ringStepper.UnitToPosition(unit));
+	}
+	else if (topic == TOPIC_MANUAL_Z_POSITION_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual z position, not in manual mode");
+			return;
+		}
+		float unit = payload.toFloat();
+		if (!s.zStepper.unitInRange(unit)) {
+			Logger::Error("z position " + payload + " out of range.");
+			return;
+		}
+		s.zStepper.moveTo(s.zStepper.UnitToPosition(unit));
+	}
+	else if (topic == TOPIC_MANUAL_YAW_POSITION_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual yaw position, not in manual mode");
+			return;
+		}
+		float unit = payload.toFloat();
+		if (!s.yawStepper.unitInRange(unit)) {
+			Logger::Error("yaw position " + payload + " out of range.");
+			return;
+		}
+		s.yawStepper.moveTo(s.yawStepper.UnitToPosition(unit));
+	}
+	else if (topic == TOPIC_MANUAL_PITCH_POSITION_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual pitch position, not in manual mode");
+			return;
+		}
+		float unit = payload.toFloat();
+		if (!s.pitchStepper.unitInRange(unit)) {
+			Logger::Error("pitch position " + payload + " out of range.");
+			return;
+		}
+		s.pitchStepper.moveTo(s.pitchStepper.UnitToPosition(unit));
+	}
+	else if (topic == TOPIC_MANUAL_PIPETTE_POSITION_SET) {
+		if (!s.manualRequested) {
+			Logger::Warn("ignoring manual pipette position, not in manual mode");
+			return;
+		}
+		float unit = payload.toFloat();
+		if (!s.pipetteStepper.unitInRange(unit)) {
+			Logger::Error("pipette position " + payload + " out of range.");
+			return;
+		}
+		s.pipetteStepper.moveTo(s.pipetteStepper.UnitToPosition(unit));
 	}
 	else
 	{

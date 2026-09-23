@@ -25,6 +25,19 @@ constants:
   TOPIC_GOTO_RING_IDLE_POS: "mega/req/goto-ring-idle-pos"
   TOPIC_SET_BOWL_STEPS_PER_SEC: "mega/req/set-bowl-steps-per-sec"
 
+  # Manual-jog axis control. Speed topics jog at a continuous rate; position
+  # topics move to an absolute target unit value.
+  TOPIC_MANUAL_RING_SPEED_SET: "mega/req/manual/ring-speed"
+  TOPIC_MANUAL_Z_SPEED_SET: "mega/req/manual/z-speed"
+  TOPIC_MANUAL_YAW_SPEED_SET: "mega/req/manual/yaw-speed"
+  TOPIC_MANUAL_PITCH_SPEED_SET: "mega/req/manual/pitch-speed"
+  TOPIC_MANUAL_PIPETTE_SPEED_SET: "mega/req/manual/pipette-speed"
+  TOPIC_MANUAL_RING_POSITION_SET: "mega/req/manual/ring-position"
+  TOPIC_MANUAL_Z_POSITION_SET: "mega/req/manual/z-position"
+  TOPIC_MANUAL_YAW_POSITION_SET: "mega/req/manual/yaw-position"
+  TOPIC_MANUAL_PITCH_POSITION_SET: "mega/req/manual/pitch-position"
+  TOPIC_MANUAL_PIPETTE_POSITION_SET: "mega/req/manual/pipette-position"
+
   TOPIC_STATE_REPORT_REQUEST: "mega/req/state-report"
   TOPIC_STATE_REPORT_RAW: "mega/state-report"
 

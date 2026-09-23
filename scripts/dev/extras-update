@@ -7,7 +7,7 @@ PROTOS_REPO_DIR=./asol-protos
 CURRENT_DIR=$(pwd)
 
 cd $PROTOS_REPO_DIR
-docker-compose up
+docker compose up
 
 echo 'Copying python files'
 
