@@ -9,6 +9,7 @@ import { ErrorManager } from "./components/ErrorManager";
 import Header from "./components/Header";
 import MqttProvider from "./util/MqttProvider";
 import ConfigPage from "./components/ConfigPage";
+import ManualPage from "./components/ManualPage";
 
 function App() {
 	const mqtt_url =
@@ -28,6 +29,7 @@ function App() {
 							<Route path="/cleaning" element={<CleaningPage />} />
 							<Route path="/content" element={<ContentPage />} />
 							<Route path="/config" element={<ConfigPage />} />
+							<Route path="/manual" element={<ManualPage />} />
 						</Routes>
 					</Router>
 				</MqttProvider>
