@@ -47,18 +47,6 @@
 	border-radius: 4px;
 	margin: 0.25rem 0;
 }
-
-.dslr-placeholder {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 400px;
-	border: 2px dashed #ccc;
-	background: #f9f9f9;
-	color: #666;
-	font-size: 1.1rem;
-}
-
 .crop-instructions {
 	background: #e3f2fd;
 	padding: 1rem;

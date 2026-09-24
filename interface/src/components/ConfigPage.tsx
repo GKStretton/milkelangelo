@@ -1,9 +1,9 @@
-import { useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { useContext, useState, useEffect, useCallback } from 'react';
 import './ConfigPage.css';
 import MqttContext from '../util/mqttContext';
 import { Typography, Button, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, Paper } from '@mui/material';
 import VideoPlayer from './VideoPlayer';
-import { TOPIC_KV_GET, TOPIC_KV_SET, TOPIC_KV_GET_RESP, TOPIC_KV_SET_RESP, TOPIC_TRIGGER_DSLR, TOPIC_TRIGGER_DSLR_RESP } from '../topics_backend/topics_backend';
+import { TOPIC_KV_GET, TOPIC_KV_SET, TOPIC_KV_GET_RESP, TOPIC_KV_SET_RESP } from '../topics_backend/topics_backend';
 
 interface CropConfig {
   left_abs: number;
@@ -18,8 +18,7 @@ interface CropConfig {
 
 const CAMERA_CHOICES = {
   'top-cam': { id: '1', name: 'Top Camera', configKey: 'crop_top-cam', streamUrl: 'ws://milkelangelo:8889/top-cam/' },
-  'front-cam': { id: '2', name: 'Front Camera', configKey: 'crop_front-cam', streamUrl: 'ws://milkelangelo:8889/front-cam/' },
-  'dslr': { id: '3', name: 'DSLR', configKey: 'crop_dslr', streamUrl: '' }
+  'front-cam': { id: '2', name: 'Front Camera', configKey: 'crop_front-cam', streamUrl: 'ws://milkelangelo:8889/front-cam/' }
 };
 
 function ConfigPage() {
@@ -31,10 +30,7 @@ function ConfigPage() {
   });
   const [showOverlay, setShowOverlay] = useState(true);
   const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0 });
-  const [dslrImageUrl, setDslrImageUrl] = useState<string>(`http://milkelangelo:8089/get-dslr-preview?t=${Date.now()}`);
   const [saveStatus, setSaveStatus] = useState<string>('');
-  const [dslrDisplayDimensions, setDslrDisplayDimensions] = useState({ width: 0, height: 0 });
-  const dslrImageRef = useRef<HTMLImageElement>(null);
 
   // Subscribe to response topics
   useEffect(() => {
@@ -42,7 +38,6 @@ function ConfigPage() {
       const configKey = CAMERA_CHOICES[selectedCamera].configKey;
       c.subscribe(TOPIC_KV_GET_RESP + configKey);
       c.subscribe(TOPIC_KV_SET_RESP + configKey);
-      c.subscribe(TOPIC_TRIGGER_DSLR_RESP);
     }
   }, [c, selectedCamera]);
 
@@ -83,55 +78,6 @@ function ConfigPage() {
       console.log('Crop config saved successfully');
     }
   }, [messages, selectedCamera]);
-
-  // Handle DSLR response messages
-  useEffect(() => {
-    const dslrMessage = messages[TOPIC_TRIGGER_DSLR_RESP];
-    
-    if (dslrMessage) {
-      const response = dslrMessage.toString();
-      if (response === 'success') {
-        // Wait 5 seconds before fetching the image to allow processing
-        setTimeout(() => {
-          setDslrImageUrl(`http://milkelangelo:8089/get-dslr-preview?t=${Date.now()}`);
-        }, 5000);
-      }
-    }
-  }, [messages]);
-
-  // Track DSLR image display dimensions
-  useEffect(() => {
-    const updateDslrDisplayDimensions = () => {
-      if (dslrImageRef.current) {
-        setDslrDisplayDimensions({
-          width: dslrImageRef.current.clientWidth,
-          height: dslrImageRef.current.clientHeight
-        });
-      }
-    };
-
-    const resizeObserver = new ResizeObserver(() => {
-      updateDslrDisplayDimensions();
-    });
-
-    if (dslrImageRef.current) {
-      updateDslrDisplayDimensions();
-      resizeObserver.observe(dslrImageRef.current);
-    }
-
-    return () => {
-      if (dslrImageRef.current) {
-        resizeObserver.unobserve(dslrImageRef.current);
-      }
-    };
-  }, [dslrImageUrl, selectedCamera]);
-
-  // Handle DSLR capture
-  const triggerDslrCapture = useCallback(() => {
-    if (c && c.connected && selectedCamera === 'dslr') {
-      c.publish(TOPIC_TRIGGER_DSLR, '');
-    }
-  }, [c, selectedCamera]);
 
   // Save crop config
   const saveCropConfig = useCallback(() => {
@@ -230,17 +176,6 @@ function ConfigPage() {
     updateCropConfig(x, y, e.shiftKey);
   }, [videoDimensions, updateCropConfig]);
 
-  // Handle mouse events for image clicks (DSLR)
-  const handleImageClick = useCallback((e: React.MouseEvent<HTMLImageElement>) => {
-    if (!videoDimensions.width || !videoDimensions.height) return;
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = Math.round((e.clientX - rect.left) * (videoDimensions.width / rect.width));
-    const y = Math.round((e.clientY - rect.top) * (videoDimensions.height / rect.height));
-
-    updateCropConfig(x, y, e.shiftKey);
-  }, [videoDimensions, updateCropConfig]);
-
   // Update relative values when absolute values change
   useEffect(() => {
     if (videoDimensions.width && videoDimensions.height) {
@@ -285,19 +220,6 @@ function ConfigPage() {
       <Paper style={{ padding: '1rem', marginTop: '1rem' }}>
         <Typography variant="h6" gutterBottom>Crop Configuration Tool</Typography>
         
-        <div className="crop-instructions">
-          <Typography variant="body2" gutterBottom>
-            <strong>Instructions:</strong>
-          </Typography>
-          <ul>
-            <li>Select a camera from the dropdown</li>
-            <li>Click on the video/image to set the top-left corner of the crop area</li>
-            <li>Hold Shift and click to set the bottom-right corner</li>
-            <li>For top-cam and DSLR, the crop area will maintain a square aspect ratio</li>
-            <li>Click "Save Crop Config" to store your settings</li>
-          </ul>
-        </div>
-        
         <div className="crop-controls">
           <FormControl style={{ minWidth: 200 }}>
             <InputLabel>Camera</InputLabel>
@@ -321,12 +243,6 @@ function ConfigPage() {
             label="Show Overlay"
           />
           
-          {selectedCamera === 'dslr' && (
-            <Button variant="contained" onClick={triggerDslrCapture}>
-              Capture DSLR Image
-            </Button>
-          )}
-          
           <Button variant="contained" color="primary" onClick={saveCropConfig}>
             Save Crop Config
           </Button>
@@ -349,49 +265,21 @@ function ConfigPage() {
         </div>
 
         <div className="crop-container" style={{ maxWidth: '800px', margin: '0 auto' }}>
-          {selectedCamera === 'dslr' ? (
-            dslrImageUrl ? (
-              <div style={{ position: 'relative' }}>
-                <img
-                  ref={dslrImageRef}
-                  className="crop-image"
-                  src={dslrImageUrl}
-                  alt="DSLR Preview"
-                  style={{
-                    transform: 'rotate(180deg)',
-                    maxWidth: '100%',
-                    height: 'auto'
-                  }}
-                  onClick={handleImageClick}
-                  onLoad={(e) => {
-                    const img = e.target as HTMLImageElement;
-                    setVideoDimensions({ width: img.naturalWidth, height: img.naturalHeight });
-                  }}
-                />
-                {renderCropOverlay(dslrDisplayDimensions)}
-              </div>
-            ) : (
-              <div className="dslr-placeholder">
-                <Typography>Click "Capture DSLR Image" to load preview</Typography>
-              </div>
-            )
-          ) : (
-            <VideoPlayer
-              url={CAMERA_CHOICES[selectedCamera].streamUrl}
-              name={`crop-${selectedCamera}`}
-              handleClick={handleVideoClick}
-              renderOverlay={renderCropOverlay}
-              onVideoLoad={(videoElement: HTMLVideoElement) => {
-                // Set video dimensions when video loads
-                if (videoElement.videoWidth && videoElement.videoHeight) {
-                  setVideoDimensions({
-                    width: videoElement.videoWidth,
-                    height: videoElement.videoHeight
-                  });
-                }
-              }}
-            />
-          )}
+          <VideoPlayer
+            url={CAMERA_CHOICES[selectedCamera].streamUrl}
+            name={`crop-${selectedCamera}`}
+            handleClick={handleVideoClick}
+            renderOverlay={renderCropOverlay}
+            onVideoLoad={(videoElement: HTMLVideoElement) => {
+              // Set video dimensions when video loads
+              if (videoElement.videoWidth && videoElement.videoHeight) {
+                setVideoDimensions({
+                  width: videoElement.videoWidth,
+                  height: videoElement.videoHeight
+                });
+              }
+            }}
+          />
         </div>
       </Paper>
     </div>

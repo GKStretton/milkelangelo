@@ -28,7 +28,7 @@
 
 #define YAW_ZERO_OFFSET -21.3f
 // anticlockwise offset of arm from negative x axis
-#define RING_ZERO_OFFSET 175.0f
+#define RING_ZERO_OFFSET 177.0f
 
 #define CENTRE_PITCH 48.95f
 #define MIN_BOWL_Z 32.5f

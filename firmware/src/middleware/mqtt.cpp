@@ -57,6 +57,8 @@ namespace Mqtt {
 		}
 
 		void reconnect() {
+			Serial.println("MQTT disconnected, rc=" + String(client.state()) +
+				", wifi status=" + String(WiFi.status()) + ", rssi=" + String(WiFi.RSSI()));
 			while (!client.connected()) {
 				Serial.print("connecting to MQTT broker...");
 				if (client.connect(MQTT_CLIENT_ID)) {
@@ -110,8 +112,13 @@ namespace Mqtt {
 		client.setBufferSize(512);
 		client.setServer(MQTT_BROKER, MQTT_PORT);
 		client.setCallback(onMessage);
+		// PubSubClient busy-waits (without yielding) for the CONNACK and for
+		// the rest of partially received packets, for up to this many seconds.
+		// It must stay below the 5s task watchdog, or a slow/dropped broker
+		// connection starves IDLE0 and the watchdog aborts the whole chip.
+		client.setSocketTimeout(2);
 
-		xTaskCreatePinnedToCore(task, "mqtt", 4096, nullptr, 1, nullptr, 0);
+		xTaskCreatePinnedToCore(task, "mqtt", 8192, nullptr, 1, nullptr, 0);
 	}
 
 	void SetTopicHandler(void (*f)(String topic, String payload)) {
