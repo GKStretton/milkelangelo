@@ -159,6 +159,10 @@ bool UnitStepper::HasLimitSwitchBeenPressed() {
 	return limitSwitchContacted_;
 }
 
+bool UnitStepper::ReadLimitSwitch() {
+	return digitalRead(limitSwitchPin_);
+}
+
 bool UnitStepper::GetPositionWasSetLast() {
 	return positionWasSetLast_;
 }

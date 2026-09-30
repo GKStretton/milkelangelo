@@ -9,6 +9,16 @@ bool atLocalTargetNode(State *s) {
 	return result;
 }
 
+// TEMP: pos/target in steps, speed in steps/s, mode is P (moveTo) or S (setSpeed),
+// sw is the raw limit switch read.
+String axisDebug(const char *name, UnitStepper &st) {
+	return String(name) + "[pos=" + String(st.currentPosition()) +
+		" tgt=" + String(st.targetPosition()) +
+		" spd=" + String(st.speed(), 0) +
+		" mode=" + (st.GetPositionWasSetLast() ? "P" : "S") +
+		" sw=" + String(st.ReadLimitSwitch()) + "]";
+}
+
 machine_Node calculateNextNode(machine_Node lastNode, machine_Node targetNode) {
 	if (lastNode == machine_Node_UNDEFINED || targetNode == machine_Node_UNDEFINED)
 		return machine_Node_UNDEFINED;
@@ -250,6 +260,10 @@ Status Navigation::UpdateNodeNavigation(State *s)
 			atGlobalNodeHandler(s->lastNode);
 			return SUCCESS;
 		}
+	} else {
+		// TEMP: diagnosing stalls where an axis never reaches its target
+		// Logger::Debug("not at local target: " + axisDebug("z", s->zStepper) + " " +
+			// axisDebug("pitch", s->pitchStepper) + " " + axisDebug("yaw", s->yawStepper));
 	}
 
 	return RUNNING;

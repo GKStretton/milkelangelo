@@ -48,6 +48,8 @@ public:
 	void SetContinuous(bool continuous);
 	// Returns true if limit switch has been pressed for this motor
 	bool HasLimitSwitchBeenPressed();
+	// Raw read of the limit switch pin right now
+	bool ReadLimitSwitch();
 
 	// (relative) Move the target position by an amount
 	void MoveTarget(float d);

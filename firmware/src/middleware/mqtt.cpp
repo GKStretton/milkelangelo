@@ -63,6 +63,10 @@ namespace Mqtt {
 				Serial.print("connecting to MQTT broker...");
 				if (client.connect(MQTT_CLIENT_ID)) {
 					Serial.println("connected");
+					// Disable Nagle so small publishes go out immediately rather
+					// than being batched into bursts. Must be set on the live
+					// socket, so it's redone on every reconnect.
+					wifiClient.setNoDelay(true);
 					client.subscribe(TOPIC_SUBSCRIBE_WILDCARD);
 				} else {
 					Serial.println("failed, rc=" + String(client.state()) + ", retrying in 2s");
