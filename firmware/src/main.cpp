@@ -91,27 +91,27 @@ void setup()
 }
 
 void initSteppers() {
-	s.pitchStepper.setMaxSpeed(1250 * SPEED_MULT);
-	s.pitchStepper.setAcceleration(1600 * SPEED_MULT);
+	s.pitchStepper.setMaxSpeed(2500 * SPEED_MULT);
+	s.pitchStepper.setAcceleration(2500 * SPEED_MULT);
 	s.pitchStepper.setPinsInverted(false);
 	s.pitchStepper.SetLimitSwitchPin(PITCH_LIMIT_SWITCH);
 	s.pitchStepper.SetAtTargetUnitThreshold(0);
 
-	s.yawStepper.setMaxSpeed(1250 * SPEED_MULT);
-	s.yawStepper.setAcceleration(1600 * SPEED_MULT);
+	s.yawStepper.setMaxSpeed(2500 * SPEED_MULT);
+	s.yawStepper.setAcceleration(2500 * SPEED_MULT);
 	s.yawStepper.setPinsInverted(false);
 	s.yawStepper.SetLimitSwitchPin(YAW_LIMIT_SWITCH);
 	s.yawStepper.SetAtTargetUnitThreshold(0);
 
-	s.zStepper.setMaxSpeed(1250 * SPEED_MULT);
-	s.zStepper.setAcceleration(800 * SPEED_MULT);
+	s.zStepper.setMaxSpeed(2500 * SPEED_MULT);
+	s.zStepper.setAcceleration(1500 * SPEED_MULT);
 	s.zStepper.setPinsInverted(true);
 	s.zStepper.SetLimitSwitchPin(Z_LIMIT_SWITCH);
 	s.zStepper.SetAtTargetUnitThreshold(0);
 
 	s.ringStepper.setPinsInverted(true);
-	s.ringStepper.setMaxSpeed(1250 * SPEED_MULT);
-	s.ringStepper.setAcceleration(800 * SPEED_MULT);
+	s.ringStepper.setMaxSpeed(2500 * SPEED_MULT);
+	s.ringStepper.setAcceleration(1500 * SPEED_MULT);
 	s.ringStepper.SetLimitSwitchPin(RING_LIMIT_SWITCH);
 	s.ringStepper.SetContinuous(true);
 
@@ -361,6 +361,14 @@ void topicHandler(String topic, String payload)
 	}
 }
 
+void dataUpdate()
+{
+	if (millis() - s.lastDataUpdate < 1000) return;
+	s.lastDataUpdate = millis();
+
+	Mqtt::Publish("mega/d/UPS", String(s.updatesPerSecond));
+}
+
 void runSteppers(State *s)
 {
 	s->ringStepper.Update();
@@ -385,6 +393,8 @@ void loop()
 	controller.Update(&s);
 
 	runSteppers(&s);
+
+	dataUpdate();
 
 	updatesInLastSecond++;
 	if (millis() - lastUpdatesPerSecondTime > 1000)

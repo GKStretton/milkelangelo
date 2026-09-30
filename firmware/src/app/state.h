@@ -75,6 +75,8 @@ struct State {
 	uint8_t startup_counter;
 
 	bool overrideCalibrationBlock;
+
+	unsigned long lastDataUpdate;
 };
 
 State CreateStateObject();
