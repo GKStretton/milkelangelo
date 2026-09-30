@@ -20,17 +20,17 @@
 #define PIPETTE_BACKLASH_UL 3
 
 // Physical calibration of arm positions etc
-#define STAGE_RADIUS_MM 75
+#define STAGE_RADIUS_MM 70
 #define ARM_PATH_RADIUS_MM 164.7f
 // The stage is equivalent to the crop area. But the tip can't target -1 to 1.
 // IK target requests will be bounded to a circle THIS portion of the stage radius
-#define IK_TARGET_RADIUS_FRAC 0.8f
+#define IK_TARGET_RADIUS_FRAC 0.7f
 
 #define YAW_ZERO_OFFSET -21.3f
 // anticlockwise offset of arm from negative x axis
 #define RING_ZERO_OFFSET 177.0f
 
-#define CENTRE_PITCH 48.95f
+#define CENTRE_PITCH 53.0f
 #define MIN_BOWL_Z 32.5f
 
 // NODE CALIBRATION (UNITS)

@@ -1,15 +1,20 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import MqttContext from '../util/mqttContext'
 import { TOPIC_GOTO_XY } from '../topics_firmware/topics_firmware';
 import VideoPlayer from './VideoPlayer';
+import { useStateReport } from '../util/hooks';
 
 interface TopCamProps {
   url: string;
 }
 
 const TopCamPlayer = ({ url }: TopCamProps) => {
-  const [circlePos, setCirclePos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-	const { client: c, messages } = useContext(MqttContext);
+	const { client: c } = useContext(MqttContext);
+  const stateReport = useStateReport();
+  const circlePos = {
+    x: stateReport?.movementDetails?.targetXUnit ?? 0,
+    y: stateReport?.movementDetails?.targetYUnit ?? 0,
+  };
 
   const handleClick = (e: React.MouseEvent<HTMLVideoElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -20,8 +25,6 @@ const TopCamPlayer = ({ url }: TopCamProps) => {
     const normalizedY = -((y / rect.height) * 2 - 1);
 
     console.log(`Clicked at normalized coordinates: (${normalizedX}, ${normalizedY})`);
-
-    setCirclePos({ x: normalizedX, y: normalizedY });
 
     c?.publish(TOPIC_GOTO_XY, `${normalizedX},${normalizedY}`)
   };
