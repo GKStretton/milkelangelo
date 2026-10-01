@@ -5,6 +5,10 @@ import {
 	Card,
 	CardContent,
 	Chip,
+	FormControl,
+	InputLabel,
+	MenuItem,
+	Select,
 	Slider,
 	Stack,
 	TextField,
@@ -28,6 +32,7 @@ import {
 } from "../topics_firmware/topics_firmware";
 import { useStateReport } from "../util/hooks";
 import MqttContext from "../util/mqttContext";
+import TopCamPlayer from "./TopCamPlayer";
 
 // Matches setMaxSpeed() in firmware initSteppers (steps/sec)
 const MAX_SPEED = 1250;
@@ -234,6 +239,10 @@ export default function ManualPage() {
 	const { client: c } = useContext(MqttContext);
 	const stateReport = useStateReport();
 	const [jogSpeed, setJogSpeed] = useState(300);
+	const [axisName, setAxisName] = useState(AXES[0].name);
+	const axis = AXES.find((a) => a.name === axisName) ?? AXES[0];
+	const webrtc_url =
+		process.env.REACT_APP_WEBRTC_URL ?? `ws://${window.location.hostname}:8889`;
 
 	useEffect(() => {
 		if (!c || !c.connected) return;
@@ -250,8 +259,6 @@ export default function ManualPage() {
 
 	return (
 		<div style={{ padding: "1rem" }}>
-			<Typography variant="h5">Manual Control</Typography>
-
 			<Stack direction="row" spacing={2} alignItems="center" sx={{ my: 2 }}>
 				<Chip
 					label={`Mode: ${stateReport ? Mode[stateReport.mode] : "UNKNOWN"}`}
@@ -286,7 +293,7 @@ export default function ManualPage() {
 				</Button>
 			</Stack>
 
-			<Stack direction="row" spacing={2} alignItems="center" sx={{ maxWidth: 500, mb: 2 }}>
+			<Stack direction="row" spacing={1} alignItems="center" sx={{ maxWidth: 500, mb: 1 }}>
 				<Typography variant="subtitle2" noWrap>
 					Jog speed (steps/s)
 				</Typography>
@@ -300,24 +307,33 @@ export default function ManualPage() {
 				/>
 			</Stack>
 
-			{!isAwake && (
-				<Typography variant="body2" color="error" sx={{ mb: 2 }}>
-					Machine is asleep: the firmware ignores everything except wake and
-					state report requests, so wake it before toggling manual mode.
-				</Typography>
-			)}
-
-			{!isManual && (
-				<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-					Controls are disabled until the state report shows MANUAL mode (the
-					firmware ignores manual commands otherwise).
-				</Typography>
-			)}
-
-			<Stack direction="row" flexWrap="wrap" gap={2}>
-				{AXES.map((a) => (
-					<AxisControl key={a.name} axis={a} enabled={isManual} jogSpeed={jogSpeed} />
-				))}
+			<Stack direction="row" flexWrap="wrap" gap={2} alignItems="flex-start">
+				<div style={{ width: 500, maxWidth: "100%" }}>
+					<TopCamPlayer url={webrtc_url} centerLines angleGuide />
+				</div>
+				<Stack spacing={2}>
+					<FormControl size="small" sx={{ width: 380 }}>
+						<InputLabel id="manual-axis-label">Axis</InputLabel>
+						<Select
+							labelId="manual-axis-label"
+							label="Axis"
+							value={axis.name}
+							onChange={(e) => setAxisName(e.target.value)}
+						>
+							{AXES.map((a) => (
+								<MenuItem key={a.name} value={a.name}>
+									{a.name}
+								</MenuItem>
+							))}
+						</Select>
+					</FormControl>
+					<AxisControl
+						key={axis.name}
+						axis={axis}
+						enabled={isManual}
+						jogSpeed={jogSpeed}
+					/>
+				</Stack>
 			</Stack>
 		</div>
 	);

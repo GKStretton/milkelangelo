@@ -3,12 +3,17 @@ import MqttContext from '../util/mqttContext'
 import { TOPIC_GOTO_XY } from '../topics_firmware/topics_firmware';
 import VideoPlayer from './VideoPlayer';
 import { useStateReport } from '../util/hooks';
+import AngleGuide from './AngleGuide';
 
 interface TopCamProps {
   url: string;
+  // Green lines through the centre of the frame, for judging alignment
+  centerLines?: boolean;
+  // Toggleable tool for measuring angles on the frame (see AngleGuide)
+  angleGuide?: boolean;
 }
 
-const TopCamPlayer = ({ url }: TopCamProps) => {
+const TopCamPlayer = ({ url, centerLines = false, angleGuide = false }: TopCamProps) => {
 	const { client: c } = useContext(MqttContext);
   const stateReport = useStateReport();
   const circlePos = {
@@ -77,6 +82,37 @@ const TopCamPlayer = ({ url }: TopCamProps) => {
         pointerEvents: 'none',
       }}
     />
+    {centerLines && (
+      <>
+        <div
+          style={{
+            position: 'absolute',
+            top: `${videoDimensions.height / 2}px`,
+            left: 0,
+            width: `${videoDimensions.width}px`,
+            height: '1px',
+            background: 'lime',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            left: `${videoDimensions.width / 2}px`,
+            top: 0,
+            height: `${videoDimensions.height}px`,
+            width: '1px',
+            background: 'lime',
+            transform: 'translateX(-50%)',
+            pointerEvents: 'none',
+          }}
+        />
+      </>
+    )}
+    {angleGuide && (
+      <AngleGuide width={videoDimensions.width} height={videoDimensions.height} />
+    )}
     </>
   );
 
