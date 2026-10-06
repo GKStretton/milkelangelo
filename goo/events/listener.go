@@ -61,7 +61,12 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 			ebsApi.UpdateState(func(state *types.GooState) {
 				state.X = sr.MovementDetails.TargetXUnit
 				state.Y = sr.MovementDetails.TargetYUnit
-				state.Status = types.GooStatusUnknown
+
+				if sr.Status == machinepb.Status_SLEEPING {
+					state.Status = types.GooStatusSleeping
+				} else {
+					state.Status = types.GooStatusUnknown
+				}
 
 				if sr.CollectionRequest == nil {
 					state.CollectionState = nil
@@ -155,7 +160,7 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 
 	RequestStateReport()
 
-	listenForEbsConnect(ebsApi)
+	go listenForEbsConnect(ebsApi)
 }
 
 func listenForEbsConnect(ebsApi ebsinterface.EbsApi) {

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/app"
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/contentscheduler"
+	"github.com/gkstretton/dark/services/goo/control"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
@@ -70,8 +70,8 @@ func main() {
 	sm := session.NewSessionManager(false)
 	twitchApi := twitchapi.Start()
 
-	actor.Setup(sm, ebsApi)
 	events.Start(sm, ebsApi)
+	control.Start(ebsApi)
 	livecapture.Start(sm)
 	obs.Start(config.BrokerHost(), sm)
 	vialprofiles.Start(sm, ebsApi)

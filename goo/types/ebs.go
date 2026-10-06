@@ -3,7 +3,8 @@ package types
 type GooStatus = string
 
 const (
-	GooStatusUnknown GooStatus = "unknown"
+	GooStatusUnknown  GooStatus = "unknown"
+	GooStatusSleeping GooStatus = "sleeping"
 )
 
 type GooState struct {
@@ -17,7 +18,7 @@ type GooState struct {
 
 	WaitingForCollection bool
 	WaitingForDispense   bool
-	ActorRunning         bool
+	ControlEnabled       bool
 }
 
 type CollectionState struct {

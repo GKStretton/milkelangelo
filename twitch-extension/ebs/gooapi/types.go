@@ -55,7 +55,7 @@ type GooStateUpdate struct {
 
 	WaitingForCollection bool
 	WaitingForDispense   bool
-	ActorRunning         bool
+	ControlEnabled       bool
 }
 
 type CollectionState struct {

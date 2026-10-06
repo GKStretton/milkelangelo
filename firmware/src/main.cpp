@@ -10,6 +10,7 @@
 #include "middleware/mqtt.h"
 #include "app/state.h"
 #include "app/navigation.h"
+#include "app/node.h"
 #include "app/controller.h"
 #include "app/state_report.h"
 #include "extras/topics_firmware/topics_firmware.h"
@@ -175,7 +176,9 @@ void topicHandler(String topic, String payload)
 		int vial = values[0].toInt();
 		float ul = values[1].toFloat();
 
-		if (!s.collectionRequest.requestCompleted) {
+		if (VialNumberToInsideNode(vial) == machine_Node_UNDEFINED || ul <= 0) {
+			Logger::Info("rejecting collection: invalid vial " + String(vial) + " or volume " + String(ul) + "ul");
+		} else if (!s.collectionRequest.requestCompleted) {
 			Logger::Info("cannot collect because collection request " + String(s.collectionRequest.requestNumber) + " is still in progress");
 		} else {
 			s.collectionRequest.requestNumber++;

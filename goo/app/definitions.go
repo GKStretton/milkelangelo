@@ -82,9 +82,7 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi, 
 			err := RunSession(
 				&SessionDescriptor{
 					streamPreStartMinutes:  streamPreStartMinutes,
-					actorDurationMinutes:   actorDurationMins,
 					sessionDurationMinutes: defaultSessionDurationMinutes,
-					runActor:               !s.disableActor,
 				},
 				sm, twitchApi, ebsApi,
 			)
@@ -109,23 +107,19 @@ func defineSchedule(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi, 
 }
 
 type oneTimeSettings struct {
-	skip         bool
-	disableActor bool
+	skip bool
 }
 
 // readOneTimeSettings checks for one time settings and returns them, resetting
 // the flags to false afterwards.
 func readOneTimeSettings() *oneTimeSettings {
 	skip := keyvalue.GetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_SKIP)
-	disableActor := keyvalue.GetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR)
 
 	return &oneTimeSettings{
-		skip:         skip,
-		disableActor: disableActor,
+		skip: skip,
 	}
 }
 
 func resetOneTimeSettings() {
 	keyvalue.SetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_SKIP, false)
-	keyvalue.SetBool(topics_backend.KV_SCHEDULED_SESSION_FLAG_DISABLE_ACTOR, false)
 }

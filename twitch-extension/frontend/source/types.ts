@@ -21,7 +21,7 @@ export interface GooState {
 
 	WaitingForCollection: boolean;
 	WaitingForDispense: boolean;
-	ActorRunning: boolean;
+	ControlEnabled: boolean;
 }
 
 export interface User {

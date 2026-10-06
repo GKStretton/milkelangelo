@@ -190,20 +190,20 @@ export default function ControlGroup() {
 
 	const [selectedNode, setSelectedNode] = useState<number>(Node.UNDEFINED);
 
-	const actorRunning = useBoolTopic(
+	const controlEnabled = useBoolTopic(
 		TOPIC_ACTOR_STATUS_GET,
 		TOPIC_ACTOR_STATUS_RESP,
 	);
 
 	return (
 		<>
-			{actorRunning ? (
+			{controlEnabled ? (
 				<Typography variant="h6" style={{ color: "red" }}>
-					Actor Running
+					Remote Control Enabled
 				</Typography>
 			) : (
 				<Typography variant="h6" style={{ color: "purple" }}>
-					Actor Not Running
+					Remote Control Disabled
 				</Typography>
 			)}
 
@@ -228,7 +228,7 @@ export default function ControlGroup() {
 							color="success"
 							onClick={() => c?.publish(TOPIC_RUN_FULL_SESSION, "")}
 						>
-							Run Actor Session
+							Run Remote Control Session
 						</Button>
 						<Button
 							disabled={isAwake}
@@ -247,22 +247,16 @@ export default function ControlGroup() {
 						sx={{ margin: 1 }}
 					>
 						<Button
-							disabled={!isAwake || actorRunning}
+							disabled={controlEnabled}
 							onClick={() => c?.publish(TOPIC_ACTOR_START, "")}
 						>
-							Start Actor
+							Enable Remote Control
 						</Button>
 						<Button
-							disabled={!isAwake || actorRunning}
-							onClick={() => c?.publish(TOPIC_ACTOR_START, "40,0,true")}
-						>
-							Start Test Actor
-						</Button>
-						<Button
-							disabled={!isAwake || !actorRunning}
+							disabled={!controlEnabled}
 							onClick={() => c?.publish(TOPIC_ACTOR_STOP, "")}
 						>
-							Stop Actor
+							Disable Remote Control
 						</Button>
 					</ButtonGroup>
 

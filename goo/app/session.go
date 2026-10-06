@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -11,7 +10,6 @@ import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
-	"github.com/gkstretton/dark/services/goo/actor"
 	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
@@ -25,14 +23,10 @@ var sl = log.New(os.Stdout, "[session scheduler] ", log.Flags())
 type SessionDescriptor struct {
 	// how many minutes before session should stream start?
 	streamPreStartMinutes  int
-	actorDurationMinutes   int
 	sessionDurationMinutes int
-	runActor               bool
 }
 
 var lock *AutomationLock = &AutomationLock{}
-
-const actorDurationMins = 11
 
 func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi) {
 	mqtt.Subscribe("asol/debug/runStartSequence", func(topic string, payload []byte) {
@@ -61,9 +55,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 			err := RunSession(
 				&SessionDescriptor{
 					streamPreStartMinutes:  0,
-					actorDurationMinutes:   actorDurationMins,
 					sessionDurationMinutes: defaultSessionDurationMinutes,
-					runActor:               true,
 				},
 				sm, twitchApi, ebsApi,
 			)
@@ -78,9 +70,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 			err := RunSession(
 				&SessionDescriptor{
 					streamPreStartMinutes:  0,
-					actorDurationMinutes:   actorDurationMins,
 					sessionDurationMinutes: defaultSessionDurationMinutes,
-					runActor:               false,
 				},
 				sm, twitchApi, ebsApi,
 			)
@@ -137,18 +127,7 @@ func RunTestSession(sm *session.SessionManager, d time.Duration, ebsApi ebsinter
 
 	sl.Println("valid status")
 
-	// set seed
-	seed := rand.Int63()
-	err = sm.SetCurrentSessionSeed(seed)
-	if err != nil {
-		sl.Printf("failed to set seed: %v\n", err)
-	}
-
-	sl.Println("launching actor")
-	err = actor.LaunchActor(nil, ebsApi, d, seed, true)
-	if err != nil {
-		sl.Printf("actor error: %v\n", err)
-	}
+	time.Sleep(d)
 
 	sl.Println("shutting down")
 	mqtt.Publish(topics_firmware.TOPIC_SHUTDOWN, "")
@@ -189,28 +168,7 @@ func RunSession(
 		endTime.Add(-time.Minute*time.Duration(drainOffsetMins)),
 	)
 
-	if d.runActor {
-		seed := rand.Int63()
-		err = sm.SetCurrentSessionSeed(seed)
-		if err != nil {
-			sl.Printf("failed to set seed: %v\n", err)
-		}
-
-		sl.Println("launching actor")
-		err = actor.LaunchActor(twitchApi, ebsApi, time.Duration(d.actorDurationMinutes)*time.Minute, seed, false)
-		if err != nil {
-			sl.Println("actor error, erroring")
-			mqtt.Publish(topics_backend.TOPIC_SESSION_PAUSE, "")
-			// email for help
-			errWrap := fmt.Errorf("actor returned error, unknown situation: %s", err)
-			requestSessionIntervention(errWrap)
-			return err
-		}
-		sl.Println("actor success")
-		mqtt.Publish(topics_firmware.TOPIC_GOTO_RING_IDLE_POS, "")
-	} else {
-		sl.Println("ready for manual control...")
-	}
+	sl.Println("ready for manual control...")
 
 	waitForTOffset(endTime, -drainOffsetMins, 0)
 
