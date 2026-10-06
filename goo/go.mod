@@ -12,13 +12,10 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/gempir/go-twitch-irc/v4 v4.0.0
 	github.com/gkstretton/asol-protos v0.0.9-0.20231121080309-bd93879457b6
-	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/joho/godotenv v1.5.1
 	github.com/mailjet/mailjet-apiv3-go/v4 v4.0.1
 	github.com/nicklaw5/helix/v2 v2.25.2
-	github.com/r3labs/sse v0.0.0-20210224172625-26fe804710bc
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.33.0
@@ -48,6 +45,7 @@ require (
 	github.com/gobwas/ws v1.3.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
@@ -76,6 +74,5 @@ require (
 	golang.org/x/text v0.21.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241223144023-3abc09e42ca8 // indirect
 	google.golang.org/grpc v1.67.3 // indirect
-	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

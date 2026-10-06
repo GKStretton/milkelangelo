@@ -55,6 +55,9 @@ TOP_CAM=/dev/video2
 FRONT_CAM=/dev/video0
 LIGHT_STORES_DIR=/mnt/md0/light-stores/
 
+For remote control, goo serves a control page at `http://milkelangelo:8789`
+(see [remote](remote/README.md)).
+
 ### kv/ settings:
 
 There's a key-value store in e.g. `/mnt/md0/light-stores/kv/` with most configuration.

@@ -41,9 +41,11 @@ services:
     environment:
       LIGHT_STORES_DIR: ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
       ENABLE_SCHEDULER: ${ENABLE_SCHEDULER:-false}
-      ENABLE_EBS: ${ENABLE_EBS:-false}
-      EBS_HOST: ${EBS_HOST}
-      SHARED_SECRET_EBS: ${SHARED_SECRET_EBS}
+      ENABLE_PUBLIC_API: ${ENABLE_PUBLIC_API:-true}
+      # all interfaces, so it's reachable over tailscale like the interface
+      PUBLIC_API_ADDR: ${PUBLIC_API_ADDR:-:8789}
+      PUBLIC_UI_DIR: /app/remote
+      MEDIAMTX_URL: http://127.0.0.1:8889
   interface:
     build:
       context: ./interface

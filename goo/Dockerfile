@@ -1,3 +1,11 @@
+# Remote control page, served by goo's public api
+FROM node:20 AS ui
+WORKDIR /ui
+COPY ./remote/frontend/package.json ./
+RUN npm install
+COPY ./remote/frontend .
+RUN npm run build
+
 # Build stage
 FROM golang:1.21 AS builder
 WORKDIR /src
@@ -19,5 +27,6 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY --from=builder /src/goo .
 COPY --from=builder /src/run.sh .
+COPY --from=ui /ui/dist ./remote
 COPY ./scripts ./scripts
 CMD ["./run.sh"]

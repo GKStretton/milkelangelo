@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/twitchapi"
 	"github.com/gkstretton/dark/services/goo/util"
@@ -97,8 +96,8 @@ func scheduleWatcher(s *Schedule) {
 	}
 }
 
-func Start(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi) {
+func Start(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
 	fmt.Printf("Starting scheduler. Enabled: %t\n", util.EnvBool("ENABLE_SCHEDULER"))
-	registerHandlers(sm, twitchApi, ebsApi)
-	defineSchedule(sm, twitchApi, ebsApi)
+	registerHandlers(sm, twitchApi)
+	defineSchedule(sm, twitchApi)
 }

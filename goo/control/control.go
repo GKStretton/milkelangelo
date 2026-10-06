@@ -1,10 +1,13 @@
 // Package control executes collect / dispense / goto commands directly on the
-// machine, on behalf of a remote (EBS) controller.
+// machine, on behalf of a remote controller (see publicapi).
 //
 // Commands are only accepted while control is enabled, the machine is awake,
 // and no other command is in progress. Machine-level safety checks (vial
 // validity, coordinate bounds, pipette state) are enforced here, not in the
-// EBS, so the public-facing side can't bypass them.
+// public api, so the public-facing side can't bypass them.
+//
+// Collect and Dispense validate synchronously and return an error if the
+// command is rejected; an accepted command then runs in the background.
 package control
 
 import (
@@ -17,8 +20,8 @@ import (
 	"time"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
-	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/events"
+	"github.com/gkstretton/dark/services/goo/types"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
@@ -36,19 +39,16 @@ var (
 	enabled bool
 	busy    bool
 
-	ebsApi ebsinterface.EbsApi
+	stateUpdater types.GooStateUpdater
 )
 
-// Start wires up control to the broker and, if non-nil, the EBS.
-func Start(api ebsinterface.EbsApi) {
-	ebsApi = api
+// Start wires up control to the broker. su, if non-nil, is kept informed of
+// which commands are currently accepted.
+func Start(su types.GooStateUpdater) {
+	stateUpdater = su
 
 	subscribeToBrokerTopics()
 	go watchStateReports()
-
-	if ebsApi != nil {
-		go listenForEbsCommands()
-	}
 }
 
 // SetEnabled allows or disallows control commands.
@@ -59,7 +59,7 @@ func SetEnabled(e bool) {
 
 	l.Printf("control enabled: %t\n", e)
 	publishStatus()
-	updateEbsState(events.GetLatestStateReportCopy())
+	updatePublicState(events.GetLatestStateReportCopy())
 }
 
 func IsEnabled() bool {
@@ -68,7 +68,7 @@ func IsEnabled() bool {
 	return enabled
 }
 
-// Collect collects dye from the given vial. Blocks until collection completes.
+// Collect starts collecting dye from the given vial.
 func Collect(vial int) error {
 	err := begin(func(sr *machinepb.StateReport) error {
 		if !sr.GetPipetteState().GetSpent() {
@@ -86,22 +86,25 @@ func Collect(vial int) error {
 	if err != nil {
 		return err
 	}
-	defer end()
 
-	volUl := collectionDrops * int(getVialDropVolume(vial))
-	l.Printf("collecting %dul from vial %d\n", volUl, vial)
-	collect(vial, volUl)
+	go func() {
+		defer end()
 
-	// wait for collection to start
-	time.Sleep(time.Second * 1)
-	<-events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
-		return sr.GetCollectionRequest().GetCompleted()
-	})
-	l.Println("collection complete")
+		volUl := collectionDrops * int(getVialDropVolume(vial))
+		l.Printf("collecting %dul from vial %d\n", volUl, vial)
+		collect(vial, volUl)
+
+		// wait for collection to start
+		time.Sleep(time.Second * 1)
+		<-events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
+			return sr.GetCollectionRequest().GetCompleted()
+		})
+		l.Println("collection complete")
+	}()
 	return nil
 }
 
-// Dispense moves to x, y and dispenses a drop. Blocks until dispense completes.
+// Dispense starts moving to x, y and dispensing a drop.
 func Dispense(x, y float32) error {
 	err := begin(func(sr *machinepb.StateReport) error {
 		if sr.GetPipetteState().GetSpent() {
@@ -112,25 +115,28 @@ func Dispense(x, y float32) error {
 	if err != nil {
 		return err
 	}
-	defer end()
 
-	l.Printf("going to %.3f, %.3f\n", x, y)
-	goTo(x, y)
+	go func() {
+		defer end()
 
-	// reducing to 100ms to make it more snappy
-	time.Sleep(time.Millisecond * 100)
+		l.Printf("going to %.3f, %.3f\n", x, y)
+		goTo(x, y)
 
-	<-events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
-		return sr.GetStatus() == machinepb.Status_WAITING_FOR_DISPENSE
-	})
+		// reducing to 100ms to make it more snappy
+		time.Sleep(time.Millisecond * 100)
 
-	l.Println("dispensing...")
-	dispenseBlocking()
-	l.Println("dispense complete")
+		<-events.ConditionWaiter(func(sr *machinepb.StateReport) bool {
+			return sr.GetStatus() == machinepb.Status_WAITING_FOR_DISPENSE
+		})
+
+		l.Println("dispensing...")
+		dispenseBlocking()
+		l.Println("dispense complete")
+	}()
 	return nil
 }
 
-// GoTo moves the pipette to x, y without dispensing. Non-blocking.
+// GoTo moves the pipette to x, y without dispensing.
 // Only allowed while holding dye, i.e. when a dispense is next.
 func GoTo(x, y float32) error {
 	err := begin(func(sr *machinepb.StateReport) error {
@@ -172,7 +178,7 @@ func begin(check func(sr *machinepb.StateReport) error) error {
 	}
 
 	busy = true
-	go updateEbsState(sr)
+	go updatePublicState(sr)
 	return nil
 }
 
@@ -181,7 +187,7 @@ func end() {
 	busy = false
 	lock.Unlock()
 
-	updateEbsState(events.GetLatestStateReportCopy())
+	updatePublicState(events.GetLatestStateReportCopy())
 }
 
 func isAwake(sr *machinepb.StateReport) bool {

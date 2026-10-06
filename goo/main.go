@@ -9,7 +9,6 @@ import (
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/contentscheduler"
 	"github.com/gkstretton/dark/services/goo/control"
-	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/filesystem"
@@ -17,6 +16,7 @@ import (
 	"github.com/gkstretton/dark/services/goo/livecapture"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/obs"
+	"github.com/gkstretton/dark/services/goo/publicapi"
 	"github.com/gkstretton/dark/services/goo/server"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/socialmedia"
@@ -52,32 +52,31 @@ func main() {
 	email.Start()
 	server.Start()
 
-	var ebsApi ebsinterface.EbsApi
-
-	if config.EnableEBS() {
-		host := config.EbsHost()
-		if host == "" {
-			panic("EBS_HOST not set")
-		}
-
-		var err error
-		ebsApi, err = ebsinterface.NewExtensionSession("http://" + host + ":8788")
-		if err != nil {
-			panic("failed to init ebs: " + err.Error())
-		}
-	}
-
 	sm := session.NewSessionManager(false)
 	twitchApi := twitchapi.Start()
 
-	events.Start(sm, ebsApi)
-	control.Start(ebsApi)
+	api := publicapi.New()
+
+	events.Start(sm, api)
+	control.Start(api)
 	livecapture.Start(sm)
 	obs.Start(config.BrokerHost(), sm)
-	vialprofiles.Start(sm, ebsApi)
+	vialprofiles.Start(sm, api)
 	contentscheduler.Start(sm)
 
-	app.Start(sm, twitchApi, ebsApi)
+	app.Start(sm, twitchApi)
+
+	if config.EnablePublicApi() {
+		err := api.Start(publicapi.Options{
+			Addr:        config.PublicApiAddr(),
+			UiDir:       config.PublicUiDir(),
+			MediamtxURL: config.MediamtxURL(),
+		})
+		if err != nil {
+			// don't take down the rest of goo for a misconfigured public api
+			fmt.Printf("failed to start public api: %v\n", err)
+		}
+	}
 
 	// Block to prevent early quit
 	fmt.Println("finished init, main loop sleeping.")

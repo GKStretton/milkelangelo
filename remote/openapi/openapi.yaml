@@ -1,0 +1,199 @@
+openapi: 3.0.1
+info:
+  title: Milkelangelo Public API
+  version: 3.0.0
+  description: |
+    Served by goo (goo/publicapi) for remote control of the machine.
+
+    The API does no authentication. Whoever can reach it can use it, so put it
+    behind something that controls access before exposing it.
+
+    One client controls the machine at a time. PUT /claim returns a token,
+    which must be sent as X-Claim-Token with every command, and with /claim
+    again at least every 8 seconds to keep control.
+
+    Commands are then checked by goo/control, which rejects them with 409 and
+    a reason (control disabled, machine busy, wrong pipette state, etc).
+    Accepted commands keep running after the 202 response; follow /events to
+    see progress.
+
+servers:
+  - url: http://localhost:8789/api
+    description: Local
+
+components:
+  securitySchemes:
+    claimToken:
+      type: apiKey
+      in: header
+      name: X-Claim-Token
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    State:
+      type: object
+      properties:
+        GooState:
+          type: object
+          description: Machine state, see GooState in goo/types/public.go
+        Claimed:
+          type: boolean
+          description: True while some client holds control
+    Position:
+      type: object
+      required: [x, y]
+      properties:
+        x:
+          type: number
+          format: float
+          description: Within the unit circle
+        y:
+          type: number
+          format: float
+          description: Within the unit circle
+  responses:
+    Error:
+      description: Error with a reason
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+paths:
+  /state:
+    get:
+      summary: Current state
+      operationId: getState
+      responses:
+        200:
+          description: Current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/State"
+
+  /events:
+    get:
+      summary: State as server-sent events
+      description: |
+        Sends a `state` event with a State body on connect, then on every
+        change. A keep-alive comment is sent every 15 seconds.
+      operationId: streamEvents
+      responses:
+        200:
+          description: Event stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /claim:
+    put:
+      summary: Claim or renew control
+      description: |
+        Without a token, claims control if nobody holds it. With the current
+        token, renews the claim. Claims expire after 8 seconds without renewal.
+      operationId: claim
+      security:
+        - {}
+        - claimToken: []
+      responses:
+        200:
+          description: Control claimed or renewed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        403:
+          $ref: "#/components/responses/Error"
+
+  /unclaim:
+    put:
+      summary: Release control
+      operationId: unclaim
+      security:
+        - claimToken: []
+      responses:
+        202:
+          description: Control released
+        403:
+          $ref: "#/components/responses/Error"
+
+  # Not /collect: ad and privacy blockers block that path as an analytics
+  # endpoint, so browsers never send the request.
+  /collection:
+    post:
+      summary: Collect dye from a vial
+      operationId: collection
+      security:
+        - claimToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id]
+              properties:
+                id:
+                  type: integer
+                  description: Vial position
+      responses:
+        202:
+          description: Collection started
+        400:
+          $ref: "#/components/responses/Error"
+        403:
+          $ref: "#/components/responses/Error"
+        409:
+          $ref: "#/components/responses/Error"
+
+  /dispense:
+    post:
+      summary: Move to a position and dispense a drop
+      operationId: dispense
+      security:
+        - claimToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Position"
+      responses:
+        202:
+          description: Dispense started
+        400:
+          $ref: "#/components/responses/Error"
+        403:
+          $ref: "#/components/responses/Error"
+        409:
+          $ref: "#/components/responses/Error"
+
+  /goto:
+    put:
+      summary: Move to a position without dispensing
+      operationId: goTo
+      security:
+        - claimToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Position"
+      responses:
+        202:
+          description: Movement started
+        400:
+          $ref: "#/components/responses/Error"
+        403:
+          $ref: "#/components/responses/Error"
+        409:
+          $ref: "#/components/responses/Error"

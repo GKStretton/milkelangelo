@@ -11,7 +11,6 @@ import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
-	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/filesystem"
 	"github.com/gkstretton/dark/services/goo/mqtt"
@@ -30,7 +29,7 @@ var subs = []chan *machinepb.StateReport{}
 
 var subsLock sync.Mutex
 
-func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
+func Start(sm *session.SessionManager, stateUpdater types.GooStateUpdater) {
 	mqtt.Subscribe(topics_firmware.TOPIC_STATE_REPORT_RAW, func(topic string, payload []byte) {
 		l.Println("GOT STATE REPORT")
 		t := time.Now().UnixMicro()
@@ -57,8 +56,8 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 		latest_state_report = sr
 		publishStateReport(sr)
 
-		if ebsApi != nil {
-			ebsApi.UpdateState(func(state *types.GooState) {
+		if stateUpdater != nil {
+			stateUpdater.UpdateState(func(state *types.GooState) {
 				state.X = sr.MovementDetails.TargetXUnit
 				state.Y = sr.MovementDetails.TargetYUnit
 
@@ -159,24 +158,6 @@ func Start(sm *session.SessionManager, ebsApi ebsinterface.EbsApi) {
 	})
 
 	RequestStateReport()
-
-	go listenForEbsConnect(ebsApi)
-}
-
-func listenForEbsConnect(ebsApi ebsinterface.EbsApi) {
-	if ebsApi == nil {
-		return
-	}
-
-	c := ebsApi.SubscribeMessages()
-	defer ebsApi.UnsubscribeMessages(c)
-
-	for {
-		msg := <-c
-		if msg.Type == types.EbsConnectedEvent {
-			RequestStateReport()
-		}
-	}
 }
 
 func Subscribe() chan *machinepb.StateReport {

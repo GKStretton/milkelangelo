@@ -16,7 +16,7 @@
 			"path": "tools"
 		},
 		{
-			"path": "twitch-extension"
+			"path": "remote"
 		}
 	],
 	"settings": {}

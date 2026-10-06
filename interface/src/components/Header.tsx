@@ -3,6 +3,10 @@ import { PrecisionManufacturing, Videocam, VideocamOff, Podcasts, PausePresentat
 import { useSessionStatus, useStreamStatus } from "../util/hooks";
 import { NavLink } from "react-router-dom";
 
+// remote control page served by goo's public api
+const remoteUrl =
+  process.env.REACT_APP_REMOTE_URL ?? `http://${window.location.hostname}:8789`;
+
 const nav = (
   <div style={{ flexGrow: 1, marginLeft: "3rem", color:"#ffffff"}}>
     <NavLink color="inherit" to="/" style={{marginRight:"1rem"}}>
@@ -20,6 +24,9 @@ const nav = (
     <NavLink color="inherit" to="/manual" style={{marginRight:"1rem"}}>
       <Typography display="inline" variant="h6">Manual</Typography>
     </NavLink>
+    <a href={remoteUrl} target="_blank" rel="noreferrer" style={{marginRight:"1rem"}}>
+      <Typography display="inline" variant="h6">Remote ↗</Typography>
+    </a>
   </div>
 );
 

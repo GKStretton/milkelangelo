@@ -1,4 +1,4 @@
-.PHONY: goo interface ebs_local ebs_twitch
+.PHONY: goo interface remote
 
 goo:
 	cd goo && go run .
@@ -6,12 +6,6 @@ goo:
 interface:
 	cd interface && npm start
 
-ebs_local:
-	@trap 'kill 0' INT TERM; \
-	cd twitch-extension/frontend && npm run dev & \
-	cd twitch-extension/ebs && go run .
-
-ebs_twitch:
-	@trap 'kill 0' INT TERM; \
-	cd twitch-extension/frontend && npm run dev & \
-	cd twitch-extension/ebs && go run .
+# remote control page dev server, proxying /api to a local goo
+remote:
+	cd remote/frontend && npm run dev

@@ -7,9 +7,10 @@ import (
 var defaults = map[string]any{
 	"LIGHT_STORES_DIR":  "/mnt/md0/light-stores/",
 	"BROKER_HOST":       "milkelangelo",
-	"ENABLE_EBS":        true,
-	"EBS_HOST":          "localhost",
-	"SHARED_SECRET_EBS": "local_secret",
+	"ENABLE_PUBLIC_API": true,
+	"PUBLIC_API_ADDR":   "127.0.0.1:8789",
+	"PUBLIC_UI_DIR":     "",
+	"MEDIAMTX_URL":      "http://milkelangelo:8889",
 }
 
 func init() {
@@ -31,14 +32,21 @@ func BrokerHost() string {
 	return viper.GetString("BROKER_HOST")
 }
 
-func EnableEBS() bool {
-	return viper.GetBool("ENABLE_EBS")
+func EnablePublicApi() bool {
+	return viper.GetBool("ENABLE_PUBLIC_API")
 }
 
-func EbsHost() string {
-	return viper.GetString("EBS_HOST")
+func PublicApiAddr() string {
+	return viper.GetString("PUBLIC_API_ADDR")
 }
 
-func SharedSecretEbs() string {
-	return viper.GetString("SHARED_SECRET_EBS")
+// PublicUiDir is the built remote control page, served by the public api.
+func PublicUiDir() string {
+	return viper.GetString("PUBLIC_UI_DIR")
+}
+
+// MediamtxURL is MediaMTX's WebRTC server, whose signalling for the bowl
+// camera is proxied by the public api. Empty disables video.
+func MediamtxURL() string {
+	return viper.GetString("MEDIAMTX_URL")
 }

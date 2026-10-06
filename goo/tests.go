@@ -6,17 +6,17 @@ import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/dark/services/goo/config"
 	"github.com/gkstretton/dark/services/goo/control"
-	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/email"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
+	"github.com/gkstretton/dark/services/goo/publicapi"
 	"github.com/gkstretton/dark/services/goo/session"
 	"github.com/gkstretton/dark/services/goo/vialprofiles"
 )
 
 // tests for human verification during development
 func runAdHocTests() {
-	testEBS()
+	testPublicApi()
 }
 
 func testEmail() {
@@ -35,24 +35,19 @@ func printProfiles() {
 	}
 }
 
-// connects to a local ebs and enables control, printing received messages
-func testEBS() {
+// serves the public api locally, with control enabled
+func testPublicApi() {
 	mqtt.Start(config.BrokerHost())
 	sm := session.NewSessionManager(false)
 
-	ebs, err := ebsinterface.NewExtensionSession("http://localhost:8788")
-	if err != nil {
-		panic(err)
-	}
-	events.Start(sm, ebs)
-	vialprofiles.Start(sm, ebs)
-	control.Start(ebs)
+	api := publicapi.New()
+	events.Start(sm, api)
+	vialprofiles.Start(sm, api)
+	control.Start(api)
 	control.SetEnabled(true)
 
-	ebsCh := ebs.SubscribeMessages()
-	defer ebs.UnsubscribeMessages(ebsCh)
-
-	for message := range ebsCh {
-		fmt.Printf("got ebs message '%s':\n\t%+v\n\t%+v\n\t%+v\n\n", message.Type, message.DispenseRequest, message.CollectionRequest, message.GoToRequest)
+	if err := api.Start(publicapi.Options{Addr: "127.0.0.1:8789"}); err != nil {
+		panic(err)
 	}
+	select {}
 }

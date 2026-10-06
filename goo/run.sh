@@ -7,9 +7,6 @@ set -euf -o pipefail
 # trap any appropriate signals and kill any child processes we started.
 trap "trap - SIGTERM && pkill -e -TERM -ns 1" SIGINT SIGTERM EXIT
 
-export EBS_HOST=${EBS_HOST}
-export SHARED_SECRET_EBS=${SHARED_SECRET_EBS}
-
 export BROKER_HOST=${BROKER_HOST:-"localhost"}
 
 ./goo

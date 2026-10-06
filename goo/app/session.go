@@ -10,7 +10,6 @@ import (
 	"github.com/gkstretton/asol-protos/go/machinepb"
 	"github.com/gkstretton/asol-protos/go/topics_backend"
 	"github.com/gkstretton/asol-protos/go/topics_firmware"
-	"github.com/gkstretton/dark/services/goo/ebsinterface"
 	"github.com/gkstretton/dark/services/goo/events"
 	"github.com/gkstretton/dark/services/goo/mqtt"
 	"github.com/gkstretton/dark/services/goo/obs"
@@ -28,7 +27,7 @@ type SessionDescriptor struct {
 
 var lock *AutomationLock = &AutomationLock{}
 
-func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi, ebsApi ebsinterface.EbsApi) {
+func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi) {
 	mqtt.Subscribe("asol/debug/runStartSequence", func(topic string, payload []byte) {
 		go func() {
 			fmt.Println(runStartSequence(0, false))
@@ -57,7 +56,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 					streamPreStartMinutes:  0,
 					sessionDurationMinutes: defaultSessionDurationMinutes,
 				},
-				sm, twitchApi, ebsApi,
+				sm, twitchApi,
 			)
 			if err != nil {
 				fmt.Println(err)
@@ -72,7 +71,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 					streamPreStartMinutes:  0,
 					sessionDurationMinutes: defaultSessionDurationMinutes,
 				},
-				sm, twitchApi, ebsApi,
+				sm, twitchApi,
 			)
 			if err != nil {
 				fmt.Println(err)
@@ -90,7 +89,6 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 			err = RunTestSession(
 				sm,
 				time.Duration(n)*time.Minute,
-				ebsApi,
 			)
 			if err != nil {
 				fmt.Println(err)
@@ -99,7 +97,7 @@ func registerHandlers(sm *session.SessionManager, twitchApi *twitchapi.TwitchApi
 	})
 }
 
-func RunTestSession(sm *session.SessionManager, d time.Duration, ebsApi ebsinterface.EbsApi) error {
+func RunTestSession(sm *session.SessionManager, d time.Duration) error {
 	if lock.Get() {
 		return fmt.Errorf("automation already running")
 	}
@@ -143,7 +141,6 @@ func RunSession(
 	d *SessionDescriptor,
 	sm *session.SessionManager,
 	twitchApi *twitchapi.TwitchApi,
-	ebsApi ebsinterface.EbsApi,
 ) error {
 	if lock.Get() {
 		return fmt.Errorf("automation already running")
