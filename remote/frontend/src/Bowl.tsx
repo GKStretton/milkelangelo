@@ -1,4 +1,5 @@
 import { useVideoStream } from "./useVideoStream";
+import VideoStatus from "./VideoStatus";
 
 // The cropped top camera frames the bowl exactly, so video coordinates map
 // straight onto the robot's unit circle.
@@ -14,7 +15,7 @@ interface BowlProps {
 }
 
 export default function Bowl({ x, y, canAim, onAim }: BowlProps) {
-	const { ref: videoRef, hasVideo } = useVideoStream("top-cam-crop");
+	const { ref: videoRef, status } = useVideoStream("top-cam-crop");
 
 	const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
 		if (!canAim) return;
@@ -37,7 +38,7 @@ export default function Bowl({ x, y, canAim, onAim }: BowlProps) {
 			aria-label={`Bowl, pipette at ${x.toFixed(2)}, ${y.toFixed(2)}`}
 		>
 			<video ref={videoRef} muted autoPlay playsInline />
-			{!hasVideo && <div className="bowl-blank">No video</div>}
+			<VideoStatus status={status} className="in-bowl" />
 			<div className="bowl-rim" />
 			<div
 				className="crosshair"
