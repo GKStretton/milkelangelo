@@ -11,6 +11,9 @@ var defaults = map[string]any{
 	"PUBLIC_API_ADDR":   "127.0.0.1:8789",
 	"PUBLIC_UI_DIR":     "",
 	"MEDIAMTX_URL":      "http://milkelangelo:8889",
+
+	"CLOUDFLARE_TURN_KEY_ID":    "",
+	"CLOUDFLARE_TURN_API_TOKEN": "",
 }
 
 func init() {
@@ -49,4 +52,15 @@ func PublicUiDir() string {
 // camera is proxied by the public api. Empty disables video.
 func MediamtxURL() string {
 	return viper.GetString("MEDIAMTX_URL")
+}
+
+// CloudflareTurnKeyID and CloudflareTurnAPIToken are a Cloudflare TURN key,
+// used to give video viewers relay credentials. Video works without them for
+// viewers who can reach MediaMTX directly.
+func CloudflareTurnKeyID() string {
+	return viper.GetString("CLOUDFLARE_TURN_KEY_ID")
+}
+
+func CloudflareTurnAPIToken() string {
+	return viper.GetString("CLOUDFLARE_TURN_API_TOKEN")
 }

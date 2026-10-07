@@ -90,6 +90,31 @@ paths:
               schema:
                 type: string
 
+  /ice-servers:
+    get:
+      summary: ICE servers for video, including TURN relay credentials
+      description: |
+        Short-lived Cloudflare TURN credentials, shared between viewers and
+        renewed before they expire. Pass the list to RTCPeerConnection.
+        404 when goo has no TURN key configured.
+      operationId: getIceServers
+      responses:
+        200:
+          description: ICE servers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  iceServers:
+                    type: array
+                    items:
+                      type: object
+        404:
+          $ref: "#/components/responses/Error"
+        502:
+          $ref: "#/components/responses/Error"
+
   /claim:
     put:
       summary: Claim or renew control

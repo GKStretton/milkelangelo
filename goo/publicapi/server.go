@@ -19,8 +19,13 @@ type Options struct {
 	// UiDir is the built remote control page, served at / if set.
 	UiDir string
 	// MediamtxURL is MediaMTX's WebRTC server. If set, signalling for the
-	// bowl camera is proxied at /video/.
+	// cropped cameras is proxied at /video/.
 	MediamtxURL string
+	// CloudflareTurnKeyID and CloudflareTurnAPIToken, if both set, let
+	// viewers who can't reach MediaMTX directly relay video through
+	// Cloudflare's TURN service. See /api/ice-servers.
+	CloudflareTurnKeyID    string
+	CloudflareTurnAPIToken string
 }
 
 // Start serves the api under /api/, plus the page and video signalling when
@@ -52,6 +57,10 @@ func (a *Api) Start(o Options) error {
 }
 
 func (a *Api) rootHandler(o Options) (http.Handler, error) {
+	if o.CloudflareTurnKeyID != "" && o.CloudflareTurnAPIToken != "" {
+		a.turn = newCloudflareTurn(o.CloudflareTurnKeyID, o.CloudflareTurnAPIToken)
+	}
+
 	mux := http.NewServeMux()
 	mux.Handle("/api/", http.StripPrefix("/api", a.handler()))
 	if o.UiDir != "" {
@@ -77,6 +86,7 @@ func (a *Api) handler() http.Handler {
 	mux.Handle("/collection", method(http.MethodPost, a.handleCollect))
 	mux.Handle("/dispense", method(http.MethodPost, a.handleDispense))
 	mux.Handle("/goto", method(http.MethodPut, a.handleGoTo))
+	mux.Handle("/ice-servers", method(http.MethodGet, a.getIceServers))
 
 	return recoverer(cors(limitBody(mux)))
 }

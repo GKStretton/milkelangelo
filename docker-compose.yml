@@ -50,6 +50,10 @@ services:
       PUBLIC_API_ADDR: ${PUBLIC_API_ADDR:-:8789}
       PUBLIC_UI_DIR: /app/remote
       MEDIAMTX_URL: http://127.0.0.1:8889
+      # Cloudflare TURN key, so viewers who can't reach MediaMTX directly get
+      # relay credentials. Set in .env; video still works on tailscale without.
+      CLOUDFLARE_TURN_KEY_ID: ${CLOUDFLARE_TURN_KEY_ID:-}
+      CLOUDFLARE_TURN_API_TOKEN: ${CLOUDFLARE_TURN_API_TOKEN:-}
   interface:
     build:
       context: ./interface

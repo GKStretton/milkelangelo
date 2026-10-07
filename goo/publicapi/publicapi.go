@@ -27,6 +27,9 @@ type Api struct {
 	expiryTimer *time.Timer
 
 	subs map[chan struct{}]struct{}
+
+	// nil when no TURN relay is configured
+	turn *cloudflareTurn
 }
 
 // state is sent to clients by /state and /events

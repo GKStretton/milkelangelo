@@ -71,6 +71,9 @@ func main() {
 			Addr:        config.PublicApiAddr(),
 			UiDir:       config.PublicUiDir(),
 			MediamtxURL: config.MediamtxURL(),
+
+			CloudflareTurnKeyID:    config.CloudflareTurnKeyID(),
+			CloudflareTurnAPIToken: config.CloudflareTurnAPIToken(),
 		})
 		if err != nil {
 			// don't take down the rest of goo for a misconfigured public api

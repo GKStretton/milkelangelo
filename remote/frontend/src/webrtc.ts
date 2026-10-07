@@ -1,3 +1,16 @@
+// Relay (TURN) servers from goo, for viewers who can't reach MediaMTX
+// directly. null when goo has none, so MediaMTX's own list is used.
+async function relayIceServers(): Promise<RTCIceServer[] | null> {
+	try {
+		const res = await fetch("/api/ice-servers", { cache: "no-store" });
+		if (!res.ok) return null;
+		const data = await res.json();
+		return Array.isArray(data?.iceServers) ? data.iceServers : null;
+	} catch {
+		return null;
+	}
+}
+
 // Plays a MediaMTX WebRTC stream (websocket signalling) into a video element.
 // Adapted from interface/src/util/WebRTCReceiver.ts, with a way to stop it.
 export class WebRTCReceiver {
@@ -19,19 +32,23 @@ export class WebRTCReceiver {
 		this.teardown();
 	}
 
-	private start() {
+	private async start() {
+		// fetched per connection, since the credentials expire
+		const relay = await relayIceServers();
+		if (this.stopped) return;
+
 		const ws = new WebSocket(this.url);
 		this.ws = ws;
 		ws.onerror = () => ws.close();
 		ws.onclose = () => this.scheduleRestart();
-		ws.onmessage = (msg) => this.onIceServers(msg);
+		ws.onmessage = (msg) => this.onIceServers(msg, relay);
 	}
 
-	private onIceServers(msg: MessageEvent) {
+	private onIceServers(msg: MessageEvent, relay: RTCIceServer[] | null) {
 		const ws = this.ws;
 		if (!ws) return;
 
-		const pc = new RTCPeerConnection({ iceServers: JSON.parse(msg.data) });
+		const pc = new RTCPeerConnection({ iceServers: relay ?? JSON.parse(msg.data) });
 		this.pc = pc;
 
 		ws.onmessage = (msg) => {

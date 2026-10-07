@@ -27,16 +27,23 @@ is reachable, including over https. goo proxies only those two streams, to
 MediaMTX directly.
 
 The video itself doesn't go through goo. Browser and MediaMTX connect
-directly, finding a route with the STUN server in MediaMTX's
-`webrtcICEServers`. This is the same route the cloud interface's video takes. It
-works on most networks; ones that block it (strict corporate or mobile
-networks), or that can't reach milkelangelo's network directly (it's behind a
-second router), need a TURN relay. Set one in `.env` on milkelangelo, as a
-comma-separated list in MediaMTX's `type:user:pass:host:port` format:
+directly where they can: on the LAN or tailscale, or through the internet with
+the help of STUN. milkelangelo is behind a second router, so viewers elsewhere
+usually can't, and need a TURN relay to carry the video.
+
+goo provides relay credentials from Cloudflare's TURN service. Create a TURN
+key in the Cloudflare dashboard and set it in `.env` on milkelangelo:
 
 ```bash
-WEBRTC_ICE_SERVERS=stun:stun.l.google.com:19302,turn:USER:PASS:global.relay.metered.ca:80,turns:USER:PASS:global.relay.metered.ca:443
+CLOUDFLARE_TURN_KEY_ID=...
+CLOUDFLARE_TURN_API_TOKEN=...
 ```
+
+Before each video connection the page asks goo for `/api/ice-servers`. goo
+generates credentials valid for 24 hours with the key, caches them for all
+viewers and renews them when under 2 hours are left. Without a key, or if
+Cloudflare can't be reached, the page uses MediaMTX's own list
+(`webrtcICEServers`, overridable with `WEBRTC_ICE_SERVERS` in `.env`).
 
 If video can't connect, the page shows a plain bowl with the pipette position.
 
@@ -80,3 +87,5 @@ goo's Docker image builds the page and serves it from `/app/remote`, at
 | `PUBLIC_API_ADDR` | `127.0.0.1:8789` (`:8789` in docker-compose) | listen address |
 | `PUBLIC_UI_DIR` | none (`/app/remote` in docker) | built page to serve at `/` |
 | `MEDIAMTX_URL` | `http://milkelangelo:8889` (`http://127.0.0.1:8889` in docker) | MediaMTX WebRTC server for video. Empty disables video |
+| `CLOUDFLARE_TURN_KEY_ID` | none | Cloudflare TURN key ID, for relaying video |
+| `CLOUDFLARE_TURN_API_TOKEN` | none | its API token |
