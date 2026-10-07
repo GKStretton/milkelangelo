@@ -28,6 +28,10 @@ services:
     devices:
       - ${TOP_CAM:-/dev/video2}:/dev/top-cam
       - ${FRONT_CAM:-/dev/video0}:/dev/front-cam
+    environment:
+      # overrides webrtcICEServers in rtsp-simple-server.yml. Set in .env to
+      # add a TURN relay, keeping its credentials out of the repo.
+      RTSP_WEBRTCICESERVERS: ${WEBRTC_ICE_SERVERS:-stun:stun.l.google.com:19302}
   goo:
     build:
       context: .
