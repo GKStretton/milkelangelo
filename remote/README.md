@@ -30,8 +30,15 @@ The video itself doesn't go through goo. Browser and MediaMTX connect
 directly, finding a route with the STUN server in MediaMTX's
 `webrtcICEServers`. This is the same route the cloud interface's video takes. It
 works on most networks; ones that block it (strict corporate or mobile
-networks) would need a TURN relay added to `webrtcICEServers`. If video can't
-connect, the page shows a plain bowl with the pipette position.
+networks), or that can't reach milkelangelo's network directly (it's behind a
+second router), need a TURN relay. Set one in `.env` on milkelangelo, as a
+comma-separated list in MediaMTX's `type:user:pass:host:port` format:
+
+```bash
+WEBRTC_ICE_SERVERS=stun:stun.l.google.com:19302,turn:USER:PASS:global.relay.metered.ca:80,turns:USER:PASS:global.relay.metered.ca:443
+```
+
+If video can't connect, the page shows a plain bowl with the pipette position.
 
 ## Developing
 
