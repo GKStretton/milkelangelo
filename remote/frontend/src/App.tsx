@@ -68,7 +68,7 @@ export default function App() {
 	else if (!control.hasControl && state.Claimed)
 		status = {
 			tone: "wait",
-			text: `${state.ClaimedBy || "Someone else"} is painting right now`,
+			text: `${state.ClaimedBy || "Someone else"} is using the robot`,
 		};
 	else if (!control.hasControl) status = { tone: "go", text: "The robot is free" };
 	else if (gs.WaitingForCollection) status = { tone: "go", text: "Pick a colour" };
@@ -104,7 +104,7 @@ export default function App() {
 							{control.hasControl ? (
 								<>
 									{state?.ClaimedBy && (
-										<p className="muted">Painting as {state.ClaimedBy}</p>
+										<p className="muted">In control as {state.ClaimedBy}</p>
 									)}
 									<button type="button" className="quiet" onClick={control.release}>
 										Give up control
