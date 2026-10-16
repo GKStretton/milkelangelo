@@ -18,7 +18,9 @@ var (
 // claim gives control to the caller if nobody has it, returning a token the
 // caller sends with each command. Calling it with the current token renews
 // the claim. A claim expires if not renewed within controlClaimTimeout.
-func (a *Api) claim(token string) (string, error) {
+// claimant is who is claiming, shown to clients, empty if unknown. Renewals
+// keep the original claimant.
+func (a *Api) claim(token, claimant string) (string, error) {
 	a.lock.Lock()
 	defer a.lock.Unlock()
 
@@ -35,8 +37,9 @@ func (a *Api) claim(token string) (string, error) {
 		return "", err
 	}
 
-	l.Println("control claimed")
+	l.Printf("control claimed by %q\n", claimant)
 	a.claimToken = newToken
+	a.claimant = claimant
 	a.expiryTimer = time.AfterFunc(controlClaimTimeout, func() {
 		a.lock.Lock()
 		defer a.lock.Unlock()
@@ -44,6 +47,7 @@ func (a *Api) claim(token string) (string, error) {
 		if a.claimToken == newToken {
 			l.Println("control claim expired")
 			a.claimToken = ""
+			a.claimant = ""
 			a.notify()
 		}
 	})
@@ -62,6 +66,7 @@ func (a *Api) unclaim(token string) error {
 
 	l.Println("control released")
 	a.claimToken = ""
+	a.claimant = ""
 	a.expiryTimer.Stop()
 	a.notify()
 

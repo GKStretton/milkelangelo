@@ -57,7 +57,10 @@ export default function App() {
 	else if (!gs.ControlEnabled) status = { tone: "off", text: "Remote control is switched off" };
 	else if (asleep) status = { tone: "off", text: "The robot is asleep" };
 	else if (!control.hasControl && state.Claimed)
-		status = { tone: "wait", text: "Someone else is painting right now" };
+		status = {
+			tone: "wait",
+			text: `${state.ClaimedBy || "Someone else"} is painting right now`,
+		};
 	else if (!control.hasControl) status = { tone: "go", text: "The robot is free" };
 	else if (gs.WaitingForCollection) status = { tone: "go", text: "Pick a colour" };
 	else if (gs.WaitingForDispense)
@@ -90,9 +93,14 @@ export default function App() {
 					{enabled && !asleep && (
 						<div className="claim">
 							{control.hasControl ? (
-								<button type="button" className="quiet" onClick={control.release}>
-									Give up control
-								</button>
+								<>
+									{state?.ClaimedBy && (
+										<p className="muted">Painting as {state.ClaimedBy}</p>
+									)}
+									<button type="button" className="quiet" onClick={control.release}>
+										Give up control
+									</button>
+								</>
 							) : (
 								<button
 									type="button"

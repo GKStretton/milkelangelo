@@ -11,6 +11,10 @@ page renews the claim every few seconds until they give it up or close the
 page. Commands are checked by `goo/control`, so the page only shows what's
 allowed; the robot enforces it.
 
+Behind Cloudflare Access, the page shows who has control: goo takes their
+email from the `Cf-Access-Authenticated-User-Email` header on their claim.
+The header isn't verified, so anyone who reaches goo directly could set it.
+
 The API does no authentication. Whoever can reach it can use it, so put it
 behind something that controls access before exposing it beyond your own
 networks. Run locally, goo only listens on `127.0.0.1:8789`; deployed with

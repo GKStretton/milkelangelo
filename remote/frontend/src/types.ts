@@ -4,6 +4,8 @@ export interface RemoteState {
 	GooState: GooState;
 	// true while any client holds control, including this one
 	Claimed: boolean;
+	// email of whoever holds control, from Cloudflare Access; empty if unknown
+	ClaimedBy: string;
 }
 
 export interface GooState {

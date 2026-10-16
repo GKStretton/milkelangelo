@@ -33,7 +33,7 @@ func (a *Api) getState(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) handleClaim(w http.ResponseWriter, r *http.Request) {
-	token, err := a.claim(r.Header.Get(claimHeader))
+	token, err := a.claim(r.Header.Get(claimHeader), r.Header.Get(accessEmailHeader))
 	if err != nil {
 		writeError(w, http.StatusForbidden, err)
 		return

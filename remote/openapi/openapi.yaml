@@ -42,6 +42,12 @@ components:
         Claimed:
           type: boolean
           description: True while some client holds control
+        ClaimedBy:
+          type: string
+          description: |
+            Email of whoever holds control, from the
+            Cf-Access-Authenticated-User-Email header Cloudflare Access adds
+            to their /claim request. Empty if unclaimed or unknown.
     Position:
       type: object
       required: [x, y]

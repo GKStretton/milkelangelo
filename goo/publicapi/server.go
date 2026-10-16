@@ -12,6 +12,10 @@ import (
 const (
 	maxBodyBytes = 1 << 10
 	claimHeader  = "X-Claim-Token"
+	// accessEmailHeader is added by Cloudflare Access to requests from users
+	// it has logged in. It isn't verified: anyone who can reach goo directly
+	// could set it, which is fine while that's only the LAN and tailscale.
+	accessEmailHeader = "Cf-Access-Authenticated-User-Email"
 )
 
 type Options struct {

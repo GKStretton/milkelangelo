@@ -71,6 +71,37 @@ func TestClaim(t *testing.T) {
 	assert.NotEqual(t, alice, bob)
 }
 
+func TestClaimedBy(t *testing.T) {
+	h := New().handler()
+	claimAs := func(token, email string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest(http.MethodPut, "/claim", nil)
+		req.Header.Set(claimHeader, token)
+		req.Header.Set(accessEmailHeader, email)
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, req)
+		return w
+	}
+
+	// unknown without the header
+	token := claimToken(t, h, "")
+	assert.Equal(t, "", getState(t, h).ClaimedBy)
+	do(h, http.MethodPut, "/unclaim", token, nil)
+
+	w := claimAs("", "alice@example.com")
+	require.Equal(t, http.StatusOK, w.Code)
+	var resp struct{ Token string }
+	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &resp))
+	assert.Equal(t, "alice@example.com", getState(t, h).ClaimedBy)
+
+	// renewals keep the original claimant, others can't take over
+	claimAs(resp.Token, "bob@example.com")
+	assert.Equal(t, http.StatusForbidden, claimAs("", "bob@example.com").Code)
+	assert.Equal(t, "alice@example.com", getState(t, h).ClaimedBy)
+
+	do(h, http.MethodPut, "/unclaim", resp.Token, nil)
+	assert.Equal(t, "", getState(t, h).ClaimedBy)
+}
+
 func TestCommandRejectedByControl(t *testing.T) {
 	h := New().handler()
 	token := claimToken(t, h, "")
@@ -133,7 +164,7 @@ func TestEvents(t *testing.T) {
 	a.UpdateState(func(s *types.GooState) { s.X = 0.5 })
 	assert.Equal(t, float32(0.5), next().GooState.X)
 
-	_, err = a.claim("")
+	_, err = a.claim("", "")
 	require.NoError(t, err)
 	assert.True(t, next().Claimed)
 }

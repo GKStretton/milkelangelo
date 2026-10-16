@@ -23,7 +23,9 @@ type Api struct {
 	lock     sync.Mutex
 	gooState types.GooState
 
-	claimToken  string
+	claimToken string
+	// claimant is who holds the claim, empty if unknown
+	claimant    string
 	expiryTimer *time.Timer
 
 	subs map[chan struct{}]struct{}
@@ -37,6 +39,9 @@ type state struct {
 	GooState *types.GooState
 	// Claimed is true while a client holds control
 	Claimed bool
+	// ClaimedBy is who holds control, from Cloudflare Access. Empty if
+	// unclaimed or unknown, e.g. when reached from the LAN.
+	ClaimedBy string
 }
 
 func New() *Api {
@@ -59,8 +64,9 @@ func (a *Api) marshalState() ([]byte, error) {
 	defer a.lock.Unlock()
 
 	return json.Marshal(state{
-		GooState: &a.gooState,
-		Claimed:  a.claimToken != "",
+		GooState:  &a.gooState,
+		Claimed:   a.claimToken != "",
+		ClaimedBy: a.claimant,
 	})
 }
 
