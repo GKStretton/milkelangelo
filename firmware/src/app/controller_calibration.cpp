@@ -30,9 +30,9 @@ Status Controller::evaluateCalibration(State *s) {
 		} else {
 			anyRunning = true;
 			if (steppers[i]->HasLimitSwitchBeenPressed()) {
-				steppers[i]->setSpeed(100); // release switch speed
+				steppers[i]->setSpeed(50); // release switch speed
 			} else {
-				steppers[i]->setSpeed(-300); // press switch speed
+				steppers[i]->setSpeed(-150); // press switch speed
 			}
 		}
 	}
