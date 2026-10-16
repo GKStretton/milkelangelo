@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Bowl from "./Bowl";
 import BowlSpeed from "./BowlSpeed";
 import FrontView from "./FrontView";
-import type { GooState, VialProfile } from "./types";
+import type { DispenseState, GooState, VialProfile } from "./types";
 import { useControl } from "./useControl";
 import { useRemoteState } from "./useRemoteState";
 
@@ -16,6 +16,15 @@ function vialsOf(gs: GooState | undefined): Vial[] {
 		.filter((e): e is [string, VialProfile] => e[1] !== null)
 		.map(([pos, profile]) => ({ position: Number(pos), profile }))
 		.sort((a, b) => a.position - b.position);
+}
+
+// drops left in the pipette, or µl if the vial's drop volume is unknown
+function remainingText(holding: DispenseState, vial: Vial | undefined): string {
+	const dropUl = vial?.profile.DropVolumeUl ?? 0;
+	if (dropUl <= 0) return `${holding.VolumeRemainingUl.toFixed(0)} µl left`;
+	// a part drop still counts as one; the margin absorbs float error
+	const drops = Math.max(0, Math.ceil(holding.VolumeRemainingUl / dropUl - 0.01));
+	return `${drops} ${drops === 1 ? "drop" : "drops"} left`;
 }
 
 export default function App() {
@@ -146,10 +155,7 @@ export default function App() {
 							{holding ? (
 								<>
 									{heldVial?.profile.Name ?? `Vial ${holding.VialNumber}`}
-									<span className="muted">
-										{" "}
-										· {holding.VolumeRemainingUl.toFixed(0)} µl left
-									</span>
+									<span className="muted"> · {remainingText(holding, heldVial)}</span>
 								</>
 							) : (
 								<span className="muted">Empty</span>
