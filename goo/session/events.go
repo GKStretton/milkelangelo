@@ -83,9 +83,15 @@ func (sm *SessionManager) publishToBroker(e *SessionEvent) {
 }
 
 func (sm *SessionManager) publishSessionStatus() {
-	session, _ := sm.GetLatestSession()
-	if session == nil {
+	session, err := sm.GetLatestSession()
+	if err != nil {
+		fmt.Printf("error getting latest session for status: %v\n", err)
 		return
+	}
+	if session == nil {
+		// no sessions yet (e.g. fresh disk); report a completed id 0 session
+		// so clients know a new one can be started
+		session = &Session{Complete: true}
 	}
 	s := session.ToProto()
 
