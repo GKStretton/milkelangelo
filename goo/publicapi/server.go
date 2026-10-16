@@ -86,6 +86,7 @@ func (a *Api) handler() http.Handler {
 	mux.Handle("/collection", method(http.MethodPost, a.handleCollect))
 	mux.Handle("/dispense", method(http.MethodPost, a.handleDispense))
 	mux.Handle("/goto", method(http.MethodPut, a.handleGoTo))
+	mux.Handle("/bowl", method(http.MethodPut, a.handleBowl))
 	mux.Handle("/ice-servers", method(http.MethodGet, a.getIceServers))
 
 	return recoverer(cors(limitBody(mux)))

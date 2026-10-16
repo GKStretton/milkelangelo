@@ -500,3 +500,20 @@ button:disabled {
 	color: var(--off);
 	border-color: currentColor;
 }
+
+.bowl-speed {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.bowl-speed input {
+	flex: 1;
+	min-width: 0;
+	accent-color: var(--accent);
+}
+
+.bowl-speed input:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}

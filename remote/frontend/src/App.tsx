@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Bowl from "./Bowl";
+import BowlSpeed from "./BowlSpeed";
 import FrontView from "./FrontView";
 import type { GooState, VialProfile } from "./types";
 import { useControl } from "./useControl";
@@ -33,6 +34,7 @@ export default function App() {
 	const mine = enabled && control.hasControl;
 	const canCollect = mine && gs.WaitingForCollection && !control.pending;
 	const canDispense = mine && gs.WaitingForDispense && !control.pending;
+	const canSpin = mine && !asleep;
 
 	// Space drops, number keys pick a vial
 	useEffect(() => {
@@ -154,6 +156,12 @@ export default function App() {
 							Drop <kbd>Space</kbd>
 						</button>
 					</div>
+
+					<BowlSpeed
+						speed={gs?.BowlSpeed ?? 0}
+						disabled={!canSpin}
+						onSet={control.setBowlSpeed}
+					/>
 
 					{control.notice && (
 						<div className={`notice ${control.notice.tone}`} role="status">

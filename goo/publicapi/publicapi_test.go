@@ -81,6 +81,11 @@ func TestCommandRejectedByControl(t *testing.T) {
 	w := do(h, http.MethodPost, "/collection", token, map[string]int{"id": 2})
 	assert.Equal(t, http.StatusConflict, w.Code)
 	assert.Contains(t, w.Body.String(), "disabled")
+
+	assert.Equal(t, http.StatusBadRequest, do(h, http.MethodPut, "/bowl", token, map[string]int{}).Code)
+	w = do(h, http.MethodPut, "/bowl", token, map[string]int{"speed": 200})
+	assert.Equal(t, http.StatusConflict, w.Code)
+	assert.Contains(t, w.Body.String(), "disabled")
 }
 
 func TestMethodNotAllowed(t *testing.T) {

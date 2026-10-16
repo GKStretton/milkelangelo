@@ -222,3 +222,36 @@ paths:
           $ref: "#/components/responses/Error"
         409:
           $ref: "#/components/responses/Error"
+
+  /bowl:
+    put:
+      summary: Set the bowl's rotation speed
+      description: |
+        Unlike the pipette commands, this is accepted while another command
+        is in progress. The latest requested speed is BowlSpeed in the state.
+      operationId: setBowlSpeed
+      security:
+        - claimToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [speed]
+              properties:
+                speed:
+                  type: number
+                  format: float
+                  minimum: -1000
+                  maximum: 1000
+                  description: Steps per second, negative for reverse, 0 to stop
+      responses:
+        202:
+          description: Speed set
+        400:
+          $ref: "#/components/responses/Error"
+        403:
+          $ref: "#/components/responses/Error"
+        409:
+          $ref: "#/components/responses/Error"

@@ -2,9 +2,13 @@ package control
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/gkstretton/asol-protos/go/topics_backend"
+	"github.com/gkstretton/asol-protos/go/topics_firmware"
 	"github.com/gkstretton/dark/services/goo/mqtt"
+	"github.com/gkstretton/dark/services/goo/types"
 )
 
 // The actor topics are reused for enabling / disabling control.
@@ -21,7 +25,29 @@ func subscribeToBrokerTopics() {
 		publishStatus()
 	})
 
+	// follow bowl speed requests from anywhere (this, the interface) so
+	// clients see the latest
+	mqtt.Subscribe(topics_firmware.TOPIC_SET_BOWL_STEPS_PER_SEC, func(topic string, payload []byte) {
+		speed, err := parseBowlSpeed(string(payload))
+		if err != nil {
+			l.Printf("bad bowl speed request %q: %v\n", payload, err)
+			return
+		}
+		if stateUpdater != nil {
+			stateUpdater.UpdateState(func(state *types.GooState) {
+				state.BowlSpeed = speed
+			})
+		}
+	})
+
 	publishStatus()
+}
+
+// parseBowlSpeed reads the speed from a "speed,accel" bowl request
+func parseBowlSpeed(payload string) (float32, error) {
+	speed, _, _ := strings.Cut(payload, ",")
+	f, err := strconv.ParseFloat(strings.TrimSpace(speed), 32)
+	return float32(f), err
 }
 
 func publishStatus() {

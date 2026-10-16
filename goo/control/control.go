@@ -1,4 +1,4 @@
-// Package control executes collect / dispense / goto commands directly on the
+// Package control executes collect / dispense / goto / bowl speed commands directly on the
 // machine, on behalf of a remote controller (see publicapi).
 //
 // Commands are only accepted while control is enabled, the machine is awake,
@@ -33,6 +33,14 @@ var (
 )
 
 const collectionDrops = 3
+
+const (
+	// MaxBowlSpeed is the fastest the bowl may be spun remotely, steps/sec
+	// either way
+	MaxBowlSpeed float32 = 1000
+	// bowlAcceleration is in steps/sec^2
+	bowlAcceleration float32 = 150
+)
 
 var (
 	lock    sync.Mutex
@@ -151,6 +159,33 @@ func GoTo(x, y float32) error {
 	defer end()
 
 	goTo(x, y)
+	return nil
+}
+
+// SetBowlSpeed spins the bowl at speed steps/sec, negative for reverse, 0 to
+// stop. The bowl is independent of the pipette, so this is allowed while
+// another command is in progress.
+func SetBowlSpeed(speed float32) error {
+	lock.Lock()
+	e := enabled
+	lock.Unlock()
+
+	if !e {
+		return ErrDisabled
+	}
+	sr := events.GetLatestStateReportCopy()
+	if sr == nil {
+		return errors.New("no state report available")
+	}
+	if !isAwake(sr) {
+		return fmt.Errorf("machine not ready, status: %s", sr.GetStatus())
+	}
+	if math.IsNaN(float64(speed)) || speed > MaxBowlSpeed || speed < -MaxBowlSpeed {
+		return fmt.Errorf("bowl speed must be between -%.0f and %.0f", MaxBowlSpeed, MaxBowlSpeed)
+	}
+
+	l.Printf("setting bowl speed to %.0f\n", speed)
+	setBowlSpeed(speed)
 	return nil
 }
 

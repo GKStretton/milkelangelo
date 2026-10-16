@@ -92,5 +92,6 @@ export function useControl() {
 			send((t) => api.collect(t, id), `Collecting ${name}`),
 		dispense: (x: number, y: number) => send((t) => api.dispense(t, x, y)),
 		goTo: (x: number, y: number) => send((t) => api.goTo(t, x, y)),
+		setBowlSpeed: (speed: number) => send((t) => api.setBowlSpeed(t, speed)),
 	};
 }

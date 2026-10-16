@@ -25,6 +25,10 @@ type GooState struct {
 	WaitingForCollection bool
 	WaitingForDispense   bool
 	ControlEnabled       bool
+
+	// BowlSpeed is the last requested bowl speed, steps/sec, negative for
+	// reverse
+	BowlSpeed float32
 }
 
 type CollectionState struct {

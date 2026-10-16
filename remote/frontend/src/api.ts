@@ -52,6 +52,8 @@ export const api = {
 		request("POST", "/dispense", token, { x, y }),
 	goTo: (token: string, x: number, y: number) =>
 		request("PUT", "/goto", token, { x, y }),
+	setBowlSpeed: (token: string, speed: number) =>
+		request("PUT", "/bowl", token, { speed }),
 };
 
 // Release control when the page closes. fetch with keepalive survives unload.

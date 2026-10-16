@@ -70,6 +70,7 @@ api=http://localhost:8789/api
 curl -N $api/events &                      # follow state
 token=$(curl -s -X PUT $api/claim | jq -r .token)
 curl -X POST $api/collection -H "X-Claim-Token: $token" -d '{"id":2}'
+curl -X PUT $api/bowl -H "X-Claim-Token: $token" -d '{"speed":250}'  # steps/sec, 0 stops
 ```
 
 ## Deploying

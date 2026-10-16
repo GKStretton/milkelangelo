@@ -18,6 +18,8 @@ export interface GooState {
 	WaitingForCollection: boolean;
 	WaitingForDispense: boolean;
 	ControlEnabled: boolean;
+	// last requested bowl speed, steps/sec, negative for reverse
+	BowlSpeed: number;
 }
 
 export interface CollectionState {

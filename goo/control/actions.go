@@ -19,6 +19,13 @@ func goTo(x, y float32) {
 	go mqtt.Publish(topics_firmware.TOPIC_GOTO_XY, fmt.Sprintf("%.3f,%.3f", x, y))
 }
 
+func setBowlSpeed(speed float32) {
+	go mqtt.Publish(
+		topics_firmware.TOPIC_SET_BOWL_STEPS_PER_SEC,
+		fmt.Sprintf("%.0f,%.0f", speed, bowlAcceleration),
+	)
+}
+
 func dispense() error {
 	return mqtt.Publish(
 		topics_firmware.TOPIC_DISPENSE,

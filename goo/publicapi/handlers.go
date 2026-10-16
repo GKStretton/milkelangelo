@@ -18,6 +18,10 @@ type positionBody struct {
 	Y *float32 `json:"y"`
 }
 
+type bowlBody struct {
+	Speed *float32 `json:"speed"`
+}
+
 func (a *Api) getState(w http.ResponseWriter, r *http.Request) {
 	data, err := a.marshalState()
 	if err != nil {
@@ -84,6 +88,20 @@ func (a *Api) handleGoTo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respond(w, control.GoTo(*body.X, *body.Y))
+}
+
+func (a *Api) handleBowl(w http.ResponseWriter, r *http.Request) {
+	var body bowlBody
+	if !a.authorise(w, r, &body) {
+		return
+	}
+	if body.Speed == nil {
+		writeError(w, http.StatusBadRequest, errors.New("missing speed"))
+		return
+	}
+
+	l.Printf("bowl request: %.0f\n", *body.Speed)
+	respond(w, control.SetBowlSpeed(*body.Speed))
 }
 
 // authorise checks the caller holds the claim and decodes the body. It writes
