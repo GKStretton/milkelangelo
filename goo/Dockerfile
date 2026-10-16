@@ -28,5 +28,5 @@ WORKDIR /app
 COPY --from=builder /src/goo .
 COPY --from=builder /src/run.sh .
 COPY --from=ui /ui/dist ./remote
-COPY ./scripts ./scripts
+COPY ./goo/scripts ./scripts
 CMD ["./run.sh"]
