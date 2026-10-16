@@ -8,5 +8,6 @@ set -euf -o pipefail
 trap "trap - SIGTERM && pkill -e -TERM -ns 1" SIGINT SIGTERM EXIT
 
 export BROKER_HOST=${BROKER_HOST:-"localhost"}
+export OBS_HOST=${OBS_HOST:-"localhost"}
 
 ./goo

@@ -7,6 +7,7 @@ import (
 var defaults = map[string]any{
 	"LIGHT_STORES_DIR":  "/mnt/md0/light-stores/",
 	"BROKER_HOST":       "milkelangelo",
+	"OBS_HOST":          "milkelangelo",
 	"ENABLE_PUBLIC_API": true,
 	"PUBLIC_API_ADDR":   "127.0.0.1:8789",
 	"PUBLIC_UI_DIR":     "",
@@ -33,6 +34,10 @@ func LightStores() string {
 
 func BrokerHost() string {
 	return viper.GetString("BROKER_HOST")
+}
+
+func OBSHost() string {
+	return viper.GetString("OBS_HOST")
 }
 
 func EnablePublicApi() bool {

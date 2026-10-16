@@ -60,7 +60,7 @@ func main() {
 	events.Start(sm, api)
 	control.Start(api)
 	livecapture.Start(sm)
-	obs.Start(config.BrokerHost(), sm)
+	obs.Start(config.OBSHost(), sm)
 	vialprofiles.Start(sm, api)
 	contentscheduler.Start(sm)
 
