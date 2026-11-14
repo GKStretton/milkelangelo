@@ -98,7 +98,6 @@ typedef enum _machine_ContentType {
     machine_ContentType_CONTENT_TYPE_LONGFORM = 1, 
     machine_ContentType_CONTENT_TYPE_SHORTFORM = 2, 
     machine_ContentType_CONTENT_TYPE_CLEANING = 3, 
-    machine_ContentType_CONTENT_TYPE_DSLR = 4, 
     machine_ContentType_CONTENT_TYPE_STILL = 5 
 } machine_ContentType;
 
@@ -335,8 +334,6 @@ typedef struct _machine_StateReport {
     /* the following are populated by the backend, useful in post-processing */
     bool paused;
     pb_callback_t timestamp_readable;
-    /* e.g. 1 for 0001.jpg */
-    uint64_t latest_dslr_file_number;
 } machine_StateReport;
 
 typedef struct _machine_SystemVialConfigurationSnapshot_ProfilesEntry { 
@@ -404,7 +401,7 @@ extern "C" {
 #define machine_MovementDetails_init_default     {0, 0, 0, 0, 0}
 #define machine_FluidRequest_init_default        {_machine_FluidType_MIN, 0, 0, 0}
 #define machine_FluidDetails_init_default        {0}
-#define machine_StateReport_init_default         {0, 0, _machine_Mode_MIN, _machine_Status_MIN, 0, false, machine_PipetteState_init_default, false, machine_CollectionRequest_init_default, false, machine_MovementDetails_init_default, false, machine_FluidRequest_init_default, false, machine_FluidDetails_init_default, _machine_RinseStatus_MIN, 0, {{NULL}, NULL}, 0}
+#define machine_StateReport_init_default         {0, 0, _machine_Mode_MIN, _machine_Status_MIN, 0, false, machine_PipetteState_init_default, false, machine_CollectionRequest_init_default, false, machine_MovementDetails_init_default, false, machine_FluidRequest_init_default, false, machine_FluidDetails_init_default, _machine_RinseStatus_MIN, 0, {{NULL}, NULL}}
 #define machine_StateReportList_init_default     {{{NULL}, NULL}}
 #define machine_SessionStatus_init_default       {0, 0, 0, 0, 0}
 #define machine_StreamStatus_init_default        {0}
@@ -428,7 +425,7 @@ extern "C" {
 #define machine_MovementDetails_init_zero        {0, 0, 0, 0, 0}
 #define machine_FluidRequest_init_zero           {_machine_FluidType_MIN, 0, 0, 0}
 #define machine_FluidDetails_init_zero           {0}
-#define machine_StateReport_init_zero            {0, 0, _machine_Mode_MIN, _machine_Status_MIN, 0, false, machine_PipetteState_init_zero, false, machine_CollectionRequest_init_zero, false, machine_MovementDetails_init_zero, false, machine_FluidRequest_init_zero, false, machine_FluidDetails_init_zero, _machine_RinseStatus_MIN, 0, {{NULL}, NULL}, 0}
+#define machine_StateReport_init_zero            {0, 0, _machine_Mode_MIN, _machine_Status_MIN, 0, false, machine_PipetteState_init_zero, false, machine_CollectionRequest_init_zero, false, machine_MovementDetails_init_zero, false, machine_FluidRequest_init_zero, false, machine_FluidDetails_init_zero, _machine_RinseStatus_MIN, 0, {{NULL}, NULL}}
 #define machine_StateReportList_init_zero        {{{NULL}, NULL}}
 #define machine_SessionStatus_init_zero          {0, 0, 0, 0, 0}
 #define machine_StreamStatus_init_zero           {0}
@@ -536,7 +533,6 @@ extern "C" {
 #define machine_StateReport_rinse_status_tag     15
 #define machine_StateReport_paused_tag           50
 #define machine_StateReport_timestamp_readable_tag 51
-#define machine_StateReport_latest_dslr_file_number_tag 52
 #define machine_SystemVialConfigurationSnapshot_ProfilesEntry_key_tag 1
 #define machine_SystemVialConfigurationSnapshot_ProfilesEntry_value_tag 2
 #define machine_VialProfileCollection_ProfilesEntry_key_tag 1
@@ -594,8 +590,7 @@ X(a, STATIC,   OPTIONAL, MESSAGE,  fluid_request,    13) \
 X(a, STATIC,   OPTIONAL, MESSAGE,  fluid_details,    14) \
 X(a, STATIC,   SINGULAR, UENUM,    rinse_status,     15) \
 X(a, STATIC,   SINGULAR, BOOL,     paused,           50) \
-X(a, CALLBACK, SINGULAR, STRING,   timestamp_readable,  51) \
-X(a, STATIC,   SINGULAR, UINT64,   latest_dslr_file_number,  52)
+X(a, CALLBACK, SINGULAR, STRING,   timestamp_readable,  51)
 #define machine_StateReport_CALLBACK pb_default_field_callback
 #define machine_StateReport_DEFAULT NULL
 #define machine_StateReport_pipette_state_MSGTYPE machine_PipetteState

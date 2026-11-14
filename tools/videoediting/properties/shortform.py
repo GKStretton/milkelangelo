@@ -39,7 +39,7 @@ class ShortFormPropertyManager(BasePropertyManager):
 
         if (
             video_state.canvas_status == CanvasStatus.AFTER or
-            state_report.latest_dslr_file_number >= misc_data.selected_dslr_number
+            misc_data.start_timestamp_s + seconds_into_session >= misc_data.selected_timestamp_s
         ):
             props.skip = True
             return props, delay, min_duration

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 
 	"github.com/gkstretton/dark/services/goo/util/protoyaml"
@@ -16,7 +17,12 @@ func CreateSymlink(original, new string) error {
 	if err := removeSymlink(new); err != nil {
 		return fmt.Errorf("failed to unlink latest: %v", err)
 	}
-	if err := os.Symlink(original, new); err != nil {
+	// relative, so the link works wherever the storage is mounted
+	rel, err := filepath.Rel(filepath.Dir(new), original)
+	if err != nil {
+		return fmt.Errorf("failed to make symlink target relative: %v", err)
+	}
+	if err := os.Symlink(rel, new); err != nil {
 		return fmt.Errorf("failed to symlink latest: %v", err)
 	}
 	SetPerms(new)

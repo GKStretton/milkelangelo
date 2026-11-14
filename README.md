@@ -80,11 +80,9 @@ MAILJET_API_KEY                       TWITCH_EXTENSION_SECRET     system-vial-pr
 	- [pygateway](services/pygateway/) - Serial-MQTT bridge for the firmware interface
 	- [rtsp](services/rtsp/) - [MediaMTX](https://github.com/aler9/mediamtx) instance for video stream multiplexing
 	- [goo](services/goo/) - Bulk of the runtime backend logic is here
-	- [dslrcapture](services/dslrcapture/) - Separate service for capturing DSLR images in a loop while session is live.
 - [tools](tools/)
-	- [content_generation_dslr_edit.py](tools/content_generation_dslr_edit.py) - for post-processing of the dslr images
 	- [content_generation_video.py](tools/content_generation_video.py) - for generating video content
-	- [content_generation_timelapse.py](tools/content_generation_timelapse.py) - for generating timelapses from all the top-down dslr images
+	- [content_generation_still.py](tools/content_generation_still.py) - for generating the still image from the frame selected in the interface
 
 ## Storage
 
@@ -98,7 +96,6 @@ Currently all data is stored to disk at the `-basePath` provided to _goo_.
 	- 1.yml
 	- 2.yml
 - kv/ (key-value storage for crop config etc.)
-	- crop_dslr
 	- crop_front-cam
 	- crop_top-cam
 
@@ -106,21 +103,20 @@ Each `session_content` folder has the following format (output content in bold):
 
 - state-reports.yml
 - dispense-metadata.yml
-- dslr/
-	- raw/
-		- 0001.jpg
-		- 0001.jpg.creationtime
-		- 0001.jpg.yml (crop info)
-	- post/
-		- **selected/**
 - video/
 	- raw/
 		- front-cam/
 		- top-cam/
+			- 0001.mp4
+			- 0001.mp4.creationtime
+			- 0001.mp4.yml (crop info)
 	- post/
 		- **CONTENT_TYPE.i.mp4**
-- stills/
-	- **INTRO/OUTRO-LANDSCAPE/PORTRAIT.jpg**
+- still/
+	- selected.jpg (frame selected from the top-cam recording in the interface)
+	- selected.yml (which recording and time it was taken from)
+	- post/
+		- **[production id].jpg**
 
 ## License
 

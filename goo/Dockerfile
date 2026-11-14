@@ -22,8 +22,7 @@ RUN go build -a -ldflags '-extldflags "-static"'
 # Runtime stage
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    gphoto2
+    ffmpeg
 WORKDIR /app
 COPY --from=builder /src/goo .
 COPY --from=builder /src/run.sh .

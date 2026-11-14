@@ -25,9 +25,6 @@ constants:
   TOPIC_KV_SET: "asol/kv/set/"
   TOPIC_KV_SET_RESP: "asol/kv/set-resp/"
 
-  TOPIC_TRIGGER_DSLR: "asol/dslr-crop-capture"
-  TOPIC_TRIGGER_DSLR_RESP: "asol/dslr-crop-capture-resp"
-
   TOPIC_MONITOR_ON: "asol/monitor_on"
   TOPIC_MONITOR_OFF: "asol/monitor_off"
 
@@ -38,9 +35,6 @@ constants:
   TOPIC_FRIDGE_SWITCH: "cmnd/tasmota_sw_fridge/Power1"
   PAYLOAD_SMART_SWITCH_ON: "ON"
   PAYLOAD_SMART_SWITCH_OFF: "OFF"
-
-  # deprecated
-  TOPIC_STILLS_GENERATED: "asol/stills-generated"
 
   TOPIC_PIECE_SELECTED: "asol/piece-selected"
   TOPIC_VIDEOS_GENERATED: "asol/videos-generated"

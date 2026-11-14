@@ -1,10 +1,12 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useSessionStatus } from '../util/hooks';
 import StateReport from './StateReport';
-import { Button, Typography } from '@mui/material';
-import { createIncrementalCompilerHost } from 'typescript';
+import { Button, MenuItem, Select, Typography } from '@mui/material';
 import MqttContext from '../util/mqttContext';
-import { TOPIC_GENERATE_CONTENT, TOPIC_STILLS_GENERATED, TOPIC_TRIGGER_DSLR, TRIGGER_UPLOAD_FROM_CONTENT_PLAN } from '../topics_backend/topics_backend';
+import { TOPIC_GENERATE_CONTENT, TRIGGER_UPLOAD_FROM_CONTENT_PLAN } from '../topics_backend/topics_backend';
+
+const SERVER =
+  process.env.REACT_APP_GOO_URL ?? `http://${window.location.hostname}:8089`;
 
 function ContentPage() {
   const { client: c } = useContext(MqttContext);
@@ -12,25 +14,28 @@ function ContentPage() {
 
   const sessionStatus = useSessionStatus()
 
-  const [imageNames, setImageNames] = useState<string[]>();
-  const [selectedImgIndex, setSelectedImgIndex] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoNames, setVideoNames] = useState<string[]>();
+  const [selectedVideo, setSelectedVideo] = useState("");
+  const [currentTime, setCurrentTime] = useState(0);
+  // changes whenever a still is selected, to refetch the image
+  const [stillVersion, setStillVersion] = useState(Date.now());
+  const [stillSelected, setStillSelected] = useState(false);
   const [err, setErr] = useState("");
 
   const getList = useCallback(() => {
     if (!sessionStatus?.id) return;
 
     setErr("");
-    fetch(`http://milkelangelo:8089/list-dslr-post?session_id=${sessionStatus?.id}`)
-    .then((resp) => {
-      console.log("got resp", resp)
+    fetch(`${SERVER}/list-session-videos?session_id=${sessionStatus?.id}`)
+    .then(async (resp) => {
       if (!resp.ok) {
-        resp.text().then((t) => {
-          console.error(t);
-        })
+        throw new Error(await resp.text());
       }
-      resp.json().then((data) => {
-        setImageNames(data);
-      })
+      const data: string[] = await resp.json();
+      setVideoNames(data);
+      // default to the last recording, which contains the end of the session
+      setSelectedVideo(data[data.length - 1] ?? "");
     })
     .catch((e) => {
       console.error(e);
@@ -42,27 +47,28 @@ function ContentPage() {
     getList()
   }, [getList])
 
-  const increment = (i: number) => {
-    const n = (imageNames ?? []).length;
-    setSelectedImgIndex((selectedImgIndex + i + n) % n);
+  const step = (s: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.pause();
+    v.currentTime = Math.min(Math.max(v.currentTime + s, 0), v.duration || 0);
   }
 
   const select = () => {
-    if (!imageNames) return;
-    if (imageNames[selectedImgIndex] === "selected.jpg") {
-      alert("must selected numbered image, not selected.jpg")
-      return;
-    }
+    if (!sessionStatus?.id || !selectedVideo) return;
 
     setErr("");
-
-    fetch(`http://milkelangelo:8089/select-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`)
-    .catch(r => {
-      console.error(r);
-      setErr(r);
+    const t = videoRef.current?.currentTime ?? 0;
+    fetch(`${SERVER}/select-still?session_id=${sessionStatus.id}&name=${selectedVideo}&t=${t.toFixed(3)}`)
+    .then(async (resp) => {
+      if (!resp.ok) {
+        throw new Error(await resp.text());
+      }
+      setStillVersion(Date.now());
     })
-    .finally(() => {
-      getList()
+    .catch((e) => {
+      console.error(e);
+      setErr(e.toString());
     })
   }
 
@@ -82,33 +88,46 @@ function ContentPage() {
     setGenerateRequested(true);
   }
 
-  const imageSelected = useMemo(() => imageNames?.find((v) => v === "selected.jpg") !== undefined, [imageNames])
-
   return (
     <div style={{padding: "1rem"}}>
-      {err ? 
+      {err ?
         <Typography variant='h4' color='error'>{err}</Typography>
       : null}
-      {imageNames ?
+      {!sessionStatus?.id ?
+        <Typography>No session status received yet, waiting for goo over mqtt...</Typography>
+      : null}
+      {videoNames ?
       <>
         <Typography variant="h5">Piece selection session {sessionStatus?.productionId} ({sessionStatus?.id})</Typography>
-        <img
-          alt={imageNames[selectedImgIndex]}
-          width={600}
-          src={`http://milkelangelo:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=${imageNames[selectedImgIndex]}`}
-        />
-        <br/>
-        <div>{imageNames[selectedImgIndex]}</div>
-        <Button variant="outlined" onClick={()=>{increment(-10)}}>{"- 10"}</Button>
-        <Button variant="outlined" onClick={()=>{increment(-1)}}>{"- 1"}</Button>
-        <Button variant="contained" onClick={()=>{select()}}>{"Select"}</Button>
-        <Button variant="outlined" onClick={()=>{increment(1)}}>{"+ 1"}</Button>
-        <Button variant="outlined" onClick={()=>{increment(10)}}>{"+ 10"}</Button>
+        {videoNames.length > 1 ?
+          <Select size="small" value={selectedVideo} onChange={(e) => setSelectedVideo(e.target.value)}>
+            {videoNames.map((n) => <MenuItem key={n} value={n}>{n}</MenuItem>)}
+          </Select>
+        : null}
+        {selectedVideo ?
+          <video
+            ref={videoRef}
+            key={selectedVideo}
+            width={600}
+            controls
+            muted
+            preload="auto"
+            src={`${SERVER}/get-session-video?session_id=${sessionStatus?.id}&name=${selectedVideo}`}
+            onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+            style={{display: "block"}}
+          />
+        : <div>No top-cam recordings found for this session</div>}
+        <div>{selectedVideo} @ {currentTime.toFixed(2)}s</div>
+        <Button variant="outlined" onClick={()=>{step(-300)}}>{"- 5m"}</Button>
+        <Button variant="outlined" onClick={()=>{step(-30)}}>{"- 30s"}</Button>
+        <Button variant="contained" disabled={!selectedVideo} onClick={()=>{select()}}>{"Select"}</Button>
+        <Button variant="outlined" onClick={()=>{step(30)}}>{"+ 30s"}</Button>
+        <Button variant="outlined" onClick={()=>{step(300)}}>{"+ 5m"}</Button>
         <br/>
         <br/>
         {!connected ? <div>ERROR: not connected to mqtt broker</div>: null}
-        {!imageSelected ? <div>Cannot generate because image has not been selected</div>: null}
-        <Button variant="contained" color="success" disabled={!connected || !imageSelected || generateRequested} onClick={()=>{generateContent()}}>Generate Content</Button>
+        {!stillSelected ? <div>Cannot generate because a still has not been selected</div>: null}
+        <Button variant="contained" color="success" disabled={!connected || !stillSelected || generateRequested} onClick={()=>{generateContent()}}>Generate Content</Button>
         <div>{generateMessage}</div>
         <br/>
         <hr />
@@ -116,16 +135,16 @@ function ContentPage() {
         <Button variant="outlined" color="warning" disabled={!connected} onClick={()=>{c?.publish(TRIGGER_UPLOAD_FROM_CONTENT_PLAN, String(sessionStatus?.id))}}>Trigger upload</Button>
         <br/>
         <br/>
-        {imageSelected ?
-        <>
+        <div style={{display: stillSelected ? "block" : "none"}}>
           <div>Selected:</div>
           <img
-            alt="selected.jpg"
+            alt="selected still"
             width={600}
-            src={`http://milkelangelo:8089/get-dslr-post?session_id=${sessionStatus?.id}&image_name=selected.jpg`}
+            src={`${SERVER}/get-still?session_id=${sessionStatus?.id}&v=${stillVersion}`}
+            onLoad={() => setStillSelected(true)}
+            onError={() => setStillSelected(false)}
           />
-        </>
-        : null}
+        </div>
       </>
       : null }
       <br/>

@@ -29,15 +29,3 @@ def read_remote_crop_config(name):
         print(resp.payload.decode("utf-8"))
         cfg = yaml.load(resp.payload, Loader=yaml.FullLoader)
         return cfg
-
-# returns True if successful, otherwise False
-def trigger_dslr_capture():
-    print("triggering dslr capture...")
-    mqttpub.single(tb.TOPIC_TRIGGER_DSLR, payload="", hostname=HOST, port=1883, client_id=CLIENT_ID)
-    resp = mqttsub.simple(tb.TOPIC_TRIGGER_DSLR_RESP, hostname=HOST, port=1883, client_id=CLIENT_ID, keepalive=1)
-    msg = resp.payload.decode("utf-8")
-    if msg == "ack":
-        return True
-    
-    print("noack:", msg)
-    return False

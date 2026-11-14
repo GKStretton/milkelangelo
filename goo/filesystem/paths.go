@@ -131,46 +131,21 @@ func GetRawVideoDir(sessionId uint64, rtspPath string) string {
 	return p
 }
 
-func GetRawDslrDir(sessionId uint64) string {
-	// ensures each level gets set, because this is run from dslrcapture root
-	// service.
-
+// GetStillDir mkdirAlls and returns the dir holding the still frame
+// selected from the session's top-cam recording (selected.jpg, selected.yml).
+func GetStillDir(sessionId uint64) string {
 	p := filepath.Join(
 		*basePath,
 		*contentPath,
 		strconv.Itoa(int(sessionId)),
-		"dslr",
+		"still",
 	)
-	p2 := filepath.Join(p, "raw")
-
-	err := os.MkdirAll(p2, 0777)
+	err := os.MkdirAll(p, 0777)
 	if err != nil {
-		panic(fmt.Errorf("failed to create raw dslr path: %v", err))
+		panic(fmt.Errorf("failed to create still path: %v", err))
 	}
 	SetPerms(p)
-	SetPerms(p2)
-	return p2
-}
-
-func GetPostDslrDir(sessionId uint64) string {
-	// ensures each level gets set, because this is run from dslrcapture root
-	// service.
-
-	p := filepath.Join(
-		*basePath,
-		*contentPath,
-		strconv.Itoa(int(sessionId)),
-		"dslr",
-	)
-	p2 := filepath.Join(p, "post")
-
-	err := os.MkdirAll(p2, 0777)
-	if err != nil {
-		panic(fmt.Errorf("failed to create post dslr path: %v", err))
-	}
-	SetPerms(p)
-	SetPerms(p2)
-	return p2
+	return p
 }
 
 // get dir with post processed videos in
@@ -184,17 +159,15 @@ func GetPostVideosDir(sessionId uint64) string {
 	)
 }
 
-func GetDslrPreviewFile() string {
-	return filepath.Join(*basePath, "dslr-preview.jpg")
-}
-
-// GetPostStillFile returns the filename of the first .jpg file in the specified directory
+// GetPostStillFile returns the filename of the first .jpg file in the
+// generated still dir
 func GetPostStillFile(sessionId uint64) (string, error) {
 	searchDir := filepath.Join(
 		*basePath,
 		*contentPath,
 		strconv.Itoa(int(sessionId)),
-		"dslr",
+		"still",
+		"post",
 	)
 
 	files, err := os.ReadDir(searchDir)
@@ -225,22 +198,6 @@ func GetIncrementalFileName(outDir string, ext string) string {
 		i++
 		if i > 10000 {
 			panic("bug in GetIncrementalFileName: filename should likely not exceed 10000")
-		}
-	}
-}
-
-func GetLatestDslrFileNumber(sessionId uint64) uint64 {
-	outDir := GetRawDslrDir(sessionId)
-	ext := "jpg"
-	i := uint64(1)
-	for {
-		p := filepath.Join(outDir, fmt.Sprintf("%04d", i)+"."+ext)
-		if !Exists(p) {
-			return i - 1
-		}
-		i++
-		if i > 10000 {
-			panic("bug in GetLatestDslrFilename: filename should likely not exceed 10000")
 		}
 	}
 }

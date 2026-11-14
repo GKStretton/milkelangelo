@@ -502,7 +502,6 @@ export enum ContentType {
   CONTENT_TYPE_LONGFORM = 1,
   CONTENT_TYPE_SHORTFORM = 2,
   CONTENT_TYPE_CLEANING = 3,
-  CONTENT_TYPE_DSLR = 4,
   CONTENT_TYPE_STILL = 5,
   UNRECOGNIZED = -1,
 }
@@ -521,9 +520,6 @@ export function contentTypeFromJSON(object: any): ContentType {
     case 3:
     case "CONTENT_TYPE_CLEANING":
       return ContentType.CONTENT_TYPE_CLEANING;
-    case 4:
-    case "CONTENT_TYPE_DSLR":
-      return ContentType.CONTENT_TYPE_DSLR;
     case 5:
     case "CONTENT_TYPE_STILL":
       return ContentType.CONTENT_TYPE_STILL;
@@ -544,8 +540,6 @@ export function contentTypeToJSON(object: ContentType): string {
       return "CONTENT_TYPE_SHORTFORM";
     case ContentType.CONTENT_TYPE_CLEANING:
       return "CONTENT_TYPE_CLEANING";
-    case ContentType.CONTENT_TYPE_DSLR:
-      return "CONTENT_TYPE_DSLR";
     case ContentType.CONTENT_TYPE_STILL:
       return "CONTENT_TYPE_STILL";
     case ContentType.UNRECOGNIZED:
@@ -726,8 +720,6 @@ export interface StateReport {
   /** the following are populated by the backend, useful in post-processing */
   paused: boolean;
   timestampReadable: string;
-  /** e.g. 1 for 0001.jpg */
-  latestDslrFileNumber: number;
 }
 
 export interface StateReportList {
@@ -1570,7 +1562,6 @@ function createBaseStateReport(): StateReport {
     rinseStatus: 0,
     paused: false,
     timestampReadable: "",
-    latestDslrFileNumber: 0,
   };
 }
 
@@ -1614,9 +1605,6 @@ export const StateReport: MessageFns<StateReport> = {
     }
     if (message.timestampReadable !== "") {
       writer.uint32(410).string(message.timestampReadable);
-    }
-    if (message.latestDslrFileNumber !== 0) {
-      writer.uint32(416).uint64(message.latestDslrFileNumber);
     }
     return writer;
   },
@@ -1738,14 +1726,6 @@ export const StateReport: MessageFns<StateReport> = {
             message.timestampReadable = reader.string();
             continue;
           }
-          case 52: {
-            if (tag !== 416) {
-              break;
-            }
-
-            message.latestDslrFileNumber = longToNumber(reader.uint64());
-            continue;
-          }
         }
         if ((tag & 7) === 4 || tag === 0) {
           break;
@@ -1813,11 +1793,6 @@ export const StateReport: MessageFns<StateReport> = {
         : isSet(object.timestamp_readable)
         ? globalThis.String(object.timestamp_readable)
         : "",
-      latestDslrFileNumber: isSet(object.latestDslrFileNumber)
-        ? globalThis.Number(object.latestDslrFileNumber)
-        : isSet(object.latest_dslr_file_number)
-        ? globalThis.Number(object.latest_dslr_file_number)
-        : 0,
     };
   },
 
@@ -1862,9 +1837,6 @@ export const StateReport: MessageFns<StateReport> = {
     if (message.timestampReadable !== "") {
       obj.timestampReadable = message.timestampReadable;
     }
-    if (message.latestDslrFileNumber !== 0) {
-      obj.latestDslrFileNumber = Math.round(message.latestDslrFileNumber);
-    }
     return obj;
   },
 
@@ -1896,7 +1868,6 @@ export const StateReport: MessageFns<StateReport> = {
     message.rinseStatus = object.rinseStatus ?? 0;
     message.paused = object.paused ?? false;
     message.timestampReadable = object.timestampReadable ?? "";
-    message.latestDslrFileNumber = object.latestDslrFileNumber ?? 0;
     return message;
   },
 };

@@ -11,7 +11,7 @@ from videoediting.compositor_helpers import (
     build_title,
     build_session_number,
     build_loader,
-    build_dslr_image,
+    build_still_image,
     get_size_from_format,
     water_resize_pulse,
     sponge_animation,
@@ -83,7 +83,7 @@ def build_main_intro(
 
     # Create a composite video clip
     clips = [
-        build_dslr_image(
+        build_still_image(
             base_dir,
             session_number,
             duration,
@@ -149,7 +149,7 @@ def build_cleaning_intro(
 
     # Create a composite video clip
     clips = [
-        build_dslr_image(base_dir, session_number, duration, fmt, 'center', do_drain_effect=True),
+        build_still_image(base_dir, session_number, duration, fmt, 'center', do_drain_effect=True),
     ]
     clips.extend(base)
     clips.append(loader_bounce)

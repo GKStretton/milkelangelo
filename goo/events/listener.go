@@ -47,7 +47,6 @@ func Start(sm *session.SessionManager, stateUpdater types.GooStateUpdater) {
 		session, _ := sm.GetLatestSession()
 		if session != nil {
 			sr.Paused = session.Paused
-			sr.LatestDslrFileNumber = filesystem.GetLatestDslrFileNumber(uint64(session.Id))
 		}
 
 		srLock.Lock()

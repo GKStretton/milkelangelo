@@ -4,7 +4,6 @@ const (
 	// Crop config keys
 	CC_TOP_CAM   = "crop_top-cam"
 	CC_FRONT_CAM = "crop_front-cam"
-	CC_DSLR      = "crop_dslr"
 )
 
 type CropConfig struct {

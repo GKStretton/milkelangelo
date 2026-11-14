@@ -30,12 +30,12 @@ class CleaningPropertyManager(BasePropertyManager):
         if props.skip:
             return props, delay, min_duration
 
-        # skip everything before selected dslr image
-        if state_report.latest_dslr_file_number < misc_data.selected_dslr_number:
+        # skip everything before selected still
+        if misc_data.start_timestamp_s + seconds_into_session < misc_data.selected_timestamp_s:
             props.skip = True
             return props, delay, min_duration
 
-        # speed up from selected dslr to drain start
+        # speed up from selected still to drain start
         if video_state.canvas_status == CanvasStatus.DURING:
             props.speed = 150
             return props, delay, min_duration

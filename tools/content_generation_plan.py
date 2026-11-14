@@ -5,7 +5,6 @@ import os
 import videoediting.loaders as loaders
 
 from content_plan.cleaning import *
-from content_plan.dslr import *
 from content_plan.longform import *
 from content_plan.shortform import *
 from content_plan.still import *
@@ -39,7 +38,6 @@ if __name__ == "__main__":
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_LONGFORM.name] = buildLongform(args.base_dir, session_number_text)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_SHORTFORM.name] = buildShortform(args.base_dir, session_number_text)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_CLEANING.name] = buildCleaning(args.base_dir, session_number_text, unlisted=True)
-    content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_DSLR.name] = buildDslr(session_number_text, unlisted=True)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_STILL.name] = buildStill(session_number_text)
 
     write_content_statuses(content_statuses, args.base_dir, args.session_number)

@@ -9,21 +9,14 @@ from pycommon.config_manager_client import *
 
 HOST = "localhost"
 
-# location to load dslr image from if doing that crop
-# note, this uses the mount-md0 script to mount remote filesystem
-DSLR_CAPTURE_LOCATION = "/mnt/md0/light-stores/dslr-preview.jpg"
-
 TOP_CAM_CHOICE = "1"
 FRONT_CAM_CHOICE = "2"
-DSLR_CHOICE = "3"
 
 def name_from_choice(choice):
     if choice == TOP_CAM_CHOICE:
         return "crop_top-cam"
     if choice == FRONT_CAM_CHOICE:
         return "crop_front-cam"
-    if choice == DSLR_CHOICE:
-        return "crop_dslr"
 
 def write_yaml(choice, yml):
     name = name_from_choice(choice)
@@ -52,20 +45,7 @@ class CropWindow(window.Window):
         
         print("loaded (x1, y1); (x2, y2) as ({}, {}); ({}, {})".format(self.x1, self.y1, self.x2, self.y2))
 
-        if choice == TOP_CAM_CHOICE or choice == FRONT_CAM_CHOICE:
-            self.open_stream()
-        else:
-            self.load_dslr_image()
-        
-    
-    def load_dslr_image(self):
-        # request dslr capture to be taken
-        succ = trigger_dslr_capture()
-        if not succ:
-            print("failed to do dslr capture, reading anyway")
-        self.dslr_capture = cv2.imread(DSLR_CAPTURE_LOCATION, cv2.IMREAD_UNCHANGED)
-        self.dslr_capture = cv2.rotate(self.dslr_capture, cv2.ROTATE_180)
-        # self.dslr_capture = np.zeros((1000, 1000, 3))
+        self.open_stream()
     
     def open_stream(self):
         print("Opening stream...")
@@ -122,13 +102,10 @@ class CropWindow(window.Window):
 
     
     def update(self):
-        if self.choice == TOP_CAM_CHOICE or self.choice == FRONT_CAM_CHOICE:
-            ret, frame = self.stream.read()
-            if ret == False:
-                print("Frame empty, quitting")
-                self.exit()
-        else:
-            frame = self.dslr_capture.copy()
+        ret, frame = self.stream.read()
+        if ret == False:
+            print("Frame empty, quitting")
+            self.exit()
 
         self.frame_width=frame.shape[1]
         self.frame_height=frame.shape[0]
@@ -147,9 +124,8 @@ class CropWindow(window.Window):
 if __name__ == "__main__":
     print(TOP_CAM_CHOICE, "- top-cam")
     print(FRONT_CAM_CHOICE, "- front-cam")
-    print(DSLR_CHOICE, "- dslr")
-    choice = input("Enter choice 1-3: ")
-    if choice != TOP_CAM_CHOICE and choice != FRONT_CAM_CHOICE and choice != DSLR_CHOICE:
+    choice = input("Enter choice 1-2: ")
+    if choice != TOP_CAM_CHOICE and choice != FRONT_CAM_CHOICE:
         print("invalid choice:", choice)
         exit()
 

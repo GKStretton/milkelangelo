@@ -96,7 +96,6 @@ class ContentType(betterproto.Enum):
     CONTENT_TYPE_LONGFORM = 1
     CONTENT_TYPE_SHORTFORM = 2
     CONTENT_TYPE_CLEANING = 3
-    CONTENT_TYPE_DSLR = 4
     CONTENT_TYPE_STILL = 5
 
 
@@ -191,8 +190,6 @@ class StateReport(betterproto.Message):
     # the following are populated by the backend, useful in post-processing
     paused: bool = betterproto.bool_field(50)
     timestamp_readable: str = betterproto.string_field(51)
-    # e.g. 1 for 0001.jpg
-    latest_dslr_file_number: int = betterproto.uint64_field(52)
 
 
 @dataclass

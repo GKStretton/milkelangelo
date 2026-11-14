@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 
 from moviepy.editor import ImageClip, CompositeVideoClip, TextClip
-from videoediting.loaders import get_selected_dslr_realpath
 from videoediting.compositor_helpers import (
     build_subtitle,
     build_title,
@@ -27,16 +26,6 @@ def ts_to_date_time(timestamp):
     return formatted
 
 
-def get_file_date_time(path):
-    with open(path + ".creationtime", 'r') as f:
-        raw = f.readline()
-
-        # timestamp unix in seconds with decimal
-        unix_time = float(raw)
-
-        return ts_to_date_time(unix_time)
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--base-dir", action="store",
@@ -54,11 +43,10 @@ if __name__ == "__main__":
 
     duration = 1
 
-    dslr_path = get_selected_dslr_realpath(base_dir, session_number)
-    # creationtime is on the raw not post file
-    date_time = get_file_date_time(dslr_path.replace("/post/", "/raw/"))
-    dslr_clip = ImageClip(dslr_path).with_duration(duration)
-    w, h = dslr_clip.size
+    still_img = loaders.get_selected_still_image(base_dir, session_number)
+    date_time = ts_to_date_time(loaders.get_selected_still_timestamp(base_dir, session_number))
+    still_clip = ImageClip(still_img).with_duration(duration)
+    w, h = still_clip.size
 
     align_x, align_y = -1080, -350
 
@@ -93,7 +81,7 @@ if __name__ == "__main__":
     ).with_duration(duration).with_position((30, 50))
 
     clip = CompositeVideoClip([
-        dslr_clip,
+        still_clip,
         title,
         session_number_clip,
         date
@@ -102,8 +90,9 @@ if __name__ == "__main__":
     # clip.resize((1000, 1000)).show(interactive=True)
 
     filename = f"{metadata['production_id']}" if metadata['production'] else f"dev{metadata['id']}"
-    still_path = os.path.join(base_dir, "session_content", str(
-        session_number), "dslr", f"{filename}.jpg")
-    clip.save_frame(still_path, t=0.5)
+    out_dir = os.path.join(loaders.get_still_dir(base_dir, session_number), "post")
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, f"{filename}.jpg")
+    clip.save_frame(out_path, t=0.5)
 
-    Path(f"{still_path}.completed").touch()
+    Path(f"{out_path}.completed").touch()

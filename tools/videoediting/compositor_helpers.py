@@ -9,7 +9,7 @@ from moviepy.video.fx.resize import resize
 from moviepy.video.fx.loop import loop
 
 from videoediting.constants import Format, MAIN_FONT, PIXEL_FONT
-from videoediting.loaders import get_selected_dslr_image_path
+from videoediting.loaders import get_selected_still_image
 
 
 def build_title(pos: typing.Tuple[int, int], duration: float, font_size=115) -> typing.List[TextClip]:
@@ -133,12 +133,12 @@ def get_size_from_format(fmt: Format) -> typing.Tuple[int, int]:
 
 
 def slow_grow_effect(t):
-    """A transition for dslr images, for gradual zooming in"""
+    """A transition for still images, for gradual zooming in"""
     return 1+t/15
 
 
 def get_drain_effect(duration: float):
-    """A transition for dslr images, for drain shrink effect"""
+    """A transition for still images, for drain shrink effect"""
     return lambda t: max(0.01, np.cos(0.5*np.pi*t/duration))
 
 
@@ -160,14 +160,14 @@ def sponge_animation(t):
     return -np.cos(np.pi * 2 * (t+offset)) * mag
 
 
-def build_dslr_image(base_dir: str, session_number: int, duration: float, fmt: Format, pos, do_drain_effect: bool = False) -> VideoClip:
-    """Return the selected dslr image and slowly zoom in in the clip"""
-    dslr_img = get_selected_dslr_image_path(base_dir, session_number, "selected")
-    dslr_clip = ImageClip(dslr_img).with_duration(duration)
-    dslr_start_size = min(*get_size_from_format(fmt)) * 0.95
+def build_still_image(base_dir: str, session_number: int, duration: float, fmt: Format, pos, do_drain_effect: bool = False) -> VideoClip:
+    """Return the selected still image and slowly zoom in in the clip"""
+    still_img = get_selected_still_image(base_dir, session_number)
+    still_clip = ImageClip(still_img).with_duration(duration)
+    still_start_size = min(*get_size_from_format(fmt)) * 0.95
     return (
-        dslr_clip
-        .fx(resize, (dslr_start_size, dslr_start_size))
+        still_clip
+        .fx(resize, (still_start_size, still_start_size))
         .fx(resize, get_drain_effect(duration) if do_drain_effect else slow_grow_effect)
         .with_position(pos)
     )

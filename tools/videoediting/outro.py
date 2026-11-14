@@ -5,7 +5,7 @@ from moviepy.video.fx import resize, rotate, loop
 from videoediting.constants import Format, MAIN_FONT, PIXEL_FONT
 from videoediting.compositor_helpers import (
     get_size_from_format,
-    build_dslr_image,
+    build_still_image,
     slow_grow_effect,
     build_title,
     build_session_number,
@@ -136,7 +136,7 @@ def build_outro(
     clips = []
 
     clips.append(
-        build_dslr_image(
+        build_still_image(
             base_dir,
             session_number,
             duration,

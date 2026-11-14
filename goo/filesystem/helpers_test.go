@@ -11,7 +11,7 @@ import (
 )
 
 func TestSetPerms(t *testing.T) {
-	SetPerms("/mnt/md0/light-stores/session_content/34/dslr/raw/0002.jpg.yml")
+	SetPerms("/mnt/md0/light-stores/session_content/34/still/selected.yml")
 }
 
 func TestWriteCreationTime(t *testing.T) {

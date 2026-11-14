@@ -1,11 +1,12 @@
 import logging
-from pathlib import Path
 import typing
 import os
 from dataclasses import dataclass
 
+import numpy as np
 from PIL import Image
 import machinepb.machine as pb
+import pycommon.image as image
 
 import yaml
 
@@ -50,42 +51,40 @@ def get_content_plan(base_dir: str, session_number: int) -> pb.ContentTypeStatus
     return pb.ContentTypeStatuses().from_dict(raw_plan)
 
 
-def get_selected_dslr_image_path(base_dir: str, session_number: int, image_choice: str) -> str:
-    filename = f"{image_choice}.jpg"
-    return os.path.join(base_dir, "session_content", str(session_number), "dslr/post", filename)
+def get_still_dir(base_dir: str, session_number: int) -> str:
+    return os.path.join(get_session_content_path(base_dir, session_number), "still")
 
 
-def get_selected_dslr_image(base_dir: str, session_number: int, image_choice: str) -> Image.Image:
-    return Image.open(get_selected_dslr_image_path(base_dir, session_number, image_choice))
-
-# look up creationtime of selected.jpg dslr/post image
-
-
-def get_selected_dslr_realpath(base_dir: str, session_number: int) -> str:
-    linkname = f"selected.jpg"
-    path = os.path.join(base_dir, "session_content", str(session_number), "dslr/post", linkname)
-
-    # resolves symlink
-    return os.path.realpath(path)
+# frame selected from the top-cam recording in the interface
+def get_selected_still_path(base_dir: str, session_number: int) -> str:
+    return os.path.join(get_still_dir(base_dir, session_number), "selected.jpg")
 
 
-def get_selected_dslr_image_number(base_dir: str, session_number: int) -> int:
-    real_path = get_selected_dslr_realpath(base_dir, session_number)
-    name = Path(real_path).stem
+# selected still with the vignette overlay applied, as an RGB array
+def get_selected_still_image(base_dir: str, session_number: int) -> np.ndarray:
+    img = np.array(Image.open(get_selected_still_path(base_dir, session_number)).convert("RGB"))
+    image.add_overlay(img)
+    return img
 
-    return int(name)
+
+# unix timestamp (s) of the frame selected in the interface
+def get_selected_still_timestamp(base_dir: str, session_number: int) -> float:
+    with open(os.path.join(get_still_dir(base_dir, session_number), "selected.yml"), 'r') as f:
+        selected = yaml.load(f, yaml.FullLoader)
+
+    return float(selected['timestamp_unix'])
 
 
 @dataclass
 class MiscData:
     """Miscellaneous data to be passed to the pipeline"""
-    selected_dslr_number: int = 0
+    selected_timestamp_s: float = 0
     start_timestamp_s: int = 0
 
 
 def get_misc_data(base_dir: str, session_number: int, state_reports: typing.Tuple[float, pb.StateReport]) -> MiscData:
     return MiscData(
-        selected_dslr_number=get_selected_dslr_image_number(base_dir, session_number),
+        selected_timestamp_s=get_selected_still_timestamp(base_dir, session_number),
         start_timestamp_s=state_reports[0][0]
     )
 

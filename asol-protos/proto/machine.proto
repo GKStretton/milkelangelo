@@ -166,8 +166,9 @@ message StateReport {
 	// the following are populated by the backend, useful in post-processing
 	bool paused = 50;
 	string timestamp_readable = 51;
-	// e.g. 1 for 0001.jpg
-	uint64 latest_dslr_file_number = 52;
+	// was latest_dslr_file_number
+	reserved 52;
+	reserved "latest_dslr_file_number";
 }
 
 message StateReportList {
@@ -211,7 +212,9 @@ enum ContentType {
 	CONTENT_TYPE_LONGFORM = 1;
 	CONTENT_TYPE_SHORTFORM = 2;
 	CONTENT_TYPE_CLEANING = 3;
-	CONTENT_TYPE_DSLR = 4;
+	// was CONTENT_TYPE_DSLR
+	reserved 4;
+	reserved "CONTENT_TYPE_DSLR";
 	CONTENT_TYPE_STILL = 5;
 }
 
