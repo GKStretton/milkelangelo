@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_LONGFORM.name] = buildLongform(args.base_dir, session_number_text)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_SHORTFORM.name] = buildShortform(args.base_dir, session_number_text)
-    content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_CLEANING.name] = buildCleaning(args.base_dir, session_number_text, unlisted=True)
+    # content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_CLEANING.name] = buildCleaning(args.base_dir, session_number_text, unlisted=True)
     content_statuses.content_statuses[pb.ContentType.CONTENT_TYPE_STILL.name] = buildStill(session_number_text)
 
     write_content_statuses(content_statuses, args.base_dir, args.session_number)
