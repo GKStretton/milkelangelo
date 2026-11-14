@@ -8,6 +8,10 @@ def load_song(base_dir: str, music_file: str) -> AudioFileClip:
 	return AudioFileClip(path)
 
 def add_music(base_dir: str, content_clip: VideoClip, music_file: str) -> VideoClip:
+	# no music chosen in the content plan
+	if not music_file:
+		return content_clip
+
 	audio: AudioClip = audio_loop(load_song(base_dir, music_file), duration=content_clip.duration)
 	audio = audio_fadeout(audio, 3)
 	

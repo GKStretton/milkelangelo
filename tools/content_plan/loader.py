@@ -175,20 +175,40 @@ def generate_splashtext_hue():
         choices.append(i)
     return random.choice(choices)
 
-# get_music returns file and friendly name for track to use
+# get_music returns file and friendly name for track to use, or ("", "") if
+# the music isn't in base_dir/music, in which case the content has no music
 def get_music(base_dir: str, ct: pb.ContentType) -> typing.Tuple[str, str]:
+    music_dir = os.path.join(base_dir, "music")
+
     if ct == pb.ContentType.CONTENT_TYPE_LONGFORM:
+        if not os.path.isfile(os.path.join(music_dir, "rain.mp3")):
+            print(f"no rain.mp3 in {music_dir}, {ct.name} will have no music")
+            return "", ""
         return "rain.mp3", "Rain"
     
     genre = "lofi"
     album = "18. Moonwalk"
 
-    files = os.listdir(os.path.join(base_dir, "music", genre, album))
+    album_dir = os.path.join(music_dir, genre, album)
+    if not os.path.isdir(album_dir):
+        print(f"no music at {album_dir}, {ct.name} will have no music")
+        return "", ""
+
+    files = os.listdir(album_dir)
     
     # Filter the files to only include .wav files
     wav_files = [f for f in files if f.endswith('.wav')]
+    if not wav_files:
+        print(f"no .wav files in {album_dir}, {ct.name} will have no music")
+        return "", ""
     
     # Choose a random .wav file
     choice = random.choice(wav_files).replace('.wav', '')
     
     return f"lofi/18. Moonwalk/{choice}.wav", f"{choice} - Moonwalk - StreamBeats by Harris Heller"
+
+
+# music_credit returns the "🎵 track" line for post text, after a blank line,
+# or nothing if there's no music
+def music_credit(music_name: str) -> str:
+    return f"\n\n🎵 {music_name}" if music_name else ""

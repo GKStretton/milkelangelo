@@ -20,7 +20,7 @@ def buildLongform(base_dir: str, n_str: str) -> pb.ContentTypeStatus:
     s.posts.append(pb.Post(
         platform=platform,
         title=f"{n_str} - {s.raw_title} - Robotic Art Generation Long Cut",
-        description=f"{s.raw_description}\n\n{get_hashtags(ct, platform)}\n\n{get_common_text(ct, platform)}\n\n🎵 {music_name}",
+        description=f"{s.raw_description}\n\n{get_hashtags(ct, platform)}\n\n{get_common_text(ct, platform)}{music_credit(music_name)}",
         crosspost=False,
         scheduled_unix_timetamp=get_schedule_timestamp(ct),
     ))

@@ -12,6 +12,9 @@ services:
     user: "1000:1000"
     volumes:
       - ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}:${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
+    environment:
+      # where the storage is mounted above; the tools default to it
+      LIGHT_STORES_DIR: ${LIGHT_STORES_DIR:-/mnt/md0/light-stores/}
     restart: always
   rtsp:
     build: rtsp

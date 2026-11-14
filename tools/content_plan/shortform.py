@@ -19,7 +19,7 @@ def buildShortform(base_dir: str, n_str: str) -> pb.ContentTypeStatus:
     s.posts.append(pb.Post(
         platform=platform,
         title=append_title_hashtags(f"{n_str}: {s.raw_title}", ct, platform),
-        description=f"{get_hashtags(ct, platform)}\n\n{s.raw_description}\n\n{get_common_text(ct, platform)}\n\n🎵 {music_name}",
+        description=f"{get_hashtags(ct, platform)}\n\n{s.raw_description}\n\n{get_common_text(ct, platform)}{music_credit(music_name)}",
         crosspost=False,
         scheduled_unix_timetamp=get_schedule_timestamp(ct),
     ))
@@ -36,7 +36,7 @@ def buildShortform(base_dir: str, n_str: str) -> pb.ContentTypeStatus:
     platform = pb.SocialPlatform.SOCIAL_PLATFORM_INSTAGRAM
     s.posts.append(pb.Post(
         platform=platform,
-        title=f"{n_str}: {s.raw_title}\n\n{s.raw_description}\n\n{get_common_text(ct, platform)}\n\n🎵 {music_name}\n\n{get_hashtags(ct, platform)}",
+        title=f"{n_str}: {s.raw_title}\n\n{s.raw_description}\n\n{get_common_text(ct, platform)}{music_credit(music_name)}\n\n{get_hashtags(ct, platform)}",
         description="N/A",
         crosspost=False,
         scheduled_unix_timetamp=get_schedule_timestamp(ct),

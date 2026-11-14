@@ -16,7 +16,7 @@ def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--base-dir", action="store",
                         help=("base directory containing session_content and session_metadata"),
-                        default="/mnt/md0/light-stores")
+                        default=os.environ.get("LIGHT_STORES_DIR", "/mnt/md0/light-stores"))
     parser.add_argument("-n", "--session-number", action="store",
                         help="session number e.g. 5", required=True)
 

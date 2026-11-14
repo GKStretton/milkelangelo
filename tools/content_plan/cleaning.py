@@ -19,7 +19,7 @@ def buildCleaning(base_dir: str, n_str: str, unlisted: bool = False) -> pb.Conte
     s.posts.append(pb.Post(
         platform=platform,
         title=append_title_hashtags(f"{n_str} (end): {s.raw_title}", ct, platform),
-        description=f"{get_hashtags(ct, platform)}\n\n{s.raw_description}\n\n{get_common_text(ct, platform)}\n\n🎵 {music_name}",
+        description=f"{get_hashtags(ct, platform)}\n\n{s.raw_description}\n\n{get_common_text(ct, platform)}{music_credit(music_name)}",
         crosspost=False,
         scheduled_unix_timetamp=get_schedule_timestamp(ct),
         unlisted=unlisted,

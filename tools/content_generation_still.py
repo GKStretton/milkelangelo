@@ -5,6 +5,8 @@ from datetime import datetime
 import os
 from pathlib import Path
 
+import numpy as np
+from PIL import Image
 from moviepy.editor import ImageClip, CompositeVideoClip, TextClip
 from videoediting.compositor_helpers import (
     build_subtitle,
@@ -13,6 +15,16 @@ from videoediting.compositor_helpers import (
 )
 from videoediting import loaders
 from videoediting.constants import Format, MAIN_FONT, PIXEL_FONT
+
+# height in pixels of the generated still
+OUTPUT_HEIGHT = 2160
+
+# text sizes and margin from the edges, as fractions of the output height.
+# Chosen so the text stays in the black corners outside the vignette.
+NUMBER_SIZE = 0.07
+TITLE_SIZE = 0.035
+DATE_SIZE = 0.02
+MARGIN = 0.015
 
 
 def ts_to_date_time(timestamp):
@@ -31,7 +43,7 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--base-dir", action="store",
                         help=(
                             "base directory containing session_content and session_metadata"),
-                        default="/mnt/md0/light-stores")
+                        default=os.environ.get("LIGHT_STORES_DIR", "/mnt/md0/light-stores"))
     parser.add_argument("-n", "--session-number", action="store",
                         help="session number e.g. 5", required=True)
     args = parser.parse_args()
@@ -43,42 +55,31 @@ if __name__ == "__main__":
 
     duration = 1
 
+    # upscale the frame to a fixed output height, so the text is rendered
+    # crisply and the layout looks the same whatever the camera resolution
     still_img = loaders.get_selected_still_image(base_dir, session_number)
+    src_h, src_w = still_img.shape[:2]
+    h = OUTPUT_HEIGHT
+    w = round(src_w * h / src_h)
+    still_img = np.array(Image.fromarray(still_img).resize((w, h), Image.LANCZOS))
+
     date_time = ts_to_date_time(loaders.get_selected_still_timestamp(base_dir, session_number))
     still_clip = ImageClip(still_img).with_duration(duration)
-    w, h = still_clip.size
 
-    align_x, align_y = -1080, -350
+    margin = round(MARGIN * h)
 
-    title = TextClip(
-        "Milkelangelo",
-        size=(1180, 300),
-        font_size=120,
-        color='white',
-        font=MAIN_FONT,
-    ).with_duration(duration).with_position((w + align_x, h + align_y))
+    def text(s: str, size: float) -> TextClip:
+        return TextClip(s, font_size=round(size * h), color='white', font=MAIN_FONT).with_duration(duration)
 
-    date = (
-        TextClip(
-            date_time,
-            size=(1180, 300),
-            font_size=70,
-            color='white',
-            font=MAIN_FONT,
-        )
-        .with_duration(duration)
-        .with_position((w + align_x, h + align_y + 130))
-    )
-
+    # session number in the top left
     session_number_text = f"#{metadata['production_id']}" if metadata['production'] else f"dev#{metadata['id']}"
-    session_number_clip = TextClip(
-        session_number_text,
-        size=(800, 200),
-        font_size=200,
-        color='white',
-        font=MAIN_FONT,
-        align='west'
-    ).with_duration(duration).with_position((30, 50))
+    session_number_clip = text(session_number_text, NUMBER_SIZE).with_position((margin, margin))
+
+    # title with the date under it, right aligned in the bottom right
+    title = text("Milkelangelo", TITLE_SIZE)
+    date = text(date_time, DATE_SIZE)
+    date = date.with_position((w - margin - date.w, h - margin - date.h))
+    title = title.with_position((w - margin - title.w, h - margin - date.h - title.h))
 
     clip = CompositeVideoClip([
         still_clip,
