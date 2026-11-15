@@ -16,11 +16,18 @@ import (
 	"google.golang.org/api/youtube/v3"
 )
 
+// RefreshYoutubeCreds runs the interactive oauth flow and caches the token.
 func RefreshYoutubeCreds() {
-	newYoutubeManager()
+	createYoutubeManager(true)
 }
 
+// newYoutubeManager returns nil if there are no cached credentials; run with
+// -yt to generate them.
 func newYoutubeManager() platformManager {
+	return createYoutubeManager(false)
+}
+
+func createYoutubeManager(interactive bool) platformManager {
 	ctx := context.Background()
 
 	b, err := os.ReadFile(filepath.Join(filesystem.GetKeyValueStorePath(), "youtube_client_secret.json"))
@@ -36,7 +43,11 @@ func newYoutubeManager() platformManager {
 		fmt.Printf("Unable to parse client secret file to config: %v\n", err)
 		return nil
 	}
-	client := getYoutubeHttpClient(ctx, config)
+	client, err := getYoutubeHttpClient(ctx, config, interactive)
+	if err != nil {
+		fmt.Printf("Unable to get youtube credentials: %v\n", err)
+		return nil
+	}
 	service, err := youtube.NewService(ctx, option.WithHTTPClient(client))
 
 	err = handleYoutubeError(err, "Error creating YouTube client")
@@ -56,15 +67,18 @@ type youtubeManager struct {
 
 // getYoutubeHttpClient uses a Context and Config to retrieve a Token
 // then generate a Client. It returns the generated Client.
-func getYoutubeHttpClient(ctx context.Context, config *oauth2.Config) *http.Client {
+func getYoutubeHttpClient(ctx context.Context, config *oauth2.Config, interactive bool) (*http.Client, error) {
 	cacheFile := filepath.Join(filesystem.GetKeyValueStorePath(), "youtube-credentials-cache.json")
 
 	tok, err := youtubeTokenFromFile(cacheFile)
 	if err != nil {
+		if !interactive {
+			return nil, fmt.Errorf("no cached token at %s (run with -yt to create one): %v", cacheFile, err)
+		}
 		tok = getYoutubeTokenFromWeb(config)
 		saveYoutubeToken(cacheFile, tok)
 	}
-	return config.Client(ctx, tok)
+	return config.Client(ctx, tok), nil
 }
 
 // getYoutubeTokenFromWeb uses Config to request a Token.
