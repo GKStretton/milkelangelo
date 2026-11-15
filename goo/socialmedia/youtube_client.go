@@ -23,7 +23,7 @@ func RefreshYoutubeCreds() {
 func newYoutubeManager() platformManager {
 	ctx := context.Background()
 
-	b, err := os.ReadFile(filepath.Join(filesystem.GetBasePath(), "kv", "youtube_client_secret.json"))
+	b, err := os.ReadFile(filepath.Join(filesystem.GetKeyValueStorePath(), "youtube_client_secret.json"))
 	if err != nil {
 		fmt.Printf("Unable to read client secret file: %v\n", err)
 		return nil
@@ -57,7 +57,7 @@ type youtubeManager struct {
 // getYoutubeHttpClient uses a Context and Config to retrieve a Token
 // then generate a Client. It returns the generated Client.
 func getYoutubeHttpClient(ctx context.Context, config *oauth2.Config) *http.Client {
-	cacheFile := filepath.Join(filesystem.GetBasePath(), "kv", "youtube-credentials-cache.json")
+	cacheFile := filepath.Join(filesystem.GetKeyValueStorePath(), "youtube-credentials-cache.json")
 
 	tok, err := youtubeTokenFromFile(cacheFile)
 	if err != nil {

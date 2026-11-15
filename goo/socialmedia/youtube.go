@@ -5,8 +5,10 @@ package socialmedia
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/gkstretton/asol-protos/go/machinepb"
+	"github.com/gkstretton/dark/services/goo/filesystem"
 	"google.golang.org/api/youtube/v3"
 )
 
@@ -77,7 +79,7 @@ func TestYoutubeClient() {
 		Type:              VideoPost,
 		Title:             "api test title",
 		Description:       "api test desc",
-		ContentFilePath:   "/mnt/md0/light-stores/session_content/latest_production/video/post/CONTENT_TYPE_SHORTFORM-overlay.0.mp4",
+		ContentFilePath:   filepath.Join(filesystem.GetBasePath(), "session_content/latest_production/video/post/CONTENT_TYPE_SHORTFORM-overlay.0.mp4"),
 		ThumbnailFilePath: "",
 		Unlisted:          true,
 	})

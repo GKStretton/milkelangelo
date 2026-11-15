@@ -3,15 +3,19 @@ package socialmedia
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	// This api is great!!!
 	// https://github.com/Davincible/goinsta/wiki/01.-Getting-Started
 	"github.com/Davincible/goinsta/v3"
+	"github.com/gkstretton/dark/services/goo/filesystem"
 )
 
-const path = "/mnt/md0/light-stores/kv/.goinsta"
+func goinstaConfigPath() string {
+	return filepath.Join(filesystem.GetKeyValueStorePath(), ".goinsta")
+}
 
 type instagramManager struct {
 	i *goinsta.Instagram
@@ -57,6 +61,7 @@ func (m *instagramManager) Upload(req *UploadRequest) (string, error) {
 }
 
 func newInstagramManager() platformManager {
+	path := goinstaConfigPath()
 	insta, err := goinsta.Import(path)
 	if err != nil {
 		fmt.Printf("failed to load goinsta config: %v\n", err)
@@ -108,5 +113,5 @@ func instaLogin() {
 	// it's useful when you want use goinsta repeatedly.
 	// Export is deffered because every run insta should be exported at the end of the run
 	//   as the header cookies change constantly.
-	defer insta.Export(".goinsta")
+	defer insta.Export(goinstaConfigPath())
 }
