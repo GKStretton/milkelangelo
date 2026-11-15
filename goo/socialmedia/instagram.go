@@ -1,6 +1,8 @@
 package socialmedia
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,6 +13,7 @@ import (
 	// https://github.com/Davincible/goinsta/wiki/01.-Getting-Started
 	"github.com/Davincible/goinsta/v3"
 	"github.com/gkstretton/dark/services/goo/filesystem"
+	"golang.org/x/term"
 )
 
 func goinstaConfigPath() string {
@@ -64,7 +67,7 @@ func newInstagramManager() platformManager {
 	path := goinstaConfigPath()
 	insta, err := goinsta.Import(path)
 	if err != nil {
-		fmt.Printf("failed to load goinsta config: %v\n", err)
+		fmt.Printf("failed to load goinsta config '%s': %v\n", path, err)
 		return nil
 	}
 	defer insta.Export(path)
@@ -98,20 +101,55 @@ func getInstagramUrlFromMediaId(mediaID string) (string, error) {
 	return "https://www.instagram.com/p/" + shortenedID + "/", nil
 }
 
-// only needed to generate initial config
-func instaLogin() {
-	insta := goinsta.New("astudyoflight_", "[password]")
+const defaultInstagramUsername = "astudyoflight_"
 
-	// Only call Login the first time you login. Next time import your config
-	if err := insta.Login(); err != nil {
-		panic(err)
+// RefreshInstagramCreds logs in interactively (username, password, and 2FA code
+// if required) and saves the session to the kv store for newInstagramManager.
+func RefreshInstagramCreds() {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Printf("Instagram username [%s]: ", defaultInstagramUsername)
+	username, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf("failed to read username: %v\n", err)
+		return
+	}
+	username = strings.TrimSpace(username)
+	if username == "" {
+		username = defaultInstagramUsername
 	}
 
-	// Export your configuration
-	// after exporting you can use Import function instead of New function.
-	// insta, err := goinsta.Import("~/.goinsta")
-	// it's useful when you want use goinsta repeatedly.
-	// Export is deffered because every run insta should be exported at the end of the run
-	//   as the header cookies change constantly.
-	defer insta.Export(goinstaConfigPath())
+	fmt.Print("Instagram password: ")
+	pw, err := term.ReadPassword(int(os.Stdin.Fd()))
+	fmt.Println()
+	if err != nil {
+		fmt.Printf("failed to read password: %v\n", err)
+		return
+	}
+
+	insta := goinsta.New(username, string(pw))
+	err = insta.Login()
+	if errors.Is(err, goinsta.Err2FARequired) {
+		fmt.Print("2FA code: ")
+		code, rerr := reader.ReadString('\n')
+		if rerr != nil {
+			fmt.Printf("failed to read 2FA code: %v\n", rerr)
+			return
+		}
+		err = insta.TwoFactorInfo.Login2FA(strings.TrimSpace(code))
+	}
+	if errors.Is(err, goinsta.ErrChallengeRequired) || errors.Is(err, goinsta.ErrCheckpointRequired) {
+		fmt.Println("Instagram wants verification: approve the login in the Instagram app (\"This was me\"), then run -insta again.")
+	}
+	if err != nil {
+		fmt.Printf("instagram login failed: %v\n", err)
+		return
+	}
+
+	path := goinstaConfigPath()
+	if err := insta.Export(path); err != nil {
+		fmt.Printf("failed to save instagram session to %s: %v\n", path, err)
+		return
+	}
+	fmt.Printf("Saved instagram session to %s\n", path)
 }

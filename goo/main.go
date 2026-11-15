@@ -28,6 +28,7 @@ import (
 var (
 	test                      = flag.Bool("test", false, "if true, just run test code")
 	refreshYoutubeCredentials = flag.Bool("yt", false, "if true, refresh youtube credentials")
+	refreshInstaCredentials   = flag.Bool("insta", false, "if true, log in to instagram and save the session")
 )
 
 func main() {
@@ -37,6 +38,11 @@ func main() {
 
 	if *refreshYoutubeCredentials {
 		socialmedia.RefreshYoutubeCreds()
+		return
+	}
+
+	if *refreshInstaCredentials {
+		socialmedia.RefreshInstagramCreds()
 		return
 	}
 
